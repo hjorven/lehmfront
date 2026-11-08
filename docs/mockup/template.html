@@ -1,0 +1,1114 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lehmfront – UI-Mockup</title>
+<style>
+/*FONTS*/
+
+/* ---------- Grundtoken (Stil: Generalstabskarte) ---------- */
+:root{
+  --paper:#efe6cf; --card:#f8f2e3; --ink:#2a2420; --ink2:#6e6253; --line:#8a7d66; --track:#d9cfb6;
+  --own:#1f4e9c; --enemy:#a3271f; --accent:#c99a1a; --danger:#a3271f;
+  --font-ui:"IBM Plex Sans",system-ui,sans-serif; --font-head:"Special Elite","Courier New",monospace; --font-num:"IBM Plex Mono",monospace;
+  --radius:3px; --border:1px solid var(--line); --shadow:0 1px 2px rgba(40,30,10,.18);
+  --top:14px; --card-pad:8px 10px;
+  --t-lehm:#c9b184; --t-wald:#8a9a66; --t-wiese:#bfc290; --t-gleis:#a39a84; --bld:#d9cfb6; --bld-side:#9c8f72;
+}
+
+/* Blaupause */
+body[data-style=blaupause]{
+  --paper:#10306b; --card:rgba(255,255,255,.05); --ink:#e8f0ff; --ink2:#a7c0ef; --line:#a7c0ef; --track:#2b4f99;
+  --own:#ffffff; --enemy:#ffb347; --accent:#ffd86b; --danger:#ffb347;
+  --font-head:"Architects Daughter",cursive; --font-ui:"IBM Plex Sans",sans-serif; --font-num:"IBM Plex Mono",monospace;
+  --radius:0; --border:1px dashed var(--line); --shadow:none;
+  --t-lehm:#1b3f82; --t-wald:#24508f; --t-wiese:#17397a; --t-gleis:#2c54a0; --bld:#9db8ee; --bld-side:#5d7fc4;
+}
+body[data-style=blaupause] .screen{background-image:linear-gradient(rgba(255,255,255,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.06) 1px,transparent 1px);background-size:40px 40px}
+body[data-style=blaupause] .btn.primary{background:#fff;color:#10306b;border-color:#fff}
+body[data-style=blaupause] .k,body[data-style=blaupause] .tool span{text-transform:uppercase;letter-spacing:.08em}
+
+/* Feldtelegramm */
+body[data-style=telegramm]{
+  --paper:#f3efe3; --card:#fbf9f2; --ink:#141414; --ink2:#555; --line:#141414; --track:#ddd6c4;
+  --own:#141414; --enemy:#8b1a1a; --accent:#8b1a1a; --danger:#8b1a1a;
+  --font-ui:"Special Elite","Courier New",monospace; --font-head:"Special Elite",monospace; --font-num:"Special Elite",monospace;
+  --radius:0; --border:2px solid var(--ink); --shadow:none;
+  --t-lehm:#e2dbc6; --t-wald:#bdb79f; --t-wiese:#ece7d6; --t-gleis:#cfc8b3; --bld:#fbf9f2; --bld-side:#8c8778;
+}
+body[data-style=telegramm] .round{position:relative}
+body[data-style=telegramm] .round:after{content:"EILT";position:absolute;right:-14px;top:-14px;transform:rotate(-10deg);border:2px solid var(--enemy);color:var(--enemy);padding:1px 6px;font:700 11px var(--font-head);letter-spacing:.1em;background:var(--card)}
+body[data-style=telegramm] .btn.primary{background:var(--ink);color:#f3efe3}
+
+/* Nacht */
+body[data-style=nacht]{
+  --paper:#0b0d0a; --card:#15180f; --ink:#d8d2b8; --ink2:#8f8a73; --line:#3a3f2c; --track:#262a1e;
+  --own:#7fa4e6; --enemy:#e2645a; --accent:#ffbf47; --danger:#e2645a;
+  --radius:4px; --border:1px solid var(--line); --shadow:0 2px 6px rgba(0,0,0,.6);
+  --t-lehm:#1c1f16; --t-wald:#161d12; --t-wiese:#191d13; --t-gleis:#23261c; --bld:#3a3f2c; --bld-side:#1f2318;
+}
+body[data-style=nacht] .btn.primary{background:var(--accent);color:#0b0d0a;border-color:var(--accent)}
+body[data-style=nacht] .bar i{background:var(--accent)}
+
+/* Sandkasten */
+body[data-style=sandkasten]{
+  --paper:#cbb48a; --card:#f4ead2; --ink:#2c2015; --ink2:#6b5a44; --line:#8c7757; --track:#d8c9a6;
+  --own:#1b4d8f; --enemy:#b0362a; --accent:#e0b23a; --danger:#b0362a;
+  --font-head:"Stardos Stencil",sans-serif; --font-ui:"IBM Plex Sans",sans-serif; --font-num:"IBM Plex Mono",monospace;
+  --radius:2px; --border:1px solid var(--line); --shadow:0 3px 5px rgba(40,25,5,.35);
+  --t-lehm:#c9ad7b; --t-wald:#7e8a52; --t-wiese:#b8b57c; --t-gleis:#a08f6c; --bld:#e9dcb8; --bld-side:#a08b62;
+}
+body[data-style=sandkasten] .screen{border:18px solid #5a3a1c;border-image:repeating-linear-gradient(90deg,#6b4423 0 7px,#5a3a1c 7px 15px,#75502b 15px 19px) 18;box-shadow:inset 0 0 60px rgba(0,0,0,.35)}
+body[data-style=sandkasten] .cards .card{position:relative}
+body[data-style=sandkasten] .card:before{content:"";position:absolute;left:50%;top:-6px;width:11px;height:11px;margin-left:-5px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#e7675a,#8e1f16);box-shadow:0 1px 2px rgba(0,0,0,.5)}
+body[data-style=sandkasten] .cards.tl .card:nth-child(odd){transform:rotate(-1.2deg)}
+body[data-style=sandkasten] .cards.tl .card:nth-child(even){transform:rotate(.9deg)}
+body[data-style=sandkasten] .shield{transform:translate(-50%,calc(-100% - 14px)) rotate(-.6deg)}
+body[data-style=sandkasten] .k,body[data-style=sandkasten] .name{text-transform:uppercase;letter-spacing:.05em}
+
+/* Aquarell */
+body[data-style=aquarell]{
+  --paper:#f6f0e2; --card:#fbf7ec; --ink:#3a3330; --ink2:#7a6f66; --line:#cdbfa6; --track:#e6dcc8;
+  --own:#3f6fb0; --enemy:#c45b4a; --accent:#d9a430; --danger:#c45b4a;
+  --font-head:"Caveat",cursive; --font-ui:"Old Standard TT",serif; --font-num:"IBM Plex Mono",monospace;
+  --radius:6px; --border:0 solid transparent; --shadow:0 2px 8px rgba(60,40,20,.18);
+  --t-lehm:#e0cfae; --t-wald:#a9b98a; --t-wiese:#d6d8b4; --t-gleis:#c9bfa6; --bld:#f1e8d3; --bld-side:#b8a988;
+}
+body[data-style=aquarell] .screen{background-image:radial-gradient(ellipse at 20% 30%,rgba(120,150,190,.18),transparent 45%),radial-gradient(ellipse at 75% 70%,rgba(190,120,90,.16),transparent 40%),radial-gradient(ellipse at 60% 20%,rgba(150,170,110,.14),transparent 35%)}
+body[data-style=aquarell] .card{border-radius:14px 5px 12px 6px / 6px 12px 5px 14px;box-shadow:0 2px 8px rgba(60,40,20,.18),inset 0 0 0 1px rgba(120,100,70,.18);background-image:radial-gradient(ellipse at 80% 20%,rgba(150,170,200,.12),transparent 55%)}
+body[data-style=aquarell] .btn,body[data-style=aquarell] .tool{border-radius:10px 4px 9px 5px / 5px 9px 4px 10px;box-shadow:0 2px 6px rgba(60,40,20,.16),inset 0 0 0 1px rgba(120,100,70,.18)}
+body[data-style=aquarell] .shield:after{display:none}
+body[data-style=aquarell] .name,body[data-style=aquarell] .round .t,body[data-style=aquarell] .telegram .head{font-size:19px}
+body[data-style=aquarell] .btn.primary{background:var(--own);border-color:var(--own)}
+
+/* Moderner HUD */
+body[data-style=hud]{
+  --paper:#e9ecef; --card:#ffffff; --ink:#111418; --ink2:#5c636b; --line:#cfd4da; --track:#e3e6ea;
+  --own:#1d5bd8; --enemy:#d13b2e; --accent:#e6a700; --danger:#d13b2e;
+  --font-head:"IBM Plex Sans",sans-serif; --font-ui:"IBM Plex Sans",sans-serif; --font-num:"IBM Plex Mono",monospace;
+  --radius:8px; --border:1px solid var(--line); --shadow:0 1px 2px rgba(0,0,0,.06);
+  --t-lehm:#d9d4c5; --t-wald:#b9c9b0; --t-wiese:#dfe3d2; --t-gleis:#c4c9cf; --bld:#ffffff; --bld-side:#aab1b9;
+}
+body[data-style=hud] .cards.tl{flex-direction:column;flex-wrap:nowrap;bottom:90px;max-width:210px}
+body[data-style=hud] .cards.tl .card{width:100%}
+body[data-style=hud] .hint{left:238px;top:14px}
+body[data-style=hud] .name{font-weight:700}
+body[data-style=hud] .btn.primary{background:var(--own);border-color:var(--own)}
+
+/* Linolschnitt */
+body[data-style=linolschnitt]{
+  --paper:#e8dcc3; --card:#f3ead6; --ink:#141010; --ink2:#4a4040; --line:#141010; --track:#d6c9ab;
+  --own:#141010; --enemy:#c8321e; --accent:#c8321e; --danger:#c8321e;
+  --font-head:"Bebas Neue",sans-serif; --font-ui:"Oswald",sans-serif; --font-num:"Oswald",sans-serif;
+  --radius:0; --border:3px solid var(--ink); --shadow:5px 5px 0 var(--ink);
+  --t-lehm:#dccaa6; --t-wald:#141010; --t-wiese:#e8dcc3; --t-gleis:#b7a888; --bld:#f3ead6; --bld-side:#141010;
+}
+body[data-style=linolschnitt] .name,body[data-style=linolschnitt] .round .t,body[data-style=linolschnitt] .telegram .head,body[data-style=linolschnitt] .k{font-family:var(--font-head);font-size:19px;letter-spacing:.04em}
+body[data-style=linolschnitt] .k{font-size:13px}
+body[data-style=linolschnitt] .btn.primary{background:var(--enemy);border-color:var(--ink);color:#fff}
+body[data-style=linolschnitt] .bar i{background:var(--enemy)}
+
+/* Kriegsraum */
+body[data-style=kriegsraum]{
+  --paper:#1f3a2e; --card:#23463a; --ink:#e6e1d3; --ink2:#a9b7a6; --line:#6f9480; --track:#345a4b;
+  --own:#f2e8c8; --enemy:#ff8a65; --accent:#ffd166; --danger:#ff8a65;
+  --font-head:"Oswald",sans-serif; --font-ui:"IBM Plex Sans",sans-serif; --font-num:"IBM Plex Mono",monospace;
+  --radius:2px; --border:1px solid var(--line); --shadow:0 2px 4px rgba(0,0,0,.4);
+  --t-lehm:#2b4c3e; --t-wald:#2f5a44; --t-wiese:#28463a; --t-gleis:#365a4b; --bld:#6f9480; --bld-side:#3c6552;
+}
+body[data-style=kriegsraum] .screen{background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);background-size:60px 60px}
+body[data-style=kriegsraum] .name,body[data-style=kriegsraum] .round .t,body[data-style=kriegsraum] .k{text-transform:uppercase;letter-spacing:.08em}
+body[data-style=kriegsraum] .btn.primary{background:var(--accent);color:#1f3a2e;border-color:var(--accent)}
+
+/* Zeitungsdruck */
+body[data-style=zeitung]{
+  --paper:#f1ead8; --card:#f6f1e2; --ink:#1a1a1a; --ink2:#5a5a5a; --line:#1a1a1a; --track:#ddd6c2;
+  --own:#1a1a1a; --enemy:#1a1a1a; --accent:#1a1a1a; --danger:#1a1a1a;
+  --font-head:"Playfair Display",serif; --font-ui:"Old Standard TT",serif; --font-num:"Old Standard TT",serif;
+  --radius:0; --border:1px solid var(--ink); --shadow:none; --top:66px;
+  --t-lehm:#e4dcc6; --t-wald:#9a9a9a; --t-wiese:#ece6d4; --t-gleis:#c8c2b0; --bld:#f6f1e2; --bld-side:#7a7a7a;
+}
+body[data-style=zeitung] .card{border-left:0;border-right:0;border-top:3px double var(--ink);border-bottom:1px solid var(--ink)}
+body[data-style=zeitung] .screen:before{content:"Lehmfront";position:absolute;left:0;right:0;top:0;height:52px;z-index:3;text-align:center;font:700 36px/50px "UnifrakturCook",serif;border-bottom:3px double var(--ink);background:var(--paper);color:var(--ink)}
+body[data-style=zeitung] .screen:after{content:"";position:absolute;inset:0;pointer-events:none;background-image:radial-gradient(rgba(0,0,0,.12) 0.7px,transparent 0.8px);background-size:3px 3px;mix-blend-mode:multiply}
+body[data-style=zeitung] #map{filter:grayscale(1) contrast(1.15)}
+body[data-style=zeitung] .hint{top:200px}
+
+body[data-style=zeitung] .btn.primary{background:var(--ink);color:#f1ead8}
+body[data-style=zeitung] .name{font-style:italic}
+
+/* ---------- Grundlayout ---------- */
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{background:var(--paper);color:var(--ink);font-family:var(--font-ui);font-size:14px;line-height:1.35;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit}
+
+.mockbar{position:fixed;left:0;right:0;top:0;z-index:50;display:flex;gap:6px;flex-wrap:wrap;align-items:center;padding:8px 12px;background:#111;color:#eee;font:12px/1.2 "IBM Plex Sans",sans-serif}
+.mockbar b{margin-right:4px;opacity:.7}
+.mockbar button{background:#222;border:1px solid #444;color:#eee;padding:4px 9px;border-radius:3px;cursor:pointer}
+.mockbar button.on{background:#eee;color:#111;border-color:#eee}
+.mockbar .sep{width:1px;height:18px;background:#444;margin:0 6px}
+body.shot .mockbar{display:none}
+
+.screen{position:relative;height:100vh;min-height:620px;overflow:hidden;display:none;background:var(--paper)}
+body[data-view=battle] .screen{display:block}
+.features{display:none;padding:28px 28px 60px;max-width:1440px;margin:0 auto}
+body:not(.shot)[data-view=features] .features{padding-top:70px}
+body[data-view=features] .features{display:block}
+
+#map{position:absolute;inset:0;width:100%;height:100%;display:block}
+.hud{position:absolute;inset:0;pointer-events:none;z-index:4}
+.hud>*{pointer-events:auto}
+.card{background:var(--card);border:var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:var(--card-pad);color:var(--ink)}
+.cards{position:absolute;display:flex;gap:8px;flex-wrap:wrap;align-items:flex-start}
+.cards.tl{left:14px;top:var(--top);max-width:600px}
+.cards.tr{right:14px;top:var(--top);justify-content:flex-end;max-width:380px}
+.res{min-width:92px}
+.k{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink2)}
+.v{font:700 20px/1.1 var(--font-num);margin-top:2px}
+.v small{font-size:12px;font-weight:400;color:var(--ink2)}
+.axes{min-width:230px}
+.axes .row{display:flex;justify-content:space-between;font-size:12px;margin-top:4px}
+.axes .row b{font-family:var(--font-num)}
+.bar{height:6px;background:var(--track);border-radius:3px;overflow:hidden;margin-top:3px}
+.bar i{display:block;height:100%;background:var(--own)}
+.bar.trust i{background:var(--accent)}
+.round .t{font-family:var(--font-head);font-size:15px}
+.round .s{font-size:12px;color:var(--ink2);margin-top:2px}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:8px 12px;background:var(--card);border:var(--border);border-radius:var(--radius);box-shadow:var(--shadow);font:600 13px var(--font-ui);color:var(--ink);cursor:pointer}
+.btn .n{font-family:var(--font-num);font-weight:700}
+.btn.primary{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.hint{position:absolute;left:14px;top:calc(var(--top) + 150px);border-left:4px solid var(--danger);max-width:230px;font-size:12.5px}
+.hint b{display:block;font-family:var(--font-head);font-size:13px;margin-bottom:2px}
+.shield{position:absolute;min-width:190px;transform:translate(-50%,calc(-100% - 14px))}
+.shield:after{content:"";position:absolute;left:50%;bottom:-8px;width:14px;height:14px;background:var(--card);border-right:var(--border);border-bottom:var(--border);transform:translateX(-50%) rotate(45deg)}
+.shield .name{font-family:var(--font-head);font-size:15px;margin-bottom:5px;display:flex;justify-content:space-between;gap:12px}
+.shield .name small{font:12px var(--font-ui);color:var(--ink2)}
+.shield .row{display:flex;justify-content:space-between;gap:12px;font-size:12.5px;margin-top:2px}
+.shield .row b{font-family:var(--font-num);font-weight:600}
+.shield .order{margin-top:7px;padding-top:6px;border-top:1px dashed var(--line);font-size:12px;color:var(--ink2);display:flex;justify-content:space-between}
+.shield .order em{font-style:normal;color:var(--ink)}
+.toolbar{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);display:flex;gap:6px;align-items:stretch}
+.tool{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:66px;padding:6px 8px 5px;background:var(--card);border:var(--border);border-radius:var(--radius);box-shadow:var(--shadow);cursor:pointer}
+.tool svg{width:22px;height:22px;stroke:var(--ink);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tool span{font-size:11.5px}
+.tool kbd{font:10px var(--font-num);color:var(--ink2)}
+.tool.active{outline:2px solid var(--accent);outline-offset:-2px}
+.execute{position:absolute;right:14px;bottom:14px;padding:12px 16px;font-size:14px}
+.telegram{position:absolute;right:14px;bottom:72px;width:300px;padding:0;overflow:hidden}
+.telegram .head{padding:8px 10px;border-bottom:var(--border);font-family:var(--font-head);display:flex;justify-content:space-between;font-size:13px}
+.telegram ul{list-style:none;margin:0;padding:4px 0}
+.telegram li{padding:6px 10px;border-bottom:1px dotted var(--line);font-size:12.5px;cursor:pointer;border-left:3px solid transparent}
+.telegram li:last-child{border-bottom:0}
+.telegram li .why{display:block;color:var(--ink2);font-size:11.5px;margin-top:1px}
+.telegram li.bad{border-left-color:var(--danger)}
+.telegram li.good{border-left-color:var(--own)}
+.checklist{position:absolute;left:14px;bottom:14px;font-size:12px;min-width:220px}
+.checklist .k{margin-bottom:4px}
+.checklist div{display:flex;gap:8px;align-items:center;padding:2px 0}
+.checklist i{width:8px;height:8px;border-radius:50%;background:var(--danger);display:inline-block;flex:none}
+.checklist i.ok{background:var(--own)}
+
+/* ---------- Features ---------- */
+.features h1{font-family:var(--font-head);font-size:28px;margin:0 0 4px}
+.features .lead{color:var(--ink2);margin:0 0 22px;max-width:820px}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(560px,1fr));gap:22px}
+.feat{display:flex;flex-direction:column;overflow:hidden}
+.feat header{display:flex;gap:12px;align-items:baseline;padding:4px 4px 10px}
+.feat header .num{font:700 22px var(--font-num);color:var(--ink2)}
+.feat header h3{margin:0;font-family:var(--font-head);font-size:17px}
+.feat header p{margin:2px 0 0;color:var(--ink2);font-size:12.5px}
+.demo{position:relative;height:340px;border:var(--border);border-radius:var(--radius);overflow:hidden;background:var(--paper)}
+.demo canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.demo .ctl{position:absolute;left:10px;right:10px;bottom:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;z-index:3}
+.demo .ctl .card{padding:6px 10px;font-size:12px}
+.demo .note{position:absolute;left:10px;top:10px;z-index:3;font-size:12px;max-width:300px}
+.demo .note b{font-family:var(--font-head)}
+.demo .note.warn{border-left:4px solid var(--danger)}
+.demo .note.good{border-left:4px solid var(--own)}
+.sbtn{padding:5px 10px;background:var(--card);border:var(--border);border-radius:var(--radius);font:600 12px var(--font-ui);cursor:pointer}
+.sbtn.primary{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+input[type=range]{accent-color:var(--own)}
+
+/* F1 Etappe 3D */
+.etappe{display:grid;grid-template-columns:1fr 240px}
+.etappe .stage{position:relative;perspective:900px;overflow:hidden;cursor:grab;touch-action:none}
+.etappe .stage:active{cursor:grabbing}
+.etappe .plane{position:absolute;left:50%;top:50%;width:400px;height:250px;margin:-125px 0 0 -200px;transform-style:preserve-3d;transform:rotateX(var(--tilt,55deg)) rotateZ(var(--spin,-20deg));display:grid;grid-template-columns:repeat(8,50px);grid-template-rows:repeat(5,50px)}
+.etappe .tile{position:relative;transform-style:preserve-3d;border:1px solid rgba(0,0,0,.12);background:var(--t-wiese)}
+.etappe .tile.lehm{background:var(--t-lehm)}
+.etappe .tile.wald{background:var(--t-wald)}
+.etappe .tile.gleis{background:var(--t-gleis);background-image:repeating-linear-gradient(90deg,transparent 0 8px,rgba(0,0,0,.25) 8px 10px)}
+.etappe .tile.sel{outline:3px solid var(--accent);outline-offset:-3px;z-index:2}
+.etappe .face{position:absolute;background:var(--bld)}
+.etappe .face.top{inset:7px;transform:translateZ(var(--h))}
+.etappe .face.front{left:7px;right:7px;bottom:7px;height:var(--h);transform-origin:bottom;transform:rotateX(-90deg);background:var(--bld-side)}
+.etappe .face.back{left:7px;right:7px;top:7px;height:var(--h);transform-origin:top;transform:rotateX(90deg);background:var(--bld-side);filter:brightness(.85)}
+.etappe .face.left{left:7px;top:7px;bottom:7px;width:var(--h);transform-origin:left;transform:rotateY(-90deg);background:var(--bld-side);filter:brightness(.75)}
+.etappe .face.right{right:7px;top:7px;bottom:7px;width:var(--h);transform-origin:right;transform:rotateY(90deg);background:var(--bld-side);filter:brightness(.92)}
+.etappe .face.top span{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:700 11px var(--font-num);color:var(--ink)}
+.etappe .tag{position:absolute;left:50%;top:-2px;transform:translate(-50%,-100%) translateZ(var(--h));white-space:nowrap;font:11px var(--font-ui);background:var(--card);border:var(--border);padding:1px 5px;color:var(--ink)}
+.etappe .build{border-left:var(--border);padding:10px 12px;overflow:auto;background:var(--card)}
+.etappe .build h4{margin:0 0 8px;font-family:var(--font-head);font-size:14px}
+.etappe .opts{list-style:none;margin:0;padding:0}
+.etappe .opts li{padding:7px 8px;border:var(--border);border-radius:var(--radius);margin-bottom:6px;font-size:12px;cursor:pointer}
+.etappe .opts li.sel{outline:2px solid var(--accent);outline-offset:-2px}
+.etappe .opts b{display:block;font-size:13px}
+.etappe .opts em{display:block;font-style:normal;color:var(--own)}
+.etappe .opts em.no{color:var(--ink2)}
+.etappe .opts i{display:block;font-style:normal;color:var(--ink2);font-family:var(--font-num);font-size:11px;margin-top:2px}
+.etappe .muted{font-size:11px;color:var(--ink2);margin:6px 0 0}
+
+/* F2 Zeitleiste */
+.timeline .phases{position:absolute;left:10px;right:10px;bottom:46px;display:flex;height:22px;border:var(--border);border-radius:var(--radius);overflow:hidden;background:var(--card);z-index:3}
+.timeline .phases span{display:flex;align-items:center;justify-content:center;font:11px var(--font-ui);border-right:var(--border);color:var(--ink2);white-space:nowrap;overflow:hidden}
+.timeline .phases span.on{background:var(--ink);color:var(--paper)}
+.timeline .phases span:last-child{border-right:0}
+.timeline input{flex:1}
+
+/* F4 Lorenplan */
+.loren{padding:16px 14px;display:flex;flex-direction:column;gap:14px}
+.loren .rail{position:relative;height:118px;border-bottom:3px solid var(--ink);background-image:repeating-linear-gradient(90deg,var(--ink) 0 3px,transparent 3px 16px);background-size:16px 10px;background-repeat:repeat-x;background-position:0 100%}
+.loren .train{position:absolute;left:8px;bottom:12px;display:flex;gap:7px;align-items:flex-end}
+.loren .loco,.loren .wagon{position:relative;width:64px;height:54px;border:2px solid var(--ink);background:var(--card);border-radius:3px 3px 0 0;cursor:pointer;user-select:none}
+.loren .loco{width:62px;height:62px;background:var(--ink);color:var(--paper);display:flex;align-items:flex-end;justify-content:center;font:700 11px var(--font-num);padding-bottom:4px;cursor:default}
+.loren .loco:before{content:"";position:absolute;left:10px;top:-14px;width:16px;height:18px;background:var(--ink)}
+.loren .wheel{position:absolute;bottom:-9px;width:14px;height:14px;border:2px solid var(--ink);border-radius:50%;background:var(--card)}
+.loren .wheel.a{left:8px}.loren .wheel.b{right:8px}
+.loren .wagon .cargo{position:absolute;inset:4px 4px 4px 4px;display:flex;align-items:center;justify-content:center;font:700 13px var(--font-num);border-radius:2px;color:var(--ink)}
+.loren .wagon[data-cargo=mun] .cargo{background:repeating-linear-gradient(45deg,var(--track) 0 6px,transparent 6px 12px)}
+.loren .wagon[data-cargo=ver] .cargo{background:var(--t-wald)}
+.loren .wagon[data-cargo=mat] .cargo{background:var(--t-gleis)}
+.loren .wagon[data-cargo=san] .cargo{background:#fff;color:var(--enemy)}
+.loren .wagon[data-cargo=leer] .cargo{border:1px dashed var(--line);color:var(--ink2);font-weight:400}
+.loren .dest{position:absolute;right:-6px;top:-12px;min-width:22px;height:22px;border-radius:50%;background:var(--ink);color:var(--paper);display:flex;align-items:center;justify-content:center;font:700 11px var(--font-num);cursor:pointer}
+.loren .wagon[data-cargo=san] .dest{background:var(--enemy)}
+.loren .sum{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.loren .sum .card{font-size:12px;padding:6px 8px}
+.loren .sum b{display:block;font-family:var(--font-head);font-size:12px}
+.loren .legend{font-size:11.5px;color:var(--ink2)}
+.loren .stations{position:absolute;left:8px;right:8px;top:4px;display:flex;justify-content:space-between;font:11px var(--font-ui);color:var(--ink2)}
+
+/* F5 Uhr */
+.uhr{display:grid;grid-template-columns:260px 1fr;align-items:center}
+.uhr svg{width:240px;height:240px;margin:0 auto;display:block}
+.uhr .info{padding:14px}
+.uhr .info h4{margin:0 0 4px;font-family:var(--font-head);font-size:16px}
+.uhr .info p{margin:0 0 10px;font-size:12.5px;color:var(--ink2)}
+.uhr .info .big{font:700 30px/1 var(--font-num);margin-bottom:6px}
+.uhr .ring{transition:opacity .5s,transform .6s}
+.uhr .hand{transition:transform .6s}
+
+/* F8 Radial */
+.radial{position:absolute;width:0;height:0;z-index:5}
+.radial .item{position:absolute;left:-30px;top:-30px;width:60px;height:60px;border-radius:50%;background:var(--card);border:var(--border);box-shadow:var(--shadow);display:flex;flex-direction:column;align-items:center;justify-content:center;font:11px var(--font-ui);cursor:pointer;transform:translate(var(--x),var(--y))}
+.radial .item svg{width:18px;height:18px;stroke:var(--ink);fill:none;stroke-width:1.8;stroke-linecap:round}
+.radial .item.hot{background:var(--ink);color:var(--paper)}
+.radial .item.hot svg{stroke:var(--paper)}
+.radial .center{position:absolute;left:-7px;top:-7px;width:14px;height:14px;border-radius:50%;background:var(--accent);border:2px solid var(--ink)}
+
+/* F9 Halten */
+.halten{display:grid;grid-template-columns:1fr 220px;align-items:center;padding:16px}
+.halten .summary{list-style:none;margin:0;padding:0}
+.halten .summary li{display:flex;gap:10px;align-items:center;padding:6px 0;border-bottom:1px dotted var(--line);font-size:13px}
+.halten .summary li i{width:9px;height:9px;border-radius:50%;background:var(--own);flex:none}
+.halten .summary li.warn i{background:var(--danger)}
+.halten .summary li .n{font-family:var(--font-num);font-weight:700;min-width:28px}
+.halten .hold{position:relative;width:170px;height:170px;margin:0 auto;border-radius:50%;background:var(--card);border:var(--border);box-shadow:var(--shadow);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;user-select:none;touch-action:none}
+.halten .hold svg{position:absolute;inset:-6px;width:calc(100% + 12px);height:calc(100% + 12px);transform:rotate(-90deg)}
+.halten .hold circle{fill:none;stroke-width:6;stroke:var(--track)}
+.halten .hold circle.p{stroke:var(--accent);stroke-dasharray:565;stroke-dashoffset:565;transition:stroke-dashoffset .05s linear}
+.halten .hold b{font-family:var(--font-head);font-size:15px;text-align:center}
+.halten .hold small{color:var(--ink2);font-size:11px;margin-top:4px}
+.halten .hold.done{background:var(--ink);color:var(--paper)}
+.halten .hold.done small{color:var(--paper)}
+
+/* F10 Papier */
+.papier{perspective:1200px}
+.papier .sheet{position:absolute;width:260px;padding:16px 18px;background:#fbf7ec;color:#2a2420;box-shadow:0 8px 20px rgba(0,0,0,.25);transform-style:preserve-3d;transition:transform .25s,box-shadow .25s;cursor:pointer;font-size:12.5px}
+.papier .sheet.letter{left:22px;top:28px;transform:rotate(-4deg);font-family:"Caveat",cursive;font-size:17px;line-height:1.25;background:#f7f1e1}
+.papier .sheet.tele{left:190px;top:56px;width:290px;transform:rotate(2deg);font-family:"Special Elite",monospace;background:#f3efe3;border:1px solid #bbb}
+.papier .sheet.tele .form{display:grid;grid-template-columns:1fr 1fr;gap:6px;border-top:1px solid #333;border-bottom:1px solid #333;padding:6px 0;margin:6px 0;font-size:11px}
+.papier .sheet.tele .stamp{position:absolute;right:12px;top:10px;transform:rotate(-14deg);border:3px double #8b1a1a;color:#8b1a1a;padding:2px 8px;font:700 13px "Special Elite";letter-spacing:.1em;opacity:.85}
+.papier .sheet.photo{left:372px;top:26px;width:190px;padding:10px 10px 30px;background:#f4efe4;transform:rotate(5deg);font-family:"Caveat",cursive;font-size:15px}
+.papier .sheet.photo .img{height:140px;background:linear-gradient(160deg,#8d7a5e,#5a4a36 60%,#3b3024);position:relative;overflow:hidden}
+.papier .sheet.photo .img:after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 40%,transparent 50%,rgba(0,0,0,.5))}
+.papier .sheet.photo .img i{position:absolute;bottom:18px;left:20px;right:20px;height:40px;border-top:2px solid rgba(255,255,255,.25)}
+.papier .sheet.front{z-index:4;box-shadow:0 18px 40px rgba(0,0,0,.35)}
+.papier .hintcard{position:absolute;right:12px;bottom:12px;z-index:5;font-size:12px}
+</style>
+</head>
+<body data-style="karte" data-view="battle">
+
+<nav class="mockbar">
+  <b>Stil</b>
+  <button data-set-style="karte" class="on">Generalstabskarte</button>
+  <button data-set-style="blaupause">Blaupause</button>
+  <button data-set-style="telegramm">Feldtelegramm</button>
+  <button data-set-style="nacht">Nacht</button>
+  <button data-set-style="sandkasten">Sandkasten</button>
+  <button data-set-style="aquarell">Aquarell-Tagebuch</button>
+  <button data-set-style="hud">Moderner HUD</button>
+  <button data-set-style="linolschnitt">Linolschnitt</button>
+  <button data-set-style="kriegsraum">Kriegsraum</button>
+  <button data-set-style="zeitung">Zeitungsdruck</button>
+  <span class="sep"></span>
+  <b>Ansicht</b>
+  <button data-set-view="battle" class="on">Gefecht</button>
+  <button data-set-view="features">10 Features</button>
+  <span class="sep"></span>
+  <b>Tageszeit</b>
+  <input type="range" id="daynight" min="0" max="100" value="0" style="width:140px;accent-color:#ffbf47">
+  <span id="daynightLabel" style="min-width:110px">Tag</span>
+</nav>
+
+<!-- ======================= Gefechtsbildschirm ======================= -->
+<section class="screen" id="battle">
+  <canvas id="map"></canvas>
+  <div class="hud">
+    <div class="cards tl">
+      <div class="card res"><div class="k">Loren</div><div class="v">4<small>/6</small></div></div>
+      <div class="card res"><div class="k">Munition</div><div class="v">340</div></div>
+      <div class="card res"><div class="k">Material</div><div class="v">120</div></div>
+      <div class="card res"><div class="k">Moral</div><div class="v">72</div></div>
+      <div class="card axes">
+        <div class="row"><span>Ansehen beim Stab</span><b>61</b></div><div class="bar"><i style="width:61%"></i></div>
+        <div class="row"><span>Vertrauen der Truppe</span><b>48</b></div><div class="bar trust"><i style="width:48%"></i></div>
+      </div>
+    </div>
+
+    <div class="cards tr">
+      <div class="card round"><div class="t">Stellungsrunde 14</div><div class="s" id="roundSub">Tag · Regen · Abschnitt Asse-Nord</div></div>
+      <button class="btn">Befehle <span class="n">7</span></button>
+      <button class="btn">Overlays</button>
+      <button class="btn">Feuerplan</button>
+    </div>
+
+    <div class="card hint"><b>Hinweis</b>Abschnitt B seit 2 Runden ohne Verpflegung. Moral sinkt ab nächster Runde.</div>
+
+    <div class="card shield" id="shield">
+      <div class="name"><span>2. Gruppe</span><small>Gf. Harms</small></div>
+      <div class="row"><span>Stärke</span><b>9 / 12</b></div>
+      <div class="row"><span>Moral</span><b>64</b></div>
+      <div class="row"><span>Munition</span><b>3 Runden</b></div>
+      <div class="row"><span>Erschöpfung</span><b>hoch</b></div>
+      <div class="order"><span>Befehl</span><em>Halten (Standard)</em></div>
+    </div>
+
+    <div class="card telegram">
+      <div class="head"><span>Telegramm · Runde 13</span><span>5 Zeilen</span></div>
+      <ul>
+        <li class="bad">Gruppe 2: 3 Verluste<span class="why">Längsfeuer aus Nordost, Graben ohne Traverse</span></li>
+        <li class="good">Lore 3 zurück mit 2 Verwundeten<span class="why">Verbandsplatz erreicht, Heilung ab Runde 15</span></li>
+        <li class="bad">Leitung zu Batterie 1 durchtrennt<span class="why">Störfeuer bei Feld 31/9, Melder unterwegs</span></li>
+        <li style="color:var(--ink2)">… 2 weitere Zeilen</li>
+      </ul>
+    </div>
+
+    <div class="card checklist">
+      <div class="k">Vor der Runde</div>
+      <div><i></i>Gruppe 5 ohne Befehl</div>
+      <div><i></i>Batterie 1 ohne Leitung</div>
+      <div><i class="ok"></i>Alle Abschnitte erreichbar</div>
+    </div>
+
+    <div class="toolbar">
+      <button class="tool active"><svg viewBox="0 0 24 24"><path d="M4 20l8-8M12 12l3-3M15 9l2.5-2.5a2 2 0 0 1 3 3L18 12M4 20c3 0 5-1 6-3l-3-3c-2 1-3 3-3 6z"/></svg><span>Graben</span><kbd>G</kbd></button>
+      <button class="tool"><svg viewBox="0 0 24 24"><path d="M4 12h12M12 6l6 6-6 6"/><path d="M4 6v12" stroke-dasharray="2 2"/></svg><span>Umbauen</span><kbd>U</kbd></button>
+      <button class="tool"><svg viewBox="0 0 24 24"><path d="M5 19L19 5M19 5h-7M19 5v7"/></svg><span>Bewegen</span><kbd>B</kbd></button>
+      <button class="tool"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="6"/><path d="M12 3v4M12 17v4M3 12h4M17 12h4"/></svg><span>Feuern</span><kbd>F</kbd></button>
+      <button class="tool"><svg viewBox="0 0 24 24"><path d="M3 12h18M6 9l3 6M9 9l-3 6M12 9l3 6M15 9l-3 6M18 9l3 6M21 9l-3 6"/></svg><span>Draht</span><kbd>D</kbd></button>
+      <button class="tool"><svg viewBox="0 0 24 24"><rect x="3" y="8" width="7" height="7"/><rect x="13" y="8" width="7" height="7"/><circle cx="5" cy="18" r="1.5"/><circle cx="8" cy="18" r="1.5"/><circle cx="15" cy="18" r="1.5"/><circle cx="18" cy="18" r="1.5"/><path d="M10 11h3"/></svg><span>Lorenplan</span><kbd>L</kbd></button>
+      <button class="tool"><svg viewBox="0 0 24 24"><circle cx="6" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="18" cy="12" r="1.5"/></svg><span>Mehr</span><kbd>…</kbd></button>
+    </div>
+    <button class="btn primary execute">Runde ausführen <span class="n">7</span></button>
+  </div>
+</section>
+
+<!-- ======================= Features ======================= -->
+<section class="features" id="features">
+  <h1>10 selten genutzte UI-Ideen</h1>
+  <p class="lead">Alles unten ist interaktiv und läuft in jedem der zehn Stile. Es sind Platzhalter: Die Karte ist gezeichnet, nicht simuliert, aber die Bedienidee ist echt.</p>
+  <div class="fgrid">
+
+    <article class="feat" id="f1">
+      <header><span class="num">01</span><div><h3>Etappenfenster mit 3D-Modell</h3><p>Wie das Bau-Fenster in Poly Battle: Ziehen dreht und kippt die Etappe, rechts die Bauoptionen mit Ertragsvorschau samt Nachbarn.</p></div></header>
+      <div class="demo etappe">
+        <div class="stage" id="f1stage"><div class="plane" id="f1plane"></div></div>
+        <aside class="build">
+          <h4>Feld C3 · Lehmboden</h4>
+          <ul class="opts" id="f1opts">
+            <li class="sel"><b>Feldküche</b><span>+3 Verpflegung / Runde</span><em>+1 Moral durch Ruhelager (Nachbar)</em><i>Material 12 · 2 Stellungsrunden</i></li>
+            <li><b>Ruhelager</b><span>Erschöpfung −2 / Runde</span><em>+1 Erholung durch Feldküche (Nachbar)</em><i>Material 10 · 2 Stellungsrunden</i></li>
+            <li><b>Sägewerk</b><span>+2 Holz / Runde</span><em class="no">kein Wald angrenzend</em><i>Material 14 · 3 Stellungsrunden</i></li>
+            <li><b>Fernmeldestelle</b><span>Leitungsreichweite +4</span><em class="no">kein Turm angrenzend</em><i>Material 8 · 1 Stellungsrunde</i></li>
+          </ul>
+          <p class="muted">Ziehen: drehen und kippen. Doppelklick: Ansicht zurücksetzen.</p>
+        </aside>
+      </div>
+    </article>
+
+    <article class="feat" id="f2">
+      <header><span class="num">02</span><div><h3>Rundenfilm mit Zeitleiste</h3><p>Die ausgeführte Runde als scrubbare Zeitleiste in Phasen. Geister zeigen, wo Gruppen zu jedem Zeitpunkt waren, die Walze wandert mit.</p></div></header>
+      <div class="demo timeline">
+        <canvas id="f2c"></canvas>
+        <div class="card note" id="f2note" style="left:auto;right:10px"><b>Gefechtsrunde 3</b><br>Phase: Bewegung · Walze bei Feld 37</div>
+        <div class="phases" id="f2phases"></div>
+        <div class="ctl"><button class="sbtn" id="f2play">Abspielen</button><input type="range" id="f2t" min="0" max="1000" value="420"><span class="card" id="f2time">0:24</span></div>
+      </div>
+    </article>
+
+    <article class="feat" id="f3">
+      <header><span class="num">03</span><div><h3>Graben zeichnen mit Traversen-Vorschlag</h3><p>Linie ziehen, das Spiel zerlegt sie in Felder, warnt bei gerader Führung und baut auf Knopfdruck Traversen ein.</p></div></header>
+      <div class="demo graben">
+        <canvas id="f3c"></canvas>
+        <div class="card note warn" id="f3note"><b>Längsfeuer-gefährdet</b><br>8 Felder in gerader Linie. Ein MG am Ende bestreicht den ganzen Abschnitt.</div>
+        <div class="ctl"><button class="sbtn primary" id="f3trav">Traversen einfügen</button><button class="sbtn" id="f3clear">Neu zeichnen</button><span class="card" id="f3dur">Dauer: 2 Stellungsrunden · Pioniere 1</span></div>
+      </div>
+    </article>
+
+    <article class="feat" id="f4">
+      <header><span class="num">04</span><div><h3>Lorenplan als Zug</h3><p>Die Versorgung ist ein echter Zug mit sechs Wagen. Tippen wechselt die Ladung, der Kreis das Ziel. Verwundete fahren auf denselben Wagen zurück.</p></div></header>
+      <div class="demo loren">
+        <div class="rail">
+          <div class="stations"><span>Depot</span><span>Abschnitt A</span><span>Abschnitt B</span><span>Abschnitt C</span></div>
+          <div class="train" id="f4train">
+            <div class="loco">Feldbahn 2<div class="wheel a"></div><div class="wheel b"></div></div>
+          </div>
+        </div>
+        <div class="sum" id="f4sum"></div>
+        <div class="legend">Kapazität dieser Stellungsrunde: 6 Loren. Was nicht fährt, fehlt vorne. Verwundete, die nicht fahren, kosten Vertrauen.</div>
+      </div>
+    </article>
+
+    <article class="feat" id="f5">
+      <header><span class="num">05</span><div><h3>Zwei Zeitmaßstäbe in einer Uhr</h3><p>Die Tag-Nacht-Scheibe der Stellungsrunden wird beim Angriff zur Stoppuhr mit Fünf-Minuten-Schritten.</p></div></header>
+      <div class="demo uhr">
+        <svg viewBox="0 0 200 200" id="f5svg"></svg>
+        <div class="info">
+          <h4 id="f5h">Stellungsrunde 14</h4>
+          <div class="big" id="f5big">Nacht · 2. Hälfte</div>
+          <p id="f5p">Zwölf Stunden pro Runde. Graben, bauen, ablösen, Loren fahren. Nachts sieht niemand weit.</p>
+          <button class="sbtn primary" id="f5btn">Angriff ansetzen</button>
+        </div>
+      </div>
+    </article>
+
+    <article class="feat" id="f6">
+      <header><span class="num">06</span><div><h3>Feuerwalze als Lineal</h3><p>Startlinie und Schrittweite ziehst du direkt auf der Karte. Die Zeitbänder zeigen, wo die Walze in jeder Gefechtsrunde liegt und ob dein Sturm hinterherkommt.</p></div></header>
+      <div class="demo walze">
+        <canvas id="f6c"></canvas>
+        <div class="card note" id="f6note" style="left:auto;right:10px"><b>Feuerwalze · 2 Batterien</b><br>6 Runden · Schritt 1 Feld · 144 Schuss · Munition danach 196</div>
+        <div class="ctl"><span class="card">Griffe ziehen: Startlinie (links) und Schrittweite (rechts)</span></div>
+      </div>
+    </article>
+
+    <article class="feat" id="f7">
+      <header><span class="num">07</span><div><h3>Bedrohungs-Overlay mit Alter der Information</h3><p>Was du über den Gegner weißt, verblasst mit jeder Runde. MG-Kegel und Artilleriereichweiten aus der Aufklärung liegen schraffiert über der Karte.</p></div></header>
+      <div class="demo bedrohung">
+        <canvas id="f7c"></canvas>
+        <div class="card note" id="f7legend"><b>Bedrohung</b><br>Schraffiert: bekannte MG-Kegel · Gestrichelt: Reichweite Batterie · Geister verblassen pro Runde</div>
+        <div class="ctl"><label class="card"><input type="checkbox" id="f7on" checked> Overlay anzeigen</label><span class="card">Taste 2</span></div>
+      </div>
+    </article>
+
+    <article class="feat" id="f8">
+      <header><span class="num">08</span><div><h3>Radiales Befehlsmenü unter dem Finger</h3><p>Lang drücken auf eine Gruppe öffnet die Befehle im Kreis um den Finger. Zielwahl folgt direkt, ohne Werkzeugreihe.</p></div></header>
+      <div class="demo radialdemo">
+        <canvas id="f8c"></canvas>
+        <div class="radial" id="f8menu"></div>
+        <div class="ctl"><span class="card">Auf eine Gruppe drücken und halten (oder klicken)</span></div>
+      </div>
+    </article>
+
+    <article class="feat" id="f9">
+      <header><span class="num">09</span><div><h3>Halten zum Ausführen</h3><p>Ein Commit pro Runde. Die Zusammenfassung zeigt, was du gleich abschickst, der Ring füllt sich nur, solange du hältst.</p></div></header>
+      <div class="demo halten">
+        <ul class="summary">
+          <li><i></i><span class="n">3</span>Gruppen stürmen Abschnitt B, erwartete Verluste 2 bis 5</li>
+          <li><i></i><span class="n">1</span>Feuerwalze, Batterie 2, 6 Runden, 144 Schuss</li>
+          <li><i></i><span class="n">4</span>Loren nach vorn, 2 zurück mit Verwundeten</li>
+          <li class="warn"><i></i><span class="n">1</span>Gruppe ohne Befehl (5. Gruppe, Reserve)</li>
+          <li class="warn"><i></i><span class="n">!</span>Batterie 1 ohne Leitung, feuert nach altem Plan</li>
+        </ul>
+        <div class="hold" id="f9hold">
+          <svg viewBox="0 0 190 190"><circle cx="95" cy="95" r="90"/><circle class="p" cx="95" cy="95" r="90"/></svg>
+          <b>Runde ausführen</b><small>halten · 7 Befehle</small>
+        </div>
+      </div>
+    </article>
+
+    <article class="feat" id="f10">
+      <header><span class="num">10</span><div><h3>Papierebene</h3><p>Briefe, Telegramme und Fundstücke liegen als echte Blätter über der Karte, kippen mit der Maus und kommen beim Antippen nach vorn.</p></div></header>
+      <div class="demo papier" id="f10stage">
+        <div class="sheet letter" data-sheet>Liebe Maren,<br>der Regen hat aufgehört, dafür steht das Wasser jetzt kniehoch im Graben bei Abschnitt B. Harms sagt, die Lattenroste kommen morgen mit der Lore. Wir haben gestern zwei verloren, Boysen aus Wessel und den Jungen aus der Mühle. Schreib mir, ob die Äpfel reif sind.<br><span style="float:right">Dein Tjark</span></div>
+        <div class="sheet tele" data-sheet><div class="stamp">EILT</div><b>STABSBEFEHL</b> · Nr. 214/14<div class="form"><span>Von: Oberst van Aurach</span><span>An: Major Brandt</span><span>Abschnitt: Asse-Nord</span><span>Frist: morgen 06:00</span></div>HÜGEL 214 BIS MORGEN FRÜH NEHMEN STOP VORBEREITUNGSFEUER GENEHMIGT STOP VERLUSTE NACHRANGIG STOP<div class="form"><span>Befolgen: Ansehen +8</span><span>Verweigern: Ansehen −12, Vertrauen +6</span></div></div>
+        <div class="sheet photo" data-sheet><div class="img"><i></i></div>Fundstück 7 · Gruppe 2 vor dem Unterstand, Herbst</div>
+        <div class="card hintcard">Bewegen kippt das Blatt, Klick holt es nach vorn</div>
+      </div>
+    </article>
+
+  </div>
+</section>
+
+<script>
+/* ========================= Themen für die Karte ========================= */
+const THEMES = {
+  karte:       {paper:'#efe6cf', ink:'#2a2420', faint:'#cbbf9f', contour:'#b79b6a', forest:'#7f8f5c', water:'#7fa0b8', own:'#1f4e9c', enemy:'#a3271f', accent:'#c99a1a', wire:'#4a4036', crater:'#a89470', rail:'#3a3128', jitter:1.1, contours:true},
+  blaupause:   {paper:'#10306b', ink:'#e8f0ff', faint:'#2b4f99', contour:'#4e74bf', forest:'#9db8ee', water:'#9db8ee', own:'#ffffff', enemy:'#ffb347', accent:'#ffd86b', wire:'#cfe0ff', crater:'#6f8fcf', rail:'#e8f0ff', jitter:.4, grid:true, contours:true, dark:true, hatchForest:true},
+  telegramm:   {paper:'#f3efe3', ink:'#141414', faint:'#d6d0bd', contour:'#9a9384', forest:'#555', water:'#777', own:'#141414', enemy:'#8b1a1a', accent:'#8b1a1a', wire:'#141414', crater:'#8c8778', rail:'#141414', jitter:.3, mono:true, contours:true},
+  nacht:       {paper:'#0b0d0a', ink:'#d8d2b8', faint:'#1d2118', contour:'#2f3526', forest:'#1a2415', water:'#16252d', own:'#7fa4e6', enemy:'#e2645a', accent:'#ffbf47', wire:'#6a6350', crater:'#23251d', rail:'#8a846f', jitter:.6, dark:true, flare:true, contours:true},
+  sandkasten:  {paper:'#cbb48a', ink:'#2c2015', faint:'#b8a277', contour:'#a58b5e', forest:'#6f7f45', water:'#6f93ad', own:'#1b4d8f', enemy:'#b0362a', accent:'#e0b23a', wire:'#5b4a37', crater:'#a68f66', rail:'#4a3a28', jitter:0, thick:true, shadow:true, contours:true},
+  aquarell:    {paper:'#f6f0e2', ink:'#3a3330', faint:'#e3d9c3', contour:'#c6b08a', forest:'#8aa06a', water:'#8fb0c8', own:'#3f6fb0', enemy:'#c45b4a', accent:'#d9a430', wire:'#6a5a4a', crater:'#c9b48e', rail:'#5a4a3a', jitter:2.2, soft:true, contours:true},
+  hud:         {paper:'#e9ecef', ink:'#111418', faint:'#cfd4da', contour:'#c9cfd6', forest:'#b9c9b0', water:'#b4c8d8', own:'#1d5bd8', enemy:'#d13b2e', accent:'#e6a700', wire:'#5c636b', crater:'#c9ced4', rail:'#3a4048', jitter:0, grid:'dots', crisp:true, contours:true},
+  linolschnitt:{paper:'#e8dcc3', ink:'#141010', faint:'#d6c9ab', contour:null, forest:'#141010', water:'#141010', own:'#141010', enemy:'#c8321e', accent:'#c8321e', wire:'#141010', crater:'#141010', rail:'#141010', jitter:.8, bold:true, contours:false},
+  kriegsraum:  {paper:'#1f3a2e', ink:'#e6e1d3', faint:'#2a4a3b', contour:'#36604f', forest:'#4d7a5f', water:'#4f7f8f', own:'#f2e8c8', enemy:'#ff8a65', accent:'#ffd166', wire:'#cfc6ae', crater:'#355546', rail:'#e6e1d3', jitter:.9, dark:true, chalk:true, contours:true},
+  zeitung:     {paper:'#f1ead8', ink:'#1a1a1a', faint:'#d9d2bd', contour:'#b9b09a', forest:'#555', water:'#666', own:'#1a1a1a', enemy:'#1a1a1a', accent:'#1a1a1a', wire:'#333', crater:'#999', rail:'#222', jitter:.5, mono:true, contours:true},
+};
+let dayNightTheme = null;
+const T = () => dayNightTheme || THEMES[document.body.dataset.style] || THEMES.karte;
+const FONT_NUM = () => getComputedStyle(document.body).getPropertyValue('--font-num') || 'monospace';
+const FONT_HEAD = () => getComputedStyle(document.body).getPropertyValue('--font-head') || 'monospace';
+
+/* ========================= Zeichenhelfer ========================= */
+const GRID = {w:48, h:30};
+function mulberry32(seed){let a=seed>>>0;return()=>{a=(a+0x6d2b79f5)>>>0;let t=a;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return((t^(t>>>14))>>>0)/4294967296;};}
+
+function setupCanvas(cv){
+  const dpr=Math.min(2,window.devicePixelRatio||1);
+  const r=cv.getBoundingClientRect();
+  const w=Math.max(10,r.width), h=Math.max(10,r.height);
+  cv.width=Math.round(w*dpr); cv.height=Math.round(h*dpr);
+  const ctx=cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
+  return {ctx,w,h};
+}
+
+// Polyline mit optionalem Zittern (Bleistift), alle Maße in Rastereinheiten; width/jitter in Pixeln
+function pline(ctx,pts,o){
+  const {color='#000',width=1,dash=null,jitter=0,alpha=1,seed=1,px=1}=o;
+  const r=mulberry32(seed);
+  let p=pts;
+  if(jitter>0){
+    const out=[];
+    for(let i=0;i<pts.length-1;i++){
+      const a=pts[i],b=pts[i+1];const d=Math.hypot(b[0]-a[0],b[1]-a[1]);const n=Math.max(1,Math.round(d/0.7));
+      for(let k=0;k<n;k++){const t=k/n;out.push([a[0]+(b[0]-a[0])*t+(r()-.5)*jitter*px,a[1]+(b[1]-a[1])*t+(r()-.5)*jitter*px]);}
+    }
+    out.push(pts[pts.length-1]); p=out;
+  }
+  ctx.save();ctx.globalAlpha=alpha;ctx.strokeStyle=color;ctx.lineWidth=width*px;
+  if(dash)ctx.setLineDash(dash.map(v=>v*px));
+  ctx.beginPath();p.forEach((q,i)=>i?ctx.lineTo(q[0],q[1]):ctx.moveTo(q[0],q[1]));ctx.stroke();ctx.restore();
+}
+function hatch(ctx,poly,o){
+  const {color='#000',spacing=6,angle=Math.PI/4,width=1,alpha=.5,px=1}=o;
+  ctx.save();ctx.globalAlpha=alpha;ctx.beginPath();poly.forEach((q,i)=>i?ctx.lineTo(q[0],q[1]):ctx.moveTo(q[0],q[1]));ctx.closePath();ctx.clip();
+  const xs=poly.map(p=>p[0]),ys=poly.map(p=>p[1]);const x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys);
+  const cx=(x0+x1)/2,cy=(y0+y1)/2,R=Math.hypot(x1-x0,y1-y0)/2+1;
+  ctx.strokeStyle=color;ctx.lineWidth=width*px;ctx.beginPath();
+  const s=spacing*px;const ca=Math.cos(angle),sa=Math.sin(angle);
+  for(let d=-R;d<=R;d+=s){const bx=cx+d*(-sa),by=cy+d*ca;ctx.moveTo(bx-ca*R,by-sa*R);ctx.lineTo(bx+ca*R,by+sa*R);}
+  ctx.stroke();ctx.restore();
+}
+function label(ctx,x,y,text,o){
+  const {size=11,color='#000',alpha=1,font=FONT_NUM(),align='center',px=1,rotate=0,weight=''}=o;
+  ctx.save();ctx.globalAlpha=alpha;ctx.fillStyle=color;ctx.font=`${weight} ${size*px}px ${font}`;ctx.textAlign=align;ctx.textBaseline='middle';
+  ctx.translate(x,y);if(rotate)ctx.rotate(rotate);ctx.fillText(text,0,0);ctx.restore();
+}
+// Traversierter Graben: Rechteckwelle entlang y
+function crenel(x,y0,y1,d=0.7,len=1.3){const p=[[x,y0]];let y=y0,side=0;while(y<y1){const ny=Math.min(y1,y+len);p.push([x+side*d,ny]);if(ny>=y1)break;side^=1;p.push([x+side*d,ny]);y=ny;}return p;}
+// Laufgraben: Zickzack entlang x
+function zagH(y,x0,x1,amp=.45,step=1.4){const p=[];let s=1;for(let x=x0;x<x1;x+=step){p.push([x,y+s*amp]);s=-s;}p.push([x1,y]);return p;}
+
+function trench(ctx,th,pts,color,px,o={}){
+  const w=th.bold||th.thick?5:4;
+  if(th.shadow)pline(ctx,pts,{color:'rgba(0,0,0,.35)',width:w+2,px,seed:9});
+  pline(ctx,pts,{color,width:w,px,jitter:th.jitter,seed:o.seed||5,dash:o.dash,alpha:o.alpha??1});
+  if(!th.bold&&!th.thick)pline(ctx,pts,{color:th.paper,width:Math.max(1,w-2.6),px,jitter:th.jitter,seed:o.seed||5,dash:o.dash,alpha:o.alpha??1});
+  if(th.chalk)pline(ctx,pts,{color,width:1,px,dash:[2,3],seed:7,alpha:.6});
+}
+function unit(ctx,th,x,y,o){
+  const {color=th.own,text='1',selected=false,ghost=false,age=0,px=1,w=1.6,h=.95,mg=false}=o;
+  ctx.save();
+  if(ghost)ctx.globalAlpha=Math.max(.18,1-age*.17);
+  if(th.shadow&&!ghost){ctx.fillStyle='rgba(0,0,0,.35)';ctx.fillRect(x-w/2+3*px,y-h/2+3*px,w,h);}
+  ctx.fillStyle=ghost?'transparent':th.paper;ctx.fillRect(x-w/2,y-h/2,w,h);
+  ctx.strokeStyle=color;ctx.lineWidth=(th.bold?3:2)*px;if(ghost)ctx.setLineDash([3*px,3*px]);
+  ctx.strokeRect(x-w/2,y-h/2,w,h);
+  if(mg){ctx.beginPath();ctx.arc(x+w/2-.25,y-h/2+.25,.16,0,7);ctx.fillStyle=color;ctx.fill();}
+  if(selected){ctx.setLineDash([]);ctx.strokeStyle=th.accent;ctx.lineWidth=3*px;ctx.strokeRect(x-w/2-4*px,y-h/2-4*px,w+8*px,h+8*px);}
+  label(ctx,x,y+.02,text,{size:11,color:ghost?color:th.ink,px,weight:'700'});
+  ctx.restore();
+}
+function arrow(ctx,from,to,color,px,o={}){
+  pline(ctx,[from,to],{color,width:o.width||2,px,dash:o.dash||[6,4],alpha:o.alpha??1});
+  const a=Math.atan2(to[1]-from[1],to[0]-from[0]);const s=10*px;
+  ctx.save();ctx.globalAlpha=o.alpha??1;ctx.fillStyle=color;ctx.beginPath();ctx.moveTo(to[0],to[1]);
+  ctx.lineTo(to[0]-s*Math.cos(a-.4),to[1]-s*Math.sin(a-.4));ctx.lineTo(to[0]-s*Math.cos(a+.4),to[1]-s*Math.sin(a+.4));ctx.closePath();ctx.fill();ctx.restore();
+}
+
+/* ========================= Die Karte ========================= */
+// Zeichnet die Szene in ein Canvas. view = sichtbarer Ausschnitt in Rasterkoordinaten. layers = Schalter.
+function drawMap(cv,th,opts={}){
+  const {ctx,w,h}=setupCanvas(cv);
+  const view=opts.view||{x:0,y:0,w:GRID.w,h:GRID.h};
+  const cell=Math.min(w/view.w,h/view.h);
+  const ox=(w-view.w*cell)/2-view.x*cell, oy=(h-view.h*cell)/2-view.y*cell;
+  const L=Object.assign({grid:true,contours:true,terrain:true,etappe:true,trenches:true,enemy:true,units:true,orders:true,barrage:true,labels:true,mg:true,wire:true,flare:true},opts.layers||{});
+  ctx.fillStyle=th.paper;ctx.fillRect(0,0,w,h);
+  ctx.save();ctx.translate(ox,oy);ctx.scale(cell,cell);ctx.lineJoin='round';ctx.lineCap='round';
+  const px=1/cell;
+  const R=mulberry32(11);
+
+  // Raster
+  if(L.grid&&th.grid){
+    ctx.save();ctx.strokeStyle=th.faint;ctx.fillStyle=th.faint;ctx.lineWidth=1*px;
+    for(let x=0;x<=GRID.w;x++){for(let y=0;y<=GRID.h;y++){
+      if(th.grid==='dots'){ctx.beginPath();ctx.arc(x,y,1.2*px,0,7);ctx.fill();}
+    }}
+    if(th.grid===true){ctx.beginPath();for(let x=0;x<=GRID.w;x++){ctx.moveTo(x,0);ctx.lineTo(x,GRID.h);}for(let y=0;y<=GRID.h;y++){ctx.moveTo(0,y);ctx.lineTo(GRID.w,y);}ctx.globalAlpha=.5;ctx.stroke();}
+    ctx.restore();
+  }
+  // Höhenlinien
+  if(L.contours&&th.contours&&th.contour){
+    const hills=[[16,7,6.5,3.8],[39,22,7.5,4.6],[6,26,4,2.2]];
+    hills.forEach(([cx,cy,rx,ry],hi)=>{for(let k=1;k<=4;k++){const pts=[];const n=48;for(let i=0;i<=n;i++){const a=i/n*Math.PI*2;pts.push([cx+Math.cos(a)*rx*k/4,cy+Math.sin(a)*ry*k/4]);}pline(ctx,pts,{color:th.contour,width:1,px,jitter:th.jitter*1.5,seed:20+hi*5+k,alpha:.9});}});
+    if(L.labels)label(ctx,39,22,'Hügel 214',{size:11,color:th.contour,px,font:FONT_HEAD()});
+  }
+  // Fluss
+  if(L.terrain){
+    const riv=[];for(let y=0;y<=GRID.h;y+=1)riv.push([1.2+Math.sin(y*.5)*.5,y]);
+    ctx.save();ctx.globalAlpha=th.dark?.5:.35;ctx.fillStyle=th.water;ctx.beginPath();ctx.moveTo(-1,0);riv.forEach(p=>ctx.lineTo(p[0]+.6,p[1]));ctx.lineTo(-1,GRID.h);ctx.closePath();ctx.fill();ctx.restore();
+    pline(ctx,riv.map(p=>[p[0]+.6,p[1]]),{color:th.water,width:1.5,px,jitter:th.jitter,seed:31});
+    if(L.labels)label(ctx,1.1,15,'Asse',{size:12,color:th.water,px,rotate:-Math.PI/2,font:FONT_HEAD()});
+    // Wald
+    const woods=[[5,2,6,4],[19,25,6,4],[40,2,7,5]];
+    woods.forEach(([x,y,ww,hh],wi)=>{
+      if(th.hatchForest||th.mono){hatch(ctx,[[x,y],[x+ww,y],[x+ww,y+hh],[x,y+hh]],{color:th.forest,spacing:5,px,alpha:.5});}
+      else if(th.bold){ctx.save();ctx.fillStyle=th.forest;ctx.beginPath();ctx.ellipse(x+ww/2,y+hh/2,ww/2,hh/2,0,0,7);ctx.fill();ctx.restore();}
+      else{const r=mulberry32(40+wi);ctx.save();ctx.strokeStyle=th.forest;ctx.fillStyle=th.forest;ctx.lineWidth=1*px;for(let i=0;i<ww*hh*1.1;i++){const tx=x+r()*ww,ty=y+r()*hh;ctx.beginPath();ctx.arc(tx,ty,.22+r()*.12,0,7);ctx.globalAlpha=th.soft?.35:.55;ctx.fill();ctx.globalAlpha=1;ctx.stroke();}ctx.restore();}
+    });
+    // Dorf
+    const vill=[[44,24],[45.4,24.2],[44.2,25.6],[45.8,25.8],[44.8,27.2],[46.4,27]];
+    ctx.save();ctx.fillStyle=th.ink;ctx.globalAlpha=.8;vill.forEach(([x,y])=>ctx.fillRect(x,y,.9,.7));ctx.restore();
+    if(L.labels)label(ctx,45.4,28.6,'Kalkhof',{size:10,color:th.ink,px,font:FONT_HEAD(),alpha:.8});
+    // Sumpf
+    for(let i=0;i<14;i++){const sx=32+R()*4,sy=24+R()*5;pline(ctx,[[sx,sy],[sx+.6,sy]],{color:th.water,width:1,px,alpha:.7,seed:60+i});pline(ctx,[[sx+.15,sy-.18],[sx+.45,sy-.18]],{color:th.water,width:1,px,alpha:.7,seed:61+i});}
+  }
+  // Etappe
+  if(L.etappe){
+    const rail=[[8.5,14.5],[14,14.5],[19,14.5],[21.5,12.5],[21.5,8.5]];const rail2=[[19,14.5],[21.5,16.5],[21.5,20.5]];
+    [rail,rail2].forEach((rl,i)=>{pline(ctx,rl,{color:th.rail,width:2,px,seed:70+i});
+      // Schwellen
+      for(let s=0;s<rl.length-1;s++){const a=rl[s],b=rl[s+1];const d=Math.hypot(b[0]-a[0],b[1]-a[1]);const nx=-(b[1]-a[1])/d,ny=(b[0]-a[0])/d;for(let t=0;t<d;t+=.6){const x=a[0]+(b[0]-a[0])*t/d,y=a[1]+(b[1]-a[1])*t/d;pline(ctx,[[x-nx*.22,y-ny*.22],[x+nx*.22,y+ny*.22]],{color:th.rail,width:1.5,px});}}
+    });
+    // Loren
+    [[11,14.5],[16,14.5],[21.5,10.5]].forEach(([x,y])=>{ctx.save();ctx.fillStyle=th.accent;ctx.strokeStyle=th.ink;ctx.lineWidth=1*px;ctx.fillRect(x-.4,y-.3,.8,.6);ctx.strokeRect(x-.4,y-.3,.8,.6);ctx.restore();});
+    const blds=[[5,13,'D','Depot'],[8,13,'B','Feldbahnhof'],[5,8.5,'K','Feldküche'],[8,8.5,'R','Ruhelager'],[5,18.5,'L','Lazarett'],[10,18.5,'W','Werkstatt'],[14,5,'T','Beob.-Turm'],[11,22.5,'A1','Batterie 1'],[13,24.5,'A2','Batterie 2'],[16,9.5,'F','Fernmelde']];
+    blds.forEach(([x,y,t,n],i)=>{ctx.save();if(th.shadow){ctx.fillStyle='rgba(0,0,0,.3)';ctx.fillRect(x+.15,y+.15,2.2,1.4);}ctx.fillStyle=th.paper;ctx.fillRect(x,y,2.2,1.4);ctx.strokeStyle=th.ink;ctx.lineWidth=(th.bold?2.5:1.5)*px;ctx.strokeRect(x,y,2.2,1.4);ctx.restore();label(ctx,x+1.1,y+.72,t,{size:11,color:th.ink,px,weight:'700'});if(L.labels)label(ctx,x+1.1,y+1.95,n,{size:9,color:th.ink,px,alpha:.75});});
+    // Leitungen
+    pline(ctx,[[16.8,10.2],[20,9],[27.4,9]],{color:th.ink,width:1,px,dash:[1.5,3],alpha:.8,seed:80});
+    pline(ctx,[[16.8,10.2],[20,19.5],[27.4,19.5]],{color:th.ink,width:1,px,dash:[1.5,3],alpha:.8,seed:81});
+    // Durchtrennte Leitung
+    if(L.labels){label(ctx,24,20.4,'× Leitung unterbrochen',{size:9,color:th.enemy,px});}
+    if(L.labels)label(ctx,12,28.6,'ETAPPE',{size:11,color:th.ink,px,alpha:.5,font:FONT_HEAD()});
+  }
+  // Eigene Gräben
+  if(L.trenches){
+    trench(ctx,th,crenel(22.6,4,27,0.7,1.3),th.own,px,{seed:3});
+    trench(ctx,th,crenel(27.6,2,29,0.75,1.25),th.own,px,{seed:4});
+    trench(ctx,th,zagH(8,21.6,27.6,.4,1.3),th.own,px,{seed:5});
+    trench(ctx,th,zagH(20,21.6,27.6,.4,1.3),th.own,px,{seed:6});
+    trench(ctx,th,zagH(14.5,22.3,27.6,.4,1.3),th.own,px,{seed:12});
+    // Unterstände
+    [[26.9,6],[26.9,12],[26.9,18],[26.9,24]].forEach(([x,y])=>{ctx.save();ctx.fillStyle=th.own;ctx.globalAlpha=.9;ctx.fillRect(x-.35,y-.3,.7,.6);ctx.restore();});
+    if(L.labels){['A','B','C'].forEach((s,i)=>label(ctx,26,5+i*9.5,'Abschnitt '+s,{size:10,color:th.own,px,rotate:-Math.PI/2,alpha:.9,font:FONT_HEAD()}));}
+  }
+  // Draht
+  if(L.wire){
+    const wireLine=(x,y0,y1,color,seed)=>{pline(ctx,[[x,y0],[x,y1]],{color,width:1,px,jitter:th.jitter*.6,seed});for(let y=y0;y<y1;y+=.8){pline(ctx,[[x-.25,y],[x+.25,y+.4]],{color,width:1,px});pline(ctx,[[x+.25,y],[x-.25,y+.4]],{color,width:1,px});}};
+    wireLine(30.3,2,28,th.wire,90);wireLine(30.8,2,28,th.wire,91);
+    if(L.enemy){wireLine(35.6,2,28,th.enemy,92);wireLine(36.1,2,28,th.enemy,93);}
+  }
+  // Krater
+  if(L.terrain){const r=mulberry32(99);for(let i=0;i<34;i++){const x=30.5+r()*5.5,y=2+r()*26,rad=.3+r()*.55;ctx.save();ctx.globalAlpha=th.dark?.6:.5;ctx.fillStyle=th.crater;ctx.beginPath();ctx.arc(x,y,rad,0,7);ctx.fill();ctx.globalAlpha=.9;ctx.strokeStyle=th.ink;ctx.lineWidth=1*px;if(!th.bold){ctx.beginPath();ctx.arc(x,y,rad,0.3,3.1);ctx.stroke();}ctx.restore();}}
+  if(L.labels)label(ctx,33,16,'NIEMANDSLAND',{size:10,color:th.ink,px,alpha:.45,rotate:-Math.PI/2,font:FONT_HEAD()});
+  // Feindliche Gräben
+  if(L.enemy){
+    trench(ctx,th,crenel(37.8,2,29,0.7,1.3),th.enemy,px,{seed:7,dash:th.mono?[6,3]:null});
+    trench(ctx,th,crenel(42.2,4,27,0.7,1.3),th.enemy,px,{seed:8,dash:[4,4],alpha:.6});
+    trench(ctx,th,zagH(11,38.5,42.2,.4,1.3),th.enemy,px,{seed:13,dash:[4,4],alpha:.6});
+    trench(ctx,th,zagH(21,38.5,42.2,.4,1.3),th.enemy,px,{seed:14,dash:[4,4],alpha:.6});
+  }
+  // Vorbereitungsfeuer / Walze
+  if(L.barrage){
+    const band=[[36.8,7],[38.6,7],[38.6,14.5],[36.8,14.5]];
+    hatch(ctx,band,{color:th.accent,spacing:5,px,alpha:th.dark?.8:.7,width:1.5});
+    pline(ctx,band.concat([band[0]]),{color:th.accent,width:1.5,px,alpha:.9});
+    if(L.labels)label(ctx,37.7,6.3,'Walze R1',{size:9,color:th.accent,px,weight:'700'});
+  }
+  // MG-Kegel
+  if(L.mg){
+    const cx=28.6,cy=20.2,r=7.5,a0=-.33,a1=.33;const poly=[[cx,cy]];for(let i=0;i<=12;i++){const a=a0+(a1-a0)*i/12;poly.push([cx+Math.cos(a)*r,cy+Math.sin(a)*r]);}
+    hatch(ctx,poly,{color:th.own,spacing:7,px,alpha:.3,angle:-Math.PI/4});pline(ctx,poly.concat([poly[0]]),{color:th.own,width:1,px,alpha:.6,dash:[3,3]});
+  }
+  // Befehle
+  if(L.orders){
+    arrow(ctx,[29.2,17],[36.4,16.4],th.accent,px,{});
+    if(L.labels)label(ctx,33,15.4,'Sturm · 3. Gruppe · 38 %',{size:9.5,color:th.accent,px,weight:'700'});
+    arrow(ctx,[23.3,13],[27,12],th.ink,px,{dash:[3,3],alpha:.7,width:1.5});
+  }
+  // Einheiten
+  if(L.units){
+    unit(ctx,th,28.75,5,{text:'1',px});
+    unit(ctx,th,28.75,11,{text:'2',px,selected:true});
+    unit(ctx,th,28.75,17,{text:'3',px});
+    unit(ctx,th,28.75,24,{text:'4',px});
+    unit(ctx,th,23.3,13,{text:'5',px});
+    unit(ctx,th,28.6,20.2,{text:'MG',px,mg:true});
+    unit(ctx,th,24.5,9.6,{text:'B',px,w:1.1});
+    if(L.enemy){
+      unit(ctx,th,38.9,10,{text:'?',px,color:th.enemy,ghost:true,age:1});
+      unit(ctx,th,38.9,18,{text:'?',px,color:th.enemy,ghost:true,age:3});
+      unit(ctx,th,42.9,8,{text:'?',px,color:th.enemy,ghost:true,age:5});
+      if(L.labels){label(ctx,40.5,10,'vor 1 Runde',{size:8.5,color:th.enemy,px,align:'left'});label(ctx,40.5,18,'vor 3 Runden',{size:8.5,color:th.enemy,px,align:'left',alpha:.6});}
+    }
+  }
+  // Leuchtkugel
+  if(L.flare&&th.flare){ctx.save();const g=ctx.createRadialGradient(33,12,0,33,12,6);g.addColorStop(0,'rgba(255,200,90,.55)');g.addColorStop(1,'rgba(255,200,90,0)');ctx.fillStyle=g;ctx.beginPath();ctx.arc(33,12,6,0,7);ctx.fill();ctx.restore();}
+  // Nordpfeil + Maßstab
+  if(L.labels){pline(ctx,[[46,1.2],[46,3.4]],{color:th.ink,width:1.5,px});label(ctx,46,.7,'N',{size:10,color:th.ink,px,weight:'700'});pline(ctx,[[40,29.2],[45,29.2]],{color:th.ink,width:2,px});label(ctx,42.5,28.5,'50 m',{size:9,color:th.ink,px});}
+  ctx.restore();
+  return {cell,ox,oy,px,ctx,w,h,toPx:(x,y)=>({x:ox+x*cell,y:oy+y*cell}),toGrid:(X,Y)=>({x:(X-ox)/cell,y:(Y-oy)/cell}),
+    withGrid:(fn)=>{ctx.save();ctx.translate(ox,oy);ctx.scale(cell,cell);ctx.lineJoin='round';ctx.lineCap='round';fn(ctx,px);ctx.restore();}};
+}
+
+/* ========================= Gefechtsbildschirm ========================= */
+let battleInfo=null;
+function layoutBattle(){
+  const cv=document.getElementById('map');
+  if(!cv.offsetWidth)return;
+  battleInfo=drawMap(cv,T());
+  const p=battleInfo.toPx(28.75,10.5);
+  const sh=document.getElementById('shield');sh.style.left=p.x+'px';sh.style.top=p.y+'px';
+}
+
+/* ========================= F1 Etappe 3D ========================= */
+(function(){
+  const plane=document.getElementById('f1plane'),stage=document.getElementById('f1stage');
+  const terr='wiese lehm lehm gleis gleis wiese wald wald|wiese lehm gleis wiese wiese wiese wald wald|lehm lehm gleis gleis gleis gleis wiese wiese|lehm wiese wiese wiese gleis wiese wiese lehm|wiese wiese wiese wiese gleis lehm lehm lehm'.split('|').map(r=>r.split(' '));
+  const blds={'0,3':['D',22,'Depot'],'2,2':['B',18,'Feldbahnhof'],'1,1':['R',14,'Ruhelager'],'3,0':['L',16,'Lazarett'],'0,6':['S',20,'Sägewerk'],'4,5':['W',14,'Werkstatt'],'2,6':['T',30,'Beob.-Turm']};
+  for(let r=0;r<5;r++)for(let c=0;c<8;c++){
+    const t=document.createElement('div');t.className='tile '+terr[r][c];
+    if(r===2&&c===3)t.classList.add('sel');
+    const b=blds[r+','+c];
+    if(b){t.style.setProperty('--h',b[1]+'px');['front','back','left','right','top'].forEach(f=>{const d=document.createElement('div');d.className='face '+f;if(f==='top')d.innerHTML=`<span>${b[0]}</span>`;t.appendChild(d);});}
+    plane.appendChild(t);
+  }
+  let tilt=55,spin=-20,drag=null;
+  const apply=()=>{plane.style.setProperty('--tilt',tilt+'deg');plane.style.setProperty('--spin',spin+'deg');};
+  stage.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY};stage.setPointerCapture(e.pointerId);});
+  stage.addEventListener('pointermove',e=>{if(!drag)return;spin+=(e.clientX-drag.x)*.4;tilt=Math.max(15,Math.min(80,tilt-(e.clientY-drag.y)*.3));drag={x:e.clientX,y:e.clientY};apply();});
+  stage.addEventListener('pointerup',()=>drag=null);stage.addEventListener('pointercancel',()=>drag=null);
+  stage.addEventListener('dblclick',()=>{tilt=55;spin=-20;apply();});
+  document.getElementById('f1opts').addEventListener('click',e=>{const li=e.target.closest('li');if(!li)return;[...li.parentNode.children].forEach(x=>x.classList.remove('sel'));li.classList.add('sel');});
+  window.__f1set=(t,s)=>{tilt=t;spin=s;apply();};
+  apply();
+})();
+
+/* ========================= F2 Zeitleiste ========================= */
+(function(){
+  const cv=document.getElementById('f2c'),slider=document.getElementById('f2t'),note=document.getElementById('f2note'),time=document.getElementById('f2time'),phasesEl=document.getElementById('f2phases');
+  const phases=[['Artillerie',.14],['Unterstand',.08],['Bewegung',.36],['Feuer',.16],['Nahkampf',.16],['Protokoll',.1]];
+  phases.forEach(([n,f])=>{const s=document.createElement('span');s.style.flex=f;s.textContent=n;phasesEl.appendChild(s);});
+  function draw(){
+    const t=slider.value/1000;const th=T();
+    const info=drawMap(cv,th,{view:{x:25,y:3,w:19,h:18},layers:{orders:false,barrage:false,labels:false,units:false,mg:false}});
+    info.withGrid((ctx,px)=>{
+      // Walze
+      const bx=36.4+t*3.2;const band=[[bx,6],[bx+1.4,6],[bx+1.4,14.5],[bx,14.5]];
+      hatch(ctx,band,{color:th.accent,spacing:5,px,alpha:.75,width:1.5});pline(ctx,band.concat([band[0]]),{color:th.accent,width:1.5,px});
+      // Angreifer 1 und 3: Geisterspur
+      [[5,'1'],[17,'3']].forEach(([y,n])=>{
+        const x0=28.75,x1=37.3;const prog=Math.max(0,Math.min(1,(t-.22)/.5));const x=x0+(x1-x0)*prog;
+        pline(ctx,[[x0,y],[x,y]],{color:th.own,width:1.5,px,dash:[3,3],alpha:.6});
+        for(let k=.25;k<prog;k+=.25)unit(ctx,th,x0+(x1-x0)*k,y,{text:n,px,ghost:true,age:3});
+        unit(ctx,th,x,y,{text:n,px});
+      });
+      unit(ctx,th,28.75,11,{text:'2',px});unit(ctx,th,28.6,20.2,{text:'MG',px,mg:true});
+      // Verteidiger: im Unterstand solange Walze auf ihnen liegt
+      [[10],[18]].forEach(([y])=>{const inDug=Math.abs(bx+.7-38.9)<1.2&&y<15;unit(ctx,th,38.9,y,{text:inDug?'U':'?',px,color:th.enemy,ghost:inDug,age:inDug?2:0});if(inDug)label(ctx,41,y,'im Unterstand',{size:9,color:th.enemy,px,align:'left'});});
+      // Feuer in Phase Feuer
+      if(t>.6&&t<.78){pline(ctx,[[38.9,10],[36.6,5.4]],{color:th.enemy,width:1,px,dash:[2,2]});pline(ctx,[[28.6,20.2],[38,17.6]],{color:th.own,width:1,px,dash:[2,2]});}
+    });
+    let acc=0,cur='';for(const [n,f] of phases){if(t>=acc&&t<acc+f)cur=n;acc+=f;}
+    [...phasesEl.children].forEach(s=>s.classList.toggle('on',s.textContent===cur));
+    note.innerHTML=`<b>Gefechtsrunde 3</b><br>Phase: ${cur||'Protokoll'} · Walze bei Feld ${Math.round(36.4+t*3.2)}`;
+    const sec=Math.round(t*300);time.textContent=`${Math.floor(sec/60)}:${String(sec%60).padStart(2,'0')}`;
+  }
+  slider.addEventListener('input',draw);
+  let playing=false,raf=null;
+  document.getElementById('f2play').addEventListener('click',e=>{playing=!playing;e.target.textContent=playing?'Pause':'Abspielen';const step=()=>{if(!playing)return;slider.value=(+slider.value+4)%1001;draw();raf=requestAnimationFrame(step);};if(playing)step();else cancelAnimationFrame(raf);});
+  window.__f2draw=draw;
+})();
+
+/* ========================= F3 Graben zeichnen ========================= */
+(function(){
+  const cv=document.getElementById('f3c'),note=document.getElementById('f3note'),dur=document.getElementById('f3dur');
+  const view={x:20,y:5,w:16,h:13};
+  let cells=[],drawing=false,traversed=false,raw=[];
+  const key=(x,y)=>x+','+y;
+  function bres(a,b){const out=[];let [x0,y0]=a,[x1,y1]=b;const dx=Math.abs(x1-x0),dy=-Math.abs(y1-y0),sx=x0<x1?1:-1,sy=y0<y1?1:-1;let err=dx+dy;while(true){out.push([x0,y0]);if(x0===x1&&y0===y1)break;const e2=2*err;if(e2>=dy){err+=dy;x0+=sx;}if(e2<=dx){err+=dx;y0+=sy;}}return out;}
+  function fromRaw(){const pts=raw.map(p=>[Math.floor(p.x),Math.floor(p.y)]);const out=[];const seen=new Set();for(let i=0;i<pts.length-1;i++){bres(pts[i],pts[i+1]).forEach(c=>{if(!seen.has(key(...c))){seen.add(key(...c));out.push(c);}});}if(pts.length===1&&!seen.size)out.push(pts[0]);return out;}
+  function longestRun(cs){let best=1,run=1;for(let i=1;i<cs.length;i++){const sameCol=cs[i][0]===cs[i-1][0]&&cs[i][0]===(cs[i-2]||cs[i-1])[0];const sameRow=cs[i][1]===cs[i-1][1]&&cs[i][1]===(cs[i-2]||cs[i-1])[1];run=(sameCol||sameRow)?run+1:1;best=Math.max(best,run);}return best;}
+  function traverse(cs){const out=[];for(let i=0;i<cs.length;i++){const c=cs[i];const vertical=i>0&&cs[i-1][0]===c[0];const jog=Math.floor(i/3)%2;out.push(vertical?[c[0]+jog,c[1]]:[c[0],c[1]+jog]);}return out;}
+  function draw(){
+    const th=T();const info=drawMap(cv,th,{view,layers:{orders:false,barrage:false,labels:false,enemy:false,mg:false,units:false,etappe:false}});
+    info.withGrid((ctx,px)=>{
+      // Rasterlinien im Zeichenbereich
+      ctx.save();ctx.strokeStyle=th.ink;ctx.globalAlpha=.12;ctx.lineWidth=1*px;ctx.beginPath();for(let x=view.x;x<=view.x+view.w;x++){ctx.moveTo(x,view.y);ctx.lineTo(x,view.y+view.h);}for(let y=view.y;y<=view.y+view.h;y++){ctx.moveTo(view.x,y);ctx.lineTo(view.x+view.w,y);}ctx.stroke();ctx.restore();
+      if(raw.length>1&&!traversed)pline(ctx,raw.map(p=>[p.x,p.y]),{color:th.accent,width:1.5,px,dash:[4,3],alpha:.8});
+      const cs=traversed?traverse(cells):cells;
+      cs.forEach(([x,y])=>{ctx.save();ctx.globalAlpha=.3;ctx.fillStyle=th.accent;ctx.fillRect(x,y,1,1);ctx.restore();});
+      if(cs.length>1){pline(ctx,cs.map(([x,y])=>[x+.5,y+.5]),{color:th.accent,width:6,px,alpha:.95});pline(ctx,cs.map(([x,y])=>[x+.5,y+.5]),{color:th.paper,width:2,px,alpha:.9});}
+      unit(ctx,th,23.3,13,{text:'5',px});unit(ctx,th,28.75,11,{text:'2',px});
+    });
+    const n=cells.length;const run=longestRun(cells);
+    if(n===0){note.className='card note';note.innerHTML='<b>Graben zeichnen</b><br>Mit Finger oder Maus eine Linie ziehen.';dur.textContent='Dauer: –';}
+    else if(traversed){note.className='card note good';note.innerHTML=`<b>Traversen eingefügt</b><br>${n} Felder, längste Gerade 3. Kein Abschnitt kann bestrichen werden.`;dur.textContent=`Dauer: ${Math.ceil(n*.3)} Stellungsrunden · Pioniere ${Math.ceil(n*.15)}`;}
+    else if(run>=5){note.className='card note warn';note.innerHTML=`<b>Längsfeuer-gefährdet</b><br>${run} Felder in gerader Linie. Ein MG am Ende bestreicht den ganzen Abschnitt.`;dur.textContent=`Dauer: ${Math.ceil(n*.25)} Stellungsrunden · Pioniere ${Math.ceil(n*.125)}`;}
+    else{note.className='card note good';note.innerHTML=`<b>Gute Führung</b><br>${n} Felder, längste Gerade ${run}.`;dur.textContent=`Dauer: ${Math.ceil(n*.25)} Stellungsrunden · Pioniere ${Math.ceil(n*.125)}`;}
+  }
+  let info=null;
+  const pos=e=>{const r=cv.getBoundingClientRect();info=info||drawMap(cv,T(),{view});const g=info.toGrid(e.clientX-r.left,e.clientY-r.top);return g;};
+  cv.addEventListener('pointerdown',e=>{drawing=true;traversed=false;raw=[pos(e)];cv.setPointerCapture(e.pointerId);});
+  cv.addEventListener('pointermove',e=>{if(!drawing)return;raw.push(pos(e));cells=fromRaw();draw();});
+  cv.addEventListener('pointerup',()=>{drawing=false;cells=fromRaw();draw();});
+  document.getElementById('f3trav').addEventListener('click',()=>{traversed=true;draw();});
+  document.getElementById('f3clear').addEventListener('click',()=>{raw=[];cells=[];traversed=false;draw();});
+  // Vorbelegung: gerade Linie
+  raw=[{x:24.4,y:7.5},{x:24.5,y:16.6}];cells=fromRaw();
+  window.__f3draw=()=>{info=null;draw();};
+  window.__f3trav=()=>{traversed=true;draw();};
+})();
+
+/* ========================= F4 Lorenplan ========================= */
+(function(){
+  const train=document.getElementById('f4train'),sum=document.getElementById('f4sum');
+  const cargo=['mun','ver','mat','san','leer'],names={mun:'Munition',ver:'Verpflegung',mat:'Material',san:'Verwundete',leer:'leer'},short={mun:'MUN',ver:'VERPF',mat:'MAT',san:'+',leer:'–'};
+  const dests=['A','B','C'];
+  const state=[['mun','A'],['mun','B'],['ver','B'],['mat','C'],['san','A'],['san','B']];
+  function render(){
+    train.querySelectorAll('.wagon').forEach(w=>w.remove());
+    state.forEach(([c,d],i)=>{const w=document.createElement('div');w.className='wagon';w.dataset.cargo=c;w.innerHTML=`<div class="cargo">${short[c]}</div><div class="dest">${c==='san'?'←'+d:d}</div><div class="wheel a"></div><div class="wheel b"></div>`;
+      w.querySelector('.cargo').addEventListener('click',()=>{state[i][0]=cargo[(cargo.indexOf(c)+1)%cargo.length];render();});
+      w.querySelector('.dest').addEventListener('click',e=>{e.stopPropagation();state[i][1]=dests[(dests.indexOf(d)+1)%dests.length];render();});
+      train.appendChild(w);});
+    const per={A:{},B:{},C:{}};let back=0,used=0;
+    state.forEach(([c,d])=>{if(c==='leer')return;used++;if(c==='san'){back++;per[d].san=(per[d].san||0)+1;return;}per[d][c]=(per[d][c]||0)+1;});
+    sum.innerHTML=dests.map(d=>{const p=per[d];const parts=['mun','ver','mat'].filter(k=>p[k]).map(k=>`${p[k]} ${names[k]}`);const s=p.san?`<span style="color:var(--enemy)">${p.san} Verwundete zurück</span>`:'';return `<div class="card"><b>Abschnitt ${d}</b>${parts.join(' · ')||'<span style="color:var(--ink2)">nichts</span>'}${s?'<br>'+s:''}</div>`;}).join('')+`<div class="card"><b>Kapazität</b>${used} / 6 Loren<br>${back} zurück mit Verwundeten</div>`;
+  }
+  render();
+})();
+
+/* ========================= F5 Uhr ========================= */
+(function(){
+  const svg=document.getElementById('f5svg'),btn=document.getElementById('f5btn'),h=document.getElementById('f5h'),big=document.getElementById('f5big'),p=document.getElementById('f5p');
+  let battle=false;
+  function render(){
+    const cs=getComputedStyle(document.body);const ink=cs.getPropertyValue('--ink').trim(),ink2=cs.getPropertyValue('--ink2').trim(),card=cs.getPropertyValue('--card').trim(),accent=cs.getPropertyValue('--accent').trim(),track=cs.getPropertyValue('--track').trim(),own=cs.getPropertyValue('--own').trim();
+    let s=`<circle cx="100" cy="100" r="92" fill="${card}" stroke="${ink}" stroke-width="2"/>`;
+    // Tag/Nacht-Ring
+    s+=`<g class="ring" style="opacity:${battle?0:1};transform-origin:100px 100px;transform:scale(${battle?.7:1})">`;
+    s+=`<path d="M100 20 A80 80 0 0 1 100 180 Z" fill="${track}"/><path d="M100 180 A80 80 0 0 1 100 20 Z" fill="${ink}" opacity=".85"/>`;
+    s+=`<text x="60" y="104" font-size="11" text-anchor="middle" fill="${card}" font-family="${FONT_HEAD()}">Nacht</text><text x="140" y="104" font-size="11" text-anchor="middle" fill="${ink}" font-family="${FONT_HEAD()}">Tag</text>`;
+    for(let i=0;i<24;i++){const a=i/24*Math.PI*2;const r1=i%6?84:78;s+=`<line x1="${100+Math.sin(a)*r1}" y1="${100-Math.cos(a)*r1}" x2="${100+Math.sin(a)*88}" y2="${100-Math.cos(a)*88}" stroke="${i<12?card:ink}" stroke-width="${i%6?1:2}" opacity=".8"/>`;}
+    s+=`</g>`;
+    // Stoppuhr-Ring
+    s+=`<g class="ring" style="opacity:${battle?1:0};transform-origin:100px 100px;transform:scale(${battle?1:1.3})">`;
+    for(let i=0;i<12;i++){const a0=i/12*Math.PI*2,a1=(i+1)/12*Math.PI*2-.04;const x0=100+Math.sin(a0)*80,y0=100-Math.cos(a0)*80,x1=100+Math.sin(a1)*80,y1=100-Math.cos(a1)*80;s+=`<path d="M${x0} ${y0} A80 80 0 0 1 ${x1} ${y1}" fill="none" stroke="${i<3?accent:track}" stroke-width="14"/>`;const am=(i+.5)/12*Math.PI*2;s+=`<text x="${100+Math.sin(am)*62}" y="${100-Math.cos(am)*62+4}" font-size="10" text-anchor="middle" fill="${ink2}" font-family="${FONT_NUM()}">${(i+1)*5}</text>`;}
+    s+=`</g>`;
+    // Zeiger
+    const ang=battle?3/12*360:300;
+    s+=`<g class="hand" style="transform-origin:100px 100px;transform:rotate(${ang}deg)"><line x1="100" y1="100" x2="100" y2="28" stroke="${battle?accent:own}" stroke-width="3" stroke-linecap="round"/><circle cx="100" cy="100" r="5" fill="${ink}"/></g>`;
+    svg.innerHTML=s;
+    h.textContent=battle?'Gefechtsrunde 3':'Stellungsrunde 14';
+    big.textContent=battle?'Minute 15 von 60':'Nacht · 2. Hälfte';
+    p.textContent=battle?'Fünf Minuten pro Runde. Walze rückt vor, Sturm läuft, Verteidiger sitzen im Unterstand. Endet, wenn der Angriff steckt oder nach zwölf Runden.':'Zwölf Stunden pro Runde. Graben, bauen, ablösen, Loren fahren. Nachts sieht niemand weit.';
+    btn.textContent=battle?'Angriff abbrechen':'Angriff ansetzen';
+  }
+  btn.addEventListener('click',()=>{battle=!battle;render();});
+  window.__f5draw=render;window.__f5set=b=>{battle=b;render();};
+})();
+
+/* ========================= F6 Feuerwalze ========================= */
+(function(){
+  const cv=document.getElementById('f6c'),note=document.getElementById('f6note');
+  const view={x:25,y:3,w:19,h:18};
+  let startX=36.4,step=1,drag=null,info=null;
+  function draw(){
+    const th=T();info=drawMap(cv,th,{view,layers:{orders:false,barrage:false,labels:false,mg:false,units:false}});
+    info.withGrid((ctx,px)=>{
+      const rounds=6;
+      for(let i=0;i<rounds;i++){const x=startX+i*step;const band=[[x,6],[x+step,6],[x+step,14.5],[x,14.5]];hatch(ctx,band,{color:th.accent,spacing:5,px,alpha:.25+ (i===2?.45:0),width:1.5});pline(ctx,band.concat([band[0]]),{color:th.accent,width:1,px,alpha:.9});label(ctx,x+step/2,5.4,'R'+(i+1),{size:9,color:th.accent,px,weight:'700'});}
+      // Startlinie
+      pline(ctx,[[startX,5],[startX,16.6]],{color:th.ink,width:2,px});
+      // Griffe
+      ctx.save();ctx.fillStyle=th.accent;ctx.strokeStyle=th.ink;ctx.lineWidth=2*px;ctx.beginPath();ctx.arc(startX,16.6,.45,0,7);ctx.fill();ctx.stroke();ctx.beginPath();ctx.arc(startX+step,16.6,.45,0,7);ctx.fill();ctx.stroke();ctx.restore();
+      label(ctx,startX-.9,16.6,'Start',{size:9,color:th.ink,px,align:'right'});label(ctx,startX+step+.9,16.6,'Schritt',{size:9,color:th.ink,px,align:'left'});
+      // Sturmgruppen hinter der Walze (Runde 3)
+      const gx=startX+2*step-1.4;[5,17].forEach((y,i)=>{unit(ctx,th,28.75,y,{text:String(i?3:1),px,ghost:true,age:3});unit(ctx,th,gx,y<10?8:12,{text:String(i?3:1),px});});
+      unit(ctx,th,28.75,11,{text:'2',px});
+      [[10],[18]].forEach(([y])=>unit(ctx,th,38.9,y,{text:'?',px,color:th.enemy,ghost:true,age:1}));
+    });
+    const shots=Math.round(2*6*12*step);
+    let warn='';if(step>1.5)warn='<br><span style="color:var(--danger)">Zu schnell: Der Sturm fällt hinter die Walze zurück, Verteidiger kommen vorher aus dem Unterstand.</span>';if(step<.65)warn='<br><span style="color:var(--danger)">Zu dicht: eigene Verluste durch Kurzschüsse wahrscheinlich.</span>';
+    note.innerHTML=`<b>Feuerwalze · 2 Batterien</b><br>6 Runden · Schritt ${step.toFixed(1)} Felder · ${shots} Schuss · Munition danach ${340-shots}${warn}`;
+  }
+  const grid=e=>{const r=cv.getBoundingClientRect();return info.toGrid(e.clientX-r.left,e.clientY-r.top);};
+  cv.addEventListener('pointerdown',e=>{const g=grid(e);if(Math.hypot(g.x-startX,g.y-16.6)<1)drag='start';else if(Math.hypot(g.x-(startX+step),g.y-16.6)<1)drag='step';else drag=null;if(drag)cv.setPointerCapture(e.pointerId);});
+  cv.addEventListener('pointermove',e=>{if(!drag)return;const g=grid(e);if(drag==='start')startX=Math.max(31,Math.min(40,g.x));else step=Math.max(.4,Math.min(2.5,g.x-startX));draw();});
+  cv.addEventListener('pointerup',()=>drag=null);
+  window.__f6draw=draw;
+})();
+
+/* ========================= F7 Bedrohung ========================= */
+(function(){
+  const cv=document.getElementById('f7c'),on=document.getElementById('f7on');
+  const view={x:27,y:4,w:20,h:15};
+  function draw(){
+    const th=T();const info=drawMap(cv,th,{view,layers:{orders:false,barrage:false,labels:false,mg:false,units:false,etappe:false}});
+    info.withGrid((ctx,px)=>{
+      unit(ctx,th,28.75,5,{text:'1',px});unit(ctx,th,28.75,11,{text:'2',px});unit(ctx,th,28.75,17,{text:'3',px});unit(ctx,th,28.75,24,{text:'4',px});unit(ctx,th,28.6,20.2,{text:'MG',px,mg:true});
+      if(on.checked){
+        // MG-Kegel bekannt
+        [[38.3,9,-.3],[38.3,15.5,.25]].forEach(([cx,cy,off])=>{const poly=[[cx,cy]];for(let i=0;i<=12;i++){const a=Math.PI+off-.33+.66*i/12;poly.push([cx+Math.cos(a)*8.5,cy+Math.sin(a)*8.5]);}hatch(ctx,poly,{color:th.enemy,spacing:6,px,alpha:.3,angle:Math.PI/4});pline(ctx,poly.concat([poly[0]]),{color:th.enemy,width:1,px,dash:[3,3],alpha:.7});});
+        // Artilleriereichweite
+        ctx.save();ctx.strokeStyle=th.enemy;ctx.setLineDash([6*px,4*px]);ctx.lineWidth=1.5*px;ctx.globalAlpha=.7;ctx.beginPath();ctx.arc(46,12,13,Math.PI*.55,Math.PI*1.45);ctx.stroke();ctx.restore();
+        label(ctx,33.5,12,'Reichweite Batterie (Schallmessung)',{size:9,color:th.enemy,px,rotate:-Math.PI/2,alpha:.8});
+        // Geister mit Alter
+        [[38.9,10,1],[38.9,16.5,2],[41.5,7,4],[43.5,14,6],[36.5,18,3]].forEach(([x,y,age])=>{unit(ctx,th,x,y,{text:'?',px,color:th.enemy,ghost:true,age});label(ctx,x+1.2,y,`vor ${age} Runde${age>1?'n':''}`,{size:8.5,color:th.enemy,px,align:'left',alpha:Math.max(.3,1-age*.14)});});
+        // Bewegung gesehen
+        arrow(ctx,[41.5,7],[41.5,9.5],th.enemy,px,{alpha:.5,width:1.5,dash:[2,2]});label(ctx,43.2,8.4,'Bewegung Süd, vor 4 Runden',{size:8.5,color:th.enemy,px,align:'left',alpha:.5});
+        // Unbekannt
+        ctx.save();ctx.globalAlpha=.25;hatch(ctx,[[44.5,4],[48,4],[48,19],[44.5,19]],{color:th.ink,spacing:9,px,alpha:1,angle:-Math.PI/4});ctx.restore();label(ctx,46.3,11.5,'unbekannt',{size:10,color:th.ink,px,rotate:-Math.PI/2,alpha:.5,font:FONT_HEAD()});
+      }
+    });
+  }
+  on.addEventListener('change',draw);
+  window.__f7draw=draw;
+})();
+
+/* ========================= F8 Radiales Menü ========================= */
+(function(){
+  const cv=document.getElementById('f8c'),menu=document.getElementById('f8menu');
+  const view={x:21,y:5,w:14,h:13};
+  const items=[['Graben','M4 20l8-8M15 9l2.5-2.5a2 2 0 0 1 3 3L18 12'],['Bewegen','M5 19L19 5M19 5h-7M19 5v7'],['Feuern','M12 3v4M12 17v4M3 12h4M17 12h4'],['Halten','M7 4v16M17 4v16'],['Draht','M3 12h18M7 9l3 6M13 9l3 6'],['Umbauen','M4 12h12M12 6l6 6-6 6']];
+  let open=null,hot=2,target=null,timer=null,info=null;
+  function draw(){
+    const th=T();info=drawMap(cv,th,{view,layers:{orders:false,barrage:false,labels:false,enemy:false,mg:false,units:false,etappe:false}});
+    info.withGrid((ctx,px)=>{
+      unit(ctx,th,23.3,13,{text:'5',px});unit(ctx,th,28.75,11,{text:'2',px,selected:!!open});unit(ctx,th,24.5,9.6,{text:'B',px,w:1.1});
+      if(open&&target)arrow(ctx,[28.75,11],target,th.accent,px,{});
+    });
+    if(open){const p=info.toPx(open.x,open.y);menu.style.left=p.x+'px';menu.style.top=p.y+'px';menu.style.display='block';
+      menu.innerHTML='<div class="center"></div>'+items.map(([n,d],i)=>{const a=-Math.PI/2+i/items.length*Math.PI*2;const x=Math.cos(a)*78,y=Math.sin(a)*78;return `<div class="item ${i===hot?'hot':''}" style="--x:${x}px;--y:${y}px" data-i="${i}"><svg viewBox="0 0 24 24"><path d="${d}"/></svg>${n}</div>`;}).join('');
+    } else menu.style.display='none';
+  }
+  const grid=e=>{const r=cv.getBoundingClientRect();return info.toGrid(e.clientX-r.left,e.clientY-r.top);};
+  cv.addEventListener('pointerdown',e=>{const g=grid(e);if(Math.abs(g.x-28.75)<1.2&&Math.abs(g.y-11)<.9){timer=setTimeout(()=>{open={x:28.75,y:11};target=null;draw();},350);}else{open=null;target=null;draw();}});
+  cv.addEventListener('pointerup',()=>{if(timer){clearTimeout(timer);if(!open){open={x:28.75,y:11};target=null;draw();}}});
+  menu.addEventListener('pointerover',e=>{const it=e.target.closest('.item');if(!it)return;hot=+it.dataset.i;if(hot===1)target=[32.5,12.5];else if(hot===2)target=[33.8,9];else target=null;draw();});
+  window.__f8draw=draw;window.__f8open=()=>{open={x:28.75,y:11};hot=2;target=[33.8,9];draw();};
+})();
+
+/* ========================= F9 Halten ========================= */
+(function(){
+  const hold=document.getElementById('f9hold'),ring=hold.querySelector('circle.p');
+  let t0=null,raf=null,done=false;
+  const set=p=>{ring.style.strokeDashoffset=565*(1-p);};
+  function tick(){const p=Math.min(1,(performance.now()-t0)/1400);set(p);if(p>=1){done=true;hold.classList.add('done');hold.querySelector('b').textContent='Befehle abgeschickt';hold.querySelector('small').textContent='Runde 14 wird gerechnet';return;}raf=requestAnimationFrame(tick);}
+  hold.addEventListener('pointerdown',e=>{if(done)return;t0=performance.now();hold.setPointerCapture(e.pointerId);tick();});
+  const cancel=()=>{if(done)return;cancelAnimationFrame(raf);set(0);};
+  hold.addEventListener('pointerup',cancel);hold.addEventListener('pointercancel',cancel);
+  window.__f9set=set;
+})();
+
+/* ========================= F10 Papier ========================= */
+(function(){
+  const stage=document.getElementById("f10stage");
+  const sheets=[...stage.querySelectorAll('[data-sheet]')];
+  const base=['rotate(-4deg)','rotate(2deg)','rotate(5deg)'];
+  sheets.forEach((s,i)=>{
+    s.addEventListener('pointermove',e=>{const r=s.getBoundingClientRect();const dx=(e.clientX-r.left)/r.width-.5,dy=(e.clientY-r.top)/r.height-.5;s.style.transform=`${base[i]} rotateX(${-dy*18}deg) rotateY(${dx*18}deg) translateZ(14px)`;});
+    s.addEventListener('pointerleave',()=>{s.style.transform=base[i];});
+    s.addEventListener('click',()=>{sheets.forEach(x=>x.classList.remove('front'));s.classList.add('front');});
+  });
+  sheets[1].classList.add('front');
+  window.__f10tilt=(i,rx,ry)=>{sheets[i].style.transform=`${base[i]} rotateX(${rx}deg) rotateY(${ry}deg) translateZ(14px)`;sheets.forEach(x=>x.classList.remove('front'));sheets[i].classList.add('front');};
+})();
+
+/* ========================= Tag und Nacht ========================= */
+// Stil 01 (Karte) ist der Tag, Stil 04 (Nacht) die Nacht. Dazwischen wird interpoliert:
+// Canvas-Thema und CSS-Variablen der Kärtchen gleichzeitig, mit warmem Dämmerungsschimmer.
+const CSSVARS_NACHT={paper:'#0b0d0a',card:'#15180f',ink:'#d8d2b8',ink2:'#8f8a73',line:'#3a3f2c',track:'#262a1e',own:'#7fa4e6',enemy:'#e2645a',accent:'#ffbf47',danger:'#e2645a'};
+function hex2rgb(h){h=h.replace('#','');if(h.length===3)h=h.split('').map(c=>c+c).join('');const n=parseInt(h,16);return [n>>16&255,n>>8&255,n&255];}
+function rgb2hex(r){return '#'+r.map(v=>Math.round(Math.max(0,Math.min(255,v))).toString(16).padStart(2,'0')).join('');}
+function mix(a,b,t){if(!a.startsWith('#')||!b.startsWith('#'))return t<.5?a:b;const A=hex2rgb(a),B=hex2rgb(b);return rgb2hex(A.map((v,i)=>v+(B[i]-v)*t));}
+function lerpTheme(a,b,t){
+  const out={};
+  for(const k of new Set([...Object.keys(a),...Object.keys(b)])){
+    const va=a[k],vb=b[k]??va;
+    const late=['ink','own','enemy','accent','wire','rail'].includes(k)?Math.max(0,Math.min(1,(t-.45)/.25)):t;
+    if(typeof va==='string'&&va.startsWith('#')&&typeof vb==='string')out[k]=mix(va,vb,late);
+    else if(typeof va==='number'&&typeof vb==='number')out[k]=va+(vb-va)*t;
+    else out[k]=t<.5?va:vb;
+  }
+  const d=Math.sin(Math.PI*t);               // Dämmerung: warmer Schimmer auf dem Papier
+  out.paper=mix(out.paper,'#9c7a4f',d*.35);
+  out.faint=mix(out.faint,'#7a5c3a',d*.3);
+  out.flare=t>.5;                            // Leuchtkugeln erst, wenn es dunkel genug ist
+  return out;
+}
+function dayNightLabel(t){return t<.15?'Tag':t<.5?'Abenddämmerung':t<.85?'Nacht bricht an':'Nacht';}
+function applyDayNight(t){
+  const body=document.body;
+  body.style.cssText='';                     // Tageswerte des aktuellen Stils lesen
+  dayNightTheme=null;
+  const label=document.getElementById('daynightLabel'),sub=document.getElementById('roundSub');
+  if(t<=0||body.dataset.style==='nacht'){label.textContent=body.dataset.style==='nacht'?'Nacht':'Tag';sub.textContent=(body.dataset.style==='nacht'?'Nacht':'Tag')+' · Regen · Abschnitt Asse-Nord';layoutBattle();return;}
+  const cs=getComputedStyle(body);
+  // Papier wandert linear, Tinte und Linien springen spät und schnell um, damit der Text lesbar bleibt
+  const tInk=Math.max(0,Math.min(1,(t-.45)/.25));
+  for(const k of Object.keys(CSSVARS_NACHT)){
+    const day=cs.getPropertyValue('--'+k).trim();
+    let v=mix(day,CSSVARS_NACHT[k],['ink','ink2','line','own','enemy','accent','danger'].includes(k)?tInk:t);
+    if(k==='paper')v=mix(v,'#9c7a4f',Math.sin(Math.PI*t)*.35);
+    if(k==='card')v=mix(v,'#8a6a44',Math.sin(Math.PI*t)*.25);
+    body.style.setProperty('--'+k,v);
+  }
+  dayNightTheme=lerpTheme(THEMES[body.dataset.style]||THEMES.karte,THEMES.nacht,t);
+  label.textContent=dayNightLabel(t);
+  sub.textContent=dayNightLabel(t)+' · Regen · Abschnitt Asse-Nord';
+  layoutBattle();
+}
+document.getElementById('daynight').addEventListener('input',e=>applyDayNight(e.target.value/100));
+window.__setDayNight=t=>{document.getElementById('daynight').value=Math.round(t*100);applyDayNight(t);};
+
+/* ========================= Steuerung ========================= */
+function redrawAll(){
+  if(document.body.dataset.view==='battle')layoutBattle();
+  else{window.__f2draw();window.__f3draw();window.__f5draw();window.__f6draw();window.__f7draw();window.__f8draw();}
+}
+document.querySelectorAll('[data-set-style]').forEach(b=>b.addEventListener('click',()=>{document.body.dataset.style=b.dataset.setStyle;document.body.style.cssText='';dayNightTheme=null;document.getElementById('daynight').value=0;applyDayNight(0);document.querySelectorAll('[data-set-style]').forEach(x=>x.classList.toggle('on',x===b));redrawAll();}));
+document.querySelectorAll('[data-set-view]').forEach(b=>b.addEventListener('click',()=>{document.body.dataset.view=b.dataset.setView;document.querySelectorAll('[data-set-view]').forEach(x=>x.classList.toggle('on',x===b));redrawAll();}));
+window.addEventListener('resize',redrawAll);
+window.__redraw=redrawAll;
+window.__setStyle=s=>{document.body.dataset.style=s;document.body.style.cssText='';dayNightTheme=null;document.getElementById('daynight').value=0;applyDayNight(0);document.querySelectorAll('[data-set-style]').forEach(x=>x.classList.toggle('on',x.dataset.setStyle===s));redrawAll();};
+window.__setView=v=>{document.body.dataset.view=v;document.querySelectorAll('[data-set-view]').forEach(x=>x.classList.toggle('on',x.dataset.setView===v));redrawAll();};
+document.fonts?.ready.then(redrawAll);
+redrawAll();
+</script>
+</body>
+</html>
