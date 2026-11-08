@@ -1,0 +1,534 @@
+{
+  "format": 1,
+  "beschreibung": "Endlosmodus Frontabschnitt (Plan 8.3): Vorlagen für den generierten Stabsbefehl pro Woche, Wochenanfang, Jahreszeiten und Ende des Abschnitts. Für beide Fraktionen.",
+  "eintraege": [
+    {
+      "id": "endlos.stab.kaldern",
+      "art": "endlos-stab",
+      "fraktion": "kaldern",
+      "von": "STAB HAVERSTADT-LAND",
+      "text": "VAN AURACH"
+    },
+    {
+      "id": "endlos.stab.morrow",
+      "art": "endlos-stab",
+      "fraktion": "morrow",
+      "von": "REGIMENTSSTAB RAUDAS",
+      "text": "DRAVIN"
+    },
+    {
+      "id": "endlos.befehl.halten.1",
+      "art": "endlos-befehl",
+      "blatt": "telegramm",
+      "befehlsart": "halten",
+      "titel": "Lage unverändert",
+      "frist": "ENDE WOCHE {woche}",
+      "eilt": false,
+      "text": "WOCHE {woche} STOP STELLUNG HALTEN STOP KEIN FELD AUFGEBEN STOP ERSATZ NACH LAGE STOP {stab} STOP",
+      "folgen": {
+        "erfuellt": {
+          "ansehen": 4
+        },
+        "verfehlt": {
+          "ansehen": -8
+        }
+      }
+    },
+    {
+      "id": "endlos.befehl.halten.2",
+      "art": "endlos-befehl",
+      "blatt": "telegramm",
+      "befehlsart": "halten",
+      "titel": "Ruhige Woche erwartet",
+      "frist": "ENDE WOCHE {woche}",
+      "eilt": false,
+      "text": "NACHBARABSCHNITT MELDET RUHE STOP ERWARTE GLEICHES VON IHNEN STOP JEDES VERLORENE FELD IST ZU BEGRÜNDEN STOP {stab} STOP",
+      "folgen": {
+        "erfuellt": {
+          "ansehen": 3
+        },
+        "verfehlt": {
+          "ansehen": -10
+        }
+      }
+    },
+    {
+      "id": "endlos.befehl.halten.3",
+      "art": "endlos-befehl",
+      "blatt": "telegramm",
+      "befehlsart": "halten",
+      "titel": "Gegner sammelt sich",
+      "frist": "ENDE WOCHE {woche}",
+      "eilt": true,
+      "text": "BEWEGUNG HINTER FELD {feld} GEMELDET STOP ANGRIFF WAHRSCHEINLICH VOR ENDE DER WOCHE STOP HALTEN UM JEDEN PREIS STOP {stab} STOP",
+      "folgen": {
+        "erfuellt": {
+          "ansehen": 8
+        },
+        "verfehlt": {
+          "ansehen": -12
+        }
+      }
+    },
+    {
+      "id": "endlos.befehl.nehmen.1",
+      "art": "endlos-befehl",
+      "blatt": "telegramm",
+      "befehlsart": "feld_nehmen",
+      "titel": "Feld nehmen",
+      "frist": "{frist}",
+      "eilt": false,
+      "text": "FELD {feld} BIS {frist} NEHMEN UND HALTEN STOP ARTILLERIE STEHT ZUR VERFÜGUNG STOP {stab} STOP",
+      "folgen": {
+        "erfuellt": {
+          "ansehen": 10
+        },
+        "verfehlt": {
+          "ansehen": -6
+        }
+      }
+    },
+    {
+      "id": "endlos.befehl.nehmen.2",
+      "art": "endlos-befehl",
+      "blatt": "telegramm",
+      "befehlsart": "feld_nehmen",
+      "titel": "Begradigung der Linie",
+      "frist": "{frist}",
+      "eilt": false,
+      "text": "VORSPRUNG BEI FELD {feld} STÖRT DAS KARTENBILD STOP LINIE BIS {frist} BEGRADIGEN STOP {stab} STOP",
+      "folgen": {
+        "erfuellt": {
+          "ansehen": 8
+        },
+        "verfehlt": {
+          "ansehen": -5
+        }
+      }
+    },
+    {
+      "id": "endlos.befehl.nehmen.3",
+      "art": "endlos-befehl",
+      "blatt": "telegramm",
+      "befehlsart": "feld_nehmen",
+      "titel": "Beobachtungspunkt",
+      "frist": "{frist}",
+      "eilt": false,
+      "text": "VON FELD {feld} SIEHT MAN BIS ZUR GEGNERISCHEN FELDBAHN STOP FELD NEHMEN UND BEOBACHTER NACHZIEHEN STOP FRIST {frist} STOP {stab} STOP",
+      "folgen": {
+        "erfuellt": {
+          "ansehen": 10
+        },
+        "verfehlt": {
+          "ansehen": -6
+        }
+      }
+    },
+    {
+      "id": "endlos.befehl.stosstrupp.1",
+      "art": "endlos-befehl",
+      "blatt": "telegramm",
+      "befehlsart": "stosstrupp",
+      "titel": "Nachtunternehmen",
+      "frist": "{frist}",
+      "eilt": false,
+      "text": "STOSSTRUPP GEGEN FELD {feld} STOP ZIEL ERKUNDUNG DER BESATZUNG STOP VOR {frist} STOP {stab} STOP",
+      "folgen": {
+        "erfuellt": {
+          "ansehen": 6
+        },
+        "verfehlt": {
+          "ansehen": -4
+        }
+      }
+    },
+    {
+      "id": "endlos.befehl.stosstrupp.2",
+      "art": "endlos-befehl",
+      "blatt": "telegramm",
+      "befehlsart": "stosstrupp",
+      "titel": "MG-Nest",
+      "frist": "{frist}",
+      "eilt": true,
+      "text": "MG BEI FELD {feld} BESTREICHT DEN NACHBARABSCHNITT STOP BIS {frist} UNSCHÄDLICH MACHEN STOP {stab} STOP",
+      "folgen": {
+        "erfuellt": {
+          "ansehen": 8
+        },
+        "verfehlt": {
+          "ansehen": -5
+        }
+      }
+    },
+    {
+      "id": "endlos.befehl.gefangene.1",
+      "art": "endlos-befehl",
+      "blatt": "telegramm",
+      "befehlsart": "gefangene",
+      "titel": "Gefangene benötigt",
+      "frist": "{frist}",
+      "eilt": false,
+      "text": "STAB BRAUCHT GEFANGENE ZUR FESTSTELLUNG DER GEGENÜBERLIEGENDEN EINHEIT STOP MINDESTENS ZWEI BIS {frist} STOP {stab} STOP",
+      "folgen": {
+        "erfuellt": {
+          "ansehen": 7
+        },
+        "verfehlt": {
+          "ansehen": -4
+        }
+      }
+    },
+    {
+      "id": "endlos.befehl.gefangene.2",
+      "art": "endlos-befehl",
+      "blatt": "telegramm",
+      "befehlsart": "gefangene",
+      "titel": "Neue Truppen drüben",
+      "frist": "{frist}",
+      "eilt": false,
+      "text": "GERÜCHT ÜBER ABLÖSUNG DRÜBEN STOP EINEN GEFANGENEN EINBRINGEN STOP SOLDBUCH WICHTIGER ALS ZAHL STOP {stab} STOP",
+      "folgen": {
+        "erfuellt": {
+          "ansehen": 6
+        },
+        "verfehlt": {
+          "ansehen": -3
+        }
+      }
+    },
+    {
+      "id": "endlos.befehl.zuruecknehmen.1",
+      "art": "endlos-befehl",
+      "blatt": "telegramm",
+      "befehlsart": "graben_zuruecknehmen",
+      "titel": "Verlorener Graben",
+      "frist": "MORGEN FRÜH",
+      "eilt": true,
+      "text": "FELD {feld} BIS MORGEN FRÜH ZURÜCKNEHMEN STOP KEINE AUSREDEN STOP {stab} STOP",
+      "folgen": {
+        "erfuellt": {
+          "ansehen": 10
+        },
+        "verfehlt": {
+          "ansehen": -10
+        }
+      }
+    },
+    {
+      "id": "endlos.befehl.zuruecknehmen.2",
+      "art": "endlos-befehl",
+      "blatt": "telegramm",
+      "befehlsart": "graben_zuruecknehmen",
+      "titel": "Ehre des Abschnitts",
+      "frist": "{frist}",
+      "eilt": true,
+      "text": "VERLUST VON FELD {feld} IST IM STAB BEMERKT WORDEN STOP RÜCKNAHME BIS {frist} ERWARTET STOP {stab} STOP",
+      "folgen": {
+        "erfuellt": {
+          "ansehen": 8
+        },
+        "verfehlt": {
+          "ansehen": -12
+        }
+      }
+    },
+    {
+      "id": "endlos.befehl.knapp",
+      "art": "endlos-befehl",
+      "blatt": "telegramm",
+      "befehlsart": "halten",
+      "titel": "Knapp",
+      "wann": {
+        "ansehen": {
+          "max": 24
+        }
+      },
+      "frist": "ENDE WOCHE {woche}",
+      "eilt": false,
+      "text": "HALTEN STOP {stab} STOP",
+      "folgen": {
+        "erfuellt": {
+          "ansehen": 2
+        },
+        "verfehlt": {
+          "ansehen": -8
+        }
+      }
+    },
+    {
+      "id": "endlos.woche.jahreszeit",
+      "art": "endlos-woche",
+      "slot": "endlos.woche",
+      "wann": {
+        "flags": [
+          "jahreszeit_wechsel"
+        ]
+      },
+      "text": "Woche {woche}. Jetzt kommt {jahreszeit}. Die Leute merken es zuerst an den Füßen."
+    },
+    {
+      "id": "endlos.woche.ersatz",
+      "art": "endlos-woche",
+      "slot": "endlos.woche",
+      "wann": {
+        "flags": [
+          "ersatz_eingetroffen"
+        ]
+      },
+      "text": "Woche {woche}. Ersatz ist eingetroffen. Die Neuen fragen, wo man hier schläft. {gruppenfuehrer} zeigt es ihnen und sagt dazu, wo man nicht schläft."
+    },
+    {
+      "id": "endlos.woche.kein-ersatz",
+      "art": "endlos-woche",
+      "slot": "endlos.woche",
+      "wann": {
+        "ansehen": {
+          "max": 24
+        }
+      },
+      "text": "Woche {woche}. Kein Ersatz. Der Stab schreibt, man habe andere Sorgen. Alle rücken zusammen."
+    },
+    {
+      "id": "endlos.woche.ruhig",
+      "art": "endlos-woche",
+      "slot": "endlos.woche",
+      "wann": {
+        "werte": {
+          "gefallene": {
+            "max": 0
+          }
+        }
+      },
+      "text": "Woche {woche}. Die letzte Woche hat niemanden gekostet. {gruppenfuehrer_nachname} sagt, man solle es nicht laut aussprechen."
+    },
+    {
+      "id": "endlos.woche.ein-name",
+      "art": "endlos-woche",
+      "slot": "endlos.woche",
+      "wann": {
+        "werte": {
+          "gefallene": {
+            "max": 1
+          }
+        }
+      },
+      "text": "Woche {woche}. Die Liste der letzten Woche hat einen Namen. Einer ist zu viel, sagt {gruppenfuehrer_nachname}, und sonst sagt niemand etwas."
+    },
+    {
+      "id": "endlos.woche.verluste",
+      "art": "endlos-woche",
+      "slot": "endlos.woche",
+      "text": "Woche {woche}. Die Liste der letzten Woche hat {anzahl} Namen. Wo Lücken sind, rücken die anderen zusammen und reden nicht darüber."
+    },
+    {
+      "id": "endlos.fruehling.wechsel",
+      "art": "jahreszeit",
+      "jahreszeit": "fruehling",
+      "teil": "wechsel",
+      "titel": "Frühjahr",
+      "text": "Das Eis in den Gräben bricht. Darunter liegt der Lehm vom Winter, und er ist tiefer als im Herbst."
+    },
+    {
+      "id": "endlos.fruehling.wetter.1",
+      "art": "jahreszeit",
+      "jahreszeit": "fruehling",
+      "teil": "wetter",
+      "wann": {
+        "wetter": [
+          "regen",
+          "schlamm"
+        ]
+      },
+      "text": "Tauwetter. Die Grabensohle weicht auf, die Lattenroste schwimmen."
+    },
+    {
+      "id": "endlos.fruehling.wetter.2",
+      "art": "jahreszeit",
+      "jahreszeit": "fruehling",
+      "teil": "wetter",
+      "wann": {
+        "wetter": "trocken"
+      },
+      "text": "Erster warmer Tag. Die Leute ziehen die Mäntel aus und frieren nachts wieder."
+    },
+    {
+      "id": "endlos.fruehling.wetter.3",
+      "art": "jahreszeit",
+      "jahreszeit": "fruehling",
+      "teil": "wetter",
+      "wann": {
+        "wetter": "nebel"
+      },
+      "text": "Über der Weide steht Dunst. Irgendwo hinter der Linie blüht etwas. Man riecht es nur, wenn der Wind dreht."
+    },
+    {
+      "id": "endlos.fruehling.wetter.rueckfall",
+      "art": "jahreszeit",
+      "jahreszeit": "fruehling",
+      "teil": "wetter",
+      "text": "Ein Frühjahrstag wie die anderen. Der Lehm klebt, die Tage werden länger, und niemand traut dem."
+    },
+    {
+      "id": "endlos.sommer.wechsel",
+      "art": "jahreszeit",
+      "jahreszeit": "sommer",
+      "teil": "wechsel",
+      "titel": "Sommer",
+      "text": "Der Lehm wird hart und reißt auf. Staub statt Schlamm, Durst statt Kälte."
+    },
+    {
+      "id": "endlos.sommer.wetter.1",
+      "art": "jahreszeit",
+      "jahreszeit": "sommer",
+      "teil": "wetter",
+      "wann": {
+        "wetter": "trocken"
+      },
+      "text": "Hitze. Die Wasserkanister sind wichtiger als die Munition."
+    },
+    {
+      "id": "endlos.sommer.wetter.2",
+      "art": "jahreszeit",
+      "jahreszeit": "sommer",
+      "teil": "wetter",
+      "wann": {
+        "wetter": "regen"
+      },
+      "text": "Gewitter am Nachmittag. Der Graben steht eine Stunde lang unter Wasser, dann dampft er."
+    },
+    {
+      "id": "endlos.sommer.wetter.3",
+      "art": "jahreszeit",
+      "jahreszeit": "sommer",
+      "teil": "wetter",
+      "wann": {
+        "wetter": "nebel"
+      },
+      "text": "Morgennebel über der Weide, der erst gegen Mittag aufreißt. Bis dahin hört man drüben Löffel an Kochgeschirr."
+    },
+    {
+      "id": "endlos.sommer.wetter.rueckfall",
+      "art": "jahreszeit",
+      "jahreszeit": "sommer",
+      "teil": "wetter",
+      "text": "Ein Sommertag wie die anderen. Staub in den Augen, Fliegen am Brot, und abends ein Himmel, der nicht hierher passt."
+    },
+    {
+      "id": "endlos.herbst.wechsel",
+      "art": "jahreszeit",
+      "jahreszeit": "herbst",
+      "teil": "wechsel",
+      "titel": "Herbst",
+      "text": "Der Regen kommt und hört nicht mehr auf. Die tiefste Stelle im Graben läuft als Erstes voll, wie jedes Jahr."
+    },
+    {
+      "id": "endlos.herbst.wetter.1",
+      "art": "jahreszeit",
+      "jahreszeit": "herbst",
+      "teil": "wetter",
+      "wann": {
+        "wetter": [
+          "regen",
+          "schlamm"
+        ]
+      },
+      "text": "Dauerregen. Der Graben ist ein Bach, und der Bach fließt zum Unterstand."
+    },
+    {
+      "id": "endlos.herbst.wetter.2",
+      "art": "jahreszeit",
+      "jahreszeit": "herbst",
+      "teil": "wetter",
+      "wann": {
+        "wetter": "nebel"
+      },
+      "text": "Nebel am Morgen, so dicht, dass sich die Posten gegenseitig beim Namen rufen."
+    },
+    {
+      "id": "endlos.herbst.wetter.3",
+      "art": "jahreszeit",
+      "jahreszeit": "herbst",
+      "teil": "wetter",
+      "wann": {
+        "wetter": "trocken"
+      },
+      "text": "Sturm ohne Regen. Der Draht singt die ganze Nacht."
+    },
+    {
+      "id": "endlos.herbst.wetter.rueckfall",
+      "art": "jahreszeit",
+      "jahreszeit": "herbst",
+      "teil": "wetter",
+      "text": "Ein Herbsttag wie die anderen. Grau von morgens bis abends, und die Mäntel werden nicht mehr trocken."
+    },
+    {
+      "id": "endlos.winter.wechsel",
+      "art": "jahreszeit",
+      "jahreszeit": "winter",
+      "teil": "wechsel",
+      "titel": "Winter",
+      "text": "Frost. Der Lehm wird zu Stein, das Graben dauert doppelt so lange. Die Nächte werden lang, und die Posten zählen Leuchtkugeln, um wach zu bleiben."
+    },
+    {
+      "id": "endlos.winter.wetter.1",
+      "art": "jahreszeit",
+      "jahreszeit": "winter",
+      "teil": "wetter",
+      "wann": {
+        "wetter": "schnee"
+      },
+      "text": "Schnee deckt die Weide zu. Für einen Morgen sieht es aus, als wäre nie etwas gewesen."
+    },
+    {
+      "id": "endlos.winter.wetter.2",
+      "art": "jahreszeit",
+      "jahreszeit": "winter",
+      "teil": "wetter",
+      "wann": {
+        "wetter": "regen"
+      },
+      "text": "Eisregen. Die Leitern sind glatt, und das Kühlwasser im MG friert, wenn niemand aufpasst."
+    },
+    {
+      "id": "endlos.winter.wetter.3",
+      "art": "jahreszeit",
+      "jahreszeit": "winter",
+      "teil": "wetter",
+      "wann": {
+        "wetter": "frost"
+      },
+      "text": "Klirrende Kälte. Jemand hat einen Ofen aus einer Munitionskiste gebaut. Er wärmt nicht, aber alle sitzen darum."
+    },
+    {
+      "id": "endlos.winter.wetter.rueckfall",
+      "art": "jahreszeit",
+      "jahreszeit": "winter",
+      "teil": "wetter",
+      "text": "Ein Wintertag wie die anderen. Kurz, kalt, und die Posten zählen die Stunden bis zur Ablösung."
+    },
+    {
+      "id": "endlos.ende.gefallen",
+      "art": "endlos-ende",
+      "grund": "abschnitt_gefallen",
+      "blatt": "tagebuch",
+      "titel": "Der Abschnitt ist gefallen",
+      "text": "In Woche {woche} hält die Linie nicht mehr. Wer konnte, ist zurückgegangen, und viele konnten nicht. Die Liste des Abschnitts endet hier. Sie ist nicht vollständig."
+    },
+    {
+      "id": "endlos.ende.abgeloest",
+      "art": "endlos-ende",
+      "grund": "abgeloest",
+      "blatt": "telegramm",
+      "titel": "Abgelöst",
+      "text": "SIE SIND MIT WIRKUNG VON HEUTE ABGELÖST STOP MELDEN SIE SICH BEIM STAB STOP NACHFOLGER UNTERWEGS STOP {stab} STOP"
+    },
+    {
+      "id": "endlos.ende.meuterei",
+      "art": "endlos-ende",
+      "grund": "meuterei",
+      "blatt": "tagebuch",
+      "titel": "Die Truppe geht nicht mehr",
+      "text": "In Woche {woche} legen die Leute die Gewehre nicht ab, aber sie gehen nicht mehr vor. {gruppenfuehrer} sagt es ruhig, ohne Trotz. Es ist kein Aufstand. Es ist das Ende dessen, was man von Menschen verlangen kann."
+    }
+  ]
+}

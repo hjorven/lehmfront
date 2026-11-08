@@ -22,8 +22,13 @@ jede Variantengruppe mit genau einem Rückfall. Neue Dateien muss man nirgends e
 | `data/letters/briefe-akt1-2.json` | Handgeschriebene Briefe 01 bis 12, Lasks abgefangene Briefe Akt 1 und 2 | T1 |
 | `data/letters/briefe-akt3-4.json` | Briefe 13 bis 24, Lasks Briefe Akt 3 und 4 | T2 |
 | `data/letters/templates.json` | Vorlagen für generierte Feldpost und Ereignis-Sätze | T1 |
+| `data/texts/enden.json` | Auswahl des Endes, vier Schlusssequenzen, vorzeitige Enden, Nachwort | T2 |
+| `data/texts/zeitungen.json` | Was die Zeitungen schreiben, vor und zwischen den Akten | T2 |
+| `data/texts/fundstuecke.json` | 24 Fundstücke in sechs Ketten | T2 |
+| `data/texts/endlos.json` | Endlosmodus: Wochenbefehle, Wochenanfang, Jahreszeiten, Ende | T2 |
+| `data/texts/erfolge.json` | 40 Erfolge | T2 |
 
-Weitere Dateien (Zeitungen, Fundstücke, Enden, Erfolge, Endlosmodus) folgen demselben Aufbau.
+Alle Dateien folgen demselben Aufbau. Einzelheiten zu den T2-Dateien unter „Ergänzungen aus T2“.
 
 ## Aufbau einer Datei
 
@@ -72,6 +77,19 @@ Echte Umlaute in allen Texten. Keine Emojis. Keine realen Länder, Personen, Sym
 | `anrede` | `empfaenger`, `fraktion` | Anrede für generierte Feldpost, Text z. B. `Lieber Vater` |
 | `bericht` | `titel`, `ab`, `ausloeser`, `zaehler`, `wirkung` | Erfahrungsbericht (Plan 4.3). `zaehler` = `{ "ereignis": "<protokoll-typ>", "anzahl": n }` ist ein Vorschlag für P14 |
 | `hinweis` | `mechanik`, `von`, `ausloeser`, `anker` | Tutorial-Hinweis als Bleistiftnotiz einer Figur (`von`) am Kartenrand, höchstens 160 Zeichen. Jede `mechanik` nur einmal |
+| `akt` | `titel`, `untertitel` | Titelkarte eines Akts (Stil 08), id `a<n>.titel` |
+| `zeitung` | `zwischen`, `zeitung`, `fraktion`, `titel`, `unterzeile`, `randnotiz` | „Was die Zeitungen schreiben“ (Stil 10), siehe unten |
+| `fundstueck` | `typ`, `kette`, `kette_nr`, `akt`, `titel`, `fundort`, `bild`, `rueckseite` | Fundstück mit Nebengeschichte im `text`, siehe unten |
+| `fundstueck-kette` | `kette`, `titel` | Ende einer Fundstück-Kette, erscheint, wenn alle vier Stücke gefunden sind |
+| `ende-wahl` | `ende`, `titel`, `setzt` | Auswahl des Endes, Slot `ende.wahl`, siehe unten |
+| `ende` | `ende`, `seite`, `titel` | Eine Seite der Schlusssequenz eines Endes |
+| `nachwort` | `figur` | „Was aus ihnen wurde“ nach der Schlusssequenz |
+| `erfolg` | `titel`, `ausloeser` | Erfolg (Stil 08), keine Punkte, keine Orden |
+| `endlos-befehl` | `befehlsart`, `titel`, `frist`, `eilt`, `folgen` | Vorlage für den Stabsbefehl einer Woche im Endlosmodus |
+| `endlos-stab` | `fraktion`, `von` | Absender und Unterschrift (`text`) des Stabs im Endlosmodus, füllt `{stab}` |
+| `endlos-woche` | | Satz zum Wochenanfang, Slot `endlos.woche` |
+| `jahreszeit` | `jahreszeit`, `teil` (`wechsel` oder `wetter`) | Texte für die Jahreszeiten im Endlosmodus |
+| `endlos-ende` | `grund` | Ende des Endlosmodus: `abschnitt_gefallen`, `abgeloest`, `meuterei` |
 
 T2 und spätere Pakete dürfen neue Arten einführen (`zeitung`, `fundstueck`, `ende`, `erfolg`,
 `endlos-befehl`, `jahreszeit` ...). Sie tragen sie hier in die Tabelle ein; der Test prüft
@@ -116,7 +134,8 @@ Options-IDs sind frei, für Stabsbefehle aber nach Plan 2.5 bevorzugt `befolgen`
 Nach dem Ende einer Mission zeigt P15 die Einträge mit `nach` gleich dieser Mission in dieser Reihenfolge:
 Gefallenenliste, Tagebuch, Briefe (`brief`, dann `lask`), Entscheidungen, dann Briefing und Stabsbefehl der
 nächsten Mission. Entscheidungen kommen zuletzt, weil Briefe sie vorbereiten (Selin bittet um Loren, dann
-entscheidet Brandt). Flags aus einer Entscheidung wirken deshalb erst ab der nächsten Mission.
+entscheidet Brandt). Flags aus einer Entscheidung wirken deshalb erst ab der nächsten Mission
+(Ausnahme: Entscheidungen mit `mission`, siehe „Entscheidungen vor oder in einer Mission“).
 
 Harms ist in Akt 1 als Figur auf der Karte und kann nur in Mission a1m6 fallen (P16 setzt `harms_gefallen`).
 In Akt 2 führt er den Gefechtsstand und steht nicht auf der Karte; ab Akt 3 entscheidet T2. Vell kann nur in
@@ -189,8 +208,110 @@ Bekannte Flags aus Akt 1 und 2:
 | `doktrin_tiefe`, `doktrin_infiltration`, `doktrin_material` | Doktrinwahl a2m4 |
 | `vell_zurueckgehalten`, `vell_angriff` | Entscheidung a2m5 |
 | `trichter_gehalten` | Mission a2m6, wenn der Trichter gehalten wurde |
+| `gas_abgeblasen`, `gas_batterien`, `gas_zurueck` | Entscheidung nach a3m3 |
+| `befehl117_befolgt`, `befehl117_umgedeutet`, `befehl117_verweigert` | Entscheidung a3m4 |
+| `waffenruhe_angenommen`, `waffenruhe_geduldet`, `waffenruhe_abgelehnt` | Entscheidung a3m5 |
+| `selin_fruehjahr_loren` | Entscheidung nach a3m6: zwei Loren nur für das Lazarett in Akt 4 |
+| `mine_gezuendet`, `mine_gewarnt`, `mine_geflutet` | Entscheidung a4m3 (`mine_gewarnt` setzt auch `mine_gezuendet`) |
+| `verweigerung_mitgegangen`, `verweigerung_harms`, `verweigerung_gemeldet`, `verweigerung_aufgehoben` | Entscheidung a4m4 |
+| `lask_treffen`, `lask_gemeldet`, `lask_geschwiegen` | Entscheidung nach a4m5 |
+| `ende_durchbruch`, `ende_waffenstillstand`, `ende_abgeloest`, `ende_haelt` | Auswahl des Endes (`ende.wahl`) |
+| `jahreszeit_wechsel` | Endlosmodus: erste Woche einer neuen Jahreszeit |
+| `ersatz_eingetroffen` | Endlosmodus: in dieser Woche kam Ersatz |
 
 Spätere Pakete ergänzen die Tabelle.
+
+## Ergänzungen aus T2 (Akt 3 und 4, Enden, Zeitungen, Fundstücke, Endlos, Erfolge)
+
+Dateien: `akt3.json`, `akt4.json`, `enden.json`, `zeitungen.json`, `fundstuecke.json`, `endlos.json`,
+`erfolge.json` in `data/texts/`, dazu `data/letters/briefe-akt3-4.json`.
+
+### Optionen mit Bedingung
+
+Eine Option einer Entscheidung darf ein eigenes `wann` haben. Gilt es nicht, wird die Option nicht
+angeboten (Beispiel: `a4m4.entscheidung`, Option `harms` nur, wenn Harms lebt). Jede Entscheidung hat mindestens
+eine Option ohne `wann`.
+
+### Entscheidungen vor oder in einer Mission
+
+Entscheidungen mit `mission` statt `nach` (a3m4, a3m5, a4m3, a4m4) fallen vor bzw. während der Mission
+und bestimmen, wie sie gespielt wird. Ihre Flags gelten deshalb sofort, auch für Tagebuch und Briefe nach
+derselben Mission. Ihre Optionen-`folgen` gelten sofort; die `folgen` des Stabsbefehls derselben Mission
+kommen nach dem Ausgang dazu (beides addiert: Wer Befehl 117 verweigert und die Mission verliert,
+verliert also zweimal Ansehen).
+
+### Tagebuch nach einer Entscheidung
+
+Ein Eintrag mit `nach_entscheidung` (ID einer Entscheidung) erscheint direkt nach dieser Entscheidung,
+nicht mit dem übrigen Tagebuch der Mission. Er hat immer ein `wann` mit dem Flag der gewählten Option
+(Beispiel: `a4m5.treffen`).
+
+### Enden (`enden.json`)
+
+1. **Auswahl** vor Mission a4m6: Slot `ende.wahl` wie jeder Slot auswerten (erster Eintrag, dessen `wann`
+   gilt). Das Feld `ende` ist der Schlüssel, `setzt` setzt das Flag `ende_<schlüssel>`. Grenzen:
+   beide Werte ab 60 → `haelt`; Vertrauen ab 50 und Ansehen bis 59 → `waffenstillstand`; Ansehen ab 50 →
+   `durchbruch`; sonst `abgeloest`. Das Briefing von a4m6 (Slot `a4m6.briefing`, Feld `ende`) nutzt dieselben
+   Grenzen, mit einer zusätzlichen Variante für das Flag `lask_gemeldet`.
+   Der Test prüft, dass beides zusammenpasst.
+2. **Schlusssequenz** nach a4m6: alle Einträge `art: "ende"` mit diesem `ende`, nach `seite` aufsteigend.
+   Gibt es zu einer Seite mehrere Einträge, bilden sie einen Slot (`ende.<schlüssel>.<seite>`).
+   Seiten mit `blatt: "gefallenenliste"` zeigen vor dem Text die ganze Gefallenenliste der Kampagne
+   (`{anzahl}` ist ihre Länge) und lassen sich nicht überspringen.
+3. **Nachwort**: alle Slots `ende.nachwort.*` und Einträge `art: "nachwort"` ohne Slot, je ein Absatz pro Figur.
+4. **Brief 24** (`brief.24`) als letzte Seite, bei jedem Ende.
+
+Die vorzeitigen Enden aus Plan 2.6 (Ansehen unter 10, Vertrauen unter 10) heißen `vorzeitig_abgeloest`
+und `vorzeitig_meuterei` und werden direkt ausgelöst, ohne `ende.wahl`. Plan 2.6 sagt bei Meuterei nur
+„Mission verloren“; ob die Kampagne danach endet oder mit Brandts Nachfolge weitergeht, entscheidet P14/P26.
+Brief 24 erscheint nur bei den vier regulären Enden (er hat ein `wann` auf die Flags `ende_*`).
+
+In `ende.abgeloest.4` füllt `{gefallener}` die letzte Person der Gefallenenliste (P14 legt sie an:
+gefallen in der letzten Runde vor dem Waffenstillstand). Seiten mit `blatt: "gefallenenliste"` gibt es
+in jedem regulären Ende.
+
+### Zeitungen (`zeitungen.json`)
+
+`zwischen` ist `vor-a1`, `a1-a2`, `a2-a3` oder `a3-a4` (zwischen Akt 4 und Ende stehen Zeitungen in der
+Schlusssequenz). Pro Zwischenspiel vier Zeitungen, zwei je Fraktion (Zeitungen aus `welt.md`).
+`randnotiz` ist eine Bleistiftnotiz am Rand, von der Front: Kalderner Leser unterschreiben mit Initialen,
+erbeutete Morrow-Zeitungen tragen den Vermerk von Leutnant de Groot. Die Randnotiz wird in Caveat schräg
+über den Satzspiegel gelegt. Zensurlücken im Ravelsker Grubenblatt stehen wie in der Papierebene (Z1) in
+`[[doppelten eckigen Klammern]]`: Der Text darin wird als schwarzer Balken gedruckt und nicht angezeigt.
+Er steht trotzdem in den Daten, damit die Balken die richtige Länge haben.
+
+### Fundstücke (`fundstuecke.json`)
+
+Alle Fundstücke haben `blatt: "foto"` (das Fundstück-Blatt der Papierebene); `typ` ist `foto`,
+`feldpostkarte` oder `karte` und bestimmt, wie das Blatt gezeichnet wird. `bild` beschreibt, was auf der Vorderseite zu sehen ist
+(für die Zeichnung und als Alternativtext), `rueckseite` ist die Schrift auf der Rückseite (Blatt
+umdrehen). `akt` sagt, ab welchem Akt das Stück gefunden werden kann. Sechs Ketten zu je vier Stücken
+(`kette`, `kette_nr` 1 bis 4). Sind alle vier einer Kette gefunden, erscheint der Eintrag
+`fundstueck-kette` derselben Kette als Abschluss. Wer die Kette „schach“ vollständig hat, hat Lasks
+Partie mit Ruta von der Eröffnung bis zur letzten Stellung.
+
+### Endlosmodus (`endlos.json`)
+
+- Stabsbefehl der Woche: unter `endlos-befehl` mit passender `befehlsart` (Plan 8.3) einen wählen, dessen
+  `wann` gilt, über `rngForTurn`. `{stab}` kommt aus `endlos-stab` der eigenen Fraktion, `{feld}` ist das
+  Zielfeld, `{frist}` die Frist, `{woche}` die Woche. `endlos.befehl.knapp` gilt nur bei Ansehen unter 25:
+  P22 nimmt dann für `halten` immer diese Vorlage, und der Stab schreibt nur noch zwei Wörter.
+- Wochenanfang: Slot `endlos.woche`, ab Woche 2 (in Woche 1 gibt es keine Vorwoche).
+- `{gruppe}`, `{gruppenfuehrer}` usw. sind für beide Fraktionen neutral formuliert (Morrow sagt „Rotte“, die Texte sagen „die Leute“).
+- Jahreszeit: beim Wechsel `teil: "wechsel"`, sonst pro Woche ein `teil: "wetter"`, dessen `wann` zum Wetter passt.
+- Ende: `endlos-ende` mit dem passenden `grund`.
+
+### Erfolge (`erfolge.json`)
+
+40 Einträge. `ausloeser` beschreibt in Worten, wann der Erfolg gilt; P14/P22/P25 setzen das um, manche
+brauchen dafür Zähler über alle Missionen. Erfolge vergeben aber keine Punkte, keine Ränge und keine Orden
+(Plan 13), und der Spieler sieht keine Zählerstände.
+
+### Weitere Felder
+
+- `hinweis` (bei `brief`): Hinweis an die Umsetzung, wird nicht angezeigt.
+- `doktrin` (bei `lask`): `masse`, `nachtangriffe`, `materialschlacht`, `tiefe_verteidigung`. Lasks letzter
+  Brief eines Akts darf schon die Doktrin des nächsten Akts ankündigen.
 
 ## Platzhalter
 

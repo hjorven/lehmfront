@@ -342,3 +342,228 @@ test('T1: etwa 20 Erfahrungsberichte und Tutorial-Hinweise ohne Doppelungen', ()
   for (const h of hints) assert.ok(h.text.length <= 160, `${h.id}: Hinweis zu lang (${h.text.length})`);
   assert.ok(byId.has('a1.titel') && byId.has('a2.titel'), 'Aktkarten fehlen');
 });
+
+// ---------------------------------------------------------------------------
+// T2: Akt 3 und 4, Enden, Zeitungen, Fundstuecke, Endlosmodus, Erfolge
+// ---------------------------------------------------------------------------
+
+const T2_FILES = [
+  'data/texts/akt3.json', 'data/texts/akt4.json', 'data/texts/enden.json', 'data/texts/zeitungen.json',
+  'data/texts/fundstuecke.json', 'data/texts/endlos.json', 'data/texts/erfolge.json', 'data/letters/briefe-akt3-4.json',
+];
+const t2 = (file) => entries.filter((x) => x.file === file).map((x) => x.e);
+const byArt = (art) => entries.filter((x) => x.e.art === art).map((x) => x.e);
+
+// Flags, die Missionen oder das Spiel selbst setzen (nicht ueber setzt einer Entscheidung).
+const T2_SPIEL_FLAGS = ['harms_gefallen', 'vell_gefallen', 'jahreszeit_wechsel', 'ersatz_eingetroffen'];
+
+// Erster passender Eintrag eines Slots fuer gegebene Achsenwerte (nur ansehen/vertrauen).
+function pickByAxes(list, ansehen, vertrauen) {
+  const inRange = (r, v) => !r || ((r.min ?? -Infinity) <= v && v <= (r.max ?? Infinity));
+  // Nur Varianten, die allein an den Achsen haengen; andere verfeinern nur den Text desselben Endes.
+  const nurAchsen = (w) => Object.keys(w).every((k) => k === 'ansehen' || k === 'vertrauen');
+  return list.find((e) => !e.wann || (nurAchsen(e.wann) && inRange(e.wann.ansehen, ansehen) && inRange(e.wann.vertrauen, vertrauen)));
+}
+
+test('T2: alle Dateien vorhanden', () => {
+  for (const f of T2_FILES) assert.ok(existsSync(join(ROOT, f)), `${f} fehlt`);
+});
+
+test('T2: jede Mission in Akt 3 und 4 hat Briefing und Stabsbefehl, Tagebuch mit Varianten', () => {
+  const errs = [];
+  for (const a of [3, 4]) {
+    for (let m = 1; m <= 6; m++) {
+      const id = `a${a}m${m}`;
+      if (!entries.some(({ e }) => e.art === 'briefing' && e.mission === id)) errs.push(`${id}: Briefing fehlt`);
+      if (!entries.some(({ e }) => e.art === 'befehl' && e.mission === id)) errs.push(`${id}: Stabsbefehl fehlt`);
+      // a4m6 endet in der Schlusssequenz statt im Tagebuch.
+      if (id === 'a4m6') continue;
+      const tb = entries.filter(({ e }) => e.art === 'tagebuch' && e.nach === id);
+      if (tb.length < 2) errs.push(`${id}: weniger als zwei Tagebuch-Varianten`);
+    }
+  }
+  for (const a of [3, 4]) if (!entries.some(({ e }) => e.id === `a${a}.titel` && e.blatt === 'aktkarte')) errs.push(`a${a}.titel fehlt`);
+  assert.deepEqual(errs, []);
+});
+
+test('T2: Briefe 13 bis 24 sind alle da, Lask schreibt in Akt 3 und 4', () => {
+  const nrs = new Set(t2('data/letters/briefe-akt3-4.json').filter((e) => e.art === 'brief').map((e) => e.nr));
+  for (let n = 13; n <= 24; n++) assert.ok(nrs.has(n), `Brief ${n} fehlt`);
+  const lask = t2('data/letters/briefe-akt3-4.json').filter((e) => e.art === 'lask');
+  for (const e of lask) {
+    assert.ok(e.vermerk && e.doktrin && e.absender && e.empfaenger, `${e.id}: vermerk, doktrin, absender, empfaenger`);
+  }
+  assert.ok(lask.some((e) => /^a3m/.test(e.nach)) && lask.some((e) => /^a4m/.test(e.nach)));
+});
+
+test('T2: Entscheidungen setzen Flags, Options-Bedingungen sind gueltig', () => {
+  const errs = [];
+  for (const f of ['data/texts/akt3.json', 'data/texts/akt4.json']) {
+    for (const e of t2(f).filter((x) => x.art === 'entscheidung')) {
+      if (!e.mission && !e.nach) errs.push(`${e.id}: mission oder nach fehlt`);
+      if (!(e.optionen ?? []).some((o) => o.setzt?.length)) errs.push(`${e.id}: keine Option setzt ein Flag`);
+      for (const o of e.optionen ?? []) if (o.wann !== undefined) checkWann(o.wann, `${e.id} ${o.id} wann`, errs);
+      // Mindestens eine Option ohne Bedingung, damit immer gewaehlt werden kann.
+      if (!(e.optionen ?? []).some((o) => o.wann === undefined)) errs.push(`${e.id}: jede Option hat eine Bedingung`);
+    }
+  }
+  assert.deepEqual(errs, []);
+});
+
+test('T2: jedes gelesene Flag wird irgendwo gesetzt', () => {
+  const gesetzt = new Set(T2_SPIEL_FLAGS);
+  for (const { e } of entries) {
+    for (const f of e.setzt ?? []) gesetzt.add(f);
+    for (const o of e.optionen ?? []) for (const f of o.setzt ?? []) gesetzt.add(f);
+  }
+  // Flags aus Akt 1 und 2 (T1) zaehlen, wenn sie in der Flag-Tabelle der README stehen.
+  const readme = readFileSync(join(ROOT, 'data/texts/README.md'), 'utf8');
+  const dokumentiert = new Set([...readme.matchAll(/`([a-z0-9_]+)`/g)].map((m) => m[1]));
+  for (const f of dokumentiert) gesetzt.add(f);
+  const errs = [];
+  const visit = (w, at) => {
+    if (!w) return;
+    for (const f of [...(w.flags ?? []), ...(w.ohne ?? [])]) if (!gesetzt.has(f)) errs.push(`${at}: Flag ${f} wird nie gesetzt`);
+    for (const x of w.oder ?? []) visit(x, at);
+  };
+  for (const f of T2_FILES) {
+    for (const e of t2(f)) {
+      for (const fl of [...(e.setzt ?? []), ...(e.optionen ?? []).flatMap((o) => o.setzt ?? [])]) {
+        if (!dokumentiert.has(fl)) errs.push(`${f} ${e.id}: Flag ${fl} fehlt in der README`);
+      }
+      visit(e.wann, `${f} ${e.id}`);
+      for (const o of e.optionen ?? []) visit(o.wann, `${f} ${e.id} ${o.id}`);
+    }
+  }
+  assert.deepEqual(errs, []);
+});
+
+test('T2: vier Enden nach Plan 2.6, jede Wertekombination fuehrt zu genau einem Ende', () => {
+  const wahl = t2('data/texts/enden.json').filter((e) => e.slot === 'ende.wahl');
+  assert.deepEqual(wahl.map((e) => e.ende).sort(), ['abgeloest', 'durchbruch', 'haelt', 'waffenstillstand']);
+  // Ecken aus Plan 2.6
+  assert.equal(pickByAxes(wahl, 90, 10).ende, 'durchbruch');
+  assert.equal(pickByAxes(wahl, 10, 90).ende, 'waffenstillstand');
+  assert.equal(pickByAxes(wahl, 10, 10).ende, 'abgeloest');
+  assert.equal(pickByAxes(wahl, 90, 90).ende, 'haelt');
+  // Jeder Punkt des Rasters hat ein Ende, und das Briefing von a4m6 passt dazu.
+  const briefing = t2('data/texts/akt4.json').filter((e) => e.slot === 'a4m6.briefing');
+  for (const b of briefing) assert.ok(wahl.some((w) => w.ende === b.ende), `${b.id}: ende ${b.ende} unbekannt`);
+  for (let a = 0; a <= 100; a++) {
+    for (let v = 0; v <= 100; v++) {
+      const ende = pickByAxes(wahl, a, v);
+      assert.ok(ende, `kein Ende fuer ${a}/${v}`);
+      assert.equal(pickByAxes(briefing, a, v).ende, ende.ende, `Briefing a4m6 passt nicht zum Ende bei ${a}/${v}`);
+    }
+  }
+});
+
+test('T2: jedes Ende hat eine Schlusssequenz mit fortlaufenden Seiten', () => {
+  const seiten = new Map();
+  for (const e of t2('data/texts/enden.json').filter((x) => x.art === 'ende')) {
+    if (!seiten.has(e.ende)) seiten.set(e.ende, new Set());
+    seiten.get(e.ende).add(e.seite);
+    assert.ok(e.blatt && e.titel, `${e.id}: blatt und titel`);
+  }
+  const ende = t2('data/texts/enden.json').filter((x) => x.art === 'ende');
+  for (const e of ende.filter((x) => x.blatt === 'telegramm')) {
+    assert.equal(e.text, e.text.toUpperCase(), `${e.id}: Telegramm nicht in Grossbuchstaben`);
+    assert.match(e.text.trim(), / STOP$/, `${e.id}: Telegramm ohne STOP`);
+    assert.doesNotMatch(e.text, /ß/, `${e.id}: ß im Telegramm`);
+  }
+  for (const k of ['durchbruch', 'waffenstillstand', 'abgeloest', 'haelt']) {
+    assert.ok(ende.some((e) => e.ende === k && e.blatt === 'gefallenenliste'), `${k}: Gefallenenliste fehlt`);
+    const s = [...(seiten.get(k) ?? [])].sort((x, y) => x - y);
+    assert.ok(s.length >= 4, `${k}: weniger als vier Seiten`);
+    assert.deepEqual(s, s.map((_, i) => i + 1), `${k}: Seiten nicht fortlaufend`);
+  }
+});
+
+test('T2: Zeitungen zwischen allen Akten, beide Fraktionen, mit Randnotiz', () => {
+  const z = t2('data/texts/zeitungen.json');
+  for (const zw of ['vor-a1', 'a1-a2', 'a2-a3', 'a3-a4']) {
+    for (const fr of ['kaldern', 'morrow']) {
+      assert.ok(z.filter((e) => e.zwischen === zw && e.fraktion === fr).length >= 2, `${zw} ${fr}: weniger als zwei Zeitungen`);
+    }
+  }
+  for (const e of z) {
+    assert.equal(e.blatt, 'zeitung');
+    assert.ok(e.zeitung && e.titel && e.randnotiz, `${e.id}: zeitung, titel, randnotiz`);
+  }
+});
+
+test('T2: 24 Fundstuecke in vollstaendigen Ketten', () => {
+  const f = byArt('fundstueck');
+  assert.equal(f.length, 24);
+  const ketten = new Map();
+  for (const e of f) {
+    assert.ok(['foto', 'feldpostkarte', 'karte'].includes(e.typ), `${e.id}: typ ${e.typ}`);
+    assert.ok(e.titel && e.fundort && e.bild && e.rueckseite && [1, 2, 3, 4].includes(e.akt), `${e.id}: Felder`);
+    if (!ketten.has(e.kette)) ketten.set(e.kette, []);
+    ketten.get(e.kette).push(e.kette_nr);
+  }
+  const enden = new Set(byArt('fundstueck-kette').map((e) => e.kette));
+  for (const [k, nrs] of ketten) {
+    assert.deepEqual(nrs.sort(), [1, 2, 3, 4], `Kette ${k}`);
+    assert.ok(enden.has(k), `Kette ${k} ohne Ende`);
+  }
+  assert.equal(enden.size, ketten.size);
+});
+
+test('T2: 40 Erfolge, eindeutige Titel, keine Orden-Zaehlerei', () => {
+  const e = byArt('erfolg');
+  assert.equal(e.length, 40);
+  assert.equal(new Set(e.map((x) => x.titel)).size, 40, 'Titel doppelt');
+  for (const x of e) {
+    assert.ok(x.titel && x.ausloeser, `${x.id}: titel und ausloeser`);
+    assert.doesNotMatch(`${x.titel} ${x.text}`, /Orden|Medaille|Punkte|Rang/, `${x.id}: Orden-Zaehlerei`);
+  }
+});
+
+test('T2: Endlosmodus: Befehle im Telegrammstil fuer alle Befehlsarten, Jahreszeiten vollstaendig', () => {
+  const errs = [];
+  const befehle = byArt('endlos-befehl');
+  const arten = new Set(befehle.map((b) => b.befehlsart));
+  for (const a of ['halten', 'feld_nehmen', 'stosstrupp', 'gefangene', 'graben_zuruecknehmen']) if (!arten.has(a)) errs.push(`Befehlsart ${a} fehlt`);
+  for (const b of befehle) {
+    const ohne = b.text.replace(/\{[a-z_]+\}/g, '');
+    if (ohne !== ohne.toUpperCase()) errs.push(`${b.id}: nicht in Grossbuchstaben`);
+    if (/ß/.test(b.text)) errs.push(`${b.id}: ß im Telegramm`);
+    if (!/ STOP$/.test(b.text.trim())) errs.push(`${b.id}: endet nicht mit STOP`);
+    if (!b.text.includes('{stab}')) errs.push(`${b.id}: Unterschrift {stab} fehlt`);
+    if (typeof b.eilt !== 'boolean' || !b.frist) errs.push(`${b.id}: eilt oder frist fehlt`);
+    checkFolgen(b.folgen?.erfuellt, `${b.id} erfuellt`, errs);
+    checkFolgen(b.folgen?.verfehlt, `${b.id} verfehlt`, errs);
+  }
+  const stab = byArt('endlos-stab').map((s) => s.fraktion).sort();
+  if (stab.join() !== 'kaldern,morrow') errs.push('endlos-stab fuer beide Fraktionen fehlt');
+  for (const j of ['fruehling', 'sommer', 'herbst', 'winter']) {
+    const t = byArt('jahreszeit').filter((e) => e.jahreszeit === j);
+    if (!t.some((e) => e.teil === 'wechsel')) errs.push(`${j}: wechsel fehlt`);
+    if (t.filter((e) => e.teil === 'wetter').length < 3) errs.push(`${j}: weniger als drei Wetter-Texte`);
+    if (!t.some((e) => e.teil === 'wetter' && e.wann === undefined)) errs.push(`${j}: Wetter-Text ohne Bedingung als Rueckfall fehlt`);
+  }
+  const gruende = new Set(byArt('endlos-ende').map((e) => e.grund));
+  for (const g of ['abschnitt_gefallen', 'abgeloest', 'meuterei']) if (!gruende.has(g)) errs.push(`Endlos-Ende ${g} fehlt`);
+  assert.deepEqual(errs, []);
+});
+
+test('T2: Tagebuch nach einer Entscheidung verweist auf eine vorhandene Entscheidung', () => {
+  const ids = new Set(byArt('entscheidung').map((e) => e.id));
+  for (const { e } of entries) {
+    if (e.nach_entscheidung === undefined) continue;
+    assert.ok(ids.has(e.nach_entscheidung), `${e.id}: ${e.nach_entscheidung} unbekannt`);
+    assert.ok(e.wann?.flags?.length, `${e.id}: braucht wann mit dem Flag der Option`);
+  }
+});
+
+test('T2: jeder Tagebuch-Slot in Akt 3 und 4 hat mindestens zwei Varianten', () => {
+  const slots = new Map();
+  for (const f of ['data/texts/akt3.json', 'data/texts/akt4.json']) {
+    for (const e of t2(f).filter((x) => x.art === 'tagebuch' && x.slot)) {
+      if (!slots.has(e.slot)) slots.set(e.slot, []);
+      slots.get(e.slot).push(e);
+    }
+  }
+  for (const [slot, list] of slots) assert.ok(list.length >= 2, `${slot}: nur eine Variante`);
+});

@@ -91,6 +91,21 @@
       "name": "abschnitt",
       "beschreibung": "Name des eigenen Abschnitts",
       "beispiel": "Asse-Nord"
+    },
+    {
+      "name": "woche",
+      "beschreibung": "Nummer der laufenden Woche im Endlosmodus, als Ziffer",
+      "beispiel": "7"
+    },
+    {
+      "name": "feld",
+      "beschreibung": "Bezeichnung eines Kartenfelds in Grossbuchstaben, fuer Telegramme im Endlosmodus",
+      "beispiel": "C7"
+    },
+    {
+      "name": "stab",
+      "beschreibung": "Unterschrift des Stabs in Grossbuchstaben, aus dem Eintrag endlos-stab der eigenen Fraktion",
+      "beispiel": "VAN AURACH"
     }
   ]
 }

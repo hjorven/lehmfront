@@ -1,0 +1,606 @@
+{
+  "format": 1,
+  "beschreibung": "Akt 3: Materialschlacht (Winter). Briefings, Stabsbefehle, Entscheidungen, Tagebuch.",
+  "eintraege": [
+    {
+      "id": "a3.titel",
+      "art": "akt",
+      "blatt": "aktkarte",
+      "titel": "Akt 3: Materialschlacht",
+      "untertitel": "Winter",
+      "text": "Der Frost kommt mit den Zügen. Sie bringen Granaten, Gasflaschen, zerlegte Flugzeuge und Befehle. In Haverstadt-Land hat man beschlossen, dass der Lehmgau im Frühjahr nicht mehr umkämpft sein soll. Wie, das steht in keinem der Telegramme."
+    },
+    {
+      "id": "a3m1.briefing",
+      "art": "briefing",
+      "mission": "a3m1",
+      "titel": "Kalte Rohre",
+      "ort": "Velde und Velder Mühle",
+      "zeit": "Frühwinter, erster Frost",
+      "text": "Über Nacht sind hinter Ostervenn vier neue Batterien eingetroffen. Die Kanoniere sind jung und haben noch nie auf etwas geschossen, das zurückschießt. Drüben ist es ähnlich: Im Zelva-Wald stehen so viele neue Geschütze, dass Lasks Etappe nachts aussieht wie eine Stadt.\n\nHalten Sie den Abschnitt, während beide Seiten ihre neuen Rohre einschießen. Halten Sie die Leute in den Unterständen, solange es kracht, und an den Brüstungen, wenn es aufhört. Und lernen Sie, wie eine Feuerwalze läuft. Der Stab wird bald eine von Ihnen verlangen.",
+      "ziele": [
+        "Den vorderen Graben bis Runde 12 halten.",
+        "Einen Feuerplan mit mindestens drei Abschnitten anlegen.",
+        "Freiwillig: Kein Unterstand geht verloren."
+      ]
+    },
+    {
+      "id": "a3m1.befehl",
+      "art": "befehl",
+      "blatt": "telegramm",
+      "mission": "a3m1",
+      "nr": "301",
+      "von": "STAB HAVERSTADT-LAND",
+      "an": "MAJOR BRANDT",
+      "abschnitt": "A-NORD",
+      "frist": "TAG 3 DER MISSION",
+      "eilt": false,
+      "text": "NEUE BATTERIEN SCHIESSEN SICH AB MORGEN EIN STOP STELLUNG HALTEN STOP ZIELMELDUNGEN STÜNDLICH AN DIE ARTILLERIE STOP VAN AURACH STOP",
+      "folgen": {
+        "erfuellt": {
+          "ansehen": 4
+        },
+        "verfehlt": {
+          "ansehen": -6
+        }
+      }
+    },
+    {
+      "id": "a3m1.tagebuch.ruhig",
+      "art": "tagebuch",
+      "blatt": "tagebuch",
+      "slot": "a3m1.tagebuch",
+      "nach": "a3m1",
+      "titel": "Zwei Tage Erde",
+      "wann": {
+        "werte": {
+          "gefallene": {
+            "max": 3
+          }
+        }
+      },
+      "text": "Zwei Tage lang hat die Erde gezittert, und unsere Leute haben unten gesessen und Karten gespielt. Die Unterstände haben gehalten. Ich habe im Sommer jeden Balken selbst gerechnet, und heute zum ersten Mal hat es sich gelohnt.\n\nIch habe an die Leute drüben gedacht, die in ihren eigenen Löchern saßen und unsere Granaten zählten. Wir haben dafür jetzt Zahlen. Ich weiß nicht, ob das besser ist."
+    },
+    {
+      "id": "a3m1.tagebuch.balken",
+      "art": "tagebuch",
+      "blatt": "tagebuch",
+      "slot": "a3m1.tagebuch",
+      "nach": "a3m1",
+      "titel": "Balken",
+      "text": "Ein Unterstand hat nicht gehalten. Ich habe die Balken im Sommer berechnet, mit Zahlen für Feldgeschütze. Die neuen Rohre im Zelva-Wald sind schwerer. Niemand hat mir das gesagt, und ich hätte fragen müssen.\n\nIch schreibe die Namen ab, bevor die Liste nach Haverstadt-Land geht. Morgen lasse ich jeden Unterstand eine Lage tiefer graben. Das hätte ich gestern tun sollen."
+    },
+    {
+      "id": "a3m2.briefing",
+      "art": "briefing",
+      "mission": "a3m2",
+      "titel": "Gelber Nebel",
+      "ort": "Sappenkopf vor dem Krähenholz",
+      "zeit": "Winter, Nacht, Ostwind",
+      "text": "In der Nacht kam der Wind von Osten, und mit ihm etwas, das nach Senf und nassem Heu riecht. Die Gruppe von {gruppenfuehrer} im Sappenkopf vor dem Krähenholz hat die Masken zu spät aufgesetzt. Sie sitzen fest, halb blind, und drüben wird man nachsehen kommen, ob noch jemand atmet.\n\nHolen Sie die Gruppe zurück. Dr. Selin hat im Lazarett Wasser, Tücher und zwölf Betten. Es werden nicht reichen.",
+      "ziele": [
+        "Die eingeschlossene Gruppe in den Hauptgraben zurückbringen.",
+        "Mindestens die Hälfte der Gasverletzten per Lore zum Verbandsplatz schaffen.",
+        "Freiwillig: Keine Gruppe steht ohne Maske im Gas."
+      ]
+    },
+    {
+      "id": "a3m2.befehl",
+      "art": "befehl",
+      "blatt": "telegramm",
+      "mission": "a3m2",
+      "nr": "309",
+      "von": "STAB HAVERSTADT-LAND",
+      "an": "MAJOR BRANDT",
+      "abschnitt": "A-NORD",
+      "frist": "SOFORT",
+      "eilt": true,
+      "text": "GASANGRIFF IST ZU MELDEN MIT UHRZEIT WINDRICHTUNG UND VERLUSTEN STOP GEGENMASSNAHMEN WERDEN VORBEREITET STOP VAN AURACH STOP",
+      "folgen": {
+        "erfuellt": {
+          "ansehen": 3
+        },
+        "verfehlt": {
+          "ansehen": -4
+        }
+      }
+    },
+    {
+      "id": "a3m2.tagebuch.geholt",
+      "art": "tagebuch",
+      "blatt": "tagebuch",
+      "slot": "a3m2.tagebuch",
+      "nach": "a3m2",
+      "titel": "Wasser",
+      "wann": {
+        "ausgang": "sieg"
+      },
+      "text": "Wir haben sie geholt. Selin hat ihnen die Augen ausgewaschen, die ganze Nacht, mit dem Wasser, das wir zum Kochen gebraucht hätten. Einer hat mich gefragt, welcher Tag ist. Ich habe ihm den falschen gesagt, damit er nicht merkt, wie lange er geschlafen hat.\n\nDer Stab schreibt, Gegenmaßnahmen würden vorbereitet. Ich weiß, was das heißt."
+    },
+    {
+      "id": "a3m2.tagebuch.nebel",
+      "art": "tagebuch",
+      "blatt": "tagebuch",
+      "slot": "a3m2.tagebuch",
+      "nach": "a3m2",
+      "titel": "Eimer",
+      "text": "Wir kamen nicht hin. Der Nebel lag in der Sappe wie Wasser in einem Eimer. Am Morgen war er weg und die Gruppe auch.\n\nIch habe die Namen aufgeschrieben, mit Uhrzeit und Windrichtung, wie es der Stab verlangt. Ostwind, 02:40 Uhr. Als ob der Wind etwas dafür könnte."
+    },
+    {
+      "id": "a3m3.briefing",
+      "art": "briefing",
+      "mission": "a3m3",
+      "titel": "Augen am Himmel",
+      "ort": "Etappe zwischen Ostervenn und Velde",
+      "zeit": "Winter, klare Tage",
+      "text": "Seit einer Woche kreist morgens ein Flugzeug über dem Abschnitt, langsam, als hätte es Zeit. Am Nachmittag fallen die Granaten genau dort, wo es gekreist ist. Es ist das erste Flugzeug, das die meisten hier gesehen haben, und niemand sieht gern hinauf.\n\nDer Stab plant einen großen Angriff und will nicht, dass Lask weiß, wo. Bauen Sie Scheinstellungen, verlegen Sie das Depot bei Nacht, lassen Sie den Flieger sehen, was er sehen soll. Ein eigenes Flugzeug steht zur Verfügung, zwei Stunden täglich, wenn das Wetter hält.",
+      "ziele": [
+        "Zwei Scheinbatterien bauen, die der Gegner beschießt.",
+        "Das Hauptdepot bleibt unentdeckt.",
+        "Freiwillig: Mit dem eigenen Flieger die Batterien im Zelva-Wald aufklären."
+      ]
+    },
+    {
+      "id": "a3m3.befehl",
+      "art": "befehl",
+      "blatt": "telegramm",
+      "mission": "a3m3",
+      "nr": "314",
+      "von": "STAB HAVERSTADT-LAND",
+      "an": "MAJOR BRANDT",
+      "abschnitt": "A-NORD",
+      "frist": "BIS AUF WEITERES",
+      "eilt": false,
+      "text": "GEGNERISCHE LUFTAUFKLÄRUNG IST ZU TÄUSCHEN STOP KEINE BEWEGUNG BEI TAG STOP EIGENER FLIEGER AB 09:00 ÜBER A-NORD STOP VAN AURACH STOP",
+      "folgen": {
+        "erfuellt": {
+          "ansehen": 6
+        },
+        "verfehlt": {
+          "ansehen": -6
+        }
+      }
+    },
+    {
+      "id": "a3m3.tagebuch.holz",
+      "art": "tagebuch",
+      "blatt": "tagebuch",
+      "slot": "a3m3.tagebuch",
+      "nach": "a3m3",
+      "titel": "Zaunpfähle",
+      "wann": {
+        "ausgang": "sieg"
+      },
+      "text": "Lask hat drei Tage lang auf Geschütze geschossen, die Feldwebel Fedders aus Zaunpfählen und Ofenrohr gebaut hat. Die Leute haben gelacht. Ich auch.\n\nDann habe ich gerechnet, wie viele Granaten das waren, und dass sie jetzt woanders fehlen. Nicht bei uns. Bei jemandem in Asse-Mitte vielleicht. Man verschiebt das Unglück nur."
+    },
+    {
+      "id": "a3m3.tagebuch.depot",
+      "art": "tagebuch",
+      "blatt": "tagebuch",
+      "slot": "a3m3.tagebuch",
+      "nach": "a3m3",
+      "titel": "Das Feuer",
+      "text": "Der Flieger hat das Depot gefunden. Es hat gebrannt bis zum Morgen, und im Licht konnte man die Leute drüben auf ihrer Brüstung stehen sehen. Sie haben zugeschaut, wie wir. Niemand hat geschossen.\n\nZwei Wochen Munition, sagt der Zahlmeister. Ich habe nachgezählt. Es sind siebzehn Tage."
+    },
+    {
+      "id": "a3m3.entscheidung",
+      "art": "entscheidung",
+      "nach": "a3m3",
+      "titel": "Die Flaschen",
+      "text": "Ein Zug bringt vierhundert Gasflaschen nach Ostervenn. Der Befehl dazu: bei nächstem Westwind auf die gegnerische Linie vor Hügel 214 abblasen. Selin hat die Flaschen gesehen. Sie sagt, sie habe gesehen, was Gas mit Menschen macht, und es sei ihr gleich, auf welcher Seite die Menschen stehen.\n\nDer Wind im Lehmgau dreht am Nachmittag. Das weiß jeder, der hier einen Herbst erlebt hat.",
+      "optionen": [
+        {
+          "id": "befolgen",
+          "label": "Abblasen wie befohlen",
+          "text": "Beim nächsten Westwind werden die Flaschen auf die Gräben vor Hügel 214 geöffnet.",
+          "folgen": {
+            "ansehen": 8,
+            "vertrauen": -6
+          },
+          "setzt": [
+            "gas_abgeblasen"
+          ]
+        },
+        {
+          "id": "umdeuten",
+          "label": "Nur auf die Batterien",
+          "text": "Das Gas wird in Granaten umgefüllt und nur auf die Batteriestellungen im Zelva-Wald geschossen, nicht auf die Gräben. Lasks Gegenfeuer in Mission 6 ist schwächer.",
+          "folgen": {
+            "ansehen": 2,
+            "vertrauen": 2
+          },
+          "setzt": [
+            "gas_batterien"
+          ]
+        },
+        {
+          "id": "verweigern",
+          "label": "Flaschen zurückschicken",
+          "text": "Die Flaschen gehen mit dem nächsten Zug ungeöffnet zurück, mit einem Bericht über unberechenbaren Wind. Der Stab rügt. Die Truppe erfährt davon, ohne dass Brandt es sagt.",
+          "folgen": {
+            "ansehen": -10,
+            "vertrauen": 6
+          },
+          "setzt": [
+            "gas_zurueck"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "a3m3.gas.abgeblasen",
+      "art": "tagebuch",
+      "blatt": "tagebuch",
+      "nach": "a3m3",
+      "nach_entscheidung": "a3m3.entscheidung",
+      "wann": {
+        "flags": [
+          "gas_abgeblasen"
+        ]
+      },
+      "titel": "Westwind",
+      "text": "Der Westwind kam um sechs Uhr früh. Die Pioniere haben die Hähne aufgedreht und sind gelaufen. Eine gelbe Wand ist über die Weide gekrochen, langsam, wie etwas, das Zeit hat.\n\nUm drei Uhr nachmittags drehte der Wind. Nicht ganz. Nur so weit, dass Selin am Abend sieben von uns in ihre Betten legte. Drüben werden es mehr gewesen sein. Ich weiß es nicht. Ich will es auch nicht wissen, und das ist neu."
+    },
+    {
+      "id": "a3m3.gas.batterien",
+      "art": "tagebuch",
+      "blatt": "tagebuch",
+      "nach": "a3m3",
+      "nach_entscheidung": "a3m3.entscheidung",
+      "wann": {
+        "flags": [
+          "gas_batterien"
+        ]
+      },
+      "titel": "Umgefüllt",
+      "text": "Die Kanoniere haben die Flaschen drei Nächte lang in Granaten umgefüllt, mit Masken und bei offenem Fenster. Morgen schießen sie damit in den Zelva-Wald, auf die Batterien, nicht auf die Gräben.\n\nIch habe mir eingeredet, dass das ein Unterschied ist. An den Batterien stehen auch Leute. Aber weniger, und hinter ihnen liegt kein Graben, in den der Wind es zurücktragen kann."
+    },
+    {
+      "id": "a3m3.gas.zurueck",
+      "art": "tagebuch",
+      "blatt": "tagebuch",
+      "nach": "a3m3",
+      "nach_entscheidung": "a3m3.entscheidung",
+      "wann": {
+        "flags": [
+          "gas_zurueck"
+        ]
+      },
+      "titel": "Rücksendung",
+      "text": "Die Flaschen fahren zurück nach Ostervenn, ungeöffnet, auf denselben Loren, die sie gebracht haben. Mein Bericht über den Wind im Lehmgau hat vier Seiten. Er ist wahr. Er ist nicht der Grund.\n\nVan Aurach hat mit zwei Wörtern geantwortet: RÜGE STOP. Ich habe das Telegramm in die Schublade gelegt, zu den anderen."
+    },
+    {
+      "id": "a3m4.briefing",
+      "art": "briefing",
+      "mission": "a3m4",
+      "titel": "Befehl 117",
+      "ort": "Gehöft Kroning im Niemandsland",
+      "zeit": "Winter, vor Tagesanbruch",
+      "text": "Das Gehöft Kroning liegt vierhundert Meter vor der Linie, an der Straße nach Raudas. Es hat kein Dach mehr, keine Wände über Hüfthöhe und keinen Brunnen. Auf der Karte des Stabs hat es einen roten Kreis.\n\nBefehl 117 verlangt, das Gehöft zu nehmen und als Ausgangsstellung für den Großangriff auszubauen. Feldwebel Fedders ist in der Nacht hinausgekrochen und hat nachgesehen. Das Gehöft liegt im Kreuzfeuer von drei MG-Nestern, und keines davon steht auf der Karte des Stabs.\n\nSie können den Befehl ausführen, ihn auslegen oder ihn ablehnen. Jede dieser Möglichkeiten hat einen Preis.",
+      "ziele": [
+        "Je nach Entscheidung: das Gehöft nehmen, den Graben in seine Richtung vortreiben oder den Abschnitt halten.",
+        "Die Verluste bleiben unter einem Drittel."
+      ]
+    },
+    {
+      "id": "a3m4.befehl",
+      "art": "befehl",
+      "blatt": "telegramm",
+      "mission": "a3m4",
+      "nr": "117",
+      "von": "STAB HAVERSTADT-LAND",
+      "an": "MAJOR BRANDT",
+      "abschnitt": "A-NORD",
+      "frist": "TAGESANBRUCH",
+      "eilt": true,
+      "text": "GEHÖFT KRONING BIS TAGESANBRUCH NEHMEN STOP ALS AUSGANGSSTELLUNG AUSBAUEN STOP RÜCKFRAGEN NICHT VORGESEHEN STOP VAN AURACH STOP",
+      "folgen": {
+        "erfuellt": {
+          "ansehen": 6
+        },
+        "verfehlt": {
+          "ansehen": -6
+        }
+      }
+    },
+    {
+      "id": "a3m4.entscheidung",
+      "art": "entscheidung",
+      "mission": "a3m4",
+      "titel": "Befehl 117",
+      "text": "Ein Gehöft ohne Dach, drei MG-Nester, die auf keiner Karte stehen, und ein Befehl, der keine Rückfragen vorsieht. Fedders hat ihre Skizze auf den Tisch gelegt, mit Bleistift, sauber bemaßt. Die Gruppen warten auf Ihre Entscheidung, ohne zu fragen.",
+      "optionen": [
+        {
+          "id": "befolgen",
+          "label": "Gehöft nehmen",
+          "text": "Der Angriff auf das Gehöft wird bei Tagesanbruch geführt, wie befohlen. Die Vorschau zeigt hohe Verluste.",
+          "folgen": {
+            "ansehen": 10,
+            "vertrauen": -10
+          },
+          "setzt": [
+            "befehl117_befolgt"
+          ]
+        },
+        {
+          "id": "umdeuten",
+          "label": "Graben vortreiben",
+          "text": "Statt das Gehöft zu stürmen, wird der eigene Graben in seine Richtung vorgetrieben und als Ausgangsstellung gemeldet. Auf der Karte sieht es aus wie Gehorsam.",
+          "folgen": {
+            "ansehen": -2,
+            "vertrauen": 4
+          },
+          "setzt": [
+            "befehl117_umgedeutet"
+          ]
+        },
+        {
+          "id": "verweigern",
+          "label": "Befehl ablehnen",
+          "text": "Brandt meldet mit Begründung und Fedders' Skizze, dass der Befehl nicht ausführbar ist, und hält den Abschnitt.",
+          "folgen": {
+            "ansehen": -15,
+            "vertrauen": 10
+          },
+          "setzt": [
+            "befehl117_verweigert"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "a3m4.tagebuch.befolgt",
+      "art": "tagebuch",
+      "blatt": "tagebuch",
+      "slot": "a3m4.tagebuch",
+      "nach": "a3m4",
+      "titel": "Ein Keller ohne Haus",
+      "wann": {
+        "flags": [
+          "befehl117_befolgt"
+        ],
+        "ausgang": "sieg"
+      },
+      "text": "Wir haben das Gehöft. Es war genau so, wie Fedders gezeichnet hat, bis auf den Meter. Jetzt liegt eine Gruppe in einem Keller ohne Haus und wartet auf einen Großangriff, den es noch nicht gibt.\n\nVan Aurach hat gratuliert. Er hat die Liste noch nicht gelesen."
+    },
+    {
+      "id": "a3m4.tagebuch.befolgt-gescheitert",
+      "art": "tagebuch",
+      "blatt": "tagebuch",
+      "slot": "a3m4.tagebuch",
+      "nach": "a3m4",
+      "titel": "Drei Nester",
+      "wann": {
+        "flags": [
+          "befehl117_befolgt"
+        ]
+      },
+      "text": "Wir sind bis zur Hofmauer gekommen. Dann haben die drei Nester geschossen, genau dort, wo Fedders sie eingezeichnet hatte. Wir sind zurück, wer konnte.\n\nIch habe Fedders' Skizze vor mir liegen. Ich habe sie gestern gelesen und den Angriff trotzdem befohlen. Das schreibe ich hier auf, damit ich es nicht anders erinnere."
+    },
+    {
+      "id": "a3m4.tagebuch.umgedeutet",
+      "art": "tagebuch",
+      "blatt": "tagebuch",
+      "slot": "a3m4.tagebuch",
+      "nach": "a3m4",
+      "titel": "Zweihundert Meter",
+      "wann": {
+        "flags": [
+          "befehl117_umgedeutet"
+        ]
+      },
+      "text": "Ich habe geschrieben, das Gehöft sei als Ausgangsstellung ungeeignet, und stattdessen den Graben zweihundert Meter vorgetrieben. Auf der Karte sieht es aus wie Gehorsam.\n\nOb van Aurach es merkt, weiß ich nicht. Die Leute haben es gemerkt. Sie graben schneller, seit sie wissen, wofür."
+    },
+    {
+      "id": "a3m4.tagebuch.verweigert",
+      "art": "tagebuch",
+      "blatt": "tagebuch",
+      "slot": "a3m4.tagebuch",
+      "nach": "a3m4",
+      "titel": "Keine Antwort",
+      "text": "Ich habe nein geschrieben. Mit Begründung, mit Fedders' Skizze, mit den drei MG-Nestern. Der Stab hat nicht geantwortet. Das ist schlimmer als eine Antwort.\n\nAm Abend stand ein Becher Tee auf meinem Tisch. Ich weiß nicht, wer ihn gebracht hat. Er war noch warm."
+    },
+    {
+      "id": "a3m5.briefing",
+      "art": "briefing",
+      "mission": "a3m5",
+      "titel": "Die längste Nacht",
+      "ort": "Niemandsland beim Heuwagen",
+      "zeit": "Mittwinter, längste Nacht des Jahres",
+      "text": "Nach dem letzten Angriff liegen zwischen den Linien noch Verwundete. Man hört sie, wenn der Wind still ist, und heute Nacht ist er still.\n\nKurz nach Einbruch der Dunkelheit hat drüben jemand eine weiße Fahne an einen Spaten gebunden und eine Laterne darunter gehängt. Ein Bote ist gekommen, ein junger Kronsoldat mit zitternden Händen, und hat einen Brief gebracht. Hauptmann Lask bietet bis Mitternacht Waffenruhe an, um die Verwundeten beider Seiten zu bergen.\n\nDer Stab hat jede Absprache mit dem Gegner untersagt.",
+      "ziele": [
+        "Je nach Entscheidung: die Verwundeten im Niemandsland bergen oder die Stellung halten.",
+        "Freiwillig: Alle eigenen Verwundeten sind vor Tagesanbruch geborgen."
+      ]
+    },
+    {
+      "id": "a3m5.befehl",
+      "art": "befehl",
+      "blatt": "telegramm",
+      "mission": "a3m5",
+      "nr": "320",
+      "von": "STAB HAVERSTADT-LAND",
+      "an": "ALLE ABSCHNITTE",
+      "abschnitt": "A-NORD",
+      "frist": "BIS AUF WEITERES",
+      "eilt": true,
+      "text": "JEDE ABSPRACHE MIT DEM GEGNER IST UNTERSAGT STOP ZUWIDERHANDLUNG WIRD KRIEGSGERICHTLICH VERFOLGT STOP VAN AURACH STOP",
+      "folgen": {
+        "erfuellt": {
+          "ansehen": 2
+        },
+        "verfehlt": {
+          "ansehen": -4
+        }
+      }
+    },
+    {
+      "id": "a3m5.entscheidung",
+      "art": "entscheidung",
+      "mission": "a3m5",
+      "titel": "Laterne unter der Fahne",
+      "text": "Lasks Brief ist kurz und höflich, in sauberer Schrift, mit der Krone über drei Ähren im Stempel. Er bietet Waffenruhe bis Mitternacht, nur für die Verwundeten, und verbürgt sich mit seinem Namen. Daneben liegt das Telegramm des Stabs.\n\nDraußen ruft jemand. Man versteht nicht, in welcher Sprache. Es ist auch nicht nötig.",
+      "optionen": [
+        {
+          "id": "annehmen",
+          "label": "Waffenruhe annehmen",
+          "text": "Brandt schickt den Boten mit einer Zusage zurück. Die Sanitäter gehen offen hinaus, mit Laternen. Alle Verwundeten werden geborgen.",
+          "folgen": {
+            "ansehen": -12,
+            "vertrauen": 12
+          },
+          "setzt": [
+            "waffenruhe_angenommen"
+          ]
+        },
+        {
+          "id": "dulden",
+          "label": "Nichts befehlen",
+          "text": "Brandt antwortet nicht und lässt die Sanitäter gehen, ohne einen Befehl zu geben. Ein Teil der Verwundeten wird geborgen. Ein nervöser Posten drüben schießt einmal.",
+          "folgen": {
+            "ansehen": -4,
+            "vertrauen": 4
+          },
+          "setzt": [
+            "waffenruhe_geduldet"
+          ]
+        },
+        {
+          "id": "ablehnen",
+          "label": "Ablehnen",
+          "text": "Brandt schickt den Boten mit einer Absage zurück und befiehlt, die Stellung zu halten. Die Mission wird zu einem Halten in der Nacht.",
+          "folgen": {
+            "ansehen": 6,
+            "vertrauen": -10
+          },
+          "setzt": [
+            "waffenruhe_abgelehnt"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "a3m5.tagebuch.angenommen",
+      "art": "tagebuch",
+      "blatt": "tagebuch",
+      "slot": "a3m5.tagebuch",
+      "nach": "a3m5",
+      "titel": "Bis Mitternacht",
+      "wann": {
+        "flags": [
+          "waffenruhe_angenommen"
+        ]
+      },
+      "text": "Bis Mitternacht standen sie und wir im selben Lehm. Jemand drüben hat Tabak angeboten, jemand von uns hat Brot zurückgegeben. Wir haben vierzehn geborgen, sie ungefähr so viele.\n\nUm Mitternacht hat eine grüne Leuchtkugel das Ende angekündigt, und alle sind zurückgegangen, ohne sich umzudrehen. Ich habe Lask nicht gesehen. Ich glaube, er hat mich gesehen."
+    },
+    {
+      "id": "a3m5.tagebuch.geduldet",
+      "art": "tagebuch",
+      "blatt": "tagebuch",
+      "slot": "a3m5.tagebuch",
+      "nach": "a3m5",
+      "titel": "Dunkel",
+      "wann": {
+        "flags": [
+          "waffenruhe_geduldet"
+        ]
+      },
+      "text": "Ich habe nichts befohlen und nichts verboten. Die Sanitäter sind hinausgegangen, und fast keiner hat geschossen. Wenn der Stab fragt, war es dunkel.\n\nEs war tatsächlich dunkel. Aber ich weiß, dass ich mich versteckt habe, hinter einem Befehl, den ich nicht gegeben habe."
+    },
+    {
+      "id": "a3m5.tagebuch.abgelehnt",
+      "art": "tagebuch",
+      "blatt": "tagebuch",
+      "slot": "a3m5.tagebuch",
+      "nach": "a3m5",
+      "titel": "Die Rufe",
+      "text": "Ich habe den Boten zurückgeschickt. Er hat genickt, als hätte er nichts anderes erwartet.\n\nDie ganze Nacht hat man sie rufen hören, in beiden Sprachen. Gegen Morgen nicht mehr. Selin hat mir am nächsten Tag nur die Liste geschickt, ohne eine Zeile dazu. Ich hätte an ihrer Stelle auch keine gefunden."
+    },
+    {
+      "id": "a3m6.briefing",
+      "art": "briefing",
+      "mission": "a3m6",
+      "titel": "Die Walze",
+      "ort": "Ganzer Abschnitt, Ziel: erste Linie vor Raudas",
+      "zeit": "Spätwinter, X-Tag",
+      "text": "Es ist so weit. Dreihundert Rohre auf zwölf Kilometern, sechs Stunden Vorbereitungsfeuer, dann die Walze, hundert Meter alle vier Minuten. A-NORD geht als dritter Abschnitt. Die Leute haben neue Stahlhelme bekommen und doppelte Rationen, und jeder weiß, was das bedeutet.\n\nWenn die Walze zu schnell läuft, kommen die Gruppen nicht mit. Wenn sie zu langsam läuft, laufen sie hinein. Sie haben den Feuerplan in der Hand.\n\nLask hat seine vordere Linie in den letzten Wochen verdünnt. Ob das Schwäche ist oder eine Falle, wissen Sie erst danach.",
+      "ziele": [
+        "Mit der Walze die erste gegnerische Linie nehmen.",
+        "Die genommene Linie gegen den Gegenstoß bis Runde 16 halten.",
+        "Freiwillig: Keine Verluste durch eigenes Feuer."
+      ]
+    },
+    {
+      "id": "a3m6.befehl",
+      "art": "befehl",
+      "blatt": "telegramm",
+      "mission": "a3m6",
+      "nr": "333",
+      "von": "STAB HAVERSTADT-LAND",
+      "an": "ALLE ABSCHNITTE",
+      "abschnitt": "A-NORD",
+      "frist": "X-TAG 10:30",
+      "eilt": true,
+      "text": "X-TAG MORGEN STOP 04:30 VORBEREITUNGSFEUER STOP 10:30 ANGRIFF STOP DER LEHMGAU WIRD BIS ZUM ABEND GENOMMEN SEIN STOP VAN AURACH STOP",
+      "folgen": {
+        "erfuellt": {
+          "ansehen": 12
+        },
+        "verfehlt": {
+          "ansehen": -10
+        }
+      }
+    },
+    {
+      "id": "a3m6.tagebuch.kalender",
+      "art": "tagebuch",
+      "blatt": "tagebuch",
+      "slot": "a3m6.tagebuch",
+      "nach": "a3m6",
+      "titel": "Der Kalender",
+      "wann": {
+        "ausgang": "sieg"
+      },
+      "text": "Wir sind in der ersten Linie von drüben. Ihre Unterstände sind tiefer als unsere, die Wände mit Brettern verschalt, an einer hing ein Kalender mit angekreuzten Tagen. Das letzte Kreuz war gestern.\n\nDer Lehmgau ist nicht bis zum Abend genommen. Er ist zweihundert Meter kleiner geworden, für die anderen. Ich lege den Kalender zu meinen Sachen."
+    },
+    {
+      "id": "a3m6.tagebuch.teilerfolg",
+      "art": "tagebuch",
+      "blatt": "tagebuch",
+      "slot": "a3m6.tagebuch",
+      "nach": "a3m6",
+      "titel": "Teilerfolg",
+      "text": "Wir waren drüben. Zwei Stunden. Dann kam der Gegenstoß aus einer zweiten Linie, die keiner gesehen hatte, und wir waren wieder hier.\n\nAlles ist wie vorher, außer der Liste. Van Aurach schreibt von einem Teilerfolg. Ich habe das Wort zweimal gelesen. Es wird beim zweiten Mal nicht besser."
+    },
+    {
+      "id": "a3m6.entscheidung",
+      "art": "entscheidung",
+      "nach": "a3m6",
+      "titel": "Zwei Loren",
+      "text": "Selin hat geschrieben. Am X-Tag hat der Stab jede Lore für Munition eingeteilt, auch die des Lazaretts, und neun Verwundete sind draußen geblieben. Sie bittet um zwei Loren, die im Frühjahr nur für das Lazarett fahren, egal, was der Lorenplan sagt. Zwei Loren weniger heißt weniger Munition vorn, jeden Tag.",
+      "optionen": [
+        {
+          "id": "zusagen",
+          "label": "Zwei Loren zusagen",
+          "text": "Zwei Loren fahren in Akt 4 nur für die Sanitätskette. Der Nachschub vorn ist kleiner.",
+          "folgen": {
+            "ansehen": -3,
+            "vertrauen": 5
+          },
+          "setzt": [
+            "selin_fruehjahr_loren"
+          ]
+        },
+        {
+          "id": "ablehnen",
+          "label": "Lorenplan bleibt",
+          "text": "Der Lorenplan bleibt, wie er ist. Brandt verspricht, im Gefecht selbst umzuplanen, wenn es nötig wird.",
+          "folgen": {
+            "ansehen": 2,
+            "vertrauen": -3
+          }
+        }
+      ]
+    }
+  ]
+}
