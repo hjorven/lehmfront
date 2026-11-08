@@ -30,7 +30,7 @@ Jeder Thread traegt hier nach dem Merge ein, was fertig ist und was offen bleibt
 - K1: Klaenge sind noch nirgends im Spiel eingehaengt, das macht P19 (und P03/P06/P07 duerfen `playSfx` direkt aufrufen). Lautstaerke-Regler gehoeren spaeter in die Einstellungen aus P18 (`setVolume`, Werte werden schon in localStorage gespeichert).
 - K1: In Safari auf iOS vor 16.4 bleibt der Klang stumm, wenn der Stummschalter am Geraet aktiv ist (ab 16.4 setzt die Engine `navigator.audioSession.type = 'playback'`).
 - Z1: Die Blätter haben ein eigenes Datenformat (`js/ui/paper/README.md`); T1 kam erst während Z1 auf `main`. P15 setzt Texte aus `data/texts/` in dieses Format um.
-- Z1: Zeitung nutzt die Systemschrift Georgia/Times (keine Fraktur, keine neue Schriftdatei). Der Neigungssensor ist nur auf echten Geräten geprüft wie im Code vorgesehen, nicht im Container.
+- Z1: Zeitung nutzt die Systemschrift Georgia/Times (keine Fraktur, keine neue Schriftdatei). Den Neigungssensor kann der Container nicht prüfen; abgesichert sind nur die Rechenfunktionen (Tests), nicht das Verhalten auf echten Geräten.
 
 ## Freigaben und Entscheidungen von Jorven
 
