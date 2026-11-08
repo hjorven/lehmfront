@@ -31,3 +31,4 @@ jobs:
           node tools/shot.mjs --check --path "/?scene=papier"
           node tools/shot.mjs --check --path "/?scene=karte"
           node tools/shot.mjs --check --path "/?scene=karte&night=1"
+          node tools/shot.mjs --check --path "/?scene=etappe"

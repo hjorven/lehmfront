@@ -1,0 +1,184 @@
+/* Etappenfenster: die Etappe als Pappmodell auf dem Stabstisch (Plan 6, Mockup __f1).
+   Alle Farben als Token auf .e3; Nacht ueberschreibt nur die Token. */
+.e3{
+  --e3-table:var(--paper); --e3-board:#b9a77f; --e3-board-side:#8f7f5c; --e3-seam:rgba(42,36,32,.16);
+  --e3-wiese:#bfc290; --e3-lehm:#c9b184; --e3-kreide:#e3dcc4; --e3-fels:#a9a08c; --e3-dorf:#cbbd9c;
+  --e3-wald:#8a9a66; --e3-sumpf:#9aa184; --e3-wasser:#8fa3a8; --e3-skirt:#a8946c; --e3-skirt2:#8f7d58;
+  --e3-tex:rgba(42,36,32,.10); --e3-rail:#5b5246; --e3-sleeper:#7a6a52; --e3-railbed:#a39a84;
+  --e3-bld:#e3d9bf; --e3-side-a:#a69878; --e3-side-b:#8e8164; --e3-side-c:#b8aa88; --e3-bld-edge:rgba(42,36,32,.35);
+  --e3-bau:rgba(227,217,191,.35); --e3-bau-line:#6e6253; --e3-damage:rgba(163,39,31,.55);
+  --e3-tree:#5f6e43; --e3-tree2:#728152; --e3-trunk:#5b4630; --e3-smoke:rgba(120,110,95,.45); --e3-figure:#3b332b; --e3-crate:#9c7a45;
+  --e3-hl:var(--own); --e3-sel:var(--accent);
+  position:relative; display:grid; grid-template-columns:minmax(0,1fr) 340px; height:100%; min-height:0;
+  background:var(--e3-table); color:var(--ink); font:14px/1.4 var(--font-ui);
+}
+.e3-night,.e3.night{
+  --paper:#0b0d0a; --card:#15180f; --ink:#d8d2b8; --ink2:#a39e86; --line:#3a3f2c; --track:#262a1e;
+  --own:#7fa4e6; --enemy:#e2645a; --accent:#ffbf47; --danger:#e2645a; --shadow:0 2px 6px rgba(0,0,0,.6);
+}
+.e3.night{
+  --e3-board:#2a2c20; --e3-board-side:#1a1c14; --e3-seam:rgba(216,210,184,.10);
+  --e3-wiese:#262b1c; --e3-lehm:#2e2a1e; --e3-kreide:#3a3a30; --e3-fels:#2e2f2a; --e3-dorf:#33302a;
+  --e3-wald:#1d2618; --e3-sumpf:#232a22; --e3-wasser:#1b2428; --e3-skirt:#24251b; --e3-skirt2:#1a1b14;
+  --e3-tex:rgba(216,210,184,.07); --e3-rail:#8a8470; --e3-sleeper:#4a4636; --e3-railbed:#33352a;
+  --e3-bld:#4a4f3a; --e3-side-a:#30342a; --e3-side-b:#262920; --e3-side-c:#3a3f30; --e3-bld-edge:rgba(216,210,184,.25);
+  --e3-bau:rgba(74,79,58,.35); --e3-bau-line:#a39e86; --e3-damage:rgba(226,100,90,.55);
+  --e3-tree:#2f3d22; --e3-tree2:#3a4a2a; --e3-trunk:#2a2016; --e3-smoke:rgba(190,180,150,.35); --e3-figure:#d8d2b8; --e3-crate:#8a6a3a;
+}
+
+/* Buehne */
+.e3-stage{position:relative; overflow:hidden; perspective:1200px; perspective-origin:50% 40%; cursor:grab; touch-action:none; user-select:none; -webkit-user-select:none; outline:none; min-height:0}
+.e3-stage.dragging{cursor:grabbing}
+.e3-stage:focus-visible{box-shadow:inset 0 0 0 2px var(--accent)}
+.e3-cam{pointer-events:none; position:absolute; left:50%; top:52%; width:0; height:0; transform-style:preserve-3d; transform:scale(var(--zoom,1))}
+.e3-plane{pointer-events:none; position:absolute; transform-style:preserve-3d; transform:rotateX(var(--tilt,55deg)) rotateZ(var(--spin,-20deg))}
+.e3-base{pointer-events:none; position:absolute; inset:-10px; background:var(--e3-board); transform:translateZ(-1px); transform-style:preserve-3d; box-shadow:0 0 0 1px var(--e3-bld-edge)}
+.e3-edge{position:absolute; background:var(--e3-board-side)}
+.e3-edge.s{left:0; right:0; top:100%; height:12px; transform-origin:top; transform:rotateX(-90deg)}
+.e3-edge.n{left:0; right:0; bottom:100%; height:12px; transform-origin:bottom; transform:rotateX(90deg)}
+.e3-edge.w{top:0; bottom:0; right:100%; width:12px; transform-origin:right; transform:rotateY(-90deg)}
+.e3-edge.e{top:0; bottom:0; left:100%; width:12px; transform-origin:left; transform:rotateY(90deg)}
+
+/* Felder */
+.e3-tile{pointer-events:auto; position:absolute; width:var(--t); height:var(--t); transform-style:preserve-3d; transform:translateZ(var(--z,0px)); box-shadow:inset 0 0 0 .5px var(--e3-seam); background:var(--e3-wiese)}
+.e3-tile.g-lehm{background:var(--e3-lehm); background-image:radial-gradient(var(--e3-tex) 1px,transparent 1.4px); background-size:7px 7px}
+.e3-tile.g-kreide{background:var(--e3-kreide)}
+.e3-tile.g-fels{background:var(--e3-fels); background-image:repeating-linear-gradient(45deg,transparent 0 6px,var(--e3-tex) 6px 7px)}
+.e3-tile.g-dorf{background:var(--e3-dorf); background-image:repeating-linear-gradient(0deg,transparent 0 9px,var(--e3-tex) 9px 10px)}
+.e3-tile.g-wald{background:var(--e3-wald)}
+.e3-tile.g-sumpf{background:var(--e3-sumpf); background-image:repeating-linear-gradient(0deg,transparent 0 6px,var(--e3-tex) 6px 8px)}
+.e3-tile.g-wasser{background:var(--e3-wasser); background-image:repeating-linear-gradient(0deg,transparent 0 5px,var(--e3-tex) 5px 6px)}
+.e3-tile.sel::after,.e3-tile.hl::after{content:""; position:absolute; inset:2px; pointer-events:none}
+.e3-tile.hl::after{border:2px dashed var(--e3-hl)}
+.e3-tile.sel::after{border:3px solid var(--e3-sel); inset:1px}
+.e3-skirt{position:absolute; background:var(--e3-skirt); pointer-events:none}
+.e3-skirt.s{left:0; right:0; top:100%; height:var(--d); transform-origin:top; transform:rotateX(-90deg)}
+.e3-skirt.n{left:0; right:0; bottom:100%; height:var(--d); transform-origin:bottom; transform:rotateX(90deg); background:var(--e3-skirt2)}
+.e3-skirt.w{top:0; bottom:0; right:100%; width:var(--d); transform-origin:right; transform:rotateY(-90deg); background:var(--e3-skirt2)}
+.e3-skirt.e{top:0; bottom:0; left:100%; width:var(--d); transform-origin:left; transform:rotateY(90deg)}
+
+/* Gleis: Schotterbett, Schwellen, zwei Schienen */
+.e3-rail{position:absolute; pointer-events:none}
+.e3-rail.h{left:0; right:0; top:32%; height:36%; background:
+  linear-gradient(var(--e3-rail),var(--e3-rail)) 0 22%/100% 2px no-repeat,
+  linear-gradient(var(--e3-rail),var(--e3-rail)) 0 78%/100% 2px no-repeat,
+  repeating-linear-gradient(90deg,var(--e3-sleeper) 0 3px,transparent 3px 9px),
+  var(--e3-railbed)}
+.e3-rail.v{top:0; bottom:0; left:32%; width:36%; background:
+  linear-gradient(var(--e3-rail),var(--e3-rail)) 22% 0/2px 100% no-repeat,
+  linear-gradient(var(--e3-rail),var(--e3-rail)) 78% 0/2px 100% no-repeat,
+  repeating-linear-gradient(0deg,var(--e3-sleeper) 0 3px,transparent 3px 9px),
+  var(--e3-railbed)}
+.e3-rail.end{border-right:3px solid var(--e3-rail)}
+
+/* Pappkaesten */
+.e3-box{position:absolute; inset:var(--in); transform-style:preserve-3d}
+.e3-f{position:absolute; backface-visibility:visible; transition:transform .7s cubic-bezier(.3,1.4,.5,1)}
+.e3-f.top{inset:0; transform:translateZ(var(--h)); background:var(--e3-bld); box-shadow:inset 0 0 0 1px var(--e3-bld-edge); display:flex; align-items:center; justify-content:center; transition-delay:.25s}
+.e3-f.top span{font:700 13px var(--font-head); color:var(--ink); letter-spacing:.02em; transform:rotate(calc(var(--spin,-20deg) * -1)); font-size:min(calc(13px / var(--zoom,1)), 26px); white-space:nowrap}
+.e3-f.front{left:0; right:0; bottom:0; height:var(--h); transform-origin:bottom; transform:rotateX(-90deg); background:var(--e3-side-a)}
+.e3-f.back{left:0; right:0; top:0; height:var(--h); transform-origin:top; transform:rotateX(90deg); background:var(--e3-side-b); transition-delay:.08s}
+.e3-f.left{left:0; top:0; bottom:0; width:var(--h); transform-origin:left; transform:rotateY(-90deg); background:var(--e3-side-b); transition-delay:.12s}
+.e3-f.right{right:0; top:0; bottom:0; width:var(--h); transform-origin:right; transform:rotateY(90deg); background:var(--e3-side-c); transition-delay:.04s}
+/* Aufklappen: der Kasten liegt als Bogen flach und faltet sich hoch */
+.e3-box.fold .e3-f.front{transform:rotateX(-180deg)}
+.e3-box.fold .e3-f.back{transform:rotateX(180deg)}
+.e3-box.fold .e3-f.left{transform:rotateY(-180deg)}
+.e3-box.fold .e3-f.right{transform:rotateY(180deg)}
+.e3-box.fold .e3-f.top{transform:translateZ(0)}
+.e3-box.bau .e3-f{background:var(--e3-bau); box-shadow:inset 0 0 0 1px var(--e3-bau-line); border:1px dashed var(--e3-bau-line)}
+.e3-box.bau .e3-f.top span{font-family:var(--font-num); font-weight:700; color:var(--ink)}
+.e3-box.kaputt .e3-f.top{background-image:repeating-linear-gradient(-35deg,transparent 0 5px,var(--e3-damage) 5px 7px)}
+.e3-box.kaputt .e3-f.front,.e3-box.kaputt .e3-f.right{background-image:linear-gradient(160deg,transparent 45%,var(--e3-damage) 46% 49%,transparent 50%)}
+
+/* Stehende Pappfiguren: drehen sich immer zum Betrachter */
+.e3-stand{position:absolute; transform-origin:50% 100%; transform:rotateZ(calc(var(--spin,-20deg) * -1)) rotateX(-90deg); pointer-events:none}
+.e3-tree{width:16px; height:24px; background:linear-gradient(var(--tc,var(--e3-tree)),var(--tc,var(--e3-tree))) top/100% 80% no-repeat, linear-gradient(var(--e3-trunk),var(--e3-trunk)) bottom/100% 20% no-repeat;
+  clip-path:polygon(50% 0,92% 80%,58% 80%,58% 100%,42% 100%,42% 80%,8% 80%)}
+.e3-tree.alt{--tc:var(--e3-tree2)}
+
+/* Feldkueche: Schornstein und Rauch (Rauchwolken drehen sich ganz zum Betrachter, auch beim Kippen) */
+.e3-chimney{position:absolute; width:6px; height:10px; right:5px; top:5px; background:var(--e3-side-a); transform-origin:50% 100%; transform:translateZ(var(--h)) rotateZ(calc(var(--spin,-20deg) * -1)) rotateX(-90deg)}
+.e3-puff{position:absolute; right:3px; top:7px; width:10px; height:10px; border-radius:50%; background:var(--e3-smoke); opacity:0;
+  transform:translateZ(calc(var(--h) + 12px)) rotateZ(calc(var(--spin,-20deg) * -1)) rotateX(calc(var(--tilt,55deg) * -1)); animation:e3-smoke 4.2s linear infinite}
+.e3-puff:nth-of-type(2){animation-delay:1.4s}
+.e3-puff:nth-of-type(3){animation-delay:2.8s}
+@keyframes e3-smoke{
+  0%{translate:0 0 0; scale:.5; opacity:0}
+  15%{opacity:.9}
+  100%{translate:3px -3px 30px; scale:1.9; opacity:0}
+}
+
+/* Kleine Figuren laufen zwischen benachbarten Gebaeuden hin und her */
+.e3-walk{position:absolute; left:0; top:0; transform-style:preserve-3d; pointer-events:none; animation:e3-walk var(--dur,8s) linear infinite; animation-delay:var(--delay,0s)}
+@keyframes e3-walk{
+  0%,8%{translate:var(--ax) var(--ay) var(--z)}
+  42%,58%{translate:var(--bx) var(--by) var(--z)}
+  92%,100%{translate:var(--ax) var(--ay) var(--z)}
+}
+.e3-fig{left:-3px; top:-12px; width:6px; height:12px}
+.e3-fig::before{content:""; position:absolute; left:1px; top:0; width:4px; height:4px; border-radius:50%; background:var(--e3-figure)}
+.e3-fig::after{content:""; position:absolute; left:0; top:4px; width:6px; height:8px; border-radius:2px 2px 0 0; background:var(--e3-figure)}
+.e3-fig.crate::before{left:-2px; top:3px; width:6px; height:5px; border-radius:0; background:var(--e3-crate); z-index:1}
+.e3-fig.crate{box-shadow:none}
+
+/* Hinweis unten links auf dem Tisch */
+.e3-hint{position:absolute; left:10px; bottom:10px; max-width:calc(100% - 20px); font:12px var(--font-ui); color:var(--ink2); background:var(--card); border:var(--border); border-radius:var(--radius); padding:4px 8px; pointer-events:none}
+
+/* Bauleiste */
+.e3-panel{border-left:var(--border); background:var(--card); overflow:auto; padding:12px 14px 16px; min-height:0; overscroll-behavior:contain}
+.e3-panel h4{margin:14px 0 8px; font:400 16px var(--font-head)}
+.e3-sum{border-bottom:var(--border); padding-bottom:10px}
+.e3-sum .lv{display:flex; justify-content:space-between; align-items:baseline; gap:8px; font-family:var(--font-head)}
+.e3-sum .lv small{font:12px var(--font-num); color:var(--ink2)}
+.e3-bar{height:6px; background:var(--track); border-radius:3px; margin:6px 0; overflow:hidden}
+.e3-bar i{display:block; height:100%; background:var(--ink2)}
+.e3-sum .tot{font:12px/1.5 var(--font-num); color:var(--ink2)}
+.e3-sum summary{cursor:pointer; color:var(--ink)}
+.e3-reward{margin-top:10px; padding:8px; border:2px solid var(--accent); border-radius:var(--radius)}
+.e3-reward p{margin:0 0 6px; font-weight:700}
+.e3-reward .row{display:grid; grid-template-columns:1fr 1fr; gap:6px}
+.e3-reward button{display:block; text-align:left; padding:6px 8px; background:var(--paper); border:var(--border); border-radius:var(--radius); cursor:pointer; font-size:12px; color:var(--ink)}
+.e3-reward button b{display:block; font-size:13px}
+.e3-reward button:hover{border-color:var(--ink)}
+.e3-opts{list-style:none; margin:0; padding:0}
+.e3-opt{display:block; width:100%; text-align:left; padding:8px 10px; margin:0 0 6px; background:var(--card); border:var(--border); border-radius:var(--radius); cursor:pointer; color:var(--ink); font-size:13px}
+.e3-opt:hover{border-color:var(--ink)}
+.e3-opt[aria-pressed="true"]{border:2px solid var(--accent); padding:7px 9px}
+.e3-opt.off{color:var(--ink2)}
+.e3-opt b{display:block; font-size:14px}
+.e3-opt .y{display:block}
+.e3-opt em{display:block; font-style:normal; color:var(--own)}
+.e3-opt em.no{color:var(--ink2)}
+.e3-opt em.nb{color:var(--own)}
+.e3-opt i{display:block; font-style:normal; color:var(--ink2); font:12px var(--font-num); margin-top:3px}
+.e3-opt i.why{color:var(--danger)}
+.e3-go{display:block; width:100%; margin:-2px 0 10px; padding:8px 10px; font:700 14px var(--font-ui); color:var(--paper); background:var(--ink); border:1px solid var(--ink); border-radius:var(--radius); cursor:pointer}
+.e3-go[disabled]{opacity:.45; cursor:default}
+.e3-opt:focus-visible,.e3-go:focus-visible,.e3-reward button:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+.e3-info{padding:8px 10px; border:var(--border); border-radius:var(--radius); font-size:13px}
+.e3-info p{margin:4px 0}
+.e3-info em{display:block; font-style:normal; color:var(--own)}
+.e3-info em.no{color:var(--ink2)}
+.e3-info .st{font:12px var(--font-num); color:var(--danger)}
+.e3-muted{font-size:12px; color:var(--ink2); margin:8px 0 0}
+.e3-panel h4:focus{outline:none}
+.e3-panel h4:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+.e3-sr{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap}
+
+/* Handy hochkant: Modell oben, Bauleiste unten */
+@media (max-width:760px){
+  .e3{grid-template-columns:minmax(0,1fr); grid-template-rows:minmax(0,1fr) minmax(0,54%)}
+  .e3-reward button span{display:none}
+  .e3-reward{padding:6px; margin-top:8px}
+  .e3-reward p{font-size:13px; margin-bottom:4px}
+  .e3-sum{padding-bottom:6px}
+  .e3-panel{border-left:0; border-top:var(--border); padding:10px 12px 14px}
+  .e3-panel h4{margin:10px 0 6px}
+  .e3-hint{font-size:11px}
+}
+@media (prefers-reduced-motion:reduce){
+  .e3-puff,.e3-walk{animation:none}
+  .e3-walk{translate:var(--ax) var(--ay) var(--z)}
+  .e3-f{transition:none}
+}
