@@ -1,0 +1,99 @@
+{
+  "_hinweis": "Beispielblaetter fuer die Demo-Szene ?scene=papier. Format: js/ui/paper/README.md",
+  "sheets": [
+    {
+      "id": "demo-brief-maren",
+      "kind": "letter",
+      "place": "Abschnitt B",
+      "date": "14. Oktober",
+      "salutation": "Liebe Maren,",
+      "body": [
+        "der Regen hat aufgehört, dafür steht das Wasser jetzt kniehoch im Graben bei [[Abschnitt B, gleich hinter der Mühle]]. Harms sagt, die Lattenroste kommen morgen mit der Lore.",
+        "Wir haben gestern zwei Männer verloren, Boysen aus Wessel und den Jungen von der Mühle. Schreib mir, ob die Äpfel reif sind."
+      ],
+      "closing": "Dein",
+      "signature": "Arend"
+    },
+    {
+      "id": "demo-befehl-214",
+      "kind": "telegram",
+      "heading": "STABSBEFEHL",
+      "number": "214/14",
+      "urgent": true,
+      "fields": [["Von", "Oberst van Aurach"], ["An", "Major Brandt"], ["Abschnitt", "Asse-Nord"], ["Frist", "morgen 06:00"]],
+      "lines": ["HÜGEL 214 BIS MORGEN FRÜH NEHMEN STOP", "VORBEREITUNGSFEUER GENEHMIGT STOP", "VERLUSTE NACHRANGIG STOP"],
+      "footer": [["Befolgen", "Ansehen +8"], ["Verweigern", "Ansehen −12, Vertrauen +6"]]
+    },
+    {
+      "id": "demo-tagebuch-14",
+      "kind": "diary",
+      "date": "14. Oktober, nachts",
+      "title": "Nach dem Gegenstoß",
+      "sketch": "regen",
+      "body": [
+        "Der Graben am Hang hält, aber nur, weil Harms die Traverse in der Nacht selbst gesetzt hat. Ich habe Brücken gerechnet, keine Sandsäcke.",
+        "Van Aurach will den Hügel. Der Hügel will uns."
+      ],
+      "signature": "I. B."
+    },
+    {
+      "id": "demo-gefallene-14",
+      "kind": "casualties",
+      "title": "Gefallenenliste",
+      "form": "Formblatt V 12",
+      "sector": "Asse-Nord, B",
+      "mission": "Mühlengraben",
+      "date": "14. Oktober",
+      "entries": [
+        { "name": "Boysen, Jost", "group": "2. Gruppe", "turn": 6, "cause": "Granatsplitter" },
+        { "name": "Fedders, Tjark", "group": "2. Gruppe", "turn": 6, "cause": "Granatsplitter" },
+        { "name": "Albers, Wiebke", "group": "Sanität", "turn": 9, "cause": "Längsfeuer MG" },
+        { "name": "de Groot, Dirk", "group": "3. Gruppe", "turn": 11, "cause": "Verschüttet" }
+      ],
+      "note": "Angehörige über Ortskommandantur benachrichtigen.",
+      "signedBy": "Harms, Fw."
+    },
+    {
+      "id": "demo-zeitung-akt1",
+      "kind": "newspaper",
+      "masthead": "Kalderner Bote",
+      "date": "16. Oktober",
+      "issue": "Nr. 289",
+      "price": "5 Pfennig",
+      "headline": "Front an der Asse steht",
+      "subhead": "Der Stab meldet ruhige Lage. Im Lehmgau wird gegraben.",
+      "pictureCaption": "Stellungen bei der alten Mühle",
+      "columns": [
+        "Aus dem Hauptquartier wird gemeldet, dass die Linie am Grenzfluss in allen Abschnitten gehalten wurde. Die Truppe sei guten Mutes, die Versorgung gesichert.",
+        "Reisende aus Wessel berichten von Lazarettzügen, die nachts durch den Bahnhof fahren. Die Stadtverwaltung bittet um Wolldecken."
+      ]
+    },
+    {
+      "id": "demo-foto-gruppe",
+      "kind": "photo",
+      "motif": "gruppe",
+      "caption": "2. Gruppe vor dem Unterstand",
+      "back": "Sommer, vor dem Regen. Von links: Boysen, Fedders, Harms, ich, Albers, Lohmann. Behalt es für mich, bis ich wieder da bin. A."
+    },
+    {
+      "id": "demo-akt-2",
+      "kind": "actcard",
+      "act": "Akt II",
+      "title": "Der Hügel",
+      "subtitle": "Herbst im Lehmgau. Der Stab will Gelände sehen.",
+      "motif": "leuchtkugel"
+    }
+  ],
+  "extra": [
+    {
+      "id": "demo-telegramm-nacht",
+      "kind": "telegram",
+      "heading": "TELEGRAMM",
+      "number": "231/14",
+      "urgent": true,
+      "fields": [["Von", "Stab Division"], ["An", "Abschnitt Asse-Nord"], ["Aufgegeben", "02:40"], ["Zeilen", "3"]],
+      "lines": ["VERLORENEN GRABEN BEI MÜHLE STOP", "BIS MORGEN FRÜH ZURÜCKNEHMEN STOP", "ERSATZ FOLGT NICHT STOP"],
+      "footer": [["Befolgen", "Ansehen +6"], ["Umdeuten", "Ansehen −3, Vertrauen +2"]]
+    }
+  ]
+}

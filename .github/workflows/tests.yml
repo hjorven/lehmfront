@@ -28,3 +28,4 @@ jobs:
           npm install --no-save playwright@1.50.1
           npx playwright install --with-deps chromium
           node tools/shot.mjs --check
+          node tools/shot.mjs --check --path "/?scene=papier"
