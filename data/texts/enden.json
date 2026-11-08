@@ -1,0 +1,465 @@
+{
+  "format": 1,
+  "beschreibung": "Die vier Enden aus Plan 2.6 als Schlusssequenzen, die beiden vorzeitigen Enden und das Nachwort zu den Figuren. Auswahl über den Slot ende.wahl, siehe README.",
+  "eintraege": [
+    {
+      "id": "ende.wahl.haelt",
+      "art": "ende-wahl",
+      "slot": "ende.wahl",
+      "ende": "haelt",
+      "wann": {
+        "ansehen": {
+          "min": 60
+        },
+        "vertrauen": {
+          "min": 60
+        }
+      },
+      "setzt": [
+        "ende_haelt"
+      ],
+      "titel": "Der Abschnitt hält",
+      "text": "Ansehen und Vertrauen hoch: Der Krieg endet anderswo, A-NORD bleibt stehen."
+    },
+    {
+      "id": "ende.wahl.waffenstillstand",
+      "art": "ende-wahl",
+      "slot": "ende.wahl",
+      "ende": "waffenstillstand",
+      "wann": {
+        "ansehen": {
+          "max": 59
+        },
+        "vertrauen": {
+          "min": 50
+        }
+      },
+      "setzt": [
+        "ende_waffenstillstand"
+      ],
+      "titel": "Waffenstillstand im Abschnitt",
+      "text": "Vertrauen hoch, Ansehen niedrig: Brandt und Lask einigen sich, Brandt wird danach abgelöst."
+    },
+    {
+      "id": "ende.wahl.durchbruch",
+      "art": "ende-wahl",
+      "slot": "ende.wahl",
+      "ende": "durchbruch",
+      "wann": {
+        "ansehen": {
+          "min": 50
+        }
+      },
+      "setzt": [
+        "ende_durchbruch"
+      ],
+      "titel": "Durchbruch um jeden Preis",
+      "text": "Ansehen hoch, Vertrauen niedrig: Der Abschnitt bricht durch, der Preis steht in der Gefallenenliste."
+    },
+    {
+      "id": "ende.wahl.abgeloest",
+      "art": "ende-wahl",
+      "slot": "ende.wahl",
+      "ende": "abgeloest",
+      "setzt": [
+        "ende_abgeloest"
+      ],
+      "titel": "Abgelöst",
+      "text": "Ansehen und Vertrauen niedrig: Brandt erlebt das Ende als Beobachterin."
+    },
+    {
+      "id": "ende.durchbruch.1",
+      "art": "ende",
+      "ende": "durchbruch",
+      "seite": 1,
+      "blatt": "telegramm",
+      "titel": "Raudas",
+      "text": "AN MAJOR BRANDT A-NORD STOP RAUDAS GENOMMEN STOP FEIND IN AUFLÖSUNG STOP DER LEHMGAU IST FREI STOP ANERKENNUNG DES STABS UND DES BUNDESRATS STOP VERLUSTMELDUNG NACHREICHEN STOP VAN AURACH STOP"
+    },
+    {
+      "id": "ende.durchbruch.2",
+      "art": "ende",
+      "ende": "durchbruch",
+      "seite": 2,
+      "blatt": "tagebuch",
+      "titel": "Das Pfarrhaus",
+      "text": "Wir sind in Raudas. Das Pfarrhaus, in dem Lask ein Jahr lang gesessen hat, hat noch drei Wände. Auf dem Tisch lag eine Karte von meinem Abschnitt, genauer als meine eigene. Jeder Unterstand war eingezeichnet, mit Bleistift, sauber, wie man es auf der Kadettenschule lernt.\n\nDer Lehmgau ist frei, schreibt der Stab. Ich stehe darin und sehe nichts, was frei wäre. Ich sehe Lehm und einen Förderturm und Leute, die sich hinsetzen, wo sie gerade stehen, und nicht mehr aufstehen wollen.\n\nVan Aurach will die Verlustmeldung. Ich habe sie heute Nacht geschrieben. Sie ist die längste, die ich je geschrieben habe."
+    },
+    {
+      "id": "ende.durchbruch.3",
+      "art": "ende",
+      "ende": "durchbruch",
+      "seite": 3,
+      "blatt": "gefallenenliste",
+      "titel": "Buch des Abschnitts A-NORD",
+      "text": "Abschnitt A-NORD, vom ersten Sommer bis zum letzten Frühjahr. {anzahl} Namen."
+    },
+    {
+      "id": "ende.durchbruch.4",
+      "art": "ende",
+      "ende": "durchbruch",
+      "seite": 4,
+      "blatt": "zeitung",
+      "zeitung": "Haverstädter Kurier",
+      "titel": "DER LEHMGAU IST UNSER",
+      "text": "Nach einem Jahr zähen Ringens haben die Bundestruppen im Abschnitt Asse-Nord den Widerstand des Königlichen Heeres gebrochen. Die Gruben des Lehmgaus sind in der Hand der Republik. Die Kohlenaktien stiegen an der Haverstädter Börse um elf Punkte.\n\nDie Abschnittskommandantin, Major Brandt aus Hollerbrügge, war für eine Stellungnahme nicht zu erreichen. Ein Sprecher des Stabs nannte die Verluste „im Rahmen des Erwarteten“."
+    },
+    {
+      "id": "ende.durchbruch.5.lask",
+      "art": "ende",
+      "ende": "durchbruch",
+      "seite": 5,
+      "slot": "ende.durchbruch.5",
+      "blatt": "tagebuch",
+      "wann": {
+        "oder": [
+          {
+            "flags": [
+              "waffenruhe_angenommen"
+            ]
+          },
+          {
+            "flags": [
+              "mine_gewarnt"
+            ]
+          }
+        ]
+      },
+      "titel": "Ein Gefangener",
+      "text": "Am Abend haben sie Lask gebracht. Er hatte sich nicht gewehrt. Er ist mit seinem Stab in einem Keller geblieben, bis alle anderen weg waren, und hat dann die Tür aufgemacht.\n\nEr hat mich sofort erkannt. Er hat mir ein kleines Reiseschach gegeben, aus Holz, die Figuren in einer bestimmten Stellung festgesteckt. „Meine Frau ist am Zug“, hat er gesagt. „Schicken Sie es ihr, wenn es wieder Post gibt.“\n\nIch habe es in meine Tasche gesteckt. Es ist das einzige, was ich aus Raudas mitnehme."
+    },
+    {
+      "id": "ende.durchbruch.5.fremd",
+      "art": "ende",
+      "ende": "durchbruch",
+      "seite": 5,
+      "slot": "ende.durchbruch.5",
+      "blatt": "tagebuch",
+      "titel": "Ein Gefangener",
+      "text": "Am Abend haben sie Lask gebracht. Er hatte sich nicht gewehrt. Er stand vor mir, grüßte korrekt und sagte nichts, und ich sagte nichts. Wir hatten uns nichts mehr zu sagen, oder zu viel.\n\nAls sie ihn wegführten, hat er sich noch einmal umgedreht und auf die Karte auf dem Tisch gezeigt, auf meine Unterstände, sauber mit Bleistift eingezeichnet. Dann ist er gegangen.\n\nIch habe die Karte zusammengefaltet. Ich weiß nicht, wem ich sie zurückgeben soll."
+    },
+    {
+      "id": "ende.waffenstillstand.1",
+      "art": "ende",
+      "ende": "waffenstillstand",
+      "seite": 1,
+      "blatt": "tagebuch",
+      "titel": "Mittag",
+      "text": "Um zwölf Uhr hat auf beiden Seiten jemand mit einem Spaten gegen eine leere Granathülse geschlagen. Dann war es still. Nicht ruhig, still. Man hörte Vögel, die man das ganze Jahr nicht gehört hat, weil sie das ganze Jahr nicht da waren.\n\nUm halb eins ist der Erste aus dem Graben gestiegen, drüben. Er hat sich auf die Brüstung gesetzt und eine Pfeife angezündet. Dann einer von uns. Um zwei saßen beide Linien auf ihren Brüstungen in der Sonne, vierhundert Meter auseinander, und niemand hat geschossen.\n\nNiemand hat es befohlen. Ich habe es nur nicht verboten."
+    },
+    {
+      "id": "ende.waffenstillstand.2",
+      "art": "ende",
+      "ende": "waffenstillstand",
+      "seite": 2,
+      "blatt": "brief",
+      "titel": "Zwei Unterschriften",
+      "text": "Abschnitt A-NORD und Abschnitt Raudas\n\nDie Unterzeichnenden kommen überein, dass ab heute, zwölf Uhr, zwischen ihren Linien nicht mehr geschossen wird. Verwundete und Tote werden von beiden Seiten offen geborgen. Der Heuwagen auf der Weide gilt als Treffpunkt. Wer diese Abrede brechen muss, weil ein Befehl es verlangt, kündigt es zwei Stunden vorher mit einer roten Leuchtkugel an.\n\nDiese Abrede gilt, bis eine von beiden Seiten nicht mehr da ist, oder bis der Krieg zu Ende ist. Was zuerst kommt.\n\nI. Brandt, Major\nT. Lask, Hauptmann"
+    },
+    {
+      "id": "ende.waffenstillstand.3",
+      "art": "ende",
+      "ende": "waffenstillstand",
+      "seite": 3,
+      "blatt": "telegramm",
+      "titel": "Abgelöst",
+      "text": "AN MAJOR BRANDT STOP SIE SIND MIT SOFORTIGER WIRKUNG ABGELÖST STOP MELDEN SIE SICH IN HAVERSTADT-LAND STOP DIE ABREDE MIT DEM FEIND IST NICHTIG STOP MAJOR KUIPER ÜBERNIMMT STOP VAN AURACH STOP"
+    },
+    {
+      "id": "ende.waffenstillstand.4",
+      "art": "ende",
+      "ende": "waffenstillstand",
+      "seite": 4,
+      "blatt": "tagebuch",
+      "titel": "Keine rote Leuchtkugel",
+      "text": "Kuiper ist gekommen und hat die Abrede für nichtig erklärt, wie befohlen. Dann hat er drei Tage lang in meinem Gefechtsstand gesessen und auf die Weide gesehen, auf die Leute auf beiden Brüstungen. Am vierten Tag hat er mich gefragt, wie man eine rote Leuchtkugel abschießt. Ich habe es ihm erklärt. Er hat keine abgeschossen.\n\nIch fahre heute nach Haverstadt-Land. Vielleicht kommt ein Gericht, vielleicht nur ein Schreibtisch. Lask hat mir eine Nachricht über den Heuwagen geschickt: Ihn holen sie auch. Er schreibt, es sei ihm eine Ehre gewesen, mit mir abgesetzt zu werden.\n\nSieben Wochen später war der Krieg vorbei. In Asse-Nord ist in diesen sieben Wochen niemand mehr gefallen."
+    },
+    {
+      "id": "ende.waffenstillstand.5",
+      "art": "ende",
+      "ende": "waffenstillstand",
+      "seite": 5,
+      "blatt": "zeitung",
+      "zeitung": "Kellinger Volksblatt",
+      "titel": "DER STILLE ABSCHNITT",
+      "text": "Aus Feldpostbriefen, die unserer Redaktion vorliegen, ergibt sich ein bemerkenswertes Bild: Im Abschnitt Asse-Nord ist seit sieben Wochen kein Schuss mehr gefallen. Soldaten beider Seiten sollen sich an einem umgestürzten Heuwagen treffen, um Verwundete und Post auszutauschen.\n\nDer Stab bestreitet dies. Die Kommandantin des Abschnitts, deren Name uns bekannt ist, ist abgelöst worden. Wir drucken ihren Namen nicht. Die Leute in ihrem Abschnitt, schreibt uns ein Gefreiter, kennen ihn auch so."
+    },
+    {
+      "id": "ende.waffenstillstand.6",
+      "art": "ende",
+      "ende": "waffenstillstand",
+      "seite": 6,
+      "blatt": "gefallenenliste",
+      "titel": "Buch des Abschnitts A-NORD",
+      "text": "Abschnitt A-NORD, vom ersten Sommer bis zum letzten Mittag. {anzahl} Namen. Nach dem letzten Mittag kam keiner mehr dazu."
+    },
+    {
+      "id": "ende.abgeloest.1",
+      "art": "ende",
+      "ende": "abgeloest",
+      "seite": 1,
+      "blatt": "telegramm",
+      "titel": "Übergabe",
+      "text": "AN MAJOR BRANDT STOP ABSCHNITT A-NORD MITTAGS AN MAJOR KUIPER ÜBERGEBEN STOP SIE BLEIBEN BIS AUF WEITERES ALS BEOBACHTERIN IM ABSCHNITT STOP KEINE BEFEHLSGEWALT STOP VAN AURACH STOP"
+    },
+    {
+      "id": "ende.abgeloest.2",
+      "art": "ende",
+      "ende": "abgeloest",
+      "seite": 2,
+      "blatt": "tagebuch",
+      "titel": "Beobachterin",
+      "text": "Ich habe Kuiper die Karte gegeben, meine Karte, mit allen Unterständen, mit den Zahlen der Leute, mit den Namen der Gruppenführer am Rand. Er hat sich bedankt und eine neue angelegt.\n\nSeitdem sitze ich in der Velder Mühle und sehe zu. Ich sehe, wie er die Gruppen länger vorn lässt, als ich es getan hätte. Ich sehe, wie die Loren Munition fahren statt Verwundete. Ich sage nichts, weil ich nichts sagen darf, und weil ich mir nicht sicher bin, ob ich es besser gemacht habe. Die Liste sagt: nicht viel besser.\n\nDie Leute grüßen mich noch. Sie wissen nicht genau, warum."
+    },
+    {
+      "id": "ende.abgeloest.3",
+      "art": "ende",
+      "ende": "abgeloest",
+      "seite": 3,
+      "blatt": "zeitung",
+      "zeitung": "Haverstädter Kurier",
+      "titel": "WAFFENSTILLSTAND UNTERZEICHNET",
+      "text": "In der vergangenen Nacht haben die Gesandten der Republik und des Hauses Morrow in einem neutralen Kurort einen Waffenstillstand unterzeichnet. Über die Gruben des Lehmgaus soll eine gemeinsame Kommission entscheiden. Die Kohlenaktien gaben leicht nach.\n\nAn der Front, so meldet der Stab, sei der Waffenstillstand ohne Zwischenfälle in Kraft getreten."
+    },
+    {
+      "id": "ende.abgeloest.4",
+      "art": "ende",
+      "ende": "abgeloest",
+      "seite": 4,
+      "blatt": "tagebuch",
+      "titel": "Ohne Zwischenfälle",
+      "text": "Um vierzehn Uhr trat er in Kraft. Um dreizehn Uhr fünfzig ist noch jemand gefallen, durch eine Granate, die irgendwo hinten abgefeuert wurde, damit sie nicht übrig bleibt. {gefallener}. Der Name steht als letzter auf der Liste.\n\nUm vierzehn Uhr bin ich auf die Brüstung gestiegen. Drüben stand auch jemand, weit weg. Ich weiß nicht, ob es Lask war. Ich habe gewinkt, wie man einem Zug winkt, der abfährt. Er hat zurückgewinkt.\n\nIch war dabei, und ich habe nichts entschieden. Das wird man mir nicht vorwerfen. Ich werfe es mir vor."
+    },
+    {
+      "id": "ende.abgeloest.5",
+      "art": "ende",
+      "ende": "abgeloest",
+      "seite": 5,
+      "blatt": "gefallenenliste",
+      "titel": "Buch des Abschnitts A-NORD",
+      "text": "Abschnitt A-NORD, vom ersten Sommer bis zum letzten Frühjahr. {anzahl} Namen. Die letzten hat Brandt nicht mehr befohlen. Sie stehen trotzdem in ihrer Handschrift da."
+    },
+    {
+      "id": "ende.haelt.1",
+      "art": "ende",
+      "ende": "haelt",
+      "seite": 1,
+      "blatt": "tagebuch",
+      "titel": "Zwanzig Kilometer südlich",
+      "text": "Den ganzen Tag hat es im Süden gedonnert, zwanzig Kilometer weit. Bei uns fiel kaum ein Schuss. Lask hat gehalten, ich habe gehalten, und wir haben beide nach Süden gehört.\n\nAm Abend kam ein Melder auf einem Fahrrad, ohne Telegramm, nur mit einem Satz: Es ist vorbei. Der Waffenstillstand gilt ab morgen vierzehn Uhr. Er war außer Atem und hat gelacht und geweint und sein Fahrrad fallen lassen.\n\nIch habe die Gruppen einzeln besucht, alle, auch die Pioniere unten im Stollen. Ich wollte es jedem selbst sagen. Es hat bis Mitternacht gedauert."
+    },
+    {
+      "id": "ende.haelt.2",
+      "art": "ende",
+      "ende": "haelt",
+      "seite": 2,
+      "blatt": "telegramm",
+      "titel": "Vierzehn Uhr",
+      "text": "AN ALLE ABSCHNITTE STOP WAFFENSTILLSTAND AB 14:00 STOP BIS DAHIN STELLUNG HALTEN STOP KEINE UNTERNEHMEN STOP A-NORD HAT GEHALTEN STOP DANKE STOP VAN AURACH STOP"
+    },
+    {
+      "id": "ende.haelt.3",
+      "art": "ende",
+      "ende": "haelt",
+      "seite": 3,
+      "blatt": "tagebuch",
+      "titel": "Danke",
+      "text": "Van Aurach hat „danke“ geschrieben. Ein ganzes Jahr hat er kein Wort benutzt, das nicht in einer Dienstvorschrift steht. Dieses steht in keiner. Ich habe das Telegramm an die Tür des Gefechtsstands geheftet. Jeder, der vorbeikam, hat es gelesen. Die meisten zweimal.\n\nUm vierzehn Uhr ist nichts passiert. Kein Signal, keine Glocke. Es hat nur einfach niemand mehr geschossen. Nach einer Viertelstunde ist der Erste aus dem Graben gestiegen. Dann alle. Drüben auch.\n\nWir sind uns am Heuwagen begegnet."
+    },
+    {
+      "id": "ende.haelt.4.wieder",
+      "art": "ende",
+      "ende": "haelt",
+      "seite": 4,
+      "slot": "ende.haelt.4",
+      "blatt": "tagebuch",
+      "wann": {
+        "flags": [
+          "lask_treffen"
+        ]
+      },
+      "titel": "Am Heuwagen",
+      "text": "Diesmal kam er bei Tag, die Mütze in der Hand, und hinter ihm kamen alle anderen. Er hat mir die Hand gegeben und gesagt: „Sie haben gehalten.“ Ich habe gesagt: „Sie auch.“ Wir hatten uns beim letzten Mal mehr zu sagen. Jetzt war nichts mehr nötig.\n\nIch habe ihm meine Karte gezeigt, mit seinen Unterständen. Er hat seine herausgeholt, mit meinen. Wir haben sie nebeneinander auf den Heuwagen gelegt. Sie passten zusammen, an jeder Stelle. Zwei Hälften desselben Lehms.\n\nWir haben die Karten getauscht. Ich habe seine noch."
+    },
+    {
+      "id": "ende.haelt.4.fremd",
+      "art": "ende",
+      "ende": "haelt",
+      "seite": 4,
+      "blatt": "tagebuch",
+      "titel": "Am Heuwagen",
+      "text": "Lask war älter, als ich dachte, und kleiner. Er trug die Mütze in der Hand. Er hat mir die Hand gegeben und gesagt: „Sie haben gehalten.“ Ich habe gesagt: „Sie auch.“ Mehr haben wir zuerst nicht gesagt.\n\nDann hat er gefragt, ob ich seine Briefe gelesen habe. Ich habe ja gesagt. Er hat gelacht und gesagt, dann wisse ich mehr über ihn als seine Frau. Ich habe ihm meine Karte gezeigt, mit seinen Unterständen. Er hat seine herausgeholt, mit meinen. Wir haben sie nebeneinander auf den Heuwagen gelegt. Sie passten zusammen, an jeder Stelle. Zwei Hälften desselben Lehms.\n\nWir haben die Karten getauscht. Ich habe seine noch.",
+      "slot": "ende.haelt.4"
+    },
+    {
+      "id": "ende.haelt.5",
+      "art": "ende",
+      "ende": "haelt",
+      "seite": 5,
+      "blatt": "gefallenenliste",
+      "titel": "Buch des Abschnitts A-NORD",
+      "text": "Abschnitt A-NORD hat gehalten. Vom ersten Sommer bis zum letzten Frühjahr: {anzahl} Namen. Es ist die kürzeste Liste, die dieser Abschnitt haben konnte. Sie ist trotzdem zu lang."
+    },
+    {
+      "id": "ende.vorzeitig.abgeloest.1",
+      "art": "ende",
+      "ende": "vorzeitig_abgeloest",
+      "seite": 1,
+      "blatt": "telegramm",
+      "titel": "Abgelöst",
+      "text": "AN MAJOR BRANDT STOP SIE SIND MIT WIRKUNG VON HEUTE ABGELÖST STOP MELDEN SIE SICH IN HAVERSTADT-LAND STOP NACHFOLGER UNTERWEGS STOP VAN AURACH STOP"
+    },
+    {
+      "id": "ende.vorzeitig.abgeloest.2",
+      "art": "ende",
+      "ende": "vorzeitig_abgeloest",
+      "seite": 2,
+      "blatt": "tagebuch",
+      "titel": "Der Zug nach Haverstadt",
+      "text": "Ich sitze im Zug nach Haverstadt-Land, mit einem Koffer und einer Karte, die niemand mehr braucht. Der Nachfolger kam mit dem Zug, mit dem ich jetzt fahre. Wir haben uns auf dem Bahnsteig in Ostervenn die Hand gegeben. Er war sehr jung.\n\nIch habe ihm die Namen der Gruppenführer aufgeschrieben, auf die Rückseite der Karte. Ich weiß nicht, ob er sie lesen wird.\n\nDer Abschnitt wird weiterkämpfen, ohne mich. Das ist das Einzige, was ich sicher weiß."
+    },
+    {
+      "id": "ende.vorzeitig.meuterei.1",
+      "art": "ende",
+      "ende": "vorzeitig_meuterei",
+      "seite": 1,
+      "blatt": "tagebuch",
+      "titel": "Die Truppe geht nicht mehr",
+      "text": "Heute Morgen sind die Gruppen nicht mehr aus den Unterständen gekommen. Nicht laut, nicht mit Waffen. Sie sind einfach geblieben. {gruppenfuehrer} hat es mir ins Gesicht gesagt, ruhig, ohne Trotz: „Wir halten den Graben, Frau Major. Aber wir gehen nirgends mehr hin.“\n\nEs ist kein Aufstand. Es ist das Ende dessen, was man von Menschen verlangen kann, und ich habe es zu spät bemerkt.\n\nDie Mission ist verloren. Der Stab wird Feldgendarmen schicken und eine neue Kommandantin. Ich werde vor ihnen in der Tür stehen. Das ist das Mindeste."
+    },
+    {
+      "id": "ende.nachwort.brandt.waffenstillstand",
+      "art": "nachwort",
+      "slot": "ende.nachwort.brandt",
+      "figur": "Ilse Brandt",
+      "wann": {
+        "flags": [
+          "ende_waffenstillstand"
+        ]
+      },
+      "text": "Ilse Brandt kam nie vor ein Gericht. Der Krieg war vorbei, bevor man sich auf eines einigen konnte. Sie baute nach dem Krieg Brücken über die Wessel-Au, sieben Stück, alle aus Stein. Auf dem Geländer der dritten ist ein kleines Schachbrett eingeritzt. Niemand weiß, wer es war."
+    },
+    {
+      "id": "ende.nachwort.brandt.durchbruch",
+      "art": "nachwort",
+      "slot": "ende.nachwort.brandt",
+      "figur": "Ilse Brandt",
+      "wann": {
+        "flags": [
+          "ende_durchbruch"
+        ]
+      },
+      "text": "Ilse Brandt wurde zum Oberst befördert und lehnte ab. Sie ging zurück nach Hollerbrügge an die Ingenieursschule und unterrichtete Statik. Jeden Herbst schrieb sie Briefe an Familien, deren Namen auf einer Liste standen, die sie auswendig kannte. Sie hörte erst damit auf, als die letzte Antwort ausblieb."
+    },
+    {
+      "id": "ende.nachwort.brandt.haelt",
+      "art": "nachwort",
+      "slot": "ende.nachwort.brandt",
+      "figur": "Ilse Brandt",
+      "wann": {
+        "flags": [
+          "ende_haelt"
+        ]
+      },
+      "text": "Ilse Brandt baute nach dem Krieg die Brücke über die Asse bei Ostervenn neu, aus Stein, mit sechs Bögen. Es war die erste Brücke über die Grenze seit dem Krieg. Bei der Einweihung stand ein älterer Herr aus Sarneva am anderen Ende und hob die Mütze."
+    },
+    {
+      "id": "ende.nachwort.brandt.rueckfall",
+      "art": "nachwort",
+      "slot": "ende.nachwort.brandt",
+      "figur": "Ilse Brandt",
+      "text": "Ilse Brandt verließ das Bundesheer im Sommer nach dem Krieg. Sie zog zu ihrem Bruder Arend nach Weddersiel und baute mit ihm Schleusen. Sie sprach selten über den Lehmgau. Wenn jemand fragte, sagte sie: „Der Lehm trägt nichts. Er nimmt nur.“"
+    },
+    {
+      "id": "ende.nachwort.harms.lebt",
+      "art": "nachwort",
+      "slot": "ende.nachwort.harms",
+      "figur": "Otto Harms",
+      "wann": {
+        "ohne": [
+          "harms_gefallen"
+        ]
+      },
+      "text": "Otto Harms ging zurück nach Ostmoor und baute wieder Deiche. Die Socken, die Geske ihm schickte, passten zum ersten Mal, als er wieder zu Hause war. Die Pfeife hat er nie wieder angezündet. Er sagte, er habe sich daran gewöhnt."
+    },
+    {
+      "id": "ende.nachwort.harms.gefallen",
+      "art": "nachwort",
+      "slot": "ende.nachwort.harms",
+      "figur": "Otto Harms",
+      "text": "Otto Harms liegt auf dem Friedhof von Ostervenn, neben der Schule, in der das Lazarett war. Geske Harms hat den Hund mitgebracht, als sie ihn das erste Mal besuchte. Der Hund hat sich hingelegt und ist lange liegen geblieben."
+    },
+    {
+      "id": "ende.nachwort.selin.loren",
+      "art": "nachwort",
+      "slot": "ende.nachwort.selin",
+      "figur": "Mira Selin",
+      "wann": {
+        "oder": [
+          {
+            "flags": [
+              "selin_loren"
+            ]
+          },
+          {
+            "flags": [
+              "selin_fruehjahr_loren"
+            ]
+          }
+        ]
+      },
+      "text": "Mira Selin eröffnete in Haverstadt eine Praxis für Kinder, mit Fenstern zur Straße. In ihrem Wartezimmer hing eine gerahmte Zeichnung einer Lore. Kinder fragten oft, was das ist. Sie sagte: „Etwas, das zurückfährt.“ Arvo Kalnis schrieb ihr jedes Jahr aus Ravelsk."
+    },
+    {
+      "id": "ende.nachwort.selin.rueckfall",
+      "art": "nachwort",
+      "slot": "ende.nachwort.selin",
+      "figur": "Mira Selin",
+      "text": "Mira Selin eröffnete in Haverstadt eine Praxis für Kinder, mit Fenstern zur Straße. Arvo Kalnis schrieb ihr jedes Jahr aus Ravelsk, immer mit einer Zahl: wie viele Kinder in der Grubengasse geboren worden waren. Sie hat jeden Brief aufgehoben."
+    },
+    {
+      "id": "ende.nachwort.vell.lebt",
+      "art": "nachwort",
+      "slot": "ende.nachwort.vell",
+      "figur": "Jost Vell",
+      "wann": {
+        "ohne": [
+          "vell_gefallen"
+        ]
+      },
+      "text": "Jost Vell bekam keinen Orden. Er wurde Lehrer an einer Schule in Haverstadt und strich aus den Lesebüchern die Zitate, die er früher auswendig konnte. Seinem Vater schrieb er bis zu dessen Tod jeden Monat einen Brief. Sie wurden kürzer und wahrer."
+    },
+    {
+      "id": "ende.nachwort.vell.gefallen",
+      "art": "nachwort",
+      "slot": "ende.nachwort.vell",
+      "figur": "Jost Vell",
+      "text": "Jost Vells Zigarettenetui liegt im Rathaus von Haverstadt in einer Vitrine, die sein Vater gestiftet hat. Den Orden, den der Stab ihm nachträglich verliehen hat, hat der Vater nicht dazugelegt. Daneben liegt nur ein handgeschriebener Brief aus dem Lehmgau."
+    },
+    {
+      "id": "ende.nachwort.lask.gewarnt",
+      "art": "nachwort",
+      "slot": "ende.nachwort.lask",
+      "figur": "Teodor Lask",
+      "wann": {
+        "flags": [
+          "mine_gewarnt"
+        ]
+      },
+      "text": "Teodor Lask kehrte nach Sarneva zurück. Er hat nie erzählt, warum Hügel 214 leer war, als er in die Luft flog. Die zweihundert Männer, die in jener Nacht umziehen mussten, haben es sich selbst erzählt, über die Jahre, und die Geschichte wurde jedes Mal etwas größer. Die Partie mit Ruta endete remis. Sie sagt, sie habe ihn nicht gewinnen lassen, er sagt, er sie nicht."
+    },
+    {
+      "id": "ende.nachwort.lask.rueckfall",
+      "art": "nachwort",
+      "slot": "ende.nachwort.lask",
+      "figur": "Teodor Lask",
+      "text": "Teodor Lask kehrte nach Sarneva zurück und führte mit Ruta das Gut, das kein Geld hatte und keines brauchte. Ignas hat die Front nie gesehen. Die Partie, die im ersten Kriegssommer begonnen hatte, spielten sie am Küchentisch zu Ende. Sie endete remis."
+    },
+    {
+      "id": "ende.nachwort.albers",
+      "art": "nachwort",
+      "figur": "Wiebke Albers",
+      "text": "Wiebke Albers ging zurück nach Fennhusen und stach wieder Torf, wie ihr Vater. Sie sagte, im Moor sei es so still, dass man das eigene Herz hört. Das sei ihr lieber als alles, was sie unter dem Hügel gehört habe."
+    }
+  ]
+}

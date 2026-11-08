@@ -1,0 +1,684 @@
+{
+  "format": 1,
+  "beschreibung": "Akt 4: Das letzte Frühjahr. Briefings, Stabsbefehle, Entscheidungen, Tagebuch. Die Schlusssequenzen stehen in enden.json.",
+  "eintraege": [
+    {
+      "id": "a4.titel",
+      "art": "akt",
+      "blatt": "aktkarte",
+      "titel": "Akt 4: Das letzte Frühjahr",
+      "untertitel": "Frühjahr",
+      "text": "Das Eis bricht, und unter ihm liegt alles, was der Winter zugedeckt hat. Beide Armeen sind müde. In den Städten wird von Verhandlungen gesprochen, im Graben von gar nichts mehr. Der Stab will den Lehmgau vor dem Sommer. Die Truppe will nach Hause. Brandt steht dazwischen."
+    },
+    {
+      "id": "a4m1.briefing",
+      "art": "briefing",
+      "mission": "a4m1",
+      "titel": "Tauwetter",
+      "ort": "Lasks vordere Linie vor Raudas",
+      "zeit": "Frühjahr, Tauwetter",
+      "text": "Heute Nacht war es drüben still. Keine Leuchtkugeln, kein Rauch aus den Unterständen, kein Husten. Eine Patrouille meldet: Die vordere Linie von Haus Morrow ist leer.\n\nDer Stab jubelt und befiehlt nachzustoßen. Fedders schüttelt den Kopf. Wer einen Graben räumt, den er den ganzen Winter gehalten hat, lässt ihn nicht einfach liegen.\n\nRücken Sie vor, aber langsam. Lassen Sie jeden Unterstand prüfen, bevor jemand hineingeht. Irgendwo hinter der leeren Linie wartet Lask, und er kennt jeden Meter, den Sie betreten.",
+      "ziele": [
+        "Die geräumte gegnerische Linie besetzen.",
+        "Den Gegenstoß aus der Tiefe bis Runde 14 abwehren.",
+        "Freiwillig: Keine Gruppe gerät in eine Sprengfalle."
+      ]
+    },
+    {
+      "id": "a4m1.befehl",
+      "art": "befehl",
+      "blatt": "telegramm",
+      "mission": "a4m1",
+      "nr": "401",
+      "von": "STAB HAVERSTADT-LAND",
+      "an": "MAJOR BRANDT",
+      "abschnitt": "A-NORD",
+      "frist": "SOFORT",
+      "eilt": true,
+      "text": "GEGNER WEICHT STOP SOFORT NACHSTOSSEN STOP JEDE STUNDE ZÄHLT STOP VAN AURACH STOP",
+      "folgen": {
+        "erfuellt": {
+          "ansehen": 6
+        },
+        "verfehlt": {
+          "ansehen": -6
+        }
+      }
+    },
+    {
+      "id": "a4m1.tagebuch.fallen",
+      "art": "tagebuch",
+      "blatt": "tagebuch",
+      "slot": "a4m1.tagebuch",
+      "nach": "a4m1",
+      "titel": "Drähte an Türrahmen",
+      "wann": {
+        "ausgang": "sieg",
+        "werte": {
+          "gefallene": {
+            "max": 4
+          }
+        }
+      },
+      "text": "In den Unterständen drüben hingen Drähte an den Türrahmen, unter den Pritschen lagen Granaten ohne Splint. Fedders hat sie gefunden, eine nach der anderen, mit einer Taschenlampe und einer Geduld, die ich nicht habe.\n\nIn einem Unterstand hing eine Kinderzeichnung an der Wand, ein Haus mit Rauch aus dem Schornstein. Ich habe sie hängen lassen."
+    },
+    {
+      "id": "a4m1.tagebuch.zurueck",
+      "art": "tagebuch",
+      "blatt": "tagebuch",
+      "slot": "a4m1.tagebuch",
+      "nach": "a4m1",
+      "titel": "Leere Gräben",
+      "wann": {
+        "ausgang": "niederlage"
+      },
+      "text": "Wir waren in Lasks leerer Linie, einen Tag und eine Nacht. Dann kam der Gegenstoß aus der Tiefe, aus Gräben, die auf keiner Karte standen, und wir sind zurück in unsere.\n\nEr hat uns hineingelassen, damit er uns wieder hinauswerfen kann. Ein Ingenieur würde sagen: Er hat die Last nicht getragen, er hat sie umgeleitet. Ich hätte es sehen müssen."
+    },
+    {
+      "id": "a4m1.tagebuch.raum",
+      "art": "tagebuch",
+      "blatt": "tagebuch",
+      "slot": "a4m1.tagebuch",
+      "nach": "a4m1",
+      "titel": "Der Raum dahinter",
+      "text": "Wir haben die leere Linie. Sie hat uns gekostet, was eine volle gekostet hätte, nur dass drüben niemand dafür sterben musste.\n\nIch verstehe Lask jetzt besser, als mir lieb ist. Er hält nicht mehr den Graben. Er hält den Raum dahinter. Ein Ingenieur würde sagen: Er hat aufgehört, die Last an einem Punkt zu tragen."
+    },
+    {
+      "id": "a4m2.briefing",
+      "art": "briefing",
+      "mission": "a4m2",
+      "titel": "Der Kasten",
+      "ort": "Straße nach Raudas",
+      "zeit": "Frühjahr, trockener Tag",
+      "text": "Auf einem Tieflader ist ein Ding angekommen, das die Leute den Kasten nennen. Stahlplatten, Ketten statt Räder, zwei Maschinengewehre und ein Motor, der klingt wie eine Dreschmaschine. Die Ingenieure von der Werft in Kelling sagen, er fährt durch Draht und über Gräben. Sie sagen nicht, was er im Lehm tut.\n\nBegleiten Sie den Kasten bis zur zweiten gegnerischen Linie. Die Gruppen gehen hinter ihm, nicht vor ihm. Wenn er stecken bleibt, ist er das größte Ziel im ganzen Lehmgau.",
+      "ziele": [
+        "Den Panzerwagen bis zur zweiten gegnerischen Linie bringen.",
+        "Die Gruppen bleiben im Schutz des Panzerwagens.",
+        "Freiwillig: Der Panzerwagen bleibt nicht stecken."
+      ]
+    },
+    {
+      "id": "a4m2.befehl",
+      "art": "befehl",
+      "blatt": "telegramm",
+      "mission": "a4m2",
+      "nr": "407",
+      "von": "STAB HAVERSTADT-LAND",
+      "an": "MAJOR BRANDT",
+      "abschnitt": "A-NORD",
+      "frist": "TAG 2 DER MISSION",
+      "eilt": false,
+      "text": "PANZERWAGEN K1 ZUR ERPROBUNG ZUGETEILT STOP VERLUST DES GERÄTS IST ZU VERMEIDEN STOP BERICHT AN WERFT KELLING STOP VAN AURACH STOP",
+      "folgen": {
+        "erfuellt": {
+          "ansehen": 8
+        },
+        "verfehlt": {
+          "ansehen": -6
+        }
+      }
+    },
+    {
+      "id": "a4m2.tagebuch.gesichter",
+      "art": "tagebuch",
+      "blatt": "tagebuch",
+      "slot": "a4m2.tagebuch",
+      "nach": "a4m2",
+      "titel": "Gesichter",
+      "wann": {
+        "ausgang": "sieg"
+      },
+      "text": "Der Kasten ist durch den Draht gefahren wie durch Gras. Drüben haben sie die Gewehre weggeworfen, nicht weil sie feige waren, sondern weil nichts, was sie hatten, dagegen half. Ich habe ihre Gesichter gesehen. So haben wir ausgesehen, als das Gas kam.\n\nDer Ingenieur aus Kelling schreibt jetzt einen Bericht über hundert Kästen. Ich schreibe einen über die Gesichter. Nur einer von beiden wird gelesen."
+    },
+    {
+      "id": "a4m2.tagebuch.trichter",
+      "art": "tagebuch",
+      "blatt": "tagebuch",
+      "slot": "a4m2.tagebuch",
+      "nach": "a4m2",
+      "titel": "Deckung",
+      "text": "Der Kasten ist im zweiten Granattrichter stecken geblieben, schräg, mit einer Kette in der Luft. Die Besatzung ist herausgeklettert, bevor er zu brennen anfing.\n\nJetzt steht er im Niemandsland, und beide Seiten benutzen ihn als Deckung, je nachdem, wer gerade schießt. Neben dem Heuwagen ist er das zweite Ding auf der Weide, das allen gehört. Vielleicht ist das sein bester Zweck."
+    },
+    {
+      "id": "a4m3.briefing",
+      "art": "briefing",
+      "mission": "a4m3",
+      "titel": "Unter dem Hügel",
+      "ort": "Stollen unter Hügel 214",
+      "zeit": "Frühjahr, vier Tage vor dem X-Tag",
+      "text": "Seit dem Herbst graben die Pioniere unter Hügel 214. Jetzt ist die Kammer fertig: zwanzig Tonnen Sprengstoff, zwölf Meter unter Lasks Stellung auf dem Kreidehügel. Der Hügel ist der einzige Vorsprung, den Lask vorn noch hält: Von dort sieht man bis Ostervenn, und das gibt niemand freiwillig her.\n\nGestern Nacht hat Wiebke Albers im Horchposten Klopfen gehört, ganz nah. Lask gräbt einen Gegenstollen. In zwei, vielleicht drei Tagen bricht er in die Kammer durch. Der Stab will die Mine zum Großangriff zünden, in vier Tagen.\n\nHalten Sie den Stollen bis dahin, oder entscheiden Sie, was mit dem Hügel geschieht.",
+      "ziele": [
+        "Den eigenen Stollen gegen den Gegenstollen sichern.",
+        "Die Kammer bleibt bis zur Entscheidung unentdeckt.",
+        "Freiwillig: Kein Pionier wird verschüttet."
+      ]
+    },
+    {
+      "id": "a4m3.befehl",
+      "art": "befehl",
+      "blatt": "telegramm",
+      "mission": "a4m3",
+      "nr": "414",
+      "von": "STAB HAVERSTADT-LAND",
+      "an": "MAJOR BRANDT",
+      "abschnitt": "A-NORD",
+      "frist": "X-TAG 04:10",
+      "eilt": true,
+      "text": "ZÜNDUNG MINE 214 AM X-TAG 04:10 STOP NICHT FRÜHER NICHT SPÄTER STOP STOLLEN BIS DAHIN HALTEN STOP VAN AURACH STOP",
+      "folgen": {
+        "erfuellt": {
+          "ansehen": 8
+        },
+        "verfehlt": {
+          "ansehen": -10
+        }
+      }
+    },
+    {
+      "id": "a4m3.entscheidung",
+      "art": "entscheidung",
+      "mission": "a4m3",
+      "titel": "Zwanzig Tonnen",
+      "text": "Albers meldet: Lasks Gegenstollen ist noch zwei Meter entfernt. Bricht er durch, ist die Mine verloren und die Pioniere in der Kammer auch. Der Befehl sagt: X-Tag, 04:10. Auf dem Hügel liegen um die zweihundert Mann.\n\nUnter den Gefangenen der letzten Woche ist ein Melder aus dem Regiment Sarneva, der zurück will. Er weiß nicht, was unter dem Hügel liegt.",
+      "optionen": [
+        {
+          "id": "befolgen",
+          "label": "Wie befohlen zünden",
+          "text": "Die Mine wird am X-Tag um 04:10 gezündet. Die Pioniere halten den Stollen bis dahin. Hügel 214 wird zum Krater.",
+          "folgen": {
+            "ansehen": 12,
+            "vertrauen": -4
+          },
+          "setzt": [
+            "mine_gezuendet"
+          ]
+        },
+        {
+          "id": "warnen",
+          "label": "Lask warnen",
+          "text": "Der Melder wird mit einer Skizze und der Uhrzeit zurückgeschickt. Die Mine wird gezündet, aber der Hügel ist leer. Wird das bekannt, ist es Hochverrat.",
+          "folgen": {
+            "ansehen": -6,
+            "vertrauen": 6
+          },
+          "setzt": [
+            "mine_gezuendet",
+            "mine_gewarnt"
+          ]
+        },
+        {
+          "id": "verweigern",
+          "label": "Kammer fluten",
+          "text": "Die Kammer wird mit dem Grabenwasser geflutet und die Mine unbrauchbar gemacht. Dem Stab wird ein Wassereinbruch gemeldet.",
+          "folgen": {
+            "ansehen": -10,
+            "vertrauen": 3
+          },
+          "setzt": [
+            "mine_geflutet"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "a4m3.tagebuch.gewarnt",
+      "art": "tagebuch",
+      "blatt": "tagebuch",
+      "slot": "a4m3.tagebuch",
+      "nach": "a4m3",
+      "titel": "Leer",
+      "wann": {
+        "flags": [
+          "mine_gewarnt"
+        ]
+      },
+      "text": "Ich habe den Melder zurückgeschickt, mit einer Skizze und einer Uhrzeit. Lask hat den Hügel in der Nacht geräumt. Um 04:10 ist er in die Luft gegangen, leer.\n\nDer Stab hat seinen Krater und keine Toten, und keiner kann sagen, warum. Ich weiß, dass ich dafür vor ein Gericht gehöre. Ich weiß nicht, ob ich es bereue. Ich glaube, nein."
+    },
+    {
+      "id": "a4m3.tagebuch.gezuendet",
+      "art": "tagebuch",
+      "blatt": "tagebuch",
+      "slot": "a4m3.tagebuch",
+      "nach": "a4m3",
+      "titel": "04:10",
+      "wann": {
+        "flags": [
+          "mine_gezuendet"
+        ]
+      },
+      "text": "Um 04:10 hat sich der Hügel gehoben, langsam, wie ein Tier, das aufsteht. Dann kam der Ton, dann der Wind, dann regnete Kreide. Wo der Hügel war, ist ein Loch, in das die Kirche von Ostervenn passen würde.\n\nAuf dem Hügel waren um die zweihundert. Die Zeitungen werden die Zahl drucken. Ich werde sie nicht lesen."
+    },
+    {
+      "id": "a4m3.tagebuch.geflutet",
+      "art": "tagebuch",
+      "blatt": "tagebuch",
+      "slot": "a4m3.tagebuch",
+      "nach": "a4m3",
+      "titel": "Wasser läuft nach unten",
+      "text": "Wir haben die Kammer geflutet. Die Pioniere haben das Wasser aus den Gräben hineingepumpt, das ganze Frühjahr ist jetzt da unten, mit zwanzig Tonnen Sprengstoff, die nie mehr etwas tun werden.\n\nAlbers hat geweint. Sie hat ein halbes Jahr an diesem Stollen gegraben. Ich habe ihr gesagt, dass es die beste Arbeit ihres Lebens war, gerade weil sie umsonst war. Ich weiß nicht, ob sie mir geglaubt hat."
+    },
+    {
+      "id": "a4m4.briefing",
+      "art": "briefing",
+      "mission": "a4m4",
+      "titel": "Gerüchte",
+      "ort": "Laufgraben am alten Bahndamm",
+      "zeit": "Frühjahr, Mittag",
+      "text": "Mit der Post sind Zeitungen gekommen, die von Verhandlungen schreiben. Ein Waffenstillstand im Sommer, vielleicht früher. Am selben Tag kam der Befehl, den alten Bahndamm vor Raudas zurückzunehmen, den Lask beim Gegenstoß im Winter gehalten hat.\n\nDie Gruppe von {gruppenfuehrer} hat den Befehl gelesen und die Gewehre an die Grabenwand gelehnt. Sie meutern nicht. Sie sagen, sie gehen nicht mehr für einen Bahndamm sterben, den in drei Wochen niemand mehr braucht. Die anderen Gruppen sehen zu.\n\nWas Sie jetzt tun, entscheidet, ob in diesem Abschnitt noch einmal jemand aus dem Graben steigt.",
+      "ziele": [
+        "Je nach Entscheidung: den Bahndamm zurücknehmen oder den Abschnitt halten.",
+        "Keine weitere Gruppe verweigert."
+      ]
+    },
+    {
+      "id": "a4m4.befehl",
+      "art": "befehl",
+      "blatt": "telegramm",
+      "mission": "a4m4",
+      "nr": "421",
+      "von": "STAB HAVERSTADT-LAND",
+      "an": "MAJOR BRANDT",
+      "abschnitt": "A-NORD",
+      "frist": "MORGEN FRÜH",
+      "eilt": true,
+      "text": "BAHNDAMM VOR RAUDAS BIS MORGEN FRÜH ZURÜCKNEHMEN STOP GERÜCHTE ÜBER VERHANDLUNGEN SIND FEINDPROPAGANDA STOP WER SIE VERBREITET WIRD BESTRAFT STOP VAN AURACH STOP",
+      "folgen": {
+        "erfuellt": {
+          "ansehen": 8
+        },
+        "verfehlt": {
+          "ansehen": -10
+        }
+      }
+    },
+    {
+      "id": "a4m4.entscheidung",
+      "art": "entscheidung",
+      "mission": "a4m4",
+      "titel": "Die Gewehre an der Wand",
+      "text": "Die Gruppe steht im Graben, die Gewehre an der Wand, die Hände in den Manteltaschen. Niemand ist laut. Der Befehl verlangt, Verweigerer zu melden. Die anderen Gruppen warten darauf, was Sie tun, und tun so, als würden sie nicht warten.",
+      "optionen": [
+        {
+          "id": "mitgehen",
+          "label": "Selbst vorgehen",
+          "text": "Brandt nimmt ein Gewehr, steigt aus dem Graben und geht vor, ohne einen Befehl zu geben. Die Gruppen folgen. Brandt steht in dieser Mission als eigene Einheit auf der Karte und kann verwundet werden. Wer folgt, folgt ihr, nicht dem Befehl.",
+          "folgen": {
+            "ansehen": 6,
+            "vertrauen": 0
+          },
+          "setzt": [
+            "verweigerung_mitgegangen"
+          ]
+        },
+        {
+          "id": "harms",
+          "label": "Harms sprechen lassen",
+          "text": "Harms setzt sich zur Gruppe. Die Verweigerung wird abgewendet. Was es ihn kostet, zeigt er nicht.",
+          "wann": {
+            "ohne": [
+              "harms_gefallen"
+            ]
+          },
+          "folgen": {
+            "ansehen": 4,
+            "vertrauen": 2
+          },
+          "setzt": [
+            "verweigerung_harms"
+          ]
+        },
+        {
+          "id": "befolgen",
+          "label": "Gruppe melden",
+          "text": "Die Gruppe wird gemeldet und von Feldgendarmen abgeführt. Der Angriff wird mit den übrigen Gruppen geführt. Die Gruppe fehlt für den Rest der Kampagne.",
+          "folgen": {
+            "ansehen": 10,
+            "vertrauen": -18
+          },
+          "setzt": [
+            "verweigerung_gemeldet"
+          ]
+        },
+        {
+          "id": "verweigern",
+          "label": "Befehl nicht weitergeben",
+          "text": "Brandt hält den Befehl zurück und meldet den Angriff als nicht durchführbar. Der Bahndamm bleibt beim Gegner. Der Stab schickt einen Beobachter.",
+          "folgen": {
+            "ansehen": -14,
+            "vertrauen": 10
+          },
+          "setzt": [
+            "verweigerung_aufgehoben"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "a4m4.tagebuch.mitgegangen",
+      "art": "tagebuch",
+      "blatt": "tagebuch",
+      "slot": "a4m4.tagebuch",
+      "nach": "a4m4",
+      "titel": "Zehn Meter",
+      "wann": {
+        "flags": [
+          "verweigerung_mitgegangen"
+        ]
+      },
+      "text": "Ich bin vorgegangen. Nicht mutig, nur als Erste. Ich habe nicht gesagt, dass sie mitkommen sollen. Nach zehn Metern habe ich Schritte hinter mir gehört.\n\nWir haben den Bahndamm. Ich weiß nicht, ob ich etwas Gutes getan habe oder etwas, das man ihnen nicht hätte antun dürfen. Vielleicht ist das in diesem Krieg dasselbe."
+    },
+    {
+      "id": "a4m4.tagebuch.harms",
+      "art": "tagebuch",
+      "blatt": "tagebuch",
+      "slot": "a4m4.tagebuch",
+      "nach": "a4m4",
+      "titel": "Eine Stunde",
+      "wann": {
+        "flags": [
+          "verweigerung_harms"
+        ]
+      },
+      "text": "Harms hat sich zu ihnen gesetzt, eine Stunde lang, die kalte Pfeife im Mund. Ich weiß nicht, was er gesagt hat. Danach sind sie gegangen, nicht für den Bahndamm, sondern für die Gruppe daneben, die schon draußen war.\n\nAm Abend sagte er nur: „Das war die letzte, Frau Major. Mehr hab ich nicht.“"
+    },
+    {
+      "id": "a4m4.tagebuch.gemeldet",
+      "art": "tagebuch",
+      "blatt": "tagebuch",
+      "slot": "a4m4.tagebuch",
+      "nach": "a4m4",
+      "titel": "Korrekt",
+      "wann": {
+        "flags": [
+          "verweigerung_gemeldet"
+        ]
+      },
+      "text": "Ich habe die Gruppe gemeldet, wie es der Befehl verlangt. Feldgendarmen haben sie abgeholt, am hellen Tag, durch den Laufgraben, an allen anderen vorbei. Niemand hat etwas gesagt.\n\nSeitdem grüßt man mich korrekt. Nur korrekt."
+    },
+    {
+      "id": "a4m4.tagebuch.aufgehoben",
+      "art": "tagebuch",
+      "blatt": "tagebuch",
+      "slot": "a4m4.tagebuch",
+      "nach": "a4m4",
+      "titel": "Nicht die ganze Wahrheit",
+      "text": "Ich habe den Befehl nicht weitergegeben. Der Bahndamm bleibt drüben. An van Aurach habe ich geschrieben, der Angriff sei wegen Erschöpfung der Truppe nicht durchführbar gewesen.\n\nDas ist wahr. Es ist nicht die ganze Wahrheit. Die Gruppe hat mir am Abend einen Becher Tee gebracht, ohne ein Wort. Das war die ganze."
+    },
+    {
+      "id": "a4m5.briefing",
+      "art": "briefing",
+      "mission": "a4m5",
+      "titel": "Die Brücke",
+      "ort": "Fährhaus Ostervenn und Asse",
+      "zeit": "Frühjahr, Hochwasser",
+      "text": "Die Asse führt Hochwasser. In der Nacht hat sie die Behelfsbrücke beim Fährhaus mitgenommen, mit Bohlen, Seilen und einer Lore. Der Abschnitt ist von der Etappe abgeschnitten: kein Nachschub nach vorn, kein Verwundeter nach hinten.\n\nSie sind Ingenieurin. Sie haben Brücken gebaut, bevor Sie Gräben gebaut haben. Bauen Sie eine neue über die Asse, unter Störfeuer aus dem Zelva-Wald, mit dem Holz, das noch steht, und legen Sie die Feldbahn darüber.\n\nAm Abend kommt ein Bote mit einer weißen Binde über die Weide. Hauptmann Lask möchte mit Ihnen sprechen. Allein, beim Heuwagen.",
+      "ziele": [
+        "Die Pionierbrücke über die Asse fertigstellen.",
+        "Die Feldbahn bis über die Brücke legen.",
+        "Freiwillig: Keine Verluste unter den Pionieren."
+      ]
+    },
+    {
+      "id": "a4m5.befehl",
+      "art": "befehl",
+      "blatt": "telegramm",
+      "mission": "a4m5",
+      "nr": "428",
+      "von": "STAB HAVERSTADT-LAND",
+      "an": "MAJOR BRANDT",
+      "abschnitt": "A-NORD",
+      "frist": "48 STUNDEN",
+      "eilt": true,
+      "text": "ASSE-ÜBERGANG BINNEN 48 STUNDEN HERSTELLEN STOP TRAGFÄHIGKEIT FÜR FELDHAUBITZE STOP ZWECK FOLGT STOP VAN AURACH STOP",
+      "folgen": {
+        "erfuellt": {
+          "ansehen": 8
+        },
+        "verfehlt": {
+          "ansehen": -8
+        }
+      }
+    },
+    {
+      "id": "a4m5.tagebuch.gebaut",
+      "art": "tagebuch",
+      "blatt": "tagebuch",
+      "slot": "a4m5.tagebuch",
+      "nach": "a4m5",
+      "titel": "Lasten, Fugen, Wasser",
+      "wann": {
+        "ausgang": "sieg"
+      },
+      "text": "Sie steht. Vierundvierzig Meter, sechs Joche, Bohlen aus der Scheune von Velde und Balken aus dem Trockenschuppen der Ziegelei Tamm, die eigentlich zu dünn waren. Ich habe einen ganzen Tag lang nicht an den Krieg gedacht, nur an Lasten, Fugen und Wasser. Ich hatte vergessen, wie sich das anfühlt.\n\nAls die erste Lore mit Verwundeten hinüberfuhr, hat Selin am anderen Ufer gestanden und gezählt. Dann hat sie die Hand gehoben. Mehr nicht. Es war genug."
+    },
+    {
+      "id": "a4m5.tagebuch.halb",
+      "art": "tagebuch",
+      "blatt": "tagebuch",
+      "slot": "a4m5.tagebuch",
+      "nach": "a4m5",
+      "titel": "Zu nass",
+      "text": "Die Brücke trägt Fußgänger und keine Lore. Die Balken aus dem Krähenholz waren Stümpfe und zu nass, das habe ich gewusst und trotzdem genommen, weil es keine anderen gab.\n\nDie Verwundeten gehen jetzt zu Fuß über die Asse, gestützt, einer nach dem anderen. Ich stehe am Ufer und zähle sie. Das ist das Einzige, was ich heute richtig mache."
+    },
+    {
+      "id": "a4m5.entscheidung",
+      "art": "entscheidung",
+      "nach": "a4m5",
+      "titel": "Beim Heuwagen",
+      "text": "Der Bote wartet am Rand der Weide. Lask will sprechen, allein, beim umgestürzten Heuwagen, nach Einbruch der Dunkelheit. Der Stab hat jede Absprache verboten. Der Stab hat auch geschrieben, Gerüchte über Verhandlungen seien Feindpropaganda.\n\nIn Ihrer Tasche liegen seine Briefe, die Sie nie hätten lesen sollen.",
+      "optionen": [
+        {
+          "id": "gehen",
+          "label": "Hinübergehen",
+          "text": "Brandt geht ohne Waffe hinaus zum Heuwagen und spricht mit Lask. Danach weiß jeder, mit wem er es zu tun hat.",
+          "folgen": {
+            "ansehen": -8,
+            "vertrauen": 8
+          },
+          "setzt": [
+            "lask_treffen"
+          ]
+        },
+        {
+          "id": "melden",
+          "label": "Dem Stab melden",
+          "text": "Brandt meldet das Angebot nach Haverstadt-Land und bleibt in ihrem Graben. Lask schreibt ihr nicht mehr.",
+          "folgen": {
+            "ansehen": 8,
+            "vertrauen": -6
+          },
+          "setzt": [
+            "lask_gemeldet"
+          ]
+        },
+        {
+          "id": "schweigen",
+          "label": "Nicht hingehen",
+          "text": "Brandt geht nicht und sagt niemandem etwas. Am Heuwagen brennt bis Mitternacht eine Laterne.",
+          "folgen": {
+            "ansehen": 0,
+            "vertrauen": 0
+          },
+          "setzt": [
+            "lask_geschwiegen"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "a4m5.treffen",
+      "art": "tagebuch",
+      "blatt": "tagebuch",
+      "nach": "a4m5",
+      "nach_entscheidung": "a4m5.entscheidung",
+      "wann": {
+        "flags": [
+          "lask_treffen"
+        ]
+      },
+      "titel": "Beim Heuwagen",
+      "text": "Er ist älter, als ich dachte, und kleiner. Er hat mir eine Zigarette angeboten und sich entschuldigt, als ich ablehnte. Wir standen eine halbe Stunde am Heuwagen, jeder mit dem Rücken zu seiner Linie.\n\nEr sagte, er habe meine Gräben studiert wie ein Buch. Ich sagte, ich hätte seine Briefe gelesen. Er hat gelacht, zum ersten Mal, und gesagt: „Dann wissen Sie mehr über mich als meine Frau. Das dürfen Sie ihr nie erzählen.“\n\nWir haben nichts vereinbart. Wir haben nur ausgemacht, dass jeder weiß, wo der andere steht. Für einen Krieg ist das sehr viel."
+    },
+    {
+      "id": "a4m5.gemeldet",
+      "art": "tagebuch",
+      "blatt": "tagebuch",
+      "nach": "a4m5",
+      "nach_entscheidung": "a4m5.entscheidung",
+      "wann": {
+        "flags": [
+          "lask_gemeldet"
+        ]
+      },
+      "titel": "Ausrufezeichen",
+      "text": "Ich habe das Angebot nach Haverstadt-Land gemeldet. Van Aurach hat mit einem Wort geantwortet: ANERKENNUNG.\n\nAm nächsten Morgen lag Lasks Bote tot beim Heuwagen. Ich weiß nicht, wer geschossen hat. Ich habe eine Brücke gebaut, damit man hinübergehen kann, und dann bin ich auf meinem Ufer geblieben."
+    },
+    {
+      "id": "a4m5.geschwiegen",
+      "art": "tagebuch",
+      "blatt": "tagebuch",
+      "nach": "a4m5",
+      "nach_entscheidung": "a4m5.entscheidung",
+      "wann": {
+        "flags": [
+          "lask_geschwiegen"
+        ]
+      },
+      "titel": "Die Mütze",
+      "text": "Ich bin nicht gegangen und habe es niemandem erzählt. Am Heuwagen hat bis Mitternacht eine Laterne gebrannt, ich habe sie durch das Glas gesehen. Dann hat jemand kurz die Mütze gehoben, in meine Richtung, und die Laterne ausgeblasen.\n\nAm Morgen bin ich über meine Brücke gegangen, einmal hin und zurück. Das ist nicht dasselbe wie hinübergehen."
+    },
+    {
+      "id": "a4m6.briefing.haelt",
+      "art": "briefing",
+      "slot": "a4m6.briefing",
+      "mission": "a4m6",
+      "titel": "Der letzte Morgen",
+      "ort": "Ganzer Abschnitt A-NORD",
+      "zeit": "Frühjahr, letzter Tag",
+      "wann": {
+        "ansehen": {
+          "min": 60
+        },
+        "vertrauen": {
+          "min": 60
+        }
+      },
+      "text": "Der Großangriff findet anderswo statt. A-NORD soll nur halten, während zwanzig Kilometer weiter südlich entschieden wird, wie dieser Krieg endet. Lask hat dieselbe Aufgabe, und er wird sie so ernst nehmen wie Sie.\n\nEs wird ein langer Tag. Halten Sie ihn durch, bis jemand anderes entschieden hat. Sie haben das ganze Jahr dafür gebaut.",
+      "ziele": [
+        "Den Abschnitt bis zum Abend halten.",
+        "Keine Gruppe bleibt länger als vier Runden vorn.",
+        "Freiwillig: Kein Verwundeter bleibt liegen."
+      ],
+      "ende": "haelt"
+    },
+    {
+      "id": "a4m6.briefing.waffenstillstand-laterne",
+      "art": "briefing",
+      "slot": "a4m6.briefing",
+      "mission": "a4m6",
+      "titel": "Der letzte Morgen",
+      "ort": "Ganzer Abschnitt A-NORD",
+      "zeit": "Frühjahr, letzter Tag",
+      "wann": {
+        "ansehen": {
+          "max": 59
+        },
+        "vertrauen": {
+          "min": 50
+        },
+        "flags": [
+          "lask_gemeldet"
+        ]
+      },
+      "text": "Lask schreibt Ihnen nicht mehr, seit Sie sein Angebot gemeldet haben. Aber heute früh hängt am Heuwagen wieder eine Laterne, am hellen Tag, und darunter ein Zettel mit einer einzigen Zeile: ab Mittag nicht mehr schießen, beide Seiten, und sehen, wer es bemerkt.\n\nBis Mittag gilt noch der Befehl von hinten. Halten Sie bis dahin, ohne einen Schritt nach vorn. Danach entscheiden Sie, ob Sie die Laterne gesehen haben.",
+      "ziele": [
+        "Den Abschnitt bis Mittag halten, ohne anzugreifen.",
+        "Ab Mittag fällt von A-NORD kein Schuss mehr.",
+        "Freiwillig: Keine Gruppe verlässt den Graben."
+      ],
+      "ende": "waffenstillstand"
+    },
+    {
+      "id": "a4m6.briefing.waffenstillstand",
+      "art": "briefing",
+      "slot": "a4m6.briefing",
+      "mission": "a4m6",
+      "titel": "Der letzte Morgen",
+      "ort": "Ganzer Abschnitt A-NORD",
+      "zeit": "Frühjahr, letzter Tag",
+      "wann": {
+        "ansehen": {
+          "max": 59
+        },
+        "vertrauen": {
+          "min": 50
+        }
+      },
+      "text": "Lask hat geschrieben. Er hat die Erlaubnis seines Obersts nicht, und Sie haben die Ihres Stabs nicht. Aber er schlägt vor, ab Mittag nicht mehr zu schießen, beide Seiten, im ganzen Abschnitt, und zu sehen, wer es bemerkt.\n\nBis Mittag gilt noch der Befehl von hinten. Halten Sie bis dahin, ohne einen Schritt nach vorn. Danach halten Sie Ihr Wort.",
+      "ziele": [
+        "Den Abschnitt bis Mittag halten, ohne anzugreifen.",
+        "Ab Mittag fällt von A-NORD kein Schuss mehr.",
+        "Freiwillig: Keine Gruppe verlässt den Graben."
+      ],
+      "ende": "waffenstillstand"
+    },
+    {
+      "id": "a4m6.briefing.durchbruch",
+      "art": "briefing",
+      "slot": "a4m6.briefing",
+      "mission": "a4m6",
+      "titel": "Der letzte Morgen",
+      "ort": "Ganzer Abschnitt A-NORD, Ziel: Raudas",
+      "zeit": "Frühjahr, X-Tag",
+      "wann": {
+        "ansehen": {
+          "min": 50
+        }
+      },
+      "text": "X-Tag. Alles, was der Stab noch hat, steht hinter A-NORD. Über die Asse rollt, was noch fahren kann, der Kasten hat Geschwister bekommen, und die Gruppen haben Befehl, nicht anzuhalten, bis Raudas fällt.\n\nSie werden durchbrechen. Die Frage ist nur, wer am Abend noch da ist, um es zu sehen.",
+      "ziele": [
+        "Lasks letzte Linie durchbrechen.",
+        "Raudas bis zum Abend erreichen.",
+        "Freiwillig: Keine Gruppe stürmt trotz Warnung der Vorschau."
+      ],
+      "ende": "durchbruch"
+    },
+    {
+      "id": "a4m6.briefing.abgeloest",
+      "art": "briefing",
+      "slot": "a4m6.briefing",
+      "mission": "a4m6",
+      "titel": "Der letzte Morgen",
+      "ort": "Gefechtsstand Velde",
+      "zeit": "Frühjahr, letzter Tag",
+      "text": "Der Nachfolger ist da. Major Kuiper aus Haverstadt-Land, ein höflicher Mann mit einer Karte, auf der keine Namen stehen. Sie übergeben den Abschnitt heute Mittag.\n\nBis dahin sind Sie noch Kommandantin. Was Sie bis Mittag anordnen, gilt. Danach dürfen Sie zusehen.",
+      "ziele": [
+        "Den Abschnitt bis Mittag halten.",
+        "Bei der Übergabe ist jede Gruppe abgelöst oder im Unterstand.",
+        "Freiwillig: Alle Verwundeten sind vor der Übergabe im Lazarett."
+      ],
+      "ende": "abgeloest"
+    },
+    {
+      "id": "a4m6.befehl",
+      "art": "befehl",
+      "blatt": "telegramm",
+      "mission": "a4m6",
+      "nr": "444",
+      "von": "STAB HAVERSTADT-LAND",
+      "an": "MAJOR BRANDT",
+      "abschnitt": "A-NORD",
+      "frist": "HEUTE",
+      "eilt": true,
+      "text": "BEFEHLE FÜR DEN HEUTIGEN TAG FOLGEN GESONDERT STOP VAN AURACH STOP",
+      "folgen": {
+        "erfuellt": {
+          "ansehen": 0
+        },
+        "verfehlt": {
+          "ansehen": 0
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,326 @@
+{
+  "format": 1,
+  "beschreibung": "40 Erfolge (Linolschnitt, Stil 08). Keine Orden und keine Punkte: Jeder Erfolg ist eine kleine Notiz über etwas, das gelungen ist oder ausgehalten wurde.",
+  "eintraege": [
+    {
+      "id": "erfolg.erster_spatenstich",
+      "art": "erfolg",
+      "blatt": "aktkarte",
+      "titel": "Erster Spatenstich",
+      "ausloeser": "Ein Grabenfeld fertig ausgehoben.",
+      "text": "Das erste Grabenfeld ausgehoben. Der Lehm gibt nach, aber nur ein Stück."
+    },
+    {
+      "id": "erfolg.niemand_vorn_vergessen",
+      "art": "erfolg",
+      "blatt": "aktkarte",
+      "titel": "Niemand vorn vergessen",
+      "ausloeser": "Mission beendet, keine Gruppe mehr als vier Stellungsrunden ununterbrochen vorn.",
+      "text": "Eine ganze Mission lang blieb keine Gruppe länger als vier Stellungsrunden in der vordersten Linie."
+    },
+    {
+      "id": "erfolg.warme_suppe",
+      "art": "erfolg",
+      "blatt": "aktkarte",
+      "titel": "Warme Suppe",
+      "ausloeser": "In einer Stellungsrunde alle Gruppen mit warmer Mahlzeit versorgt.",
+      "text": "Jede Gruppe im Abschnitt hat in derselben Stellungsrunde eine warme Mahlzeit bekommen."
+    },
+    {
+      "id": "erfolg.die_lore_faehrt",
+      "art": "erfolg",
+      "blatt": "aktkarte",
+      "titel": "Die Lore fährt",
+      "ausloeser": "20 Verwundete per Lore geborgen, über alle Missionen.",
+      "text": "Zwanzig Verwundete per Lore aus der Linie zurückgebracht. Dr. Selin hat es in ihrem Buch vermerkt."
+    },
+    {
+      "id": "erfolg.post_ist_da",
+      "art": "erfolg",
+      "blatt": "aktkarte",
+      "titel": "Post ist da",
+      "ausloeser": "50 Feldpostbriefe zugestellt.",
+      "text": "Fünfzig Briefe von daheim haben ihren Weg in den Graben gefunden."
+    },
+    {
+      "id": "erfolg.kein_feld_verloren",
+      "art": "erfolg",
+      "blatt": "aktkarte",
+      "titel": "Kein Feld verloren",
+      "ausloeser": "Verteidigungsmission ohne verlorenes Feld beendet.",
+      "text": "Eine Abwehrmission beendet, ohne ein einziges Grabenfeld aufzugeben."
+    },
+    {
+      "id": "erfolg.der_traverse_sei_dank",
+      "art": "erfolg",
+      "blatt": "aktkarte",
+      "titel": "Der Traverse sei Dank",
+      "ausloeser": "Längsfeuer auf einen Graben mit Traversen ohne Verluste.",
+      "text": "Längsfeuer traf den Graben, aber die Traversen hielten es auf. Niemand fiel."
+    },
+    {
+      "id": "erfolg.trockene_fuesse",
+      "art": "erfolg",
+      "blatt": "aktkarte",
+      "titel": "Trockene Füße",
+      "ausloeser": "Drei Stellungsrunden Regen ohne Schlamm in eigenen Gräben.",
+      "text": "Nach drei Regentagen stand in keinem eigenen Graben Wasser."
+    },
+    {
+      "id": "erfolg.das_kabel_haelt",
+      "art": "erfolg",
+      "blatt": "aktkarte",
+      "titel": "Das Kabel hält",
+      "ausloeser": "Gefechtsrunde unter Artilleriefeuer ohne unterbrochene Leitung.",
+      "text": "Eine ganze Gefechtsrunde unter Beschuss, und die Leitung zum Beobachter war nie tot."
+    },
+    {
+      "id": "erfolg.ganz_leise",
+      "art": "erfolg",
+      "blatt": "aktkarte",
+      "titel": "Ganz leise",
+      "ausloeser": "Nachtunternehmen ohne gegnerische Leuchtkugel abgeschlossen.",
+      "text": "Einen Stoßtrupp hinüber und zurück gebracht, ohne dass eine einzige Leuchtkugel aufstieg."
+    },
+    {
+      "id": "erfolg.gefangene_mit_namen",
+      "art": "erfolg",
+      "blatt": "aktkarte",
+      "titel": "Namen statt Zahlen",
+      "ausloeser": "10 Gefangene eingebracht, über alle Missionen.",
+      "text": "Zehn Gefangene eingebracht. Jeder von ihnen hat dem Dolmetscher seinen Namen gesagt."
+    },
+    {
+      "id": "erfolg.harms_bleibt",
+      "art": "erfolg",
+      "blatt": "aktkarte",
+      "titel": "Harms bleibt",
+      "ausloeser": "Kampagne mit einem der vier regulären Enden (Flag ende_*) beendet, ohne Flag harms_gefallen.",
+      "text": "Feldwebel Harms hat das letzte Frühjahr erlebt. Er sagt, das sei nicht sein Verdienst, sondern das der Socken."
+    },
+    {
+      "id": "erfolg.vell_kommt_heim",
+      "art": "erfolg",
+      "blatt": "aktkarte",
+      "titel": "Vell kommt heim",
+      "ausloeser": "Kampagne mit einem der vier regulären Enden (Flag ende_*) beendet, ohne Flag vell_gefallen.",
+      "text": "Leutnant Vell hat das letzte Frühjahr erlebt. Er hat aufgehört, Zitate zu sammeln, und angefangen, Briefe zu schreiben, die stimmen."
+    },
+    {
+      "id": "erfolg.selins_buch",
+      "art": "erfolg",
+      "blatt": "aktkarte",
+      "titel": "Selins Buch",
+      "ausloeser": "Mission beendet ohne liegen gelassene Verwundete.",
+      "text": "In einer ganzen Mission blieb kein Verwundeter auf der Weide liegen."
+    },
+    {
+      "id": "erfolg.nein_gesagt",
+      "art": "erfolg",
+      "blatt": "aktkarte",
+      "titel": "Nein gesagt",
+      "ausloeser": "Bei einer Entscheidung erstmals die Option verweigern gewählt.",
+      "text": "Einen Befehl verweigert, weil er Leben gekostet hätte und sonst nichts."
+    },
+    {
+      "id": "erfolg.zwischen_den_zeilen",
+      "art": "erfolg",
+      "blatt": "aktkarte",
+      "titel": "Zwischen den Zeilen",
+      "ausloeser": "Option umdeuten gewählt, danach Ansehen und Vertrauen beide mindestens 50.",
+      "text": "Einen Befehl so umgedeutet, dass der Stab zufrieden war und die Truppe auch."
+    },
+    {
+      "id": "erfolg.lasks_handschrift",
+      "art": "erfolg",
+      "blatt": "aktkarte",
+      "titel": "Lasks Handschrift",
+      "ausloeser": "Alle Lask-Briefe der Kampagne geöffnet.",
+      "text": "Alle abgefangenen Briefe von Hauptmann Lask gelesen."
+    },
+    {
+      "id": "erfolg.eine_stunde_frieden",
+      "art": "erfolg",
+      "blatt": "aktkarte",
+      "titel": "Eine Stunde Frieden",
+      "ausloeser": "Flag waffenruhe_angenommen gesetzt.",
+      "text": "Eine Waffenruhe angenommen. Auf beiden Seiten wurden die Verwundeten geborgen."
+    },
+    {
+      "id": "erfolg.walze_ohne_eigene",
+      "art": "erfolg",
+      "blatt": "aktkarte",
+      "titel": "Hinter der Walze",
+      "ausloeser": "Feuerwalze mit Sturm ohne Verluste durch eigenes Feuer.",
+      "text": "Eine Feuerwalze geführt, ohne dass jemand aus den eigenen Gruppen von eigenen Granaten getroffen wurde."
+    },
+    {
+      "id": "erfolg.maske_auf",
+      "art": "erfolg",
+      "blatt": "aktkarte",
+      "titel": "Maske auf",
+      "ausloeser": "Gegnerischer Gasangriff ohne Gasverluste.",
+      "text": "Ein Gasangriff, und jede Gruppe hatte die Masken rechtzeitig vor dem Gesicht."
+    },
+    {
+      "id": "erfolg.unter_dem_himmel",
+      "art": "erfolg",
+      "blatt": "aktkarte",
+      "titel": "Unter offenem Himmel",
+      "ausloeser": "Gegnerische Luftaufklärung ohne entdeckte Batterie oder Depot.",
+      "text": "Ein Flieger kreiste über dem Abschnitt und fand nichts, was sich zu melden lohnte."
+    },
+    {
+      "id": "erfolg.brueckenbauerin",
+      "art": "erfolg",
+      "blatt": "aktkarte",
+      "titel": "Brückenbauerin",
+      "ausloeser": "Mission a4m5 gewonnen.",
+      "text": "Brandt hat gebaut, wofür sie ausgebildet wurde: eine Brücke über die Asse, die Loren trägt."
+    },
+    {
+      "id": "erfolg.der_kasten_rollt",
+      "art": "erfolg",
+      "blatt": "aktkarte",
+      "titel": "Der Kasten rollt",
+      "ausloeser": "Panzerwagen erreicht ein gegnerisches Drahtfeld.",
+      "text": "Der Panzerwagen hat den gegnerischen Draht erreicht, ohne im Lehm stecken zu bleiben."
+    },
+    {
+      "id": "erfolg.die_mine_schweigt",
+      "art": "erfolg",
+      "blatt": "aktkarte",
+      "titel": "Die Mine schweigt",
+      "ausloeser": "Flag mine_geflutet gesetzt.",
+      "text": "Die große Mine unter Hügel 214 ist nie explodiert."
+    },
+    {
+      "id": "erfolg.alle_fundstuecke",
+      "art": "erfolg",
+      "blatt": "aktkarte",
+      "titel": "Schuhkarton",
+      "ausloeser": "Alle Fundstücke gefunden.",
+      "text": "Alle 24 Fundstücke gesammelt. Irgendwann wird jemand fragen, wem sie gehörten."
+    },
+    {
+      "id": "erfolg.eine_kette",
+      "art": "erfolg",
+      "blatt": "aktkarte",
+      "titel": "Ein ganzes Leben",
+      "ausloeser": "Alle vier Fundstücke einer Kette gefunden.",
+      "text": "Alle Fundstücke einer Nebengeschichte zusammengetragen und ihr Ende gelesen."
+    },
+    {
+      "id": "erfolg.akt_1",
+      "art": "erfolg",
+      "blatt": "aktkarte",
+      "titel": "Erstarrung",
+      "ausloeser": "Akt 1 abgeschlossen.",
+      "text": "Den ersten Sommer an der Asse überstanden."
+    },
+    {
+      "id": "erfolg.akt_2",
+      "art": "erfolg",
+      "blatt": "aktkarte",
+      "titel": "Lehm und Regen",
+      "ausloeser": "Akt 2 abgeschlossen.",
+      "text": "Den Herbst im Wasser überstanden."
+    },
+    {
+      "id": "erfolg.akt_3",
+      "art": "erfolg",
+      "blatt": "aktkarte",
+      "titel": "Materialschlacht",
+      "ausloeser": "Akt 3 abgeschlossen.",
+      "text": "Den Winter überstanden, in dem es mehr Granaten als Schnee gab."
+    },
+    {
+      "id": "erfolg.ende_durchbruch",
+      "art": "erfolg",
+      "blatt": "aktkarte",
+      "titel": "Um jeden Preis",
+      "ausloeser": "Ende „Durchbruch um jeden Preis“ erreicht.",
+      "text": "Der Abschnitt ist durchgebrochen. Die Liste ist lang."
+    },
+    {
+      "id": "erfolg.ende_waffenstillstand",
+      "art": "erfolg",
+      "blatt": "aktkarte",
+      "titel": "Zwei Unterschriften",
+      "ausloeser": "Ende „Waffenstillstand im Abschnitt“ erreicht.",
+      "text": "Brandt und Lask haben sich geeinigt. Der Stab hat es nicht verziehen."
+    },
+    {
+      "id": "erfolg.ende_abgeloest",
+      "art": "erfolg",
+      "blatt": "aktkarte",
+      "titel": "Von der Seitenlinie",
+      "ausloeser": "Ende „Abgelöst“ erreicht.",
+      "text": "Das Ende erlebt, ohne dabei etwas zu sagen zu haben."
+    },
+    {
+      "id": "erfolg.ende_haelt",
+      "art": "erfolg",
+      "blatt": "aktkarte",
+      "titel": "Der Abschnitt hält",
+      "ausloeser": "Ende „Der Abschnitt hält“ erreicht.",
+      "text": "Der Krieg ist anderswo zu Ende gegangen. Hier stehen noch alle, die stehen konnten."
+    },
+    {
+      "id": "erfolg.alle_enden",
+      "art": "erfolg",
+      "blatt": "aktkarte",
+      "titel": "Vier Frühjahre",
+      "ausloeser": "Alle vier Enden erreicht, über mehrere Spielstände.",
+      "text": "Alle vier Enden gesehen. Keines davon war billig."
+    },
+    {
+      "id": "erfolg.endlos_woche_12",
+      "art": "erfolg",
+      "blatt": "aktkarte",
+      "titel": "Ein Vierteljahr",
+      "ausloeser": "Endlosmodus: 12 Wochen gehalten.",
+      "text": "Im Endlosmodus zwölf Wochen gehalten. Dieselben Leute, derselbe Lehm."
+    },
+    {
+      "id": "erfolg.endlos_jahr",
+      "art": "erfolg",
+      "blatt": "aktkarte",
+      "titel": "Ein ganzes Jahr",
+      "ausloeser": "Endlosmodus: 24 Wochen gehalten.",
+      "text": "Alle vier Jahreszeiten im selben Abschnitt erlebt."
+    },
+    {
+      "id": "erfolg.endlos_veteran",
+      "art": "erfolg",
+      "blatt": "aktkarte",
+      "titel": "Von Anfang an dabei",
+      "ausloeser": "Endlosmodus: dieselbe Person führt seit 20 Wochen dieselbe Gruppe.",
+      "text": "Eine Gruppe hat im Endlosmodus zwanzig Wochen lang dieselbe Führung behalten. Wer sie führt, kennt jeden Graben beim Namen."
+    },
+    {
+      "id": "erfolg.sandbox_architekt",
+      "art": "erfolg",
+      "blatt": "aktkarte",
+      "titel": "Zickzack",
+      "ausloeser": "Sandbox: Graben ohne bestreichbares Feld.",
+      "text": "In der Sandbox einen Graben gebaut, den die Längsfeuer-Analyse an keiner Stelle bestreichen kann."
+    },
+    {
+      "id": "erfolg.puzzle_alle",
+      "art": "erfolg",
+      "blatt": "aktkarte",
+      "titel": "Auf dem Papier gelöst",
+      "ausloeser": "Alle Puzzle-Lagen gelöst.",
+      "text": "Alle zwölf Puzzle-Lagen gelöst. Draußen ist es nie so ordentlich."
+    },
+    {
+      "id": "erfolg.hotseat_unentschieden",
+      "art": "erfolg",
+      "blatt": "aktkarte",
+      "titel": "Gleichstand",
+      "ausloeser": "Hotseat-Gefecht endet unentschieden.",
+      "text": "Ein Gefecht zu zweit an einem Gerät, und keiner hat gewonnen. Vielleicht ist das die ehrlichste Wertung."
+    }
+  ]
+}

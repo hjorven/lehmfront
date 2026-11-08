@@ -1,0 +1,556 @@
+{
+  "format": 1,
+  "beschreibung": "Handgeschriebene Briefe 13 bis 24 (Akt 3 und 4) und Lasks abgefangene Briefe aus Akt 3 und 4.",
+  "eintraege": [
+    {
+      "id": "brief.13",
+      "art": "brief",
+      "blatt": "brief",
+      "nr": 13,
+      "nach": "a3m1",
+      "absender": "Unteroffizier Dirk Lohmann",
+      "empfaenger": "an seine Frau Trientje in Kelling",
+      "ort": "Velde, MG-Stand 2",
+      "text": "Liebe Trientje,\n\nzwei Tage lang hat die Erde gezittert. Die neuen Geschütze, hier und drüben, schießen sich ein, sagt man, als wäre das ein Sport. Wir haben unten gesessen und gewartet. Ich habe an deine Hände gedacht, die ganze Zeit, wie du Teig knetest, und an die Werft, wo wir Bleche genietet haben, die halten sollten.\n\nDie Frau Major war selbst in jedem Unterstand und hat die Balken nachgemessen. Sie hat nichts gesagt, aber am nächsten Tag haben wir alle Unterstände eine Lage tiefer gegraben. Sie hat mitgegraben. Die Frau Major mit Spaten, das glaubt mir in Kelling keiner.\n\nWenn das hier vorbei ist, will ich nie wieder ein Loch graben. Nur eins, für einen Apfelbaum hinter dem Haus.\n\nDein Dirk"
+    },
+    {
+      "id": "brief.14",
+      "art": "brief",
+      "blatt": "brief",
+      "nr": 14,
+      "nach": "a3m2",
+      "absender": "Dr. Mira Selin",
+      "empfaenger": "an ihre Schwester Femke in Haverstadt",
+      "ort": "Feldlazarett Ostervenn",
+      "text": "Liebe Femke,\n\nich habe jetzt einen Schrank voller Augentropfen und keinen einzigen Tag ohne Leute, die sie brauchen. Das Gas kam über Nacht. Es hat keine Farbe, die man nachts sieht, nur einen Geruch, und wer ihn bemerkt, hat ihn schon zu lange gerochen.\n\nArvo, der Junge von drüben, der bei mir hilft, hat die ganze Nacht Wasser getragen. Einer unserer Leute hat ihn an der Stimme erkannt und gefragt, ob er einer von denen sei, die das geschickt haben. Arvo hat gesagt: Ich bin einer von denen, die das Wasser tragen. Danach hat keiner mehr gefragt.\n\nSchick mir bitte Wolle, wenn du hast. Nicht für mich. Die Leute frieren, wenn sie nicht sehen können, und keiner weiß, warum. Ich habe einunddreißig.\n\nDeine Mira"
+    },
+    {
+      "id": "brief.15.harms",
+      "art": "brief",
+      "blatt": "brief",
+      "slot": "brief.15",
+      "nr": 15,
+      "nach": "a3m3",
+      "wann": {
+        "ohne": [
+          "harms_gefallen"
+        ]
+      },
+      "absender": "Feldwebel Otto Harms",
+      "empfaenger": "an seine Frau Geske in Ostmoor",
+      "ort": "Velder Mühle",
+      "text": "Liebe Geske,\n\ndu fragst, ob wir genug zu essen haben. Haben wir. Du fragst, ob es kalt ist. Ist es. Du fragst, ob ich vorsichtig bin. Ich bin der vorsichtigste Mann im ganzen Lehmgau, das sagen hier alle, und manche meinen es nicht freundlich.\n\nFeldwebel Fedders hat Kanonen aus Zaunpfählen gebaut, mit Ofenrohr vorn, und drüben haben sie drei Tage lang darauf geschossen. Ich habe seit dem Sommer nicht mehr so gelacht. Danach habe ich mich geschämt, weil ich an die gedacht habe, die drüben die Granaten schleppen mussten. Die schleppen genauso wie wir.\n\nDie Frau Major ist in Ordnung. Sie rechnet alles nach. Ich glaube, sie rechnet auch nach, was wir kosten. Das hat vor ihr noch keiner gemacht.\n\nDie Socken passen wieder nicht. Ich trage sie trotzdem. Gib dem Hund was von mir.\n\nDein Otto"
+    },
+    {
+      "id": "brief.15.fedders",
+      "art": "brief",
+      "blatt": "brief",
+      "slot": "brief.15",
+      "nr": 15,
+      "nach": "a3m3",
+      "absender": "Feldwebel Swantje Fedders",
+      "empfaenger": "an ihren Mann Hauke in Grauwarf",
+      "ort": "Ziegelei Tamm",
+      "text": "Lieber Hauke,\n\nich habe diese Woche Kanonen gebaut. Aus Zaunpfählen, Ofenrohr und einem Wagenrad, das in der Ziegelei herumlag. Drüben haben sie drei Tage lang darauf geschossen. Die Leute haben gelacht, und ich habe mitgelacht, weil man sonst nichts tun kann.\n\nDu weißt, ich habe mein Leben lang Ziegel gebrannt, damit Häuser stehen. Jetzt baue ich Dinge, damit auf sie geschossen wird statt auf uns. Es ist eine gute Arbeit, sagt die Frau Major. Sie hat recht. Es ist trotzdem eine seltsame.\n\nWenn du den Ofen anheizt, denk an mich. Ich rieche den Rauch bis hier.\n\nDeine Swantje"
+    },
+    {
+      "id": "brief.16.vell",
+      "art": "brief",
+      "blatt": "brief",
+      "slot": "brief.16",
+      "nr": 16,
+      "nach": "a3m4",
+      "wann": {
+        "ohne": [
+          "vell_gefallen",
+          "befehl117_befolgt"
+        ]
+      },
+      "absender": "Leutnant Jost Vell",
+      "empfaenger": "an seinen Vater in Haverstadt",
+      "ort": "Velde",
+      "text": "Lieber Vater,\n\nDu hast mir zum Abschied gesagt, dass ein Offizier seine Leute nach vorn führt und dass man das Glück zwingen kann. Ich habe es geglaubt. Ich habe es der Frau Major im Herbst ins Gesicht gesagt.\n\nDiese Woche kam ein Befehl, ein Gehöft zu nehmen, das nichts wert ist. Ich wollte gehen. Ich habe es ihr gesagt. Sie hat mir die Skizze von Feldwebel Fedders gezeigt, mit drei MG-Nestern, bemaßt auf den Meter, und mich gefragt, wie viele von meinen Leuten ich dafür hergebe. Ich wusste keine Zahl. Sie wusste eine.\n\nIch glaube, ich habe Dich missverstanden, oder Du hast Dich geirrt. Beides ist schwer zu schreiben. Ich schreibe es trotzdem, weil ich Dir sonst nichts mehr schreiben kann, das wahr ist.\n\nDein Sohn Jost"
+    },
+    {
+      "id": "brief.16.vell-gehoeft",
+      "art": "brief",
+      "blatt": "brief",
+      "slot": "brief.16",
+      "nr": 16,
+      "nach": "a3m4",
+      "wann": {
+        "ohne": [
+          "vell_gefallen"
+        ],
+        "flags": [
+          "befehl117_befolgt"
+        ]
+      },
+      "absender": "Leutnant Jost Vell",
+      "empfaenger": "an seinen Vater in Haverstadt",
+      "ort": "Velde",
+      "text": "Lieber Vater,\n\nDu hast mir zum Abschied gesagt, dass ein Offizier seine Leute nach vorn führt und dass man das Glück zwingen kann. Diese Woche habe ich es versucht. Wir sollten ein Gehöft nehmen, das nichts wert ist, und ich habe mich gemeldet, als Erster.\n\nWir haben es genommen. Feldwebel Fedders hatte drei MG-Nester eingezeichnet, bemaßt auf den Meter, und alle drei waren da. Die Frau Major hat die Skizze vorher gesehen und den Befehl trotzdem gegeben, weil er so kam. Ich habe ihn ausgeführt, weil sie ihn gab. Jetzt sitze ich in einem Keller ohne Haus und zähle, wer fehlt.\n\nIch glaube, ich habe Dich missverstanden, oder Du hast Dich geirrt. Beides ist schwer zu schreiben. Ich schreibe es trotzdem, weil ich Dir sonst nichts mehr schreiben kann, das wahr ist.\n\nDein Sohn Jost"
+    },
+    {
+      "id": "brief.16.harms",
+      "art": "brief",
+      "blatt": "brief",
+      "slot": "brief.16",
+      "nr": 16,
+      "nach": "a3m4",
+      "wann": {
+        "ohne": [
+          "harms_gefallen"
+        ]
+      },
+      "absender": "Feldwebel Otto Harms",
+      "empfaenger": "an Stadtrat Vell in Haverstadt",
+      "ort": "Velder Mühle",
+      "text": "Sehr geehrter Herr Vell,\n\nich schreibe Ihnen, weil die Frau Major den Brief geschrieben hat, den man schreiben muss, und ich den schreiben will, den man schreiben sollte. Es ist ein paar Monate her. Ich habe so lange gebraucht.\n\nIhr Sohn war ungeduldig und mutig und hat zu früh geglaubt, dass beides dasselbe ist. Er ist vorn geblieben, als seine Leute zurückmussten, damit sie zurückkonnten. Das steht in keiner Meldung, weil es nicht nach Orden klingt. Ich möchte, dass Sie es wissen.\n\nDiese Woche kam ein Befehl, den er gemocht hätte. Ich habe an ihn gedacht und war froh, dass er ihn nicht lesen musste. Verzeihen Sie mir das.\n\nOtto Harms, Feldwebel"
+    },
+    {
+      "id": "brief.16.selin",
+      "art": "brief",
+      "blatt": "brief",
+      "slot": "brief.16",
+      "nr": 16,
+      "nach": "a3m4",
+      "absender": "Dr. Mira Selin",
+      "empfaenger": "an Stadtrat Vell in Haverstadt",
+      "ort": "Feldlazarett Ostervenn",
+      "text": "Sehr geehrter Herr Vell,\n\nSie haben mich gefragt, ob Ihr Sohn gelitten hat. Ich habe Ihnen damals geantwortet, wie man das beantwortet. Heute schreibe ich Ihnen noch einmal, weil ich Ihnen etwas anderes schuldig bin.\n\nSeine Leute haben ihn vom Hang von Hügel 214 zurückgetragen, zu viert, unter Feuer, obwohl er es ihnen verboten hätte. Sie haben ihn bei mir abgelegt und sind lange vor der Tür stehen geblieben. Ich glaube, das sollten Sie wissen: dass jemand ihn nicht liegen lassen wollte.\n\nSein Zigarettenetui liegt bei mir. Ich schicke es mit dem nächsten Urlauber, damit es nicht verloren geht.\n\nM. Selin"
+    },
+    {
+      "id": "brief.17.laterne",
+      "art": "brief",
+      "blatt": "brief",
+      "slot": "brief.17",
+      "nr": 17,
+      "nach": "a3m5",
+      "wann": {
+        "flags": [
+          "waffenruhe_angenommen"
+        ]
+      },
+      "absender": "Gefreite Imke Vos",
+      "empfaenger": "an ihre Mutter in Brookdorp",
+      "ort": "Velde, Gruppe 5",
+      "text": "Liebe Mama,\n\nich habe heute Nacht einen von drüben getroffen. Nicht so, wie du denkst. Wir haben zusammen einen Verwundeten getragen, er an den Füßen, ich an den Schultern, und erst auf halbem Weg haben wir gemerkt, dass es einer von seinen war. Wir haben ihn trotzdem bis zum Heuwagen gebracht, und von da haben ihn seine Leute genommen.\n\nEr hat mir Tabak gegeben. Ich rauche nicht, aber ich habe ihn genommen. Ich habe ihm Brot gegeben. Er hatte Hunger, Mama, richtigen Hunger. Er war vielleicht siebzehn. Er hatte einen Schal, gestrickt, mit einem Muster, das du auch machst.\n\nIch weiß nicht, wie ich morgen auf seinen Graben schießen soll. Ich werde es tun, glaube ich. Aber ich weiß nicht wie.\n\nDeine Imke"
+    },
+    {
+      "id": "brief.17.dunkel",
+      "art": "brief",
+      "blatt": "brief",
+      "slot": "brief.17",
+      "nr": 17,
+      "nach": "a3m5",
+      "absender": "Gefreite Imke Vos",
+      "empfaenger": "an ihre Mutter in Brookdorp",
+      "ort": "Velde, Gruppe 5",
+      "text": "Liebe Mama,\n\nheute Nacht durften wir nicht hinaus, und wir sind trotzdem gegangen. Niemand hat es befohlen. Niemand hat es verboten. Die Sanitäter sind zuerst los, dann wir, ohne Laternen, so leise es ging.\n\nDrüben hing eine Laterne unter einer weißen Fahne. Einmal hat einer geschossen, irgendwo, und alle haben sich in den Lehm geworfen. Dann ging es weiter. Wir haben sechs zurückgebracht. Die anderen haben wir rufen hören, bis es hell wurde.\n\nIch weiß nicht, ob das richtig war, Mama. Ich weiß nur, dass ich mich geschämt hätte, liegen zu bleiben. Schreib mir vom Webstuhl.\n\nDeine Imke",
+      "wann": {
+        "flags": [
+          "waffenruhe_geduldet"
+        ]
+      }
+    },
+    {
+      "id": "brief.17.rufe",
+      "art": "brief",
+      "blatt": "brief",
+      "slot": "brief.17",
+      "nr": 17,
+      "nach": "a3m5",
+      "absender": "Gefreite Imke Vos",
+      "empfaenger": "an ihre Mutter in Brookdorp",
+      "ort": "Velde, Gruppe 5",
+      "text": "Liebe Mama,\n\ndie ganze Nacht haben sie draußen gerufen. Manche in unserer Sprache, manche in der von drüben. Man versteht es trotzdem, wenn einer nach seiner Mutter ruft. Es klingt überall gleich.\n\nDrüben hatten sie eine Laterne aufgehängt, unter einer weißen Fahne. Sie hing die ganze Nacht da und hat geschaukelt. Ich habe sie angesehen, bis mir die Augen wehtaten.\n\nGegen Morgen war es still. Ich habe geschlafen. Das werde ich mir nicht verzeihen, glaube ich. Schreib mir trotzdem, wie es dir geht. Schreib mir vom Webstuhl.\n\nDeine Imke"
+    },
+    {
+      "id": "brief.18",
+      "art": "brief",
+      "blatt": "brief",
+      "nr": 18,
+      "nach": "a3m6",
+      "absender": "Dr. Mira Selin",
+      "empfaenger": "an Major Brandt",
+      "ort": "Feldlazarett Ostervenn",
+      "text": "Frau Major,\n\nSie bekommen die Zahlen vom Stab und die Namen von mir. Ich lege Ihnen die Liste bei, die Sie nicht bekommen werden: die Leute, die wir nicht zurückgebracht haben, weil am X-Tag jede Lore für Munition eingeteilt war, auch die des Lazaretts. Bei sechs habe ich selbst gesehen, wo sie lagen, als ich auf den Damm am Gleisende stieg. Es sind neun Namen.\n\nIch weiß, dass der Plan nicht von Ihnen war. Ich weiß auch, dass Sie den Lorenplan unterschrieben haben.\n\nIch werde weiter für Sie arbeiten. Ich bitte Sie nur, im Frühjahr zwei Loren für mich freizuhalten. Nur zwei. Dann schreibe ich Ihnen keinen solchen Brief mehr.\n\nM. Selin"
+    },
+    {
+      "id": "brief.19.loren",
+      "art": "brief",
+      "blatt": "brief",
+      "slot": "brief.19",
+      "nr": 19,
+      "nach": "a4m1",
+      "wann": {
+        "oder": [
+          {
+            "flags": [
+              "selin_fruehjahr_loren"
+            ]
+          },
+          {
+            "flags": [
+              "selin_loren"
+            ]
+          }
+        ]
+      },
+      "absender": "Arvo Kalnis",
+      "empfaenger": "an seine Mutter in Ravelsk",
+      "ort": "Feldlazarett Ostervenn, über die Gefangenenpost",
+      "text": "Liebe Mutter,\n\nich bin gesund und habe zu essen. Das schreibe ich zuerst, weil du es zuerst lesen willst.\n\nDie Frau Doktor hat Wagen, die nur für die Verwundeten fahren. Die Kommandantin hat sie ihr gegeben, sagt man, gegen den Willen von ganz oben. Jeden Abend kommen die Wagen, und ich laufe hinaus und zähle, wie viele drauf sind, und dann laufe ich zur Frau Doktor und sage die Zahl. Sie sagt dann: Gut, Arvo. Nur das.\n\nGestern war auf dem Wagen einer von uns. Aus Ravelsk, Mutter, aus der Grubengasse. Er kannte den Vater. Er wird leben.\n\nDein Arvo"
+    },
+    {
+      "id": "brief.19.zu-fuss",
+      "art": "brief",
+      "blatt": "brief",
+      "slot": "brief.19",
+      "nr": 19,
+      "nach": "a4m1",
+      "absender": "Arvo Kalnis",
+      "empfaenger": "an seine Mutter in Ravelsk",
+      "ort": "Feldlazarett Ostervenn, über die Gefangenenpost",
+      "text": "Liebe Mutter,\n\nich bin gesund und habe zu essen. Das schreibe ich zuerst, weil du es zuerst lesen willst.\n\nDie Frau Doktor hat um Wagen für die Verwundeten gebeten und keine bekommen. Jetzt gehe ich jeden Abend mit zwei anderen bis zum Ende der Schienen und wir tragen. Es ist weit. Ich bin stark, vom Schacht. Die Frau Doktor sagt, ich sei der beste Träger im Lazarett. Ich glaube, sie sagt das, damit ich weitertrage.\n\nGestern habe ich einen von uns getragen. Aus Ravelsk, Mutter, aus der Grubengasse. Er kannte den Vater. Ich weiß nicht, ob er lebt. Ich frage morgen.\n\nDein Arvo"
+    },
+    {
+      "id": "brief.20",
+      "art": "brief",
+      "blatt": "brief",
+      "nr": 20,
+      "nach": "a4m2",
+      "absender": "Gefreiter Jan Ebens",
+      "empfaenger": "an seinen kleinen Bruder Hinni in Kelling",
+      "ort": "Straße nach Raudas",
+      "text": "Lieber Hinni,\n\ndu hast gefragt, ob ich den Kasten gesehen habe, von dem im Kurier steht. Habe ich. Er ist nicht so groß wie auf dem Bild, er stinkt nach Öl, und wenn er fährt, hört man sein eigenes Wort nicht mehr.\n\nWeißt du, was komisch ist? Die Nieten. Ich kenne die Nieten. Die sind von Halle 4, wo ich vor dem Krieg gearbeitet habe, man sieht es an den Köpfen. Vielleicht hat Vater welche davon geschlagen.\n\nIm Kurier steht, er entscheidet den Krieg. Er entscheidet gar nichts, Hinni. Er fährt, bis er irgendwann im Lehm steckt, und dann sitzen wir dahinter und die von drüben auch. Heute ist er durchgekommen. Morgen vielleicht nicht.\n\nWenn du groß bist, bau etwas, das nicht schießt. Du bist geschickter als ich. Du schaffst das.\n\nDein Jan"
+    },
+    {
+      "id": "brief.21.geflutet",
+      "art": "brief",
+      "blatt": "brief",
+      "slot": "brief.21",
+      "nr": 21,
+      "nach": "a4m3",
+      "wann": {
+        "flags": [
+          "mine_geflutet"
+        ]
+      },
+      "absender": "Gefreite Wiebke Albers",
+      "empfaenger": "an ihren Vater in Fennhusen",
+      "ort": "Stollen 214, Horchposten",
+      "text": "Lieber Vater,\n\nich habe ein halbes Jahr unter einem Hügel gelegen. Ich kenne jeden Stein da unten, jede Wasserader, ich weiß, wo der Lehm aufhört und die Kreide anfängt und wie sie riecht, wenn sie nass wird. Wie im Moor, wenn du den Torf stichst und plötzlich der helle Sand kommt.\n\nWir haben gehört, wie sie drüben gegraben haben. Einmal so nah, dass ich einen husten gehört habe. Ich habe gedacht: Der hat auch einen Vater.\n\nJetzt ist da unten Wasser. Mehr darf ich nicht schreiben. Ich habe geweint, Vater, nicht weil es umsonst war, sondern weil es umsonst sein durfte. Die Frau Major hat gesagt, es sei die beste Arbeit meines Lebens. Ich glaube, sie hat recht.\n\nDeine Wiebke"
+    },
+    {
+      "id": "brief.21.still",
+      "art": "brief",
+      "blatt": "brief",
+      "slot": "brief.21",
+      "nr": 21,
+      "nach": "a4m3",
+      "absender": "Gefreite Wiebke Albers",
+      "empfaenger": "an ihren Vater in Fennhusen",
+      "ort": "Stollen 214, Horchposten",
+      "text": "Lieber Vater,\n\nich habe ein halbes Jahr unter einem Hügel gelegen. Ich kenne jeden Stein da unten, jede Wasserader, ich weiß, wo der Lehm aufhört und die Kreide anfängt und wie sie riecht, wenn sie nass wird.\n\nWir haben gehört, wie sie drüben gegraben haben. Einmal so nah, dass ich einen husten gehört habe. Ich habe gedacht: Der hat auch einen Vater.\n\nJetzt ist es still unter dem Hügel. Es gibt auch keinen Hügel mehr. Ich höre nachts trotzdem noch das Klopfen, Vater. Ich glaube, das hört nicht mehr auf. Schreib mir vom Moor. Schreib mir, wie es riecht, wenn es regnet.\n\nDeine Wiebke"
+    },
+    {
+      "id": "brief.22.harms-sitzt",
+      "art": "brief",
+      "blatt": "brief",
+      "slot": "brief.22",
+      "nr": 22,
+      "nach": "a4m4",
+      "wann": {
+        "flags": [
+          "verweigerung_harms"
+        ],
+        "ohne": [
+          "harms_gefallen"
+        ]
+      },
+      "absender": "Feldwebel Otto Harms",
+      "empfaenger": "an seine Frau Geske in Ostmoor",
+      "ort": "Velder Mühle",
+      "text": "Liebe Geske,\n\nheute haben Leute aus {gruppe} ihre Gewehre an die Wand gelehnt. Ich habe so etwas zweimal gesehen in diesem Krieg. Beim ersten Mal habe ich geschrien. Heute habe ich mich dazugesetzt.\n\nIch habe ihnen nicht gesagt, dass sie gehen sollen. Ich habe ihnen von dir erzählt und vom Hund und vom Deich, und dass ich nicht weiß, ob ich nach dem Krieg noch Deiche bauen kann, mit diesen Händen. Sie haben zugehört. Dann sind sie gegangen, für die anderen, nicht für den Befehl. Das ist ein Unterschied, auch wenn ihn hinten keiner sieht.\n\nIch glaube, das kann ich nicht noch einmal. Sag es niemandem. Und sag dem Hund, dass ich komme.\n\nDein Otto"
+    },
+    {
+      "id": "brief.22.harms",
+      "art": "brief",
+      "blatt": "brief",
+      "slot": "brief.22",
+      "nr": 22,
+      "nach": "a4m4",
+      "wann": {
+        "ohne": [
+          "harms_gefallen",
+          "verweigerung_gemeldet"
+        ]
+      },
+      "absender": "Feldwebel Otto Harms",
+      "empfaenger": "an seine Frau Geske in Ostmoor",
+      "ort": "Velder Mühle",
+      "text": "Liebe Geske,\n\nheute haben Leute aus {gruppe} ihre Gewehre an die Wand gelehnt. Ich habe so etwas zweimal gesehen in diesem Krieg. Beim ersten Mal habe ich geschrien. Diesmal habe ich zugesehen, was die Frau Major tut. Sie hat es richtig gemacht, glaube ich. Oder so richtig, wie es geht.\n\nIch habe in meinem Leben Deiche gebaut, damit das Wasser draußen bleibt. Hier habe ich gelernt, dass man das Wasser nicht aufhält. Man sagt ihm nur, wo es hinlaufen soll.\n\nIch bin müde, Geske. Nicht vom Graben. Sag es niemandem. Und sag dem Hund, dass ich komme. Bald, glaube ich. Das sagen jetzt alle.\n\nDein Otto"
+    },
+    {
+      "id": "brief.22.harms-gemeldet",
+      "art": "brief",
+      "blatt": "brief",
+      "slot": "brief.22",
+      "nr": 22,
+      "nach": "a4m4",
+      "wann": {
+        "ohne": [
+          "harms_gefallen"
+        ],
+        "flags": [
+          "verweigerung_gemeldet"
+        ]
+      },
+      "absender": "Feldwebel Otto Harms",
+      "empfaenger": "an seine Frau Geske in Ostmoor",
+      "ort": "Velder Mühle",
+      "text": "Liebe Geske,\n\nheute haben Leute aus {gruppe} ihre Gewehre an die Wand gelehnt. Die Frau Major hat sie gemeldet, wie es der Befehl verlangt. Feldgendarmen haben sie abgeholt, am hellen Tag, durch den Laufgraben.\n\nIch habe nichts gesagt. Ich habe zwanzig Jahre lang nichts gesagt, wenn hinten etwas befohlen wurde, und heute habe ich zum ersten Mal gemerkt, wie das klingt, wenn man nichts sagt. Es klingt wie Zustimmung.\n\nIch bin müde, Geske. Nicht vom Graben. Sag dem Hund, dass ich komme. Bald, glaube ich. Das sagen jetzt alle.\n\nDein Otto"
+    },
+    {
+      "id": "brief.22.geske",
+      "art": "brief",
+      "blatt": "brief",
+      "slot": "brief.22",
+      "nr": 22,
+      "nach": "a4m4",
+      "absender": "Geske Harms",
+      "empfaenger": "an Major Brandt",
+      "ort": "Ostmoor, hinter dem Deich",
+      "text": "Frau Major Brandt,\n\nich danke Ihnen für Ihren Brief. Er war länger als der vom Regiment, und er hatte keine Wörter wie Pflicht oder Ehre. Otto hätte das gefallen. Er mochte keine großen Wörter. Er sagte immer, die passen nicht durch die Tür.\n\nEr hat oft von Ihnen geschrieben. Dass Sie alles nachrechnen. Dass Sie mitgegraben haben. Er war stolz, glaube ich, aber er hätte es nie so gesagt.\n\nIn den Zeitungen steht jetzt von Verhandlungen. Ich lese das und denke: ein Jahr zu spät für uns. Für Sie hoffentlich nicht.\n\nDer Hund wartet jeden Abend an der Tür. Ich habe aufgehört, ihn hereinzurufen.\n\nGeske Harms"
+    },
+    {
+      "id": "brief.23",
+      "art": "brief",
+      "blatt": "brief",
+      "nr": 23,
+      "nach": "a4m5",
+      "absender": "Feldwebel Swantje Fedders",
+      "empfaenger": "an ihren Mann Hauke in Grauwarf",
+      "ort": "Fährhaus Ostervenn",
+      "text": "Lieber Hauke,\n\nheute hat die Frau Major eine Brücke gebaut. Du musst dir das vorstellen: Wir standen bis zu den Knien in der Asse und haben Balken getragen, und sie stand am Ufer mit einem Bleistift hinter dem Ohr und hat gerufen, wohin. Sie hat die Last im Kopf ausgerechnet, schneller als ich die Ziegel zählen kann. Einmal hat sie gelacht. Ich habe sie noch nie lachen gehört.\n\nAm Abend kam ein Bote von drüben über die Weide, mit einer weißen Binde. Wir haben alle gewartet, was sie tut. Ich weiß es bis jetzt nicht.\n\nIch weiß nicht, was das alles bedeutet. Aber zum ersten Mal seit dem Sommer habe ich einen Tag lang etwas gebaut, das bleiben soll, und es hat sich angefühlt wie zu Hause am Ofen.\n\nDeine Swantje"
+    },
+    {
+      "id": "brief.24",
+      "art": "brief",
+      "blatt": "brief",
+      "nr": 24,
+      "nach": "a4m6",
+      "absender": "Major Ilse Brandt",
+      "empfaenger": "an alle, die das finden",
+      "ort": "Ostervenn",
+      "hinweis": "Erscheint nach der Schlusssequenz, bei jedem Ende. Wird im Buch des Abschnitts als letzte Seite abgelegt.",
+      "text": "An alle, die das finden,\n\nich habe ein Jahr lang Briefe gelesen, die nicht an mich gerichtet waren. Ich musste, das ist Vorschrift: Man liest, damit nichts über die Linie geht, was dem Gegner nützt. Ich habe nie etwas gefunden, das dem Gegner genützt hätte. Ich habe Hände gefunden, die Teig kneten, und Hunde, die an Türen warten, und Apfelbäume, die noch nicht gepflanzt sind. Drüben, in Lasks Briefen, habe ich dasselbe gefunden, nur mit anderen Namen.\n\nIch habe gelernt, Gräben zu bauen, die halten. Ich habe nicht gelernt, ob das gut war.\n\nIch lege die Liste des Abschnitts zu diesem Brief. Lest die Namen. Nicht alle auf einmal. Einer am Tag reicht.\n\nIlse Brandt",
+      "wann": {
+        "oder": [
+          {
+            "flags": [
+              "ende_durchbruch"
+            ]
+          },
+          {
+            "flags": [
+              "ende_waffenstillstand"
+            ]
+          },
+          {
+            "flags": [
+              "ende_abgeloest"
+            ]
+          },
+          {
+            "flags": [
+              "ende_haelt"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "lask.a3.1",
+      "art": "lask",
+      "blatt": "brief",
+      "nach": "a3m1",
+      "absender": "Hauptmann Teodor Lask",
+      "empfaenger": "an seine Frau Ruta in Sarneva",
+      "doktrin": "materialschlacht",
+      "vermerk": "Abgefangen im Postsack eines Melders, Krähenholz. Übersetzt: Lt. H. de Groot. Am Rand ein Schachzug: Turm e1. Nicht verschlüsselt, nur Schach.",
+      "text": "Meine liebe Ruta,\n\nDein Turm auf e1 ist frech, und ich lasse ihn stehen, weil ich hier vorn genug Türme habe. Sie haben uns endlich Munition geschickt. Mehr, als wir Gräben haben, und mehr Geschütze, als ich Kanoniere habe. Der Oberst nennt es Materialschlacht. Ich nenne es: die Gießerei gegen den Lehm. Der Lehm gewinnt immer, er hat Zeit.\n\nDrüben sitzt seit dem Sommer dieselbe Kommandantin. Sie gräbt wie jemand, der Brücken gebaut hat: Ihre Gräben tragen Lasten, wo meine nur Löcher sind. Ich habe aufgehört, darüber zu lachen.\n\nIgnas schreibt, er will sich melden, sobald er darf. Bitte, Ruta. Halte ihn auf, mit allem, was Du hast. Erzähl ihm, ich bräuchte ihn auf dem Gut. Lüg, wenn Du musst. Für Milan einen Kuss.\n\nDein Teodor"
+    },
+    {
+      "id": "lask.a3.2",
+      "art": "lask",
+      "blatt": "brief",
+      "nach": "a3m3",
+      "absender": "Hauptmann Teodor Lask von Sarneva",
+      "empfaenger": "an Oberst Dravin, Regiment Sarneva",
+      "doktrin": "materialschlacht",
+      "vermerk": "Dienstschreiben, abgefangen bei Gehöft Kroning. Übersetzt: Lt. H. de Groot. Der Brief wurde nie zugestellt.",
+      "text": "Herr Oberst,\n\ngemäß Ihrer Weisung melde ich die Vernichtung von drei feindlichen Batterien durch unser Feuer in den vergangenen drei Tagen. Ich melde außerdem, dass zwei davon aus Holz waren. Ich halte es für meine Pflicht, beides zu melden.\n\nIch bitte erneut darum, den angeforderten Gasangriff auf den Abschnitt gegenüber zu überdenken. Der Wind im Lehmgau dreht am Nachmittag, das weiß hier jeder Bauer. Ich möchte keinen eigenen Mann in die Liste schreiben, weil eine Zeichnung in Dravask den Wind nicht kennt.\n\nMit Gehorsam,\nT. Lask von Sarneva, Hauptmann"
+    },
+    {
+      "id": "lask.a3.3.bild",
+      "art": "lask",
+      "blatt": "brief",
+      "slot": "lask.a3.3",
+      "nach": "a3m5",
+      "wann": {
+        "flags": [
+          "waffenruhe_angenommen",
+          "lask_bild_zurueck"
+        ]
+      },
+      "absender": "Hauptmann Teodor Lask",
+      "empfaenger": "an seine Frau Ruta in Sarneva",
+      "doktrin": "materialschlacht",
+      "vermerk": "Abgefangen beim Heuwagen, am Morgen nach der Waffenruhe. Übersetzt: Lt. H. de Groot. Am Rand: Springer f3, durchgestrichen, dann wieder hingeschrieben.",
+      "text": "Ruta,\n\nich habe heute Nacht etwas getan, wofür man mich vor ein Gericht stellen kann. Ich habe eine Laterne aufgehängt. Und sie hat geantwortet.\n\nDu erinnerst Dich an den Sommer, an das Familienbild eines unserer Toten, das sie über den Draht zurückgeschickt hat? Ich habe es seiner Mutter gegeben. Seitdem wusste ich, dass drüben jemand sitzt, der Namen behält. Heute Nacht haben ihre Leute und meine im selben Lehm gestanden und getragen. Einer von ihren hat einem von meinen Brot gegeben.\n\nIch schreibe das auf, falls man Dir erzählt, ich sei ein Verräter. Ich bin ein Hauptmann, der vierzehn Männer im Lehm liegen hatte. Jetzt liegen sie in Betten.\n\nDein Teodor"
+    },
+    {
+      "id": "lask.a3.3.angenommen",
+      "art": "lask",
+      "blatt": "brief",
+      "slot": "lask.a3.3",
+      "nach": "a3m5",
+      "wann": {
+        "flags": [
+          "waffenruhe_angenommen"
+        ]
+      },
+      "absender": "Hauptmann Teodor Lask",
+      "empfaenger": "an seine Frau Ruta in Sarneva",
+      "doktrin": "materialschlacht",
+      "vermerk": "Abgefangen beim Heuwagen, am Morgen nach der Waffenruhe. Übersetzt: Lt. H. de Groot. Am Rand: Springer f3.",
+      "text": "Ruta,\n\nich habe heute Nacht etwas getan, wofür man mich vor ein Gericht stellen kann. Ich habe eine Laterne aufgehängt. Und sie hat geantwortet.\n\nIch habe nicht gewusst, ob sie es tut. Wenn Du drüben kommandiert hättest, hättest Du zuerst gefragt, ob die Laterne eine Falle ist. Und dann wärst Du trotzdem hinausgegangen. Ich glaube, so ist sie.\n\nIch schreibe das auf, falls man Dir erzählt, ich sei ein Verräter. Ich bin ein Hauptmann, der vierzehn Männer im Lehm liegen hatte. Jetzt liegen sie in Betten.\n\nDein Teodor"
+    },
+    {
+      "id": "lask.a3.3.dunkel",
+      "art": "lask",
+      "blatt": "brief",
+      "slot": "lask.a3.3",
+      "nach": "a3m5",
+      "absender": "Hauptmann Teodor Lask",
+      "empfaenger": "an seine Frau Ruta in Sarneva",
+      "doktrin": "materialschlacht",
+      "vermerk": "Abgefangen im Postsack eines Melders. Übersetzt: Lt. H. de Groot. Kein Schachzug am Rand.",
+      "text": "Ruta,\n\nich habe heute Nacht eine Laterne aufgehängt, unter einer weißen Fahne, und bis Mitternacht gewartet. Drüben ist niemand offen gekommen. Ich werfe es ihr nicht vor. Sie hat einen Stab wie ich, und ihr Stab hat ein Telegramm wie meiner.\n\nUm eins habe ich die Laterne selbst abgenommen. Sie war noch warm. Ich habe mich gefragt, wie lange man so etwas hängen lassen darf, bevor es lächerlich wird. Ich glaube, länger, als ich es getan habe.\n\nDiesen Zug musst Du ohne mich machen. Mir fällt keiner ein.\n\nDein Teodor"
+    },
+    {
+      "id": "lask.a3.4.zweite-linie",
+      "art": "lask",
+      "blatt": "brief",
+      "nach": "a3m6",
+      "absender": "Hauptmann Teodor Lask von Sarneva",
+      "empfaenger": "an Oberst Dravin, Regiment Sarneva",
+      "doktrin": "tiefe_verteidigung",
+      "vermerk": "Abschrift, gefunden im geräumten Gefechtsstand der ersten Linie. Übersetzt: Lt. H. de Groot. Kündigt nach meiner Lesart die Doktrin für das Frühjahr an: Tiefe statt Linie.",
+      "text": "Herr Oberst,\n\nder feindliche Angriff hat unsere vordere Linie genommen, die wir gemäß meinem Vorschlag vom Monatsanfang nur noch schwach besetzt hatten. Die zweite Linie hält. Ein Gegenstoß würde mehr kosten, als der Graben wert ist, und ich habe ihn nicht befohlen.\n\nIch bitte, im Bericht nicht von einer Niederlage zu sprechen. Wir haben einen Graben aufgegeben, den wir ohnehin aufgeben wollten. Die Verluste des Gegners sind hoch. Unsere sind niedriger als im Herbst.\n\nIch empfehle für das Frühjahr, die Tiefe der Stellung weiter auszubauen. Wir geben vorn nach, damit hinten etwas hält. Ich empfehle, keine Gräben mehr zu halten, die man nur halten kann, indem man in ihnen stirbt.\n\nT. Lask von Sarneva, Hauptmann",
+      "slot": "lask.a3.4",
+      "wann": {
+        "ausgang": "sieg"
+      }
+    },
+    {
+      "id": "lask.a3.4.gegenstoss",
+      "art": "lask",
+      "blatt": "brief",
+      "nach": "a3m6",
+      "absender": "Hauptmann Teodor Lask von Sarneva",
+      "empfaenger": "an Oberst Dravin, Regiment Sarneva",
+      "doktrin": "tiefe_verteidigung",
+      "vermerk": "Abschrift, gefunden im geräumten Gefechtsstand der ersten Linie. Übersetzt: Lt. H. de Groot. Kündigt nach meiner Lesart die Doktrin für das Frühjahr an: Tiefe statt Linie.",
+      "text": "Herr Oberst,\n\nder feindliche Angriff ist wie erwartet in die vordere Linie eingedrungen, die wir gemäß meinem Vorschlag vom Monatsanfang nur noch schwach besetzt hatten. Der Gegenstoß aus der zweiten Linie war erfolgreich.\n\nIch bitte, im Bericht nicht von einem Sieg zu sprechen. Wir haben einen Graben zurück, den wir selbst geräumt hatten. Die Verluste des Gegners sind hoch. Unsere auch.\n\nIch empfehle für das Frühjahr, die Tiefe der Stellung weiter auszubauen. Wir geben vorn nach, damit hinten etwas hält. Ich empfehle, keine Gräben mehr zu halten, die man nur halten kann, indem man in ihnen stirbt.\n\nT. Lask von Sarneva, Hauptmann",
+      "slot": "lask.a3.4"
+    },
+    {
+      "id": "lask.a4.1.vorsichtig",
+      "art": "lask",
+      "blatt": "brief",
+      "nach": "a4m1",
+      "absender": "Hauptmann Teodor Lask von Sarneva",
+      "empfaenger": "an Oberst Dravin, Regiment Sarneva",
+      "doktrin": "tiefe_verteidigung",
+      "vermerk": "Abgefangen bei Raudas. Übersetzt: Lt. H. de Groot. Die erwähnten Fallen deckt unsere Meldung vom selben Tag.",
+      "text": "Herr Oberst,\n\nwie befohlen ist die vordere Linie geräumt. Der Gegner ist nachgerückt, langsamer als erwartet und vorsichtiger. Die vorbereiteten Fallen in den Unterständen haben ihm weniger gekostet, als der Plan vorsah. Ich vermute, die Kommandantin gegenüber hat jeden einzelnen Unterstand prüfen lassen, bevor jemand hineinging.\n\nIch erlaube mir die Bemerkung, dass ich es an ihrer Stelle genauso gemacht hätte. Die Tiefe hält. Wie lange die Männer darin halten, kann ich nicht melden, weil ich es nicht weiß.\n\nT. Lask von Sarneva, Hauptmann",
+      "slot": "lask.a4.1",
+      "wann": {
+        "ausgang": "sieg"
+      }
+    },
+    {
+      "id": "lask.a4.1.tiefe",
+      "art": "lask",
+      "blatt": "brief",
+      "nach": "a4m1",
+      "absender": "Hauptmann Teodor Lask von Sarneva",
+      "empfaenger": "an Oberst Dravin, Regiment Sarneva",
+      "doktrin": "tiefe_verteidigung",
+      "vermerk": "Abgefangen bei Raudas. Übersetzt: Lt. H. de Groot. Die erwähnten Fallen deckt unsere Meldung vom selben Tag.",
+      "text": "Herr Oberst,\n\nwie befohlen ist die vordere Linie geräumt. Der Gegner ist nachgerückt, in die vorbereiteten Gräben, und hat dort bezahlt, was der Plan vorsah. Der Gegenstoß aus der Tiefe hat ihn zurückgeworfen.\n\nIch melde den Erfolg ohne Freude. Die Kommandantin gegenüber wird daraus lernen, wie ich aus ihren Gräben gelernt habe. Die Tiefe hält. Wie lange die Männer darin halten, kann ich nicht melden, weil ich es nicht weiß.\n\nT. Lask von Sarneva, Hauptmann",
+      "slot": "lask.a4.1"
+    },
+    {
+      "id": "lask.a4.2.gewarnt",
+      "art": "lask",
+      "blatt": "brief",
+      "slot": "lask.a4.2",
+      "nach": "a4m3",
+      "wann": {
+        "flags": [
+          "mine_gewarnt"
+        ]
+      },
+      "absender": "Hauptmann Teodor Lask",
+      "empfaenger": "an seine Frau Ruta in Sarneva",
+      "doktrin": "tiefe_verteidigung",
+      "vermerk": "Abgefangen bei Raudas. Übersetzt: Lt. H. de Groot. Ich habe diesen Brief nicht an den Stab weitergegeben. H. d. G.",
+      "text": "Ruta,\n\nheute Nacht kam ein Melder aus der Gefangenschaft zurück, mit einer Zeichnung und einer Uhrzeit. Ich habe den Hügel geräumt, ohne Befehl, und um zehn nach vier ist er in den Himmel gestiegen. Zweihundert Männer standen einen Kilometer weiter hinten und haben zugesehen, wie ihr Bett verschwindet.\n\nIch weiß nicht, warum sie das getan hat. Ich weiß nur, dass ich ihr jetzt etwas schulde, das man nicht zurückzahlen kann, ohne dass einer von uns beiden vor ein Gericht kommt.\n\nVielleicht ist das der Anfang von Frieden. Zwei Leute, die sich gegenseitig vor Gericht bringen könnten und es nicht tun.\n\nDein Teodor"
+    },
+    {
+      "id": "lask.a4.2.wasser",
+      "art": "lask",
+      "blatt": "brief",
+      "slot": "lask.a4.2",
+      "nach": "a4m3",
+      "wann": {
+        "flags": [
+          "mine_geflutet"
+        ]
+      },
+      "absender": "Hauptmann Teodor Lask",
+      "empfaenger": "an seine Frau Ruta in Sarneva",
+      "doktrin": "tiefe_verteidigung",
+      "vermerk": "Abgefangen bei Raudas. Übersetzt: Lt. H. de Groot.",
+      "text": "Ruta,\n\nmeine Mineure haben drei Wochen lang unter dem Hügel gehorcht. Sie haben das Klopfen von drüben gehört, Tag und Nacht, immer näher. Dann, vorgestern, haben sie Wasser gehört. Stundenlang. Und dann nichts mehr.\n\nAls wir durchgebrochen sind, war da eine Kammer, voll bis zur Decke, und darin Kisten, die nie mehr etwas tun werden. Mein Feldwebel hat lange hineingesehen und dann gesagt: Die haben ihre eigene Mine ersäuft, Herr Hauptmann. Ich habe ihm gesagt, er soll das niemandem erzählen. Ich erzähle es Dir.\n\nDein Teodor"
+    },
+    {
+      "id": "lask.a4.2.krater",
+      "art": "lask",
+      "blatt": "brief",
+      "slot": "lask.a4.2",
+      "nach": "a4m3",
+      "absender": "Hauptmann Teodor Lask",
+      "empfaenger": "an seine Frau Ruta in Sarneva",
+      "doktrin": "tiefe_verteidigung",
+      "vermerk": "Abgefangen bei Raudas. Übersetzt: Lt. H. de Groot. Ich habe ihn zweimal gelesen.",
+      "text": "Ruta,\n\nder Hügel ist weg. Ich schreibe Dir nicht mehr darüber, weil ich die Wörter nicht habe, und die, die ich habe, solltest Du nicht lesen.\n\nIch hatte mir eingebildet, die Frau drüben sei anders. Vielleicht ist sie es. Vielleicht hat sie einen Stab wie meinen und einen Befehl, auf dem eine Uhrzeit stand. Ich hätte die Mine auch gezündet. Das ist das Schlimmste daran.\n\nIgnas ist in Velsk. Er hat sich gemeldet, am Tag nach seinem Geburtstag. Du konntest nichts tun, ich weiß. Schreib ihm, dass sein Vater sagt, er soll langsam sein. Langsam ist hier das einzige, was hilft.\n\nDein Teodor"
+    },
+    {
+      "id": "lask.a4.3",
+      "art": "lask",
+      "blatt": "brief",
+      "nach": "a4m5",
+      "absender": "Teodor Lask",
+      "empfaenger": "an Major Ilse Brandt",
+      "doktrin": "tiefe_verteidigung",
+      "vermerk": "Nicht abgefangen. Vom Boten mit der weißen Binde abgegeben, adressiert an Major Brandt. Nicht übersetzt: Er schreibt in unserer Sprache. H. d. G.",
+      "text": "Major Brandt,\n\nverzeihen Sie die Form. Ich weiß, wie man über einen Gegner schreibt, aber nicht, wie man ihm schreibt.\n\nIn den Städten reden sie. Auf beiden Seiten. Es wird ein Ende geben, bald, an einem Tisch, an dem weder Sie noch ich sitzen. Bis dahin bekommt jeder von uns noch Befehle, die ihn nichts angehen.\n\nIch bitte Sie, heute nach Einbruch der Dunkelheit zum Heuwagen zu kommen. Allein, ohne Waffe, wie ich. Ich will nichts vereinbaren, was Sie nicht vereinbaren dürfen. Ich will nur, dass wir einmal miteinander reden, bevor andere über uns reden.\n\nMeine Frau spielt Schach mit mir, per Post. Wir sind seit dem Sommer bei derselben Partie. Ich hoffe, ich darf sie zu Hause zu Ende spielen. Ich hoffe, Sie haben auch etwas, das Sie zu Hause zu Ende machen wollen.\n\nMit Achtung,\nT. Lask"
+    }
+  ]
+}

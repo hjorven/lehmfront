@@ -261,6 +261,50 @@ Zärtlichkeit für die Familie, die er hinter Förmlichkeit versteckt.
 | Morrow | **Der Kronbote** | amtlich, feierlich, Hofnachrichten |
 | Morrow | **Ravelsker Grubenblatt** | klein, Bergleute, oft mit weißen Flecken der Zensur |
 
+## Ergänzungen aus Akt 3 und 4 (T2)
+
+### Orte
+
+| Ort | Wo | Was dort ist | Taucht auf |
+|---|---|---|---|
+| **Gehöft Kroning** | Niemandsland, an der Straße nach Raudas | Hof ohne Dach, Ziel von Befehl 117. Die Weide davor heißt eigentlich **Lange Wiese**, der Heuwagen war Kronings letzte Fuhre | Akt 3, Fundstücke |
+| **Bahndamm vor Raudas** | vor Lasks zweiter Linie | Damm der Grubenbahn von Schacht Drei. Nach dem Winterangriff bei Lask, Anlass der Verweigerung in a4m4 | Akt 3 bis 4 |
+| **Pionierbrücke Ostervenn** | über die Asse beim Fährhaus | Brandts Brücke aus Akt 4, nachdem das Frühjahrshochwasser die Behelfsbrücke mitgenommen hat | Akt 4 |
+
+### Figuren
+
+| Figur | Wer | Kommt vor |
+|---|---|---|
+| **Oberst Dravin** | Lasks Vorgesetzter, Regiment Sarneva | Dienstbriefe von Lask, Endlosmodus (Morrow) |
+| **Major Kuiper** | aus Haverstadt-Land, höflich, ohne Namen auf der Karte. Löst Brandt ab | Enden |
+| **Unteroffizier Dirk Lohmann** | verheiratet mit **Trientje**, Kelling | Brief 13 |
+| **Feldwebel Swantje Fedders** | verheiratet mit **Hauke**, Ziegler in Grauwarf. Baut die Holzgeschütze, zeichnet die Skizze zu Befehl 117 | Akt 3 bis 4, Briefe 15, 23 |
+| **Gefreite Imke Vos** | 19, aus Brookdorp, Weberstochter, Gruppe 5 | Brief 17 |
+| **Gefreiter Jan Ebens** | 22, aus Kelling, Nieter in Halle 4 der Werft, Bruder **Hinni** | Brief 20 |
+| **Femke Selin** | Selins Schwester in Haverstadt | Brief 14 |
+| **Laima Kalnis** | Arvos Schwester, neun Jahre | Fundstücke |
+| **Familie Kroning** | Vater aus Velde, Mutter aus Raudas, Sohn **Jonas** (von Morrow eingezogen), Tochter **Ilka** | Fundstücke |
+| **Kronsoldat Kazimir Ozols** | Fotograf aus Brasta, gefangen in Akt 2, verlobt mit **Vesna** | Fundstücke |
+| **Elke Tamm** | Tochter des Zieglers Tamm, Kontoristin in Haverstadt | Fundstücke |
+
+### Wiederkehrende Dinge
+
+- **Der Panzerwagen K1** heißt bei der Truppe „der Kasten“. Gebaut auf der Werft in Kelling.
+- **Lasks Schachpartie** mit Ruta läuft über alle vier Akte (Fundstücke, Vermerke unter seinen Briefen).
+  Ruta eröffnet mit e4. Lask teilt Karten in Schachfelder.
+- **Grüße von der Asse**: gedruckte Bildpostkarten eines Haverstädter Verlags, die die Truppe mit
+  Bleistift berichtigt.
+
+### Was T2 über Akt 1 und 2 voraussetzt (T1 bitte beachten oder hier korrigieren)
+
+- Falls Vell in a2m5 fällt (am Hang von Hügel 214): Seine Leute tragen ihn zurück. Sein Zigarettenetui geht
+  an den Vater (Briefe 16), den nachträglichen Orden legt der Vater nicht in die Vitrine.
+- Das Familienbild aus a1m6 (`lask_bild_zurueck`) gibt Lask der Mutter des Toten.
+- Harms hat zu Hause einen Hund, der an der Tür wartet.
+- Kazimir Ozols wird im Spätherbst (Akt 2) mit seiner Kamera gefangen.
+- Gas gibt es erst ab Akt 3, auf beiden Seiten.
+- Der Waffenstillstand am Ende tritt um 14:00 Uhr in Kraft.
+
 ## Was nie vorkommt
 
 - Reale Länder, Städte, Flüsse, Personen, Schlachten, Einheiten, Abzeichen, Lieder, Parolen.
