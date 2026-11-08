@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "note": "Namenslisten pro Fraktion (Plan 2.3). Fiktive Heimatorte. 'reserved' sind Hauptfiguren und werden nie zufaellig vergeben.",
+  "kaldern": {
+    "first": ["Ilse", "Otto", "Jost", "Hinrich", "Wiebke", "Arend", "Geske", "Tjark", "Maren", "Dirk", "Hilke", "Eilert", "Antje", "Folkert", "Swantje", "Remmer"],
+    "last": ["Brandt", "Harms", "Vell", "Boysen", "Tiedemann", "de Groot", "Wessel", "Lohmann", "Fedders", "Albers", "Janssen", "Ubben", "ter Veen", "Dreesmann", "Kollmeyer", "Siebels"],
+    "homes": ["Veldhaven", "Asseloo", "Tiedemoor", "Harmsdiek", "Ommerfeen", "Grotewarf", "Lehmstede", "Kaldersiel", "Brakenhuus", "Wittmarsch", "Oldenvenn", "Sielhorst"],
+    "reserved": ["Ilse Brandt", "Otto Harms", "Jost Vell"],
+    "women": true
+  },
+  "morrow": {
+    "first": ["Teodor", "Arvo", "Jurgis", "Dainis", "Milan", "Ignas", "Kazimir", "Valdis", "Oskars", "Rimvid", "Stanis", "Edvin"],
+    "firstWomen": ["Ruta", "Ludmila", "Vesna"],
+    "last": ["Lask", "Kalnis", "Ozols", "Vaitkus", "Mirek", "Dravin", "Berzin", "Sorek", "Lenart", "Vilks", "Pakaln", "Strazdin", "Rudovic", "Kovaar", "Melnis", "Zarenko"],
+    "homes": ["Ozvara", "Dravinsk", "Seljuva", "Kastrovo", "Velnora", "Jurmaja", "Lenkova Brod", "Mirvaine", "Tarvelje", "Kolmoraz", "Vaskeja", "Hohenmorrow"],
+    "reserved": ["Teodor Lask"],
+    "women": false
+  }
+}
