@@ -18,6 +18,7 @@ Jeder Thread traegt hier nach dem Merge ein, was fertig ist und was offen bleibt
   - Daten: `js/config/units.js` (Release-1.0-Einheiten befuellt, spaetere mit `enabled: false`), `js/config/factions.js`, `data/names.json` mit fiktiven Heimatorten.
   - Debug-Ansicht: `?scene=debug-state&seed=42&turns=3&side=a|b|all&kind=position|battle`.
   - `test/purity.test.js` prueft alle reinen Dateien (inkl. kuenftiger `js/map.js`, `js/supply.js`, `js/phases/*`) auf Math.random, Date, DOM, transzendente Mathematik und localeCompare.
+- E1 Etappenfenster als Baustein: `js/config/buildings.js` (alle Gebäude aus Plan 6 mit Ertrag, Nachbarbonus, Kosten, Bauzeit, Akt), `js/config/grounds.js`, `js/etappe.js` (Ertrag mit Nachbarboni, Bauvorschau inklusive Wirkung auf Nachbarn, Bauen, Bauzeit, Etappenstufen 1 bis 4 mit Belohnungswahl), `js/ui/etappe3d/` (drehbares Pappmodell in CSS-3D plus Bauleiste), Demo unter `?scene=etappe` (Parameter `sel`, `night`, `view`, `act`, `material`). Schnittstelle für P11: `renderEtappe(root, { fields, buildings, selected, onSelect, onBuild })`, optional `rewards`, `onChooseReward`, `onRepair`, `act`, `material`, `night`; Rückgabe `{ update, setView, getView, destroy }`.
 
 - Z1 Papierebene: Baustein `js/ui/paper/` mit `css/paper.css`, Demo `?scene=papier`. Sieben Blattarten (Brief, Telegramm/Stabsbefehl, Tagebuch, Gefallenenliste, Zeitung, Fundstück-Foto mit Rückseite, Aktkarte), prozedurale Bilder, Kippen mit Maus und Neigungssensor, nach vorn holen, Verschieben, Wegwischen in die Ablage, getippte Telegramme mit Klang-Hooks, Zensur `[[...]]`, Tag/Nacht, reduzierte Bewegung, Tastatur. Format und Schnittstelle: `js/ui/paper/README.md`.
 - P02 Lagekarte: `js/map.js` (Boden, Höhe 0..3, Zonen, Gräben mit Stufe und Feuerrichtung, Krater, Draht, Gleise, Gebäude; `loadMap`, `neighbors`, `lineCells`, `lineOfSight` mit Höhe und Wald/Dorf als Hindernis, `findPath` (A*), `cellChains`, `cellLabel`), Karte `data/maps/asse.json` 60 x 40 aus `tools/maps/asse.mjs` (Format: `data/maps/README.md`), `js/theme.js` (DAY, NIGHT, `lerpTheme`, `themeAt`, `applyTheme`, `animateDarkness`, `onThemeChange`), `js/render/geometry.js`, `js/render/map-layer.js` (statische Ebene, Path2D-Geometrie einmal je Karte, zeichnet nur nach `invalidate()`), `js/render/camera.js` (Maus, Rad, Trackpad-Pinch, Pfeiltasten, +/-, Doppelklick, Ziehen mit Nachgleiten, Zwei-Finger-Pinch, Grenzen, Bildschirm/Feld). Szene `?scene=karte` mit `&night=0..1`, `&x=&y=&zoom=`, `&ui=0`. Antippen zeigt Feldinfo, zweites Feld zeigt A*-Weg und Sichtlinie.
@@ -43,6 +44,11 @@ Jeder Thread traegt hier nach dem Merge ein, was fertig ist und was offen bleibt
 - P02: Doppelklick zum Zoomen zählt in der Szene `karte` auch als zwei Antipp-Vorgänge (Weg/Sicht-Anzeige wird dabei zurückgesetzt). Nur Demo-Szene; P03 sollte Antippen mit kurzer Verzögerung von Doppelklick trennen.
 - P02: Szenen haben noch kein Abmelden: Kamera-Listener, ResizeObserver und `onThemeChange` bleiben bestehen. Harmlos, solange `main.js` Szenen nicht wechselt.
 - P02: Diagonale Grabenstücke werden als schräge Rechteckwelle gezeichnet; das sieht etwas unruhiger aus als gerade Abschnitte.
+- E1: Einhängen in Spielzustand und Runden fehlt noch (P11). Beschuss und Aufklärbarkeit sind nur als Feld `damaged` vorbereitet; Reparatur gibt es schon (`repairBuilding`).
+- E1: Kosten und Bauzeiten außer Feldküche, Ruhelager, Sägewerk und Fernmeldestelle (aus dem Mockup) sind geschätzt, Balancing in P21.
+- E1: Feldpost "alle 5 Runden" ist nur als `periodic` ausgewiesen; wann sie fällig ist (Bezug auf Runde oder Fertigstellung), legt P11 fest.
+- E1: Erreichte Belohnungsstufen hängen an der aktuellen Leistung; fällt sie vor der Wahl unter die Schwelle (Beschuss), verschwindet das Angebot wieder. P11 kann die höchste erreichte Stufe im Spielzustand merken.
+- E1: Figuren laufen auf gerader Linie zwischen Nachbargebäuden und gehen dabei sichtbar "durch die Tür" in den Kasten; auf Hängen schweben sie leicht.
 
 ## Freigaben und Entscheidungen von Jorven
 
@@ -66,3 +72,11 @@ Stand 2026-11-08, von Jorven bestaetigt:
 - P01: Ein Gruppenfuehrer bekommt moeglichst einen auf seiner Seite einmaligen Nachnamen, und die Nachnamen der Hauptfiguren (Brandt, Harms, Vell, Lask) werden nicht zufaellig vergeben. Meldungen sagen "Gruppe Lohmann", das soll eindeutig sein.
 - P02, Tinte beim Tag-Nacht-Übergang: Plan 7.7 lässt Tinte und Signaturfarben zwischen darkness 0,45 und 0,7 linear wandern. Nachgemessen fällt dabei der Kontrast Tinte auf Papier bis 1,1 : 1. Jetzt springt jede Farbe innerhalb dieses Fensters an ihrem eigenen Kreuzungspunkt (dort, wo die Nachtfarbe auf dem dann gültigen Papier besser lesbar ist). Tinte bleibt damit immer über 3 : 1, im Übergang wirkt es wie Tinte, die aufleuchtet.
 - P02, Kartenblatt: Die Karte liegt als Papierblatt mit Rand auf einem Tisch: Spalten- und Zeilennummern am Rand (passend zu Meldungen wie „Feld 31/9"), Titel, Maßstab, Nordpfeil. Das war im Plan nicht vorgesehen, macht Feldangaben im Protokoll aber auffindbar.
+- E1: "Angrenzend" heißt nur die vier Felder mit gemeinsamer Kante, keine Diagonalen (klarer lesbar im Modell).
+- E1: Depot braucht ein angrenzendes Gleis oder einen Feldbahnhof, sonst kommen keine Loren weg. Ein stillstehender Bahnhof gibt keinen Nachbarbonus.
+- E1: Die Etappenstufe zählt nur die Loren aus eigenen Gebäuden; Loren aus Belohnungen (Zweite Gleisstrecke) heben die Stufe nicht selbst an.
+- E1: Reparatur kostet die halbe Baukosten (aufgerundet) und eine Stellungsrunde (`repairBuilding`).
+- E1: Feldbahnhof braucht ein angrenzendes Gleis, sonst bringt er keine Loren; Gleis ist ein baubares Gebäude statt eines Bodens. So zeigt die Vorschau eines Gleisstücks, dass ein Bahnhof anfängt zu fahren.
+- E1: Verbandsplatz/Feldlazarett, Ziegelei/Betonmischer und Kapelle/Gedenkstätte sind jeweils zwei Gebäude statt einer Zeile im Plan.
+- E1: Etappenstufen: Stufe 2 ab 5 Loren, Stufe 3 ab 8, Stufe 4 ab 12. Stufe 4 bietet zusätzlich Pionierpark (Bauzeit −1) oder Materialzug (+3 Material).
+- E1: Ist die Modellbühne hochkant (schmale Fenster), steht das Brett längs gedreht, damit die Felder groß genug zum Antippen sind.
