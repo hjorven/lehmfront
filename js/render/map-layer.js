@@ -36,15 +36,20 @@ function addTo(path, pts) {
   pts.forEach((q, i) => (i ? path.lineTo(q[0], q[1]) : path.moveTo(q[0], q[1])));
 }
 
-/** Bestimmt fuer einen Grabenzug, auf welcher Seite der Laufrichtung die Feuerrichtung liegt. */
+/**
+ * Bestimmt fuer einen Grabenzug, auf welcher Seite die Feuerrichtung liegt: Summe ueber alle Abschnitte,
+ * gewichtet mit der Feuerrichtung des jeweiligen Feldes. 0 = keine Seite (dann keine Schuetzenauftritte).
+ */
 function facingSign(map, chain) {
   const pts = chain.cells;
-  const c = cellAt(map, pts[0][0], pts[0][1]);
-  const f = DIR[c.trench.facing];
-  const a = pts[0], b = pts[Math.min(1, pts.length - 1)];
-  const tx = b[0] - a[0], ty = b[1] - a[1];
-  const dot = -ty * f.dx + tx * f.dy; // Normale links (-ty, tx)
-  return dot >= 0 ? 1 : -1;
+  let sum = 0;
+  for (let i = 1; i < pts.length; i++) {
+    const a = pts[i - 1], b = pts[i];
+    const f = DIR[cellAt(map, a[0], a[1]).trench.facing];
+    const tx = b[0] - a[0], ty = b[1] - a[1];
+    sum += -ty * f.dx + tx * f.dy; // Normale (-ty, tx)
+  }
+  return sum > 0 ? 1 : sum < 0 ? -1 : 0;
 }
 
 /**
@@ -64,7 +69,9 @@ export function buildMapGeometry(map, { jitter = 0.045 } = {}) {
     for (const line of isolines(hField, lv)) {
       if (line.pts.length < 4) continue;
       const smooth = chaikin(line.pts, 2, line.closed);
-      addTo(p, jitterPolyline(smooth, jitter * 0.8, hashSeed(seed, 'h', li, line.pts.length), 0.6));
+      const jl = jitterPolyline(smooth, jitter * 0.8, hashSeed(seed, 'h', li, line.pts.length), 0.6);
+      if (line.closed) jl[jl.length - 1] = jl[0]; // Ring ohne Luecke schliessen
+      addTo(p, jl);
     }
     g.contours.push({ level: lv, path: p, index: Number.isInteger(lv * 2) && lv >= 1 });
   });
@@ -75,7 +82,11 @@ export function buildMapGeometry(map, { jitter = 0.045 } = {}) {
   for (let y = 0; y < map.height; y++) for (let x = 0; x < map.width; x++) if (isWater(x, y)) g.waterMask.push([x, y]);
   const wField = cornerField(map.width, map.height, isWater, 1);
   g.shore = new Path2D();
-  for (const line of isolines(wField, 0.5)) addTo(g.shore, jitterPolyline(chaikin(line.pts, 2, line.closed), jitter, hashSeed(seed, 'u'), 0.5));
+  for (const line of isolines(wField, 0.5)) {
+    const jl = jitterPolyline(chaikin(line.pts, 2, line.closed), jitter, hashSeed(seed, 'u'), 0.5);
+    if (line.closed) jl[jl.length - 1] = jl[0];
+    addTo(g.shore, jl);
+  }
 
   // Signaturen je Feld
   g.forestFill = new Path2D();
@@ -179,9 +190,9 @@ export function buildMapGeometry(map, { jitter = 0.045 } = {}) {
       let line, bays = [];
       if (kind === 'fire') {
         const sign = facingSign(map, ch);
-        const cr = crenelPath(pts, { amp: 0.6, len: 1.25, sign });
+        const cr = crenelPath(pts, { amp: 0.6, len: 1.25, sign: sign || 1 });
         line = cr.path;
-        bays = cr.bays;
+        bays = sign ? cr.bays : [];
       } else {
         line = zigzagPath(pts, { amp: 0.3, step: 1.0 });
       }
@@ -248,7 +259,7 @@ function setFont(ctx, size, family, weight = '') {
 }
 
 /** Text in Weltkoordinaten; size in Feldern. Unterhalb minPx wird nicht gezeichnet. */
-function text(ctx, cam, str, x, y, { size = 0.5, family = 'num', color, alpha = 1, align = 'center', rotate = 0, weight = '', minPx = 6, baseline = 'middle' } = {}) {
+function text(ctx, cam, str, x, y, { size = 0.5, family = 'num', color, alpha = 1, align = 'center', rotate = 0, weight = '', minPx = 6, baseline = 'middle', halo = null } = {}) {
   if (size * cam.zoom < minPx) return;
   ctx.save();
   ctx.globalAlpha *= alpha;
@@ -261,11 +272,25 @@ function text(ctx, cam, str, x, y, { size = 0.5, family = 'num', color, alpha = 
   const k = cam.zoom;
   ctx.scale(1 / k, 1 / k);
   setFont(ctx, size * k, family, weight);
+  if (halo) {
+    // Papierhof hinter der Schrift, damit Notizen und Namen auf Linien lesbar bleiben
+    ctx.strokeStyle = halo;
+    ctx.lineWidth = Math.max(2, size * k * 0.28);
+    ctx.lineJoin = 'round';
+    ctx.globalAlpha *= 0.85;
+    ctx.strokeText(str, 0, 0);
+    ctx.globalAlpha /= 0.85;
+  }
   ctx.fillText(str, 0, 0);
   ctx.restore();
 }
 
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+/** Themenfarbe (#rrggbb) mit Deckkraft als rgba() fuer Verlaeufe. */
+function rgba(hex, a) {
+  const n = parseInt(hex.slice(1, 7), 16);
+  return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${a.toFixed(3)})`;
+}
 
 /** Wasserflaeche als weiche Lavierung: 1 Pixel je Feld, beim Hochskalieren geglaettet. */
 function waterCanvas(geo, map, color) {
@@ -316,8 +341,8 @@ export function drawMapLayer(ctx, geo, cam, th, dpr = 1) {
   for (const f of sh.folds) {
     const nx = f.vertical ? 1 : 0, ny = f.vertical ? 0 : 1;
     const grad = ctx.createLinearGradient(f.x0, f.y0, f.x0 + nx * 1.6, f.y0 + ny * 1.6);
-    grad.addColorStop(0, 'rgba(0,0,0,' + (th.foldAlpha * 0.22).toFixed(3) + ')');
-    grad.addColorStop(1, 'rgba(0,0,0,0)');
+    grad.addColorStop(0, rgba(th.shade, th.foldAlpha * 0.22));
+    grad.addColorStop(1, rgba(th.shade, 0));
     ctx.fillStyle = grad;
     ctx.beginPath();
     ctx.moveTo(f.x0, f.y0); ctx.lineTo(f.x1, f.y1); ctx.lineTo(f.x1 + nx * 1.6, f.y1 + ny * 1.6); ctx.lineTo(f.x0 + nx * 1.6, f.y0 + ny * 1.6);
@@ -346,6 +371,7 @@ export function drawMapLayer(ctx, geo, cam, th, dpr = 1) {
   ctx.globalAlpha = 0.5;
   ctx.fill(geo.forestFill);
   ctx.globalAlpha = 1;
+  ctx.strokeStyle = th.forestLine;
   ctx.lineWidth = clamp(0.03 * z, 0.8, 1.6) * px;
   ctx.stroke(geo.forestFill);
   ctx.strokeStyle = th.marsh;
@@ -466,7 +492,7 @@ export function drawMapLayer(ctx, geo, cam, th, dpr = 1) {
 
   // Beschriftungen
   for (const l of map.labels) {
-    text(ctx, cam, l.text, l.x, l.y, { size: l.size || 0.5, family: l.font || 'num', color: th[l.color || 'ink'] || th.ink, alpha: l.alpha ?? 0.9, rotate: l.rotate || 0, minPx: 6.5 });
+    text(ctx, cam, l.text, l.x, l.y, { size: l.size || 0.5, family: l.font || 'num', color: th[l.color || 'ink'] || th.ink, alpha: l.alpha ?? 0.9, rotate: l.rotate || 0, minPx: 6.5, halo: th.paper });
   }
 
   // Bleistiftnotizen mit Pfeil
@@ -518,7 +544,7 @@ export function drawMapLayer(ctx, geo, cam, th, dpr = 1) {
 function drawNote(ctx, cam, geo, n, th, i) {
   const size = n.size || 0.85;
   if (size * cam.zoom < 7) return;
-  text(ctx, cam, n.text, n.x, n.y, { size, family: 'hand', color: th.pencil, rotate: n.rotate || 0, minPx: 7 });
+  text(ctx, cam, n.text, n.x, n.y, { size, family: 'hand', color: th.pencil, rotate: n.rotate || 0, minPx: 7, halo: th.paper });
   if (!n.to) return;
   // Pfeil von der Notiz zum Ziel, leicht gebogen
   ctx.save();

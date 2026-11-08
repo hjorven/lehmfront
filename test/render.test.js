@@ -45,11 +45,27 @@ test('Kontrast Tinte auf Papier und Kaertchen bleibt im ganzen Uebergang ueber 3
     assert.ok(contrast(th.ink, th.paper) >= 3, `Papier bei ${i / 200}: ${contrast(th.ink, th.paper).toFixed(2)}`);
     assert.ok(contrast(th.ink, th.card) >= 3, `Kaertchen bei ${i / 200}: ${contrast(th.ink, th.card).toFixed(2)}`);
   }
+  // Schrift auf Kaertchen springt mit dem Kaertchen
+  for (let i = 0; i <= 200; i++) {
+    const th = themeAt(i / 200);
+    assert.ok(contrast(th.ink2, th.card) >= 3, `ink2 bei ${i / 200}`);
+  }
   // Am Tag und in der Nacht: volle Lesbarkeit
   for (const th of [DAY, NIGHT]) {
     assert.ok(contrast(th.ink, th.card) >= 7);
     assert.ok(contrast(th.ink2, th.card) >= 4.5);
   }
+});
+
+test('Signaturen bleiben ausserhalb der Uebergangsmitte erkennbar, Tag und Nacht klar', () => {
+  const keys = ['pencil', 'frame', 'forestLine', 'marsh', 'rock', 'own', 'enemy', 'wire', 'rail', 'village'];
+  for (let i = 0; i <= 100; i++) {
+    const t = i / 100;
+    if (t > 0.35 && t < 0.8) continue;
+    const th = themeAt(t);
+    for (const k of keys) assert.ok(contrast(th[k], th.paper) >= 1.9, `${k} bei ${t}: ${contrast(th[k], th.paper).toFixed(2)}`);
+  }
+  for (const th of [DAY, NIGHT]) for (const k of keys) assert.ok(contrast(th[k], th.paper) >= 3, k);
 });
 
 test('applyTheme ohne DOM ruft Renderer auf', () => {

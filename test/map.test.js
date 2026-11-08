@@ -95,6 +95,40 @@ test('Sichtlinie: Wald und Dorf blockieren auf gleicher Hoehe, Nachbarn sehen si
   assert.equal(lineOfSight(m2, { x: 0, y: 0 }, { x: 4, y: 0 }).visible, true, 'von Hoehe 2 ueber das Dorf');
 });
 
+test('Sichtlinie ist symmetrisch: A sieht B genau dann, wenn B A sieht (ganze Asse-Karte, Stichprobe)', () => {
+  const m = loadMap(asseJson);
+  let n = 0;
+  for (let i = 0; i < m.cells.length; i += 7) {
+    for (let j = i + 13; j < m.cells.length; j += 53) {
+      const a = m.cells[i], b = m.cells[j];
+      assert.equal(lineOfSight(m, a, b).visible, lineOfSight(m, b, a).visible, `${a.x}/${a.y} ${b.x}/${b.y}`);
+      n++;
+    }
+  }
+  assert.ok(n > 5000);
+  // Gemeldetes Hindernis liegt beim Beobachter am naechsten
+  const t = tiny(['......'], ['020200']);
+  assert.deepEqual(lineOfSight(t, { x: 0, y: 0 }, { x: 5, y: 0 }).blockedAt, { x: 1, y: 0 });
+  assert.deepEqual(lineOfSight(t, { x: 5, y: 0 }, { x: 0, y: 0 }).blockedAt, { x: 3, y: 0 });
+});
+
+test('A*: Kosten 0 erlaubt, Heuristik bleibt zulaessig', () => {
+  const m = tiny(['....', '....']);
+  const p = findPath(m, { x: 0, y: 0 }, { x: 3, y: 1 }, { cost: (c) => (c.y === 1 ? 0 : 10) });
+  assert.ok(p);
+  assert.equal(p.cost, 0);
+});
+
+test('cellChains: Ring mit Stilwechsel ergibt genau zwei Zuege', () => {
+  const ring = [[1, 1], [2, 1], [3, 1], [3, 2], [3, 3], [2, 3], [1, 3], [1, 2]];
+  const m = tiny(['.....', '.....', '.....', '.....', '.....'], null, {
+    trenches: ring.map(([x, y]) => ({ x, y, side: 'own', kind: x === 3 ? 'comm' : 'fire', level: 2, facing: 'E' })),
+  });
+  const ch = cellChains(m, (c) => !!c.trench, (a, b) => (a.trench.kind === 'comm' || b.trench.kind === 'comm' ? 'comm' : 'fire'));
+  assert.equal(ch.length, 2);
+  assert.equal(ch.reduce((s, c) => s + c.cells.length - 1, 0), 8, 'alle Kanten genau einmal');
+});
+
 test('A*: findet kuerzesten Weg, umgeht Wasser, schneidet keine Ecken', () => {
   const m = tiny([
     '.....',

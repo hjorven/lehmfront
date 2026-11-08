@@ -189,16 +189,24 @@ export function distance(a, b) {
 export function lineOfSight(map, from, to, { eye = 1, target = 1 } = {}) {
   const a = cellAt(map, from.x, from.y), b = cellAt(map, to.x, to.y);
   if (!a || !b) return { visible: false, blockedAt: null, cells: [] };
-  const cells = lineCells(a.x, a.y, b.x, b.y);
-  const n = cells.length - 1;
-  const ha = 2 * a.height + eye, hb = 2 * b.height + target;
+  // Immer vom kleineren Index aus rechnen: Bresenham waehlt sonst je nach Richtung andere Zwischenfelder,
+  // und A saehe B, B aber nicht A (Review P02). Ergebnis ist damit symmetrisch.
+  const swap = a.y * map.width + a.x > b.y * map.width + b.x;
+  const [p, q, ep, eq] = swap ? [b, a, target, eye] : [a, b, eye, target];
+  const line = lineCells(p.x, p.y, q.x, q.y);
+  const n = line.length - 1;
+  const hp = 2 * p.height + ep, hq = 2 * q.height + eq;
+  const blocked = [];
   for (let i = 1; i < n; i++) {
-    const c = cellAt(map, cells[i][0], cells[i][1]);
+    const c = cellAt(map, line[i][0], line[i][1]);
     const top = 2 * c.height + TERRAIN[c.terrain].obstacle;
-    // Sichtgerade an Position i: ha + (hb - ha) * i / n  ->  mal n
-    if (top * n > ha * (n - i) + hb * i) return { visible: false, blockedAt: { x: c.x, y: c.y }, cells };
+    // Sichtgerade an Position i: hp + (hq - hp) * i / n  ->  mal n
+    if (top * n > hp * (n - i) + hq * i) blocked.push({ x: c.x, y: c.y });
   }
-  return { visible: true, blockedAt: null, cells };
+  const cells = swap ? line.slice().reverse() : line;
+  if (!blocked.length) return { visible: true, blockedAt: null, cells };
+  // Gemeldet wird das Hindernis, das dem Beobachter am naechsten ist
+  return { visible: false, blockedAt: swap ? blocked[blocked.length - 1] : blocked[0], cells };
 }
 
 /** Bewegungskosten fuer das Betreten eines Feldes (Zehntel). Infinity = unpassierbar. */
@@ -258,7 +266,7 @@ export function findPath(map, start, goal, { cost = enterCost, diagonal = true, 
   // Kleinste Schrittkosten der Karte fuer eine zulaessige Schaetzung
   let minStep = Infinity;
   for (const c of map.cells) { const v = cost(c); if (v < minStep) minStep = v; }
-  if (!Number.isFinite(minStep) || minStep <= 0) minStep = 1;
+  if (!Number.isFinite(minStep) || minStep < 0) minStep = 0;
   const minDiag = Math.floor((minStep * 14) / 10);
   const heur = (i) => {
     const dx = Math.abs((i % w) - g.x), dy = Math.abs(Math.floor(i / w) - g.y);
@@ -362,6 +370,12 @@ export function cellChains(map, isMember, styleOf = () => '') {
   for (const i of sorted) {
     if (adj.get(i).length === 2) continue;
     if (adj.get(i).length === 0) { chains.push({ style: styleOf(cellOf(i), cellOf(i)), cells: [[i % w, Math.floor(i / w)]] }); continue; }
+    for (const n of adj.get(i)) if (!used.has(eKey(i, n))) walk(i, n);
+  }
+  // Verbleibende Ringe: zuerst an Feldern beginnen, an denen der Stil wechselt, damit Zuege ganz bleiben
+  for (const i of sorted) {
+    const st = new Set(adj.get(i).map((n) => style(i, n)));
+    if (st.size < 2) continue;
     for (const n of adj.get(i)) if (!used.has(eKey(i, n))) walk(i, n);
   }
   for (const i of sorted) for (const n of adj.get(i)) if (!used.has(eKey(i, n))) walk(i, n);

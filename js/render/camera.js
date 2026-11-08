@@ -127,7 +127,7 @@ export function attachCameraControls(el, cam, { onChange = () => {}, onTap = () 
     const p = local(e);
     pointers.set(e.pointerId, p);
     if (pointers.size === 1) { dragMoved = 0; last = { ...p, t: e.timeStamp }; vel = { x: 0, y: 0 }; downAt = p; }
-    if (pointers.size === 2) { pinch = pinchState(); dragMoved = 99; }
+    if (pointers.size === 2) { pinch = pinchState(); dragMoved = 99; vel = { x: 0, y: 0 }; }
   };
   const move = (e) => {
     const p = local(e);
@@ -157,8 +157,11 @@ export function attachCameraControls(el, cam, { onChange = () => {}, onTap = () 
   const up = (e) => {
     if (!pointers.has(e.pointerId)) return;
     pointers.delete(e.pointerId);
-    if (pointers.size === 1) { pinch = null; const [p] = pointers.values(); last = { ...p, t: e.timeStamp }; return; }
+    if (pointers.size === 1) { pinch = null; vel = { x: 0, y: 0 }; const [p] = pointers.values(); last = { ...p, t: e.timeStamp }; return; }
+    if (pointers.size === 2) pinch = pinchState(); // von drei auf zwei Finger: neues Paar
     if (pointers.size > 0) return;
+    // Wer vor dem Loslassen stillhaelt, will nicht gleiten
+    if (last && e.timeStamp - last.t > 80) vel = { x: 0, y: 0 };
     pinch = null;
     if (e.type === 'pointerup' && dragMoved <= 6 && downAt) onTap(downAt);
     else if (Math.hypot(vel.x, vel.y) > 0.15 && e.type === 'pointerup') {
@@ -176,14 +179,22 @@ export function attachCameraControls(el, cam, { onChange = () => {}, onTap = () 
     last = null;
     downAt = null;
   };
+  // Rad: Maus (ganze Schritte, keine Seitwaerts-Bewegung) zoomt, Trackpad (Bruchteile oder seitwaerts) verschiebt,
+  // Strg oder Trackpad-Pinch zoomt immer. Die Art wird je Geste einmal bestimmt und 200 ms beibehalten.
+  let wheelMode = null, wheelAt = 0;
   const wheel = (e) => {
     e.preventDefault();
     stopGlide();
     const p = local(e);
     const unit = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? 400 : 1;
+    if (e.timeStamp - wheelAt > 200) wheelMode = null;
+    wheelAt = e.timeStamp;
     if (e.ctrlKey) zoomAt(cam, Math.exp(-e.deltaY * unit * 0.01), p.x, p.y);
-    else if (Math.abs(e.deltaX) > 0 && !e.shiftKey && e.deltaMode === 0 && Math.abs(e.deltaY) < 40 && e.deltaY % 1 !== 0) panBy(cam, -e.deltaX, -e.deltaY);
-    else zoomAt(cam, Math.exp(-e.deltaY * unit * 0.0015), p.x, p.y);
+    else {
+      if (!wheelMode) wheelMode = e.deltaMode === 0 && (e.deltaX !== 0 || !Number.isInteger(e.deltaY)) ? 'pan' : 'zoom';
+      if (wheelMode === 'pan') panBy(cam, -e.deltaX, -e.deltaY);
+      else zoomAt(cam, Math.exp(-e.deltaY * unit * 0.0015), p.x, p.y);
+    }
     onChange();
   };
   const dbl = (e) => {
@@ -193,6 +204,7 @@ export function attachCameraControls(el, cam, { onChange = () => {}, onTap = () 
   };
   const key = (e) => {
     if (e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
+    if (e.ctrlKey || e.metaKey || e.altKey) return; // Browser-Zoom und Kuerzel nicht schlucken
     const stepPx = 60;
     const c = { x: cam.viewW / 2, y: cam.viewH / 2 };
     switch (e.key) {

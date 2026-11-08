@@ -13,7 +13,12 @@ export const CSS_KEYS = ['paper', 'card', 'ink', 'ink2', 'line', 'track', 'own',
  * Nachtfarbe auf dem dann gueltigen Papier besser lesbar wird als die Tagfarbe. So bleibt Tinte auf
  * Papier immer ueber 3 : 1. Im Zwei-Sekunden-Uebergang wirkt das wie Tinte, die aufleuchtet.
  */
-export const LATE_KEYS = ['ink', 'ink2', 'line', 'own', 'enemy', 'accent', 'danger', 'wire', 'rail', 'pencil', 'frame', 'village'];
+export const LATE_KEYS = ['ink', 'ink2', 'line', 'own', 'enemy', 'accent', 'danger', 'wire', 'rail', 'pencil', 'frame', 'village', 'forestLine', 'marsh', 'rock'];
+/**
+ * Kaertchen springen zusammen mit der Tinte (Review P02): ein Kaertchen in mittlerem Braun ist mit keiner
+ * Tinte lesbar. Bis zum Sprung wird es nur leicht abgedunkelt und angewaermt, danach ist es Nachtkarte.
+ */
+export const CARD_WITH = 'ink';
 /** Fenster aus Plan 7.7, in dem die Spruenge liegen. */
 export const LATE_FROM = 0.45;
 export const LATE_TO = 0.7;
@@ -25,23 +30,23 @@ export const DAY = {
   paper: '#efe6cf', card: '#f8f2e3', ink: '#2a2420', ink2: '#6e6253', line: '#8a7d66', track: '#d9cfb6',
   own: '#1f4e9c', enemy: '#a3271f', accent: '#c99a1a', danger: '#a3271f',
   // Karte
-  faint: '#cbbf9f', contour: '#b79b6a', forest: '#7f8f5c', water: '#7fa0b8', wire: '#4a4036', crater: '#a89470',
-  rail: '#3a3128', marsh: '#6f8fa6', chalk: '#d8d2bf', rock: '#8c8070', village: '#3b332c',
-  pencil: '#5b5650', stain: '#8a5a2b', fold: '#a8987a', frame: '#4a4036', desk: '#3a3027', shade: '#000000',
+  faint: '#cbbf9f', contour: '#b79b6a', forest: '#7f8f5c', forestLine: '#46552c', water: '#7fa0b8', wire: '#4a4036', crater: '#a89470',
+  rail: '#3a3128', marsh: '#3f6680', chalk: '#9a8e70', rock: '#5c5244', village: '#3b332c',
+  pencil: '#4a4540', stain: '#8a5a2b', fold: '#a8987a', frame: '#3a3128', desk: '#3a3027', shade: '#000000',
   jitter: 0.045, shadeAlpha: 0.22, foldAlpha: 0.35, stainAlpha: 0.22,
 };
 
 export const NIGHT = {
   paper: '#0b0d0a', card: '#15180f', ink: '#d8d2b8', ink2: '#8f8a73', line: '#3a3f2c', track: '#262a1e',
   own: '#7fa4e6', enemy: '#e2645a', accent: '#ffbf47', danger: '#e2645a',
-  faint: '#1d2118', contour: '#3d4532', forest: '#2a3a22', water: '#2a4553', wire: '#8a826a', crater: '#2b2e24',
-  rail: '#8a846f', marsh: '#3b5a6b', chalk: '#2a2c24', rock: '#3e3d34', village: '#a49e88',
-  pencil: '#9a9584', stain: '#5a4630', fold: '#2a2e22', frame: '#8a846f', desk: '#050605', shade: '#000000',
+  faint: '#1d2118', contour: '#3d4532', forest: '#4a6a3a', forestLine: '#8fb07a', water: '#2a4553', wire: '#8a826a', crater: '#2b2e24',
+  rail: '#8a846f', marsh: '#7aa4bd', chalk: '#5a5c4c', rock: '#8a8270', village: '#a49e88',
+  pencil: '#b3ae9a', stain: '#5a4630', fold: '#2a2e22', frame: '#a8a28c', desk: '#050605', shade: '#000000',
   jitter: 0.03, shadeAlpha: 0.5, foldAlpha: 0.45, stainAlpha: 0.18,
 };
 
 // Daemmerungsschimmer: Papier und Kaertchen ziehen zur Mitte hin Richtung Braunorange
-const DUSK = { paper: ['#9c7a4f', 0.35], card: ['#8a6a44', 0.25], faint: ['#7a5c3a', 0.3], desk: ['#4a3420', 0.25] };
+const DUSK = { paper: ['#9c7a4f', 0.35], card: ['#8a6a44', 0.12], faint: ['#7a5c3a', 0.3], desk: ['#4a3420', 0.25] };
 
 function hexToRgb(h) {
   let s = h.replace('#', '');
@@ -60,19 +65,26 @@ export function mix(a, b, t) {
 
 const clamp01 = (v) => Math.max(0, Math.min(1, v));
 // Papier ohne Tinte, um die Kreuzungspunkte zu finden
-function paperAt(t, key) {
-  const base = key === 'ink2' || key === 'line' ? 'card' : 'paper';
-  return mix(mix(DAY[base], NIGHT[base], t), DUSK[base][0], Math.sin(Math.PI * t) * DUSK[base][1]);
+function paperAt(t) {
+  return mix(mix(DAY.paper, NIGHT.paper, t), DUSK.paper[0], Math.sin(Math.PI * t) * DUSK.paper[1]);
 }
 
 /** Kreuzungspunkte je Schluessel, einmal beim Laden berechnet (Schritte von 0,01). */
 export const CROSSOVER = Object.fromEntries(LATE_KEYS.map((k) => {
   for (let i = 0; i <= 100; i++) {
-    const t = i / 100, p = paperAt(t, k);
+    const t = i / 100, p = paperAt(t);
     if (contrast(NIGHT[k], p) >= contrast(DAY[k], p)) return [k, Math.max(LATE_FROM, Math.min(LATE_TO, t))];
   }
   return [k, LATE_TO];
 }));
+// Schrift und Rahmen auf Kaertchen springen mit dem Kaertchen
+CROSSOVER.ink2 = CROSSOVER.line = CROSSOVER[CARD_WITH];
+
+/** Kaertchen: bis zum Sprung nur leicht abgedunkelt, danach Nachtkarte mit leichtem Resttag. */
+function cardAt(t) {
+  const c = CROSSOVER[CARD_WITH];
+  return t < c ? mix(DAY.card, NIGHT.card, t * 0.3) : mix(NIGHT.card, DAY.card, (1 - t) * 0.25);
+}
 
 /** Spaetes Umspringen einer Farbe: 0 = Tagfarbe, 1 = Nachtfarbe. */
 export function lateFactor(t, key = 'ink') {
@@ -90,6 +102,7 @@ export function lerpTheme(day, night, t) {
     else if (typeof a === 'number' && typeof b === 'number') out[k] = a + (b - a) * t;
     else out[k] = t < 0.5 ? a : b;
   }
+  if (day === DAY && night === NIGHT) out.card = cardAt(t);
   const dusk = Math.sin(Math.PI * t);
   for (const [k, [c, w]] of Object.entries(DUSK)) out[k] = mix(out[k], c, dusk * w);
   out.darkness = t;

@@ -55,11 +55,14 @@ export async function mount(root, params) {
   applyTheme(themeAt(darkness));
 
   // Kamera: Desktop zeigt das ganze Blatt, Handy startet auf der eigenen Stellung
-  const cam = createCamera({ bounds: sheetBounds(map), maxZoom: 110 });
+  // Breite Ansicht: unter dem Blatt Platz fuer Infokarte und Knoepfe lassen, damit sie Massstab und Legende nicht verdecken
+  const sheet = sheetBounds(map);
+  const boundsFor = (w) => ({ ...sheet, h: sheet.h + (w >= 700 ? 4.5 : 0) });
   const vw = root.clientWidth, vh = root.clientHeight;
+  const cam = createCamera({ bounds: boundsFor(vw), maxZoom: 110 });
   resizeCamera(cam, vw, vh);
   // Hochkant: Blatt fuellt die Hoehe, Ausschnitt liegt auf der eigenen Stellung und dem Niemandsland
-  if (vw < 700) centerOn(cam, map.width * 0.55, map.height * 0.5, Math.max(fitZoom(cam), vw / 24, vh / cam.bounds.h));
+  if (vw < 700) centerOn(cam, map.width * 0.55, map.height * 0.5, Math.max(fitZoom(cam), vw / 24, vh / sheet.h));
   if (params.has('zoom') || params.has('x') || params.has('y')) {
     centerOn(cam, num(params.get('x'), cam.x), num(params.get('y'), cam.y), num(params.get('zoom'), cam.zoom));
   }
@@ -72,6 +75,7 @@ export async function mount(root, params) {
   function resize() {
     dpr = Math.min(2, window.devicePixelRatio || 1);
     const w = root.clientWidth, h = root.clientHeight;
+    cam.bounds = boundsFor(w);
     resizeCamera(cam, w, h);
     layer.resize(w, h, dpr);
     dynCv.width = Math.round(w * dpr);
