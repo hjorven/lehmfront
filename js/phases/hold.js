@@ -66,6 +66,7 @@ registerPhase({
         implicit: o.implicit === true,
         holdTurns: g.holdTurns,
         minor: true,
+        secret: true,
         reason: holdReason(ctx.rng, g, o.implicit === true, ctx.kind),
         at: g.pos,
       });

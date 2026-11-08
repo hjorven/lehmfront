@@ -2,7 +2,8 @@
 //
 // Eine Phase: { id, kind: 'position'|'battle'|'both', order, run(ctx) }
 //   order: Zahl (gilt fuer beide Rundenarten) oder { position: Zahl, battle: Zahl } bei kind 'both'.
-//   Gleiche order-Zahl: Reihenfolge nach id. Neue Phase anmelden: Datei js/phases/<name>.js anlegen,
+//   Gleiche order-Zahl: Reihenfolge nach id. run(ctx) veraendert ctx.state direkt (eine Kopie, die resolve.js
+//   anlegt), meldet Ereignisse mit ctx.emit(type, { reason, at, ... }) und wuerfelt nur mit ctx.rng. Neue Phase anmelden: Datei js/phases/<name>.js anlegen,
 //   darin registerPhase(...) aufrufen und eine Import-Zeile in js/phases/index.js ergaenzen.
 //
 // Vorgegebene Reihenfolge (Plan 10.6). Abstaende von 10 lassen Platz fuer Zwischenphasen.
@@ -17,7 +18,9 @@ export const ORDER = {
     supply: 70,      // 7 Loren fahren, Verwundete zurueck, Vorraete
     morale: 80,      // 8 Moral, Erschoepfung, Heilung, Erfahrungsberichte
     attack: 90,      // 9 Angriff angesetzt? turnKind = 'battle', Feuerplaene scharf
-    clock: 100,      // Uhr weiterstellen (12 Stunden), Tag und Nacht
+    clock: 100,      // Uhr weiterstellen (12 Stunden), Tag und Nacht. ctx.kind bleibt die Art der laufenden
+                     //   Runde: setzt attack turnKind auf 'battle', laufen die 12 Stunden trotzdem noch ab,
+                     //   das Gefecht beginnt also am Ende dieser Stellungsrunde.
   },
   battle: {
     orders: 10,      // 1 Befehle einsammeln
@@ -27,7 +30,7 @@ export const ORDER = {
     fire: 50,        // 5 Feuer nach der Bewegung, Unterdrueckung
     melee: 60,       // 6 Nahkampf Feld fuer Feld
     morale: 70,      // 7 Unterdrueckung klingt ab, Moralproben
-    end: 80,         // 8 Angriff zu Ende? turnKind = 'position'
+    end: 80,         // 8 Angriff zu Ende? turnKind = 'position' (ctx.state.battle auf null setzen)
     clock: 100,      // Uhr weiterstellen (5 Minuten)
   },
 };

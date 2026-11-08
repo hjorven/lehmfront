@@ -46,7 +46,7 @@ test('Phasen laufen in der Reihenfolge aus Plan 10.6, gleiche Zahl nach id', () 
   assert.deepEqual(phasesFor('position', list).map((p) => p.id), ['tick', 'weather', 'artillery', 'works-a', 'works-b', 'morale']);
   assert.deepEqual(phasesFor('battle', list).map((p) => p.id), ['artillery', 'fire', 'tick']);
 
-  resolveTurn(fresh(), [], [], 1, 1, { phases: list });
+  resolveTurn(fresh(1), [], [], 1, 1, { phases: list });
   assert.deepEqual(seen, ['tick', 'weather', 'artillery', 'works-a', 'works-b', 'morale']);
 });
 
@@ -64,17 +64,17 @@ test('Register: angemeldete Phase laeuft im Standardablauf, Fehler werden benann
     assert.throws(() => registerPhase({ id: 'test-probe', kind: 'position', order: 1, run() {} }), /schon/);
     assert.throws(() => registerPhase({ id: 'x', kind: 'immer', order: 1, run() {} }), /kind/);
     assert.throws(() => registerPhase({ id: 'y', kind: 'both', order: { position: 1 }, run() {} }), /battle/);
-    resolveTurn(fresh(), [], [], 1, 1);
+    resolveTurn(fresh(1), [], [], 1, 1);
     assert.deepEqual(ran, ['position']);
   } finally {
     unregisterPhase('test-probe');
   }
   const boom = { id: 'boom', kind: 'position', order: 1, run() { throw new Error('kaputt'); } };
-  assert.throws(() => resolveTurn(fresh(), [], [], 1, 1, { phases: [boom] }), /Phase boom: kaputt/);
+  assert.throws(() => resolveTurn(fresh(1), [], [], 1, 1, { phases: [boom] }), /Phase boom: kaputt/);
 });
 
 test('Gefechtsrunde nutzt Gefechtsphasen und die 5-Minuten-Uhr', () => {
-  const s = fresh();
+  const s = fresh(9);
   const b = { ...structuredClone(s), turnKind: 'battle', battle: { round: 0, attacker: 'a' } };
   const r = resolveTurn(b, [{ group: 'a01', type: 'dig', path: [{ x: 1, y: 1 }] }], [], 9, 1);
   assert.equal(r.state.clock.hour, 6);
@@ -85,7 +85,7 @@ test('Gefechtsrunde nutzt Gefechtsphasen und die 5-Minuten-Uhr', () => {
 });
 
 test('Stellungsrunden wechseln Tag und Nacht', () => {
-  let s = fresh();
+  let s = fresh(5);
   const kinds = [];
   for (let t = 1; t <= 4; t++) {
     const r = resolveTurn(s, [], [], 5, t);
@@ -97,15 +97,15 @@ test('Stellungsrunden wechseln Tag und Nacht', () => {
 });
 
 test('Protokoll: jedes Ereignis hat phase, type, reason und at', () => {
-  const r = resolveTurn(fresh(), [{ group: 'a01', type: 'fliegen' }], [{ group: 'a02', type: 'hold' }], 3, 1);
+  const r = resolveTurn(fresh(3), [{ group: 'a01', type: 'fliegen' }], [{ group: 'a02', type: 'hold' }], 3, 1);
   assert.ok(r.log.length > 0);
   for (const e of r.log) assert.ok(isValidEvent(e), JSON.stringify(e));
   const emit = { id: 'leer', kind: 'position', order: 1, run: (ctx) => ctx.emit('x', { reason: 'ohne Ort' }) };
-  assert.throws(() => resolveTurn(fresh(), [], [], 1, 1, { phases: [emit] }), /Pflichtfeld "at"/);
+  assert.throws(() => resolveTurn(fresh(1), [], [], 1, 1, { phases: [emit] }), /Pflichtfeld "at"/);
 });
 
 test('Halten zaehlt durch, Bewegung setzt zurueck, Begruendungen nennen den Gruppenfuehrer', () => {
-  let s = fresh();
+  let s = fresh(1);
   for (let t = 1; t <= 5; t++) s = resolveTurn(s, [], [], 1, t).state;
   const a01 = s.groups.find((g) => g.id === 'a01');
   assert.equal(a01.holdTurns, 5);
@@ -121,14 +121,20 @@ test('Halten zaehlt durch, Bewegung setzt zurueck, Begruendungen nennen den Grup
 
 test('Partie-Ende ueber ctx.finish, danach keine weitere Runde', () => {
   const end = { id: 'ende', kind: 'position', order: 1, run: (ctx) => ctx.finish({ winner: 'b', reason: 'Abschnitt gefallen' }) };
-  const r = resolveTurn(fresh(), [], [], 1, 1, { phases: [end] });
+  const r = resolveTurn(fresh(1), [], [], 1, 1, { phases: [end] });
   assert.equal(r.finished, true);
   assert.deepEqual(r.state.result, { winner: 'b', reason: 'Abschnitt gefallen', turn: 1 });
   assert.throws(() => resolveTurn(r.state, [], [], 1, 2), /beendet/);
 });
 
-test('Falsche Rundennummer wird abgelehnt', () => {
-  assert.throws(() => resolveTurn(fresh(), [], [], 1, 3), /passt nicht/);
+test('Falsche Rundennummer oder fremder Seed werden abgelehnt', () => {
+  assert.throws(() => resolveTurn(fresh(), [], [], 42, 3), /Runde 3 passt nicht/);
+  assert.throws(() => resolveTurn(fresh(), [], [], 1, 1), /Seed 1 passt nicht/);
+});
+
+test('finish ohne Begruendung wird abgelehnt', () => {
+  const end = { id: 'ende', kind: 'position', order: 1, run: (ctx) => ctx.finish({ winner: 'a' }) };
+  assert.throws(() => resolveTurn(fresh(42), [], [], 42, 1, { phases: [end] }), /Begruendung/);
 });
 
 test('Jede Phase hat eigenen Zufall: eine neue Phase verschiebt die Wuerfe anderer nicht', () => {
@@ -136,7 +142,7 @@ test('Jede Phase hat eigenen Zufall: eine neue Phase verschiebt die Wuerfe ander
     const out = [];
     const a = { id: 'wuerfel', kind: 'position', order: 50, run: (ctx) => out.push(ctx.rng(), ctx.rng()) };
     const b = { id: 'neu', kind: 'position', order: 10, run: (ctx) => { ctx.rng(); ctx.rng(); ctx.rng(); } };
-    resolveTurn(fresh(), [], [], 77, 1, { phases: extra ? [a, b] : [a] });
+    resolveTurn(fresh(77), [], [], 77, 1, { phases: extra ? [a, b] : [a] });
     return out;
   };
   assert.deepEqual(draws(false), draws(true));

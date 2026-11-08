@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { normalizeOrders, validateOrder, registerOrderValidator, sortOrders } from '../js/orders.js';
+import { normalizeOrders, validateOrder, registerOrderValidator, unregisterOrderValidator, sortOrders } from '../js/orders.js';
 import { resolveTurn } from '../js/resolve.js';
 import { createInitialState } from '../js/state.js';
 import { MAP, SCENARIO } from './fixtures/scenario.js';
@@ -71,4 +71,31 @@ test('Ungueltiger Befehl landet im Rundenprotokoll und die Gruppe haelt', () => 
   assert.equal(inv[0].phase, 'orders');
   assert.equal(r.log.find((e) => e.type === 'hold' && e.group === 'a01').implicit, false);
   assert.equal(r.state.groups[0].holdTurns, 1);
+});
+
+test('Befehlsnamen aus dem Objekt-Prototyp sind unbekannt', () => {
+  assert.match(validateOrder({ group: 'a01', type: 'toString' }, s, 'a'), /unbekannter Befehl/);
+  assert.throws(() => registerOrderValidator('constructor', () => null), /Unbekannte/);
+});
+
+test('Ein ungueltiger erster Befehl blockiert einen gueltigen zweiten nicht', () => {
+  const { orders, events } = normalizeOrders(s, 'a', [
+    { group: 'a01', type: 'fliegen' },
+    { group: 'a01', type: 'dig', path: [{ x: 4, y: 2 }] },
+  ]);
+  assert.equal(orders[0].type, 'dig');
+  assert.equal(events.length, 1);
+});
+
+test('Eine werfende Pruefung bricht die Runde nicht ab', () => {
+  const bad = () => { throw new Error('Karte fehlt'); };
+  registerOrderValidator('wire', bad);
+  try {
+    const { orders, events } = normalizeOrders(s, 'a', [{ group: 'a01', type: 'wire', path: [{ x: 4, y: 2 }] }]);
+    assert.equal(orders[0].type, 'hold');
+    assert.match(events[0].reason, /Prüfung fehlgeschlagen: Karte fehlt/);
+  } finally {
+    unregisterOrderValidator('wire', bad);
+  }
+  assert.equal(validateOrder({ group: 'a01', type: 'wire', path: [{ x: 4, y: 2 }] }, s, 'a'), null);
 });

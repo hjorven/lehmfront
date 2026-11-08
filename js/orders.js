@@ -15,9 +15,15 @@ const validators = new Map();
  * fn(order, group, state, env) -> null wenn gueltig, sonst deutscher Grund als Text.
  */
 export function registerOrderValidator(type, fn) {
-  if (!ORDER_TYPES[type]) throw new Error('Unbekannte Befehlsart: ' + type);
+  if (!Object.hasOwn(ORDER_TYPES, type)) throw new Error('Unbekannte Befehlsart: ' + type);
   if (!validators.has(type)) validators.set(type, []);
   validators.get(type).push(fn);
+}
+
+/** Pruefung wieder abmelden (Tests) */
+export function unregisterOrderValidator(type, fn) {
+  const list = validators.get(type);
+  if (list) validators.set(type, list.filter((f) => f !== fn));
 }
 
 export function holdOrder(groupId, implicit = false) {
@@ -39,7 +45,7 @@ export function validateOrder(order, state, side, env = {}) {
   if (!g) return `Gruppe ${order.group} gibt es nicht`;
   if (g.side !== side) return `Gruppe ${order.group} gehört nicht zur eigenen Seite`;
   if (g.status === 'lost') return `Gruppe ${order.group} ist aufgerieben`;
-  const t = ORDER_TYPES[order.type];
+  const t = Object.hasOwn(ORDER_TYPES, order.type) ? ORDER_TYPES[order.type] : null;
   if (!t) return `unbekannter Befehl "${order.type}"`;
   if (t.kind !== 'both' && t.kind !== state.turnKind) {
     return state.turnKind === 'battle'
@@ -54,7 +60,12 @@ export function validateOrder(order, state, side, env = {}) {
     for (const p of order.path) if (!inBounds(state.map, p)) return `${t.label}: Weg führt aus der Karte`;
   }
   for (const fn of validators.get(order.type) ?? []) {
-    const why = fn(order, g, state, env);
+    let why;
+    try {
+      why = fn(order, g, state, env);
+    } catch (err) {
+      why = 'Prüfung fehlgeschlagen: ' + err.message;
+    }
     if (why) return why;
   }
   return null;
@@ -63,7 +74,7 @@ export function validateOrder(order, state, side, env = {}) {
 /**
  * Befehlsliste einer Seite fuer die Aufloesung aufbereiten:
  * - ungueltige Befehle werden zu Halten, mit Ereignis und Begruendung
- * - doppelte Befehle fuer dieselbe Gruppe: der erste gilt, weitere werden verworfen
+ * - doppelte Befehle fuer dieselbe Gruppe: der erste gueltige gilt, weitere werden verworfen
  * - einsatzfaehige Gruppen ohne Befehl bekommen Halten (implicit: true)
  * - Ergebnis nach Gruppen-ID sortiert
  * Liefert { orders, events }.
@@ -75,7 +86,7 @@ export function normalizeOrders(state, side, orders, env = {}) {
   const reject = (order, why, g) => {
     const at = g?.pos ?? { x: 0, y: 0 };
     events.push(makeEvent({
-      phase: 'orders', type: 'order_invalid', side, group: g?.id ?? null, order: order?.type ?? null,
+      phase: 'orders', type: 'order_invalid', side, secret: true, group: g?.id ?? null, order: order?.type ?? null,
       reason: g ? `Befehl für ${g.leader.name} nicht ausführbar: ${why}. Gruppe hält.` : `Befehl verworfen: ${why}`,
       at,
     }));
@@ -92,13 +103,13 @@ export function normalizeOrders(state, side, orders, env = {}) {
     const why = validateOrder(order, state, side, env);
     const g = order && typeof order.group === 'string' ? getGroup(state, order.group) : null;
     const own = g && g.side === side && g.status !== 'lost';
-    if (own && byGroup.has(g.id)) {
+    if (own && byGroup.has(g.id) && !byGroup.get(g.id).replaced) {
       reject(order, 'die Gruppe hat schon einen Befehl', g);
       continue;
     }
     if (why) {
       reject(order, why, own ? g : null);
-      if (own) byGroup.set(g.id, { ...holdOrder(g.id), replaced: order.type ?? null });
+      if (own && !byGroup.has(g.id)) byGroup.set(g.id, { ...holdOrder(g.id), replaced: String(order.type ?? '') });
       continue;
     }
     byGroup.set(g.id, structuredClone(order));

@@ -17,7 +17,9 @@ export const MIGRATIONS = [
     to: 2,
     // v1 (Plan v1): round statt turn, isDay statt night, groups als Objekt nach ID, kein cells/fallen
     migrate(s) {
+      if (!s.map || !(s.map.width > 0) || !(s.map.height > 0)) throw new Error('Alter Spielstand ohne Karte, nicht ladbar');
       const out = { ...s };
+      out.turnKind = s.turnKind ?? 'position';
       out.turn = s.turn ?? s.round ?? 1;
       delete out.round;
       out.night = s.night ?? (s.isDay === undefined ? false : !s.isDay);
@@ -29,6 +31,7 @@ export const MIGRATIONS = [
         experience: 1, fatigue: 0, morale: 70, suppressed: 0, size: g.strength ?? 1,
         facing: g.side === 'b' ? 'w' : 'e', status: 'front', inDugout: false, holdTurns: 0,
         ...g,
+        leader: g.leader ?? { name: 'Unbekannt ' + g.id, home: 'unbekannt' },
       })).sort(byId);
       // v1 kannte keine Uhr: aus Runde und Tag/Nacht ableiten (Runde 1 = Tag 1 morgens)
       out.clock = s.clock ?? { day: Math.floor((out.turn - 1) / 2) + 1, hour: out.night ? 18 : 6, minute: 0 };
@@ -36,7 +39,9 @@ export const MIGRATIONS = [
       out.scenario = s.scenario ?? { id: 'frei', name: '' };
       out.seed = (s.seed ?? 0) >>> 0;
       for (const side of ['a', 'b']) {
-        out.sides = { ...out.sides, [side]: { reputation: 50, trust: 50, control: 'human', ...(s.sides?.[side] ?? {}) } };
+        const old = s.sides?.[side] ?? {};
+        if (!old.faction) throw new Error(`Alter Spielstand ohne Fraktion fuer Seite ${side}, nicht ladbar`);
+        out.sides = { ...out.sides, [side]: { reputation: 50, trust: 50, control: 'human', ...old, supplies: { ammo: 0, food: 0, material: 0, ...(old.supplies ?? {}) } } };
       }
       out.cells = s.cells ?? {};
       out.fallen = s.fallen ?? [];

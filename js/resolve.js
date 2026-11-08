@@ -32,11 +32,14 @@ export function rngForPhase(seed, turn, phaseId) {
  * state: Zustand vor der Runde (wird nie veraendert)
  * ordersA, ordersB: Befehlslisten der Seiten a und b (siehe js/orders.js)
  * seed: Partie-Seed, turn: Nummer der Runde (muss state.turn sein)
- * env: optional { map, phases }. map = geladene Karte fuer Gelaende-Abfragen, phases = eigene Phasenliste (Tests)
+ * env: optional { map, phases }. map = geladene Karte fuer Gelaende-Abfragen, phases = eigene Phasenliste (Tests).
+ *   env und map werden nicht kopiert: Phasen und Befehlspruefungen duerfen sie nur lesen.
+ *   Was sich im Spiel aendert (Graben, Krater, Draht), gehoert in state.cells, nie in die Karte.
  * Liefert { state, log, finished }.
  */
 export function resolveTurn(state, ordersA, ordersB, seed, turn, env = {}) {
   if (state.result) throw new Error('Die Partie ist bereits beendet');
+  if (seed >>> 0 !== state.seed >>> 0) throw new Error(`Seed ${seed} passt nicht zum Zustand (Seed ${state.seed})`);
   if (turn !== state.turn) throw new Error(`Runde ${turn} passt nicht zum Zustand (Runde ${state.turn})`);
 
   const draft = structuredClone(state);
@@ -73,6 +76,7 @@ export function resolveTurn(state, ordersA, ordersB, seed, turn, env = {}) {
         return e;
       },
       finish: (result) => {
+        if (typeof result?.reason !== 'string' || !result.reason) throw new Error('finish braucht eine deutsche Begruendung (reason)');
         if (!draft.result) draft.result = { winner: result.winner ?? null, reason: result.reason, turn };
       },
     };
@@ -85,5 +89,5 @@ export function resolveTurn(state, ordersA, ordersB, seed, turn, env = {}) {
   }
 
   draft.turn = turn + 1;
-  return { state: draft, log, finished: draft.result !== null };
+  return { state: draft, log, finished: draft.result != null };
 }

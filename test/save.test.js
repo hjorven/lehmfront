@@ -103,3 +103,16 @@ test('Ohne Browser-Speicher faellt die Ablage auf RAM zurueck', async () => {
   const store = createSaveStore();
   assert.equal(await store.backendName(), 'memory');
 });
+
+test('Minimaler v1-Stand wird spielbar migriert, Stand ohne Karte abgelehnt', () => {
+  const min = { version: 1, seed: 3, map: { id: 'm', width: 10, height: 10 }, round: 1, isDay: true,
+    sides: { a: { faction: 'kaldern' }, b: { faction: 'morrow' } },
+    groups: { a01: { side: 'a', type: 'rifles', strength: 5, pos: { x: 1, y: 1 } } } };
+  const s = migrate(min);
+  assert.equal(s.turnKind, 'position');
+  assert.ok(s.groups[0].leader.name);
+  assert.equal(s.sides.b.supplies.ammo, 0);
+  const r = resolveTurn(s, [{ group: 'a01', type: 'dig', path: [{ x: 2, y: 1 }] }], [], 3, 1);
+  assert.equal(r.state.turn, 2);
+  assert.throws(() => migrate({ ...min, map: undefined }), /ohne Karte/);
+});

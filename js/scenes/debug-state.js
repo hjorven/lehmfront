@@ -60,7 +60,7 @@ export async function mount(root, params) {
     const ordersA = state.turnKind === 'position'
       ? [t % 2 ? { group: 'a04', type: 'dig', path: [{ x: 5, y: 11 }, { x: 6, y: 11 }] } : { group: 'a01', type: 'assault', path: [{ x: 9, y: 3 }] }]
       : [{ group: 'a01', type: 'move', path: [{ x: 7, y: 3 }] }];
-    const r = resolveTurn(state, ordersA, [], seed, t);
+    const r = resolveTurn(state, ordersA, [], state.seed, t);
     state = r.state;
     log = r.log;
   };
@@ -77,10 +77,11 @@ export async function mount(root, params) {
     const c = state.clock;
     const exported = exportSave(state, { name: 'Debug' });
     const check = inspectSave(exported);
+    const STAMP = { ok: 'GEPRÜFT ' + JSON.parse(exported).stamp, fehlt: 'OHNE STEMPEL', beschaedigt: 'BESCHÄDIGT' };
 
     out.replaceChildren(
       el('h1', {}, 'Lagezustand, Prüfstand'),
-      el('p', { class: 'sub' }, `Sicht: ${side ? 'Seite ' + side + ' (' + faction(state.sides[side].faction).short + ')' : 'ungefiltert'} · Seed ${seed} · ${note || 'bereit'}`),
+      el('p', { class: 'sub' }, `Sicht: ${side ? 'Seite ' + side + ' (' + faction(state.sides[side].faction).short + ')' : 'ungefiltert'} · Seed ${state.seed} · ${note || 'bereit'}`),
       el('div', { class: 'dbg-bar' },
         el('button', { type: 'button', onclick: () => { if (!state.result) run(); render('Runde ausgeführt'); } }, 'Runde ausführen'),
         el('button', { type: 'button', onclick: async () => { await store.save('debug', state, { name: 'Debug' }); render('gespeichert in ' + (await store.backendName())); } }, 'Speichern'),
@@ -134,9 +135,9 @@ export async function mount(root, params) {
           el('p', {}, Object.values(ORDER_TYPES).filter((t) => t.kind === 'both' || t.kind === state.turnKind).map((t) => t.label).join(' · ')),
         ),
       ),
-      el('h2', {}, 'Spielstand (Export)'),
+      el('h2', {}, side ? `Sicht Seite ${side} (JSON), Stempel gilt dem vollen Spielstand` : 'Spielstand (Export)'),
       el('div', { class: 'dbg-stamp' },
-        el('span', { class: 'stamp' + (check.stamp === 'ok' ? ' ok' : '') }, check.stamp === 'ok' ? 'GEPRÜFT ' + JSON.parse(exported).stamp : 'BESCHÄDIGT'),
+        el('span', { class: 'stamp' + (check.stamp === 'ok' ? ' ok' : '') }, STAMP[check.stamp]),
         el('pre', {}, JSON.stringify(side ? viewFor(state, log, side) : state, null, 1)),
       ),
     );

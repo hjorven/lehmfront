@@ -27,12 +27,13 @@ export function seesPoint(state, side, p) {
 const DEFAULT_RULES = {
   groupVisible: (state, side, group) => seesPoint(state, side, group.pos),
   cellVisible: () => true,
-  // Ereignisse mit side: nur diese Seite, ausser der Ort ist fuer die andere sichtbar und nicht secret.
+  // Ereignisse mit side: nur diese Seite. Ausnahme: public: true und der Ort ist fuer die andere Seite sichtbar
+  // (z. B. Einschlag, Sturm). Befehle, Namen und Halten bleiben so beim Gegner verborgen.
   // Ereignisse ohne side (Wetter, Uhr): beide Seiten.
   eventVisible: (state, side, e) => {
     if (e.side === undefined || e.side === null) return true;
     if (e.side === side) return true;
-    return !e.secret && seesPoint(state, side, e.at);
+    return e.public === true && seesPoint(state, side, e.at);
   },
 };
 

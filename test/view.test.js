@@ -35,13 +35,22 @@ test('Nachts sieht man weniger weit', () => {
 test('Protokoll: fremde Ereignisse nur, wenn sichtbar; allgemeine fuer beide', () => {
   const s = createInitialState(MAP, SCENARIO, 1);
   const log = [
-    makeEvent({ phase: 'x', type: 'a', side: 'b', reason: 'fern', at: { x: 20, y: 2 } }),
-    makeEvent({ phase: 'x', type: 'a', side: 'b', reason: 'nah', at: { x: 5, y: 2 } }),
-    makeEvent({ phase: 'x', type: 'a', side: 'b', reason: 'geheim', secret: true, at: { x: 5, y: 2 } }),
+    makeEvent({ phase: 'x', type: 'a', side: 'b', public: true, reason: 'fern', at: { x: 20, y: 2 } }),
+    makeEvent({ phase: 'x', type: 'a', side: 'b', public: true, reason: 'nah', at: { x: 5, y: 2 } }),
+    makeEvent({ phase: 'x', type: 'a', side: 'b', reason: 'intern', at: { x: 5, y: 2 } }),
     makeEvent({ phase: 'clock', type: 'nightfall', reason: 'dunkel', at: { x: 12, y: 6 } }),
   ];
   assert.deepEqual(viewFor(s, log, 'a').log.map((e) => e.reason), ['nah', 'dunkel']);
   assert.equal(viewFor(s, log, 'b').log.length, 4);
+});
+
+test('Befehle und Halten des Gegners bleiben verborgen, auch direkt nebenan', () => {
+  const s = createInitialState(MAP, SCENARIO, 1);
+  s.groups.find((g) => g.id === 'b01').pos = { x: 4, y: 2 };
+  const r = resolveTurn(s, [{ group: 'a01', type: 'dig', path: [{ x: 99, y: 2 }] }, { group: 'b01', type: 'hold' }], [], 1, 1);
+  const v = viewFor(r.state, r.log, 'b');
+  assert.ok(v.groups.some((g) => g.id === 'a01'));
+  assert.ok(v.log.every((e) => e.side !== 'a'), JSON.stringify(v.log));
 });
 
 test('Sichtregel ist austauschbar', () => {
