@@ -47,7 +47,7 @@
       "fraktion": "morrow",
       "titel": "DIE SCHICHT GEHT WEITER",
       "unterzeile": "Wer jetzt in Schacht Drei einfährt, fährt für die Krone.",
-      "text": "Die Kumpel von Ravelsk haben Schacht Drei nicht vergessen. Viele von uns haben dort gearbeitet, neben Männern von drüben, die unsere Sprache sprechen und wir die ihre. ███████████████████████ ███████████████. Wir hoffen, dass sie wiederkommen und dass der Förderturm dann wieder Kohle fördert und nicht ████████.\n\nDie Bergmannskasse zahlt weiterhin an alle Familien, deren Männer eingezogen sind.",
+      "text": "Die Kumpel von Ravelsk haben Schacht Drei nicht vergessen. Viele von uns haben dort gearbeitet, neben Männern von drüben, die unsere Sprache sprechen und wir die ihre. [[Wir haben keinen Streit mit ihnen.]] Wir hoffen, dass sie wiederkommen und dass der Förderturm dann wieder Kohle fördert und nicht [[Granaten]].\n\nDie Bergmannskasse zahlt weiterhin an alle Familien, deren Männer eingezogen sind.",
       "randnotiz": "Erbeutet. Die schwarzen Balken sind von der Zensur drüben. Ein Gefangener aus Ravelsk sagt, darunter stand: „Wir haben keinen Streit mit ihnen.“ H. d. G."
     },
     {
@@ -99,7 +99,7 @@
       "fraktion": "morrow",
       "titel": "NAMEN",
       "unterzeile": "Die Bergmannskasse bittet um Nachsicht: Die Liste ist länger als erwartet.",
-      "text": "Folgende Kumpel aus Ravelsk kehren nicht zurück: ██████████, ███████, ████████████, █████████, ██████, ████████████ und █████████████████████████████████.\n\nDie Zensurstelle in Velsk hat die Namen gestrichen, bis die Angehörigen benachrichtigt sind. Die Angehörigen wissen es schon. Sie wohnen in derselben Gasse.",
+      "text": "Folgende Kumpel aus Ravelsk kehren nicht zurück: [[Vytas Berzin]], [[Arvid Vilks]], [[Kazys Vaitkus]], [[Tomas Lenart]], [[Dainis Sorek]], [[Jurgis Mirek]] und [[ein Junge aus der Grubengasse, dessen Vornamen nur seine Mutter benutzt hat]].\n\nDie Zensurstelle in Velsk hat die Namen gestrichen, bis die Angehörigen benachrichtigt sind. Die Angehörigen wissen es schon. Sie wohnen in derselben Gasse.",
       "randnotiz": "Arvo hat die Zeitung gesehen und ist hinausgegangen. Selin sagt, er kennt alle Namen, auch die geschwärzten. H. d. G."
     },
     {
@@ -151,7 +151,7 @@
       "fraktion": "morrow",
       "titel": "WINTER IN RAVELSK",
       "unterzeile": "Die Kohle geht an die Front. Die Gasse friert.",
-      "text": "Alle Kohle aus den Ravelsker Schächten geht in diesem Winter an die Gießereien und die Bahn. Für die Familien der Bergleute bleibt ███████████. Die Bergmannskasse hat Holz bestellt. Es ist nicht gekommen.\n\nDer Pfarrer von Ravelsk bittet darum, die Kinder in der Kirche schlafen zu lassen, solange die Glocke noch hängt.",
+      "text": "Alle Kohle aus den Ravelsker Schächten geht in diesem Winter an die Gießereien und die Bahn. Für die Familien der Bergleute bleibt [[nichts]]. Die Bergmannskasse hat Holz bestellt. Es ist nicht gekommen.\n\nDer Pfarrer von Ravelsk bittet darum, die Kinder in der Kirche schlafen zu lassen, solange die Glocke noch hängt.",
       "randnotiz": "Arvo hat gefragt, ob er die Zeitung behalten darf. Selin hat ja gesagt. H. d. G."
     },
     {
@@ -201,10 +201,10 @@
       "nach": "a3m6",
       "zeitung": "Ravelsker Grubenblatt",
       "fraktion": "morrow",
-      "titel": "███████████████",
-      "unterzeile": "████████ ██████ ███ ███████ ████████████.",
-      "text": "███████████████████ ████████ ███ ██████████████ ███████████ ████ ███████████. ██████████████████ ██████ ███████████ █████████ ██ ███ █████████████ ███████████████.\n\nDie Bergmannskasse zahlt weiter.",
-      "randnotiz": "Die ganze Seite geschwärzt bis auf die letzte Zeile. Arvo sagt, das sei die ehrlichste Ausgabe, die das Grubenblatt je gedruckt hat. H. d. G."
+      "titel": "[[DIE GRUBE STREIKT]]",
+      "unterzeile": "[[Bergleute fordern Kohle für die Gasse und Frieden im Lehmgau.]]",
+      "text": "[[Seit Montag fährt in Ravelsk keine Schicht mehr ein. Die Kumpel fordern, dass ein Teil der Kohle in der Gasse bleibt.]] [[Und sie fordern, dass niemand mehr aus Ravelsk an die Asse geht, um gegen Männer zu schießen, mit denen er unter Tage gearbeitet hat.]]\n\nDie Bergmannskasse zahlt weiter.",
+      "randnotiz": "Die ganze Seite geschwärzt bis auf die letzte Zeile. Arvo hat sie gegen das Licht gehalten und gesagt, er wisse auch so, was darunter steht. H. d. G."
     }
   ]
 }

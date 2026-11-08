@@ -276,8 +276,9 @@ in jedem regulären Ende.
 Schlusssequenz). Pro Zwischenspiel vier Zeitungen, zwei je Fraktion (Zeitungen aus `welt.md`).
 `randnotiz` ist eine Bleistiftnotiz am Rand, von der Front: Kalderner Leser unterschreiben mit Initialen,
 erbeutete Morrow-Zeitungen tragen den Vermerk von Leutnant de Groot. Die Randnotiz wird in Caveat schräg
-über den Satzspiegel gelegt. Zensurlücken im Ravelsker Grubenblatt sind als `█` (U+2588) geschrieben und
-werden als schwarze Balken gedruckt.
+über den Satzspiegel gelegt. Zensurlücken im Ravelsker Grubenblatt stehen wie in der Papierebene (Z1) in
+`[[doppelten eckigen Klammern]]`: Der Text darin wird als schwarzer Balken gedruckt und nicht angezeigt.
+Er steht trotzdem in den Daten, damit die Balken die richtige Länge haben.
 
 ### Fundstücke (`fundstuecke.json`)
 

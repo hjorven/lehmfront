@@ -31,6 +31,12 @@ Jeder Thread traegt hier nach dem Merge ein, was fertig ist und was offen bleibt
   - `data/letters/templates.json`: 48 Feldpost-Vorlagen (16 je Tonlage), 43 Ereignis-Saetze in 18 Kategorien, 11 Anreden.
   - `data/texts/berichte.json`: 20 Erfahrungsberichte mit Ausloeser, Zaehler-Vorschlag und Wirkung. `data/texts/tutorial.json`: 19 Tutorial-Hinweise fuer Akt 1 als Bleistiftnotizen der Figuren.
   - `test/texts.test.js` prueft alle Text-Dateien automatisch (auch die von T2).
+- T2 Texte Akt 3 und 4, Enden, Zeitungen, Fundstuecke, Endlosmodus, Erfolge:
+  - `data/texts/akt3.json`, `akt4.json`: 12 Briefings, 12 Stabsbefehle, 7 Entscheidungen (Gas, Befehl 117, Waffenruhe, Selins Loren, Mine 214, Verweigerung der Truppe, Treffen mit Lask), Tagebuch mit Varianten nach Ausgang und Flags, Tagebuch direkt nach einer Entscheidung (`nach_entscheidung`).
+  - `data/letters/briefe-akt3-4.json`: Briefe 13 bis 24 mit Varianten (Harms/Vell gefallen, Entscheidungen), Lasks Briefe Akt 3 und 4 mit Vermerk.
+  - `data/texts/enden.json`: Auswahl des Endes (Slot `ende.wahl`, Grenzen 50/60, im Test fuer jede Wertekombination geprueft), vier Schlusssequenzen mit Gefallenenliste, vorzeitige Enden, Nachwort je Figur.
+  - `data/texts/zeitungen.json` (16 Seiten vor und zwischen den Akten, je zwei Zeitungen pro Fraktion, Randnotizen von der Front, Zensur als `[[...]]` wie in Z1), `fundstuecke.json` (24 Stuecke in 6 Ketten mit Abschluss), `endlos.json` (Wochenbefehle fuer beide Fraktionen, Wochenanfang, Jahreszeiten mit Wetter, Enden), `erfolge.json` (40, ohne Punkte und Orden).
+  - Neue Arten, Flags und Ablauf der Enden in `data/texts/README.md`, neue Orte und Figuren in `welt.md`.
 
 ### Für die nächsten Pakete (P03, P10)
 
@@ -40,6 +46,8 @@ Jeder Thread traegt hier nach dem Merge ein, was fertig ist und was offen bleibt
 - Tageszeit: `applyTheme(themeAt(darkness))`; Regeln lesen dieselbe Zahl über `visibilityFromDarkness`. `theme.flare` ist ab 0,5 wahr (Leuchtkugeln zeichnet P10).
 
 ## Offen und bekannte Macken
+
+- T2: Die Texte sind Daten; Einhaengen machen P14/P15 (Ablauf), P22 (Endlos), P24/P26 (Akt 3 und 4, Enden). Offen: Harms und Vell kommen in den Missionen von Akt 3 und 4 kaum vor (nur Briefe und a4m4); wer mag, ergaenzt Briefing-Varianten. Die Auslöser der Erfolge sind nur in Worten beschrieben, Zaehler legt P14 fest.
 
 - `data/names.json` wird per Import-Attribut (`with { type: 'json' }`) geladen: braucht Chrome 123+, Safari 17.2+, Firefox 138+. Falls aeltere Geraete wichtig werden, nur `js/config/names.js` auf fetch umstellen.
 - `resolveTurn` wirft, wenn `seed` oder `turn` nicht zum Zustand passen. Die Karte (`env.map`) wird nicht kopiert: Phasen duerfen sie nur lesen, Veraenderungen gehoeren in `state.cells`.
