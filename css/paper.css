@@ -1,0 +1,174 @@
+/* Papierebene (Plan 7.5): Blaetter ueber der Karte. Gedrucktes ist immer Stil 03, das Tagebuch Stil 06,
+   die Zeitung Stil 10, Aktkarten Stil 08 (Plan 7.7, 7.8). Alle Farben als Variablen auf .paper-layer,
+   nachts (data-light="night") liegt das Papier wie unter einer Lampe: gedaempft, Tinte bleibt dunkel. */
+
+.paper-layer{
+  --sheet-paper:#fbf7ec; --sheet-ink:#2a2420; --sheet-ink2:#5f5446; --sheet-rule:#3a332c; --sheet-shadow:rgba(40,30,10,.28);
+  --letter-paper:#f7f1e1; --letter-ink:#24324f; --letter-rule:rgba(36,50,79,.14); --letter-margin:rgba(163,39,31,.35);
+  --tele-paper:#f3efe3; --tele-border:#b9b2a2;
+  --stamp:#8b1a1a; --stamp-censor:#4b3b78; --censor:#16120f;
+  --diary-paper:#f6efe0; --diary-ink:#3f3226;
+  --wash-sky:#8fa8bc; --wash-earth:#b2925f; --wash-green:#7f9468; --wash-pencil:#4f463f;
+  --list-paper:#eee8d8; --hole:#2d2822;
+  --news-paper:#f2efe6; --news-ink:#1b1b1b;
+  --photo-frame:#f4efe4; --photo-back:#ece4d0; --photo-light:#d2b98f; --photo-mid:#8d7a5e; --photo-dark:#3b3024;
+  --lino-ground:#ebe0c6; --lino-ink:#151210; --lino-red:#b3261e;
+  --focus:#c99a1a;
+  position:absolute; inset:0; overflow:hidden; pointer-events:none; z-index:20;
+  perspective:1600px;
+}
+.paper-layer[data-light="night"]{
+  --sheet-paper:#d3c9b0; --letter-paper:#cfc4a6; --tele-paper:#cdc6b3; --tele-border:#8e8673; --diary-paper:#cec3aa;
+  --list-paper:#c8c0ab; --news-paper:#cbc6b8; --photo-frame:#cbc3b1; --photo-back:#c2b89f; --lino-ground:#c9bc9f;
+  --letter-rule:rgba(36,50,79,.18); --sheet-shadow:rgba(0,0,0,.7); --hole:#0b0d0a; --focus:#ffbf47;
+}
+
+/* ---------- Blatt, Lage, Kippen ---------- */
+.paper-sheet{
+  position:absolute; left:0; top:0; width:min(var(--w,300px), calc(100% - 24px));
+  pointer-events:auto; touch-action:none; user-select:none; -webkit-user-select:none; cursor:grab; outline:none;
+  transform-style:preserve-3d;
+  transform:translate3d(var(--x,0px),var(--y,0px),0) rotate(var(--rot,0deg))
+    rotateX(calc(var(--rx,0deg) + var(--srx,0deg))) rotateY(calc(var(--ry,0deg) + var(--sry,0deg))) translateZ(var(--lift,0px));
+  transition:transform .28s cubic-bezier(.2,.7,.3,1), opacity .4s;
+  color:var(--sheet-ink);
+}
+.paper-sheet.is-front{--lift:14px}
+.paper-sheet.is-dragging{--lift:26px; cursor:grabbing; transition:opacity .4s}
+.paper-inner{position:relative; transform-style:preserve-3d; transition:transform .55s cubic-bezier(.4,.1,.2,1)}
+.paper-inner.is-flipped{transform:rotateY(180deg)}
+.paper-face{position:relative; background:var(--face,var(--sheet-paper)); box-shadow:0 6px 16px var(--sheet-shadow); backface-visibility:hidden; -webkit-backface-visibility:hidden}
+.paper-sheet.is-front .paper-face{box-shadow:0 16px 34px var(--sheet-shadow)}
+.paper-sheet.is-dragging .paper-face{box-shadow:0 26px 44px var(--sheet-shadow)}
+.paper-back{position:absolute; inset:0; transform:rotateY(180deg)}
+.paper-sheet:focus-visible .paper-face{outline:2px solid var(--focus); outline-offset:4px}
+
+@keyframes paper-arrive{from{translate:0 -36px; scale:1.06; opacity:0}}
+.paper-arrive{animation:paper-arrive .45s cubic-bezier(.2,.7,.3,1)}
+.paper-leave{opacity:0; pointer-events:none; transition:transform .45s cubic-bezier(.5,0,.8,.4), opacity .45s}
+
+.paper-sr{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap}
+
+/* ---------- Stempel ---------- */
+.paper-stamp{position:absolute; pointer-events:none; mix-blend-mode:multiply; font:400 15px/1 var(--font-head); letter-spacing:.12em; text-transform:uppercase}
+.paper-stamp-urgent{right:14px; top:12px; transform:rotate(-12deg); border:3px double var(--stamp); color:var(--stamp); padding:4px 9px; font-weight:700; opacity:.88}
+.paper-stamp-round{left:30px; bottom:12px; transform:rotate(-7deg); border:2px solid var(--stamp-censor); border-radius:14px; color:var(--stamp-censor); padding:5px 10px; font-size:10px; letter-spacing:.08em; opacity:.8; max-width:62%; text-align:center; line-height:1.25}
+.stamp-wait .paper-stamp{opacity:0}
+@keyframes paper-stamp-in{0%{scale:1.9; opacity:0}60%{scale:.94; opacity:.95}100%{scale:1}}
+.stamp-in .paper-stamp{animation:paper-stamp-in .3s cubic-bezier(.3,1.4,.5,1)}
+
+/* Zensurbalken der Feldpostpruefstelle */
+.paper-censor{background:var(--censor); color:transparent; border-radius:1px; box-decoration-break:clone; -webkit-box-decoration-break:clone; padding:0 1px; letter-spacing:.06em}
+
+/* ---------- Brief: Caveat auf liniertem Briefpapier ---------- */
+.paper-letter{--w:310px}
+.paper-letter .paper-face{--face:var(--letter-paper);
+  background-image:repeating-linear-gradient(to bottom, transparent 0 25px, var(--letter-rule) 25px 26px),
+    linear-gradient(to right, transparent 26px, var(--letter-margin) 26px 27px, transparent 27px);
+}
+.paper-letter-body{padding:26px 18px 52px 36px; font:400 19px/26px var(--font-hand); color:var(--letter-ink)}
+.paper-letter-body p{margin:0}
+.paper-letter-body p + p{text-indent:1.1em}
+.paper-letter-date{text-align:right; text-indent:0 !important}
+.paper-letter-salutation{text-indent:0 !important}
+.paper-letter-closing{margin-top:0; text-indent:0 !important; padding-left:45%}
+.paper-letter-signature{text-indent:0 !important; padding-left:52%; font-weight:700}
+
+/* ---------- Telegramm / Stabsbefehl (Stil 03) ---------- */
+.paper-telegram{--w:350px}
+.paper-telegram .paper-face{--face:var(--tele-paper); border:1px solid var(--tele-border)}
+.paper-tele-body{padding:16px 18px 14px; font:400 13px/1.45 var(--font-head)}
+.paper-tele-head{font-size:15px; padding-right:84px; margin-bottom:8px}
+.paper-tele-head b{letter-spacing:.04em}
+.paper-form{display:grid; grid-template-columns:1fr 1fr; gap:4px 12px; margin:0; padding:7px 0; border-top:1px solid var(--sheet-rule); border-bottom:1px solid var(--sheet-rule); font-size:11.5px}
+.paper-form div{display:flex; flex-wrap:wrap; gap:0 5px; min-width:0}
+.paper-form dt{color:var(--sheet-ink2)}
+.paper-form dd{margin:0; overflow-wrap:anywhere}
+.paper-tele-text{padding:9px 0; font-size:13.5px; letter-spacing:.02em}
+.paper-tele-line{min-height:1.45em; text-transform:uppercase}
+.paper-tele-line.is-caret::after{content:"_"; animation:paper-caret .7s steps(1) infinite}
+@keyframes paper-caret{50%{opacity:0}}
+.paper-form-foot{border-bottom:1px solid var(--sheet-rule)}
+
+/* ---------- Tagebuch (Stil 06, Aquarell) ---------- */
+.paper-diary{--w:310px}
+.paper-diary .paper-face{--face:var(--diary-paper)}
+.paper-diary-body{padding:16px 20px 20px; font:400 18px/1.3 var(--font-hand); color:var(--diary-ink)}
+.paper-diary-head{display:flex; justify-content:space-between; gap:12px; align-items:baseline; border-bottom:1px solid var(--wash-pencil); padding-bottom:3px; margin-bottom:8px}
+.paper-diary-date{font-weight:700; font-size:19px}
+.paper-diary-title{font-style:italic; text-align:right}
+.paper-diary-body p{margin:6px 0 0}
+.paper-diary-sign{text-align:right; font-weight:700}
+.paper-art-wash{width:100%; height:auto; aspect-ratio:280/110; display:block}
+
+/* ---------- Gefallenenliste (Schreibmaschine, Formular) ---------- */
+.paper-casualties{--w:350px}
+.paper-casualties .paper-face{--face:var(--list-paper)}
+.paper-casualties .paper-front::before,.paper-casualties .paper-front::after{content:""; position:absolute; left:9px; width:10px; height:10px; border-radius:50%; background:var(--hole)}
+.paper-casualties .paper-front::before{top:28%}
+.paper-casualties .paper-front::after{bottom:24%}
+.paper-cas-body{padding:16px 16px 16px 30px; font:400 12px/1.4 var(--font-head)}
+.paper-cas-head{display:flex; justify-content:space-between; align-items:baseline; gap:10px; margin-bottom:6px}
+.paper-cas-head b{font-size:15px; letter-spacing:.05em; text-transform:uppercase}
+.paper-cas-head span{font-size:10px; color:var(--sheet-ink2)}
+.paper-list{width:100%; border-collapse:collapse; margin-top:8px; font-size:11.5px}
+.paper-list th{text-align:left; font-weight:400; color:var(--sheet-ink2); border-bottom:1px solid var(--sheet-rule); padding:2px 4px 3px 0}
+.paper-list td{padding:4px 4px 3px 0; border-bottom:1px dotted var(--tele-border); vertical-align:top}
+.paper-list .num{text-align:right; padding-right:8px}
+.paper-cas-note{margin:10px 0 0; font-size:11.5px}
+.paper-cas-sign{display:flex; gap:8px; align-items:flex-end; margin-top:12px; font-size:12px}
+.paper-cas-signline{flex:0 1 160px; border-bottom:1px solid var(--sheet-rule); font:700 19px/1 var(--font-hand); color:var(--letter-ink); padding:0 6px 1px}
+
+/* ---------- Zeitung (Stil 10) ---------- */
+.paper-newspaper{--w:340px}
+.paper-newspaper .paper-face{--face:var(--news-paper)}
+.paper-news-body{padding:12px 16px 14px; color:var(--news-ink); font:400 11.5px/1.38 Georgia,"Times New Roman",serif}
+.paper-news-mast{font:700 28px/1 Georgia,"Times New Roman",serif; text-align:center; letter-spacing:.01em; padding-bottom:5px; border-bottom:3px double var(--news-ink)}
+.paper-news-meta{display:flex; justify-content:space-between; font:400 10px/1 var(--font-num); padding:4px 0; border-bottom:1px solid var(--news-ink); margin-bottom:8px; text-transform:uppercase; letter-spacing:.05em}
+.paper-news-headline{font:700 21px/1.1 Georgia,"Times New Roman",serif; margin:0 0 4px}
+.paper-news-sub{margin:0 0 8px; font-style:italic}
+.paper-art-press{width:100%; height:auto; aspect-ratio:300/92; display:block}
+.paper-news-caption{margin:2px 0 8px; font-size:10px; font-style:italic; border-bottom:1px solid var(--news-ink); padding-bottom:6px}
+.paper-news-cols{columns:2; column-gap:14px; column-rule:1px solid var(--news-ink); text-align:left; hyphens:auto; -webkit-hyphens:auto}
+.paper-news-cols p{margin:0 0 6px}
+
+/* ---------- Fundstueck-Foto, Rueckseite beschriftet ---------- */
+.paper-photo{--w:240px}
+.paper-photo .paper-face{--face:var(--photo-frame)}
+.paper-photo-body{padding:11px 11px 8px}
+.paper-art-photo{width:100%; height:auto; aspect-ratio:220/160; display:block}
+.paper-photo-caption{margin:6px 2px 0; font:400 17px/1.15 var(--font-hand); color:var(--letter-ink)}
+.paper-photo .paper-back{--face:var(--photo-back); display:flex}
+.paper-photo-back{display:flex; flex-direction:column; justify-content:space-between; padding:16px 16px 12px; width:100%}
+.paper-photo-backtext{margin:0; font:400 18px/1.25 var(--font-hand); color:var(--letter-ink); transform:rotate(-2deg)}
+.paper-photo-print{margin:8px 0 0; font:400 9px/1.2 var(--font-num); color:var(--sheet-ink2); letter-spacing:.04em; text-transform:uppercase}
+.paper-photo.has-back .paper-front::after{content:"↻"; position:absolute; right:10px; bottom:6px; font:400 15px/1 var(--font-ui); color:var(--sheet-ink2)}
+
+/* ---------- Aktkarte (Stil 08, Linolschnitt) ---------- */
+.paper-actcard{--w:300px}
+.paper-actcard .paper-face{--face:var(--lino-ground); border:3px solid var(--lino-ink); box-shadow:6px 6px 0 var(--lino-ink), 0 10px 22px var(--sheet-shadow)}
+.paper-sheet.paper-actcard.is-front .paper-face{box-shadow:7px 7px 0 var(--lino-ink), 0 18px 34px var(--sheet-shadow)}
+.paper-act-body{padding:10px 10px 14px; color:var(--lino-ink)}
+.paper-art-lino{width:100%; height:auto; aspect-ratio:280/170; display:block; border:2px solid var(--lino-ink)}
+.paper-act-label{display:inline-block; margin-top:10px; background:var(--lino-red); color:var(--lino-ground); font:700 13px/1 var(--font-ui); letter-spacing:.14em; text-transform:uppercase; padding:5px 8px}
+.paper-act-title{margin:6px 0 2px; font:700 26px/1.05 var(--font-ui); text-transform:uppercase; letter-spacing:.02em}
+.paper-act-sub{margin:0; font:400 13px/1.35 var(--font-ui)}
+
+/* ---------- Ablage: weggewischte Blaetter ---------- */
+.paper-pile{position:absolute; left:12px; bottom:12px; z-index:100000; pointer-events:auto; display:flex; align-items:center; gap:10px; min-height:44px; padding:8px 12px 8px 10px;
+  background:var(--card); color:var(--ink); border:var(--border); border-radius:var(--radius); box-shadow:var(--shadow); cursor:pointer; font:400 13px/1 var(--font-ui)}
+.paper-pile[hidden]{display:none}
+.paper-pile:focus-visible{outline:2px solid var(--focus); outline-offset:2px}
+.paper-pile-stack{position:relative; width:26px; height:20px}
+.paper-pile-stack::before,.paper-pile-stack::after{content:""; position:absolute; inset:0; background:var(--sheet-paper); border:1px solid var(--line)}
+.paper-pile-stack::before{transform:rotate(-8deg)}
+.paper-pile-stack::after{transform:rotate(5deg) translate(2px,-2px)}
+.paper-pile[data-count="1"] .paper-pile-stack::before{display:none}
+.paper-pile-count{font:700 13px/1 var(--font-num)}
+
+/* Reduzierte Bewegung: kein Kippen, kein Fliegen, kein Tippen */
+@media (prefers-reduced-motion: reduce){
+  .paper-sheet,.paper-inner,.paper-leave{transition:none}
+  .paper-arrive,.stamp-in .paper-stamp,.paper-tele-line.is-caret::after{animation:none}
+  .paper-sheet{--srx:0deg; --sry:0deg}
+}
