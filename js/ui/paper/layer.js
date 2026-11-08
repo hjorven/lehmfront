@@ -83,6 +83,12 @@ export function createPaperLayer(host, opts = {}) {
       front(data.id);
       return data.id;
     }
+    // Liegt das Blatt in der Ablage, wird es von dort genommen statt verdoppelt
+    const inPile = filed.findIndex((f) => f.data.id === data.id);
+    if (inPile >= 0) {
+      filed.splice(inPile, 1);
+      updatePile();
+    }
     const kind = getKind(data.kind);
     if (!kind) throw new Error('Unbekannte Blattart: ' + data.kind);
     const r = kind.render(data);
@@ -135,7 +141,7 @@ export function createPaperLayer(host, opts = {}) {
     });
     s.node.classList.add('stamp-wait');
     const t0 = performance.now();
-    const typing = { raf: 0, finish };
+    const typing = { raf: 0, finish, stop };
     s.typing = typing;
     function frame(now) {
       const elapsed = now - t0;
@@ -156,6 +162,11 @@ export function createPaperLayer(host, opts = {}) {
       });
       if (all) finish();
       else typing.raf = requestAnimationFrame(frame);
+    }
+    // Abbrechen ohne Hooks, wenn das Blatt weggenommen wird (kein Stempelklang beim Wegwischen)
+    function stop() {
+      cancelAnimationFrame(typing.raf);
+      if (s.typing === typing) s.typing = null;
     }
     function finish() {
       cancelAnimationFrame(typing.raf);
@@ -184,7 +195,6 @@ export function createPaperLayer(host, opts = {}) {
       if (e.button > 0 || drag) return;
       const wasFront = order[order.length - 1] === s.id;
       front(s.id);
-      askSensor();
       try {
         node.setPointerCapture(e.pointerId);
       } catch {}
@@ -223,6 +233,8 @@ export function createPaperLayer(host, opts = {}) {
       const d = drag;
       drag = null;
       node.classList.remove('is-dragging');
+      if (e.pointerType !== 'mouse') askSensor(); // iOS: Erlaubnis nur aus einer abgeschlossenen Beruehrung
+      if (!sheets.has(s.id)) return; // waehrend des Ziehens per Code abgelegt
       if (d.moved) {
         const a = d.samples[0], b = d.samples[d.samples.length - 1];
         const st = stage();
@@ -255,6 +267,11 @@ export function createPaperLayer(host, opts = {}) {
       apply(s);
     });
 
+    // Mit Tab gewaehltes Blatt kommt nach vorn, sonst laege der Fokusrahmen auf einem verdeckten Blatt
+    node.addEventListener('focus', () => {
+      if (!drag && order[order.length - 1] !== s.id) front(s.id);
+    });
+
     node.addEventListener('keydown', (e) => {
       const step = e.shiftKey ? 48 : 16;
       const moves = { ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, -step], ArrowDown: [0, step] };
@@ -266,9 +283,9 @@ export function createPaperLayer(host, opts = {}) {
         else if (wasFront && node.classList.contains('has-back')) flip(s.id);
       } else if (e.key === 'Delete' || e.key === 'Backspace') {
         e.preventDefault();
-        const next = order[order.length - 2];
         dismiss(s.id, { dirX: 0, dirY: 1 });
-        if (next) sheets.get(next)?.node.focus();
+        const next = order[order.length - 1];
+        if (next) sheets.get(next).node.focus({ preventScroll: true });
         else pile.focus();
       } else if (moves[e.key]) {
         e.preventDefault();
@@ -285,7 +302,7 @@ export function createPaperLayer(host, opts = {}) {
     if (sensorRaf) return;
     sensorRaf = requestAnimationFrame(() => {
       sensorRaf = 0;
-      const t = still() ? { rx: 0, ry: 0 } : tiltFromOrientation(lastOrient.beta, lastOrient.gamma);
+      const t = still() ? { rx: 0, ry: 0 } : tiltFromOrientation(lastOrient.beta, lastOrient.gamma, 6, 40, screen.orientation?.angle ?? 0);
       layer.style.setProperty('--srx', t.rx + 'deg');
       layer.style.setProperty('--sry', t.ry + 'deg');
     });
@@ -297,10 +314,14 @@ export function createPaperLayer(host, opts = {}) {
   }
   function askSensor() {
     if (sensorAsked || opts.tiltSensor === false || typeof DeviceOrientationEvent === 'undefined') return;
-    sensorAsked = true;
-    // iOS fragt nach Erlaubnis, und nur nach einer Beruehrung
+    // iOS fragt nach Erlaubnis, und nur aus einer Nutzeraktion; bei Fehler beim naechsten Antippen erneut
     if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-      DeviceOrientationEvent.requestPermission().then((r) => r === 'granted' && listenSensor()).catch(() => {});
+      sensorAsked = true;
+      DeviceOrientationEvent.requestPermission()
+        .then((r) => (r === 'granted' ? listenSensor() : null))
+        .catch(() => {
+          sensorAsked = false;
+        });
     }
   }
   if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission !== 'function') listenSensor();
@@ -322,7 +343,7 @@ export function createPaperLayer(host, opts = {}) {
   }
 
   function detach(s) {
-    if (s.typing) s.typing.finish();
+    if (s.typing) s.typing.stop();
     sheets.delete(s.id);
     order = order.filter((x) => x !== s.id);
     restack();
@@ -382,7 +403,14 @@ export function createPaperLayer(host, opts = {}) {
     ? new ResizeObserver(() => {
         const st = stage();
         sheets.forEach((s) => {
-          s.pos = clampToStage(s.pos, st, s.size);
+          s.size = { w: s.node.offsetWidth, h: s.node.offsetHeight };
+          // Nach dem Drehen des Handys moeglichst ganz sichtbar halten, nicht nur einen Rest
+          const full = {
+            ...s.pos,
+            x: Math.max(0, Math.min(s.pos.x, st.w - s.size.w)),
+            y: Math.max(0, Math.min(s.pos.y, st.h - s.size.h)),
+          };
+          s.pos = clampToStage(full, st, s.size);
           apply(s);
         });
       })

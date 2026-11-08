@@ -19,6 +19,8 @@ Jeder Thread traegt hier nach dem Merge ein, was fertig ist und was offen bleibt
   - Debug-Ansicht: `?scene=debug-state&seed=42&turns=3&side=a|b|all&kind=position|battle`.
   - `test/purity.test.js` prueft alle reinen Dateien (inkl. kuenftiger `js/map.js`, `js/supply.js`, `js/phases/*`) auf Math.random, Date, DOM, transzendente Mathematik und localeCompare.
 
+- Z1 Papierebene: Baustein `js/ui/paper/` mit `css/paper.css`, Demo `?scene=papier`. Sieben Blattarten (Brief, Telegramm/Stabsbefehl, Tagebuch, Gefallenenliste, Zeitung, Fundstück-Foto mit Rückseite, Aktkarte), prozedurale Bilder, Kippen mit Maus und Neigungssensor, nach vorn holen, Verschieben, Wegwischen in die Ablage, getippte Telegramme mit Klang-Hooks, Zensur `[[...]]`, Tag/Nacht, reduzierte Bewegung, Tastatur. Format und Schnittstelle: `js/ui/paper/README.md`.
+
 ## Offen und bekannte Macken
 
 - `data/names.json` wird per Import-Attribut (`with { type: 'json' }`) geladen: braucht Chrome 123+, Safari 17.2+, Firefox 138+. Falls aeltere Geraete wichtig werden, nur `js/config/names.js` auf fetch umstellen.
@@ -27,6 +29,8 @@ Jeder Thread traegt hier nach dem Merge ein, was fertig ist und was offen bleibt
 - Gruppen-IDs sind `a01`, `b01` ... (Seite plus zwei Ziffern), sortiert wird ohne Locale.
 - K1: Klaenge sind noch nirgends im Spiel eingehaengt, das macht P19 (und P03/P06/P07 duerfen `playSfx` direkt aufrufen). Lautstaerke-Regler gehoeren spaeter in die Einstellungen aus P18 (`setVolume`, Werte werden schon in localStorage gespeichert).
 - K1: In Safari auf iOS vor 16.4 bleibt der Klang stumm, wenn der Stummschalter am Geraet aktiv ist (ab 16.4 setzt die Engine `navigator.audioSession.type = 'playback'`).
+- Z1: Die Blätter haben ein eigenes Datenformat (`js/ui/paper/README.md`); T1 kam erst während Z1 auf `main`. P15 setzt Texte aus `data/texts/` in dieses Format um.
+- Z1: Zeitung nutzt die Systemschrift Georgia/Times (keine Fraktur, keine neue Schriftdatei). Der Neigungssensor ist nur auf echten Geräten geprüft wie im Code vorgesehen, nicht im Container.
 
 ## Freigaben und Entscheidungen von Jorven
 
@@ -41,6 +45,8 @@ Stand 2026-11-08, von Jorven bestaetigt:
 - Bis zu 15 Threads gleichzeitig.
 
 ## Abweichungen vom Plan
+
+- Z1: Weggewischte Blätter verschwinden nicht, sie landen in einer Ablage unten links und lassen sich zurückholen. Fotos haben eine beschriftete Rückseite (Antippen des vorderen Blattes dreht um). Feldpost kann zensiert sein.
 
 - Pages baut direkt aus `main` statt ueber einen eigenen Deploy-Job (war im Repo schon so eingestellt).
 - P01: Konfiguration liegt in `js/config/*.js` (units, factions, orders, names) statt in einer `js/config.js` (Plan 10.3), damit parallele Pakete nicht dieselbe Datei aendern.

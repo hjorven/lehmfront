@@ -129,7 +129,7 @@
 .paper-news-sub{margin:0 0 8px; font-style:italic}
 .paper-art-press{width:100%; height:auto; aspect-ratio:300/92; display:block}
 .paper-news-caption{margin:2px 0 8px; font-size:10px; font-style:italic; border-bottom:1px solid var(--news-ink); padding-bottom:6px}
-.paper-news-cols{columns:2; column-gap:14px; column-rule:1px solid var(--news-ink); text-align:justify; hyphens:auto; -webkit-hyphens:auto}
+.paper-news-cols{columns:2; column-gap:14px; column-rule:1px solid var(--news-ink); text-align:left; hyphens:auto; -webkit-hyphens:auto}
 .paper-news-cols p{margin:0 0 6px}
 
 /* ---------- Fundstueck-Foto, Rueckseite beschriftet ---------- */
@@ -155,7 +155,7 @@
 .paper-act-sub{margin:0; font:400 13px/1.35 var(--font-ui)}
 
 /* ---------- Ablage: weggewischte Blaetter ---------- */
-.paper-pile{position:absolute; left:12px; bottom:12px; z-index:5; pointer-events:auto; display:flex; align-items:center; gap:10px; min-height:44px; padding:8px 12px 8px 10px;
+.paper-pile{position:absolute; left:12px; bottom:12px; z-index:100000; pointer-events:auto; display:flex; align-items:center; gap:10px; min-height:44px; padding:8px 12px 8px 10px;
   background:var(--card); color:var(--ink); border:var(--border); border-radius:var(--radius); box-shadow:var(--shadow); cursor:pointer; font:400 13px/1 var(--font-ui)}
 .paper-pile[hidden]{display:none}
 .paper-pile:focus-visible{outline:2px solid var(--focus); outline-offset:2px}

@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  hashString, placeSheet, clampToStage, tiltFromPointer, tiltFromOrientation, flingDecision,
+  hashString, placeSheet, radicalInverse, clampToStage, tiltFromPointer, tiltFromOrientation, flingDecision,
   bringToFront, typingSchedule, visibleChars, parseCensored, hasCensored,
 } from '../js/ui/paper/layout.js';
 
@@ -29,14 +29,28 @@ test('Blaetter liegen immer ganz in der Ebene, auch auf dem Handy', () => {
 
 test('Blatt groesser als die Ebene landet am Rand statt ausserhalb', () => {
   const p = placeSheet('riesig', 3, { w: 200, h: 200 }, { w: 400, h: 400 });
-  assert.equal(p.x, 8);
-  assert.equal(p.y, 8);
+  assert.equal(p.x, 0);
+  assert.equal(p.y, 0);
 });
 
-test('mehrere Blaetter faechern auf statt exakt uebereinander', () => {
-  const xs = new Set();
-  for (let i = 0; i < 5; i++) xs.add(placeSheet('x', i, stage, sheet).x);
-  assert.ok(xs.size >= 4);
+test('auch sieben und mehr Blaetter liegen nicht aufeinander', () => {
+  const ps = [];
+  for (let i = 0; i < 9; i++) ps.push(placeSheet('blatt-' + i, i, stage, sheet));
+  for (let i = 0; i < ps.length; i++)
+    for (let j = i + 1; j < ps.length; j++) {
+      const d = Math.abs(ps[i].x - ps[j].x) + Math.abs(ps[i].y - ps[j].y);
+      assert.ok(d > 60, `Blatt ${i} und ${j} zu nah: ${d}`);
+    }
+});
+
+test('gedrehte Blaetter bleiben mit den Ecken in der Ebene', () => {
+  const phone = { w: 390, h: 640 };
+  const s = { w: 340, h: 420 };
+  for (let i = 0; i < 30; i++) {
+    const p = placeSheet('d' + i, i, phone, s);
+    const rad = Math.abs(p.rot) * 0.01745;
+    assert.ok(p.x - (s.h * rad) / 2 >= 0 && p.x + s.w + (s.h * rad) / 2 <= phone.w + 1, `x ${p.x} rot ${p.rot}`);
+  }
 });
 
 test('nach dem Ziehen bleibt ein greifbarer Rest sichtbar', () => {
@@ -44,6 +58,10 @@ test('nach dem Ziehen bleibt ein greifbarer Rest sichtbar', () => {
   assert.equal(c.x, 64 - sheet.w);
   assert.equal(c.y, stage.h - 64);
   assert.equal(c.rot, 3);
+  // hohes Blatt darf nach oben hinaus, damit das untere Ende lesbar wird
+  const tall = clampToStage({ x: 0, y: -2000, rot: 0 }, { w: 844, h: 280 }, { w: 300, h: 450 });
+  assert.equal(tall.y, 64 - 450);
+  assert.equal(clampToStage({ x: 0, y: -50, rot: 0 }, stage, { w: 100, h: 50 }).y, 0);
 });
 
 test('Kippen folgt dem Zeiger und ist begrenzt', () => {
@@ -61,6 +79,14 @@ test('Neigungssensor: Ruhelage kippt nicht, fehlende Werte auch nicht', () => {
   const t = tiltFromOrientation(90, 90, 6);
   assert.equal(t.rx, -6);
   assert.equal(t.ry, 6);
+});
+
+test('Neigungssensor im Querformat: Achsen getauscht', () => {
+  // Querformat 90 Grad: Vor-zurueck-Neigung kommt aus gamma
+  assert.deepEqual(tiltFromOrientation(0, -40, 6, 40, 90), { rx: 0, ry: 0 });
+  assert.equal(tiltFromOrientation(30, -40, 6, 40, 90).ry, 6);
+  assert.equal(tiltFromOrientation(0, -70, 6, 40, 90).rx, -6);
+  assert.deepEqual(tiltFromOrientation(0, 40, 6, 40, 270), { rx: 0, ry: 0 });
 });
 
 test('schneller Wurf wischt weg, langsames Schieben nicht', () => {
@@ -109,4 +135,12 @@ test('Zensur: [[...]] wird geschwaerzt, Rest bleibt', () => {
   assert.deepEqual(parseCensored(''), []);
   assert.equal(hasCensored('x [[y]]'), true);
   assert.equal(hasCensored('x y'), false);
+});
+
+test('Halton-Folge streut gleichmaessig', () => {
+  assert.equal(radicalInverse(1, 2), 0.5);
+  assert.equal(radicalInverse(2, 2), 0.25);
+  assert.equal(radicalInverse(3, 2), 0.75);
+  assert.ok(Math.abs(radicalInverse(1, 3) - 1 / 3) < 1e-12);
+  assert.equal(radicalInverse(0, 2), 0);
 });

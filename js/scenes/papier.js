@@ -57,7 +57,8 @@ export async function mount(root, params) {
 
   const only = params.get('nur');
   const typed = params.get('getippt') === '1';
-  const all = demo.sheets.filter((s) => !only || s.kind === only);
+  // Der Stabsbefehl liegt zuletzt oben: er ist das, worauf die Lage gerade wartet
+  const all = demo.sheets.filter((s) => !only || s.kind === only).sort((a, b) => (a.kind === 'telegram') - (b.kind === 'telegram'));
   const showAll = () => all.forEach((s) => paper.add(s, { typed: typed && s.kind === 'telegram', animate: false }));
 
   const drawMap = () => drawBackground(map);

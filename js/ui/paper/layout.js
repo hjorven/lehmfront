@@ -15,31 +15,50 @@ export function hashString(s) {
 
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 
+// Van-der-Corput-Folge: gleichmaessig gestreute Werte 0..1 ohne Wiederholung, nur Grundrechenarten
+export function radicalInverse(n, base) {
+  let f = 1, r = 0, i = Math.max(0, Math.floor(n));
+  while (i > 0) {
+    f = f / base;
+    r += f * (i % base);
+    i = Math.floor(i / base);
+  }
+  return r;
+}
+
 // Wo ein Blatt landet. stage und sheet sind { w, h } in Pixeln, index die laufende Nummer im Stapel.
-// Blaetter faechern leicht versetzt um die Mitte auf, Drehung -6 bis +6 Grad, immer ganz im Sichtbereich.
+// Blaetter streuen nach einer Halton-Folge (Basis 2 und 3) ueber die Flaeche, so dass auch das sechste,
+// siebte usw. Blatt nicht auf einem frueheren landet. Drehung -6 bis +6 Grad; der Rand beruecksichtigt die
+// Drehung, damit gedrehte Ecken nicht abgeschnitten werden. Ist das Blatt hoeher als die Ebene, liegt es oben.
 export function placeSheet(id, index, stage, sheet, margin = 8) {
   const rng = createRng(hashString(id));
-  const freeX = Math.max(0, stage.w - sheet.w - 2 * margin);
-  const freeY = Math.max(0, stage.h - sheet.h - 2 * margin);
-  const slot = ((index % 5) + 5) % 5; // 0..4, wiederholt sich
-  const fanX = (slot - 2) / 2; // -1 .. 1
-  const fanY = ((index * 7) % 5 - 2) / 2;
-  const x = margin + freeX / 2 + fanX * freeX * 0.4 + (rng() - 0.5) * freeX * 0.18;
-  const y = margin + freeY / 2 + fanY * freeY * 0.3 + (rng() - 0.5) * freeY * 0.2;
   const rot = Math.round((rng() * 12 - 6) * 10) / 10;
+  const rad = Math.abs(rot) * 0.01745; // Bogenmass; fuer kleine Winkel gilt sin(a) ungefaehr a
+  const mx = margin + Math.ceil((sheet.h * rad) / 2);
+  const my = margin + Math.ceil((sheet.w * rad) / 2);
+  const freeX = Math.max(0, stage.w - sheet.w - 2 * mx);
+  const freeY = Math.max(0, stage.h - sheet.h - 2 * my);
+  const hx = radicalInverse(index + 1, 2);
+  const hy = radicalInverse(index + 1, 3);
+  const x = mx + freeX * (0.08 + 0.84 * hx) + (rng() - 0.5) * freeX * 0.08;
+  const y = my + freeY * (0.08 + 0.84 * hy) + (rng() - 0.5) * freeY * 0.08;
+  // Passt das gedrehte Blatt nicht mit Rand hinein: waagerecht mittig, senkrecht oben (Kopf lesbar)
+  const fitsX = stage.w - sheet.w - 2 * mx >= 0;
+  const fitsY = stage.h - sheet.h - 2 * my >= 0;
   return {
-    x: Math.round(clamp(x, margin, margin + freeX)),
-    y: Math.round(clamp(y, margin, margin + freeY)),
+    x: Math.round(fitsX ? clamp(x, mx, mx + freeX) : Math.max(0, (stage.w - sheet.w) / 2)),
+    y: Math.round(fitsY ? clamp(y, my, my + freeY) : Math.max(0, Math.min(my, (stage.h - sheet.h) / 2))),
     rot,
   };
 }
 
-// Haelt ein Blatt nach Groessenaenderung oder Ziehen im Sichtbereich; mindestens `keep` Pixel bleiben greifbar
+// Haelt ein Blatt nach Groessenaenderung oder Ziehen im Sichtbereich; mindestens `keep` Pixel bleiben greifbar.
+// Nach oben darf ein hohes Blatt hinausgeschoben werden, damit man sein unteres Ende lesen kann.
 export function clampToStage(pos, stage, sheet, keep = 64) {
   return {
     ...pos,
     x: Math.round(clamp(pos.x, keep - sheet.w, stage.w - keep)),
-    y: Math.round(clamp(pos.y, 0, stage.h - keep)),
+    y: Math.round(clamp(pos.y, Math.min(0, keep - sheet.h), stage.h - keep)),
   };
 }
 
@@ -51,12 +70,18 @@ export function tiltFromPointer(px, py, max = 9) {
 }
 
 // Kippen aus dem Neigungssensor (beta: vor/zurueck, gamma: links/rechts, in Grad).
-// Ruhelage ist ein schraeg gehaltenes Handy (beta etwa 40), kleine Zitterbewegungen werden geschluckt.
-export function tiltFromOrientation(beta, gamma, max = 6, rest = 40) {
+// angle ist screen.orientation.angle (0, 90, 180, 270); im Querformat tauschen die Achsen.
+// Ruhelage ist ein schraeg gehaltenes Handy (etwa 40 Grad), kleine Zitterbewegungen werden geschluckt.
+export function tiltFromOrientation(beta, gamma, max = 6, rest = 40, angle = 0) {
   if (!Number.isFinite(beta) || !Number.isFinite(gamma)) return { rx: 0, ry: 0 };
+  const a = (((Math.round(angle / 90) % 4) + 4) % 4) * 90;
+  let fb = beta, lr = gamma;
+  if (a === 90) { fb = -gamma; lr = beta; }
+  else if (a === 180) { fb = -beta; lr = -gamma; }
+  else if (a === 270) { fb = gamma; lr = -beta; }
   const dead = (v) => (Math.abs(v) < 2 ? 0 : v);
-  const b = dead(clamp(beta - rest, -30, 30));
-  const g = dead(clamp(gamma, -30, 30));
+  const b = dead(clamp(fb - rest, -30, 30));
+  const g = dead(clamp(lr, -30, 30));
   return { rx: round1((-b / 30) * max), ry: round1((g / 30) * max) };
 }
 
