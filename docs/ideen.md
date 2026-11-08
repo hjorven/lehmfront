@@ -11,3 +11,5 @@ Neue Ideen landen hier, nicht im Code (Plan 13). Mit Datum und Paket, aus dem si
 - 2026-11-08, P02: Bleistiftnotizen auf der Karte könnten aus dem Ereignisprotokoll entstehen (z. B. nach einem Verlust durch Längsfeuer schreibt jemand „Traverse fehlt!" mit Pfeil an die Stelle) und über Missionen hinweg auf dem Blatt bleiben.
 - 2026-11-08, P02: Regen könnte die Bleistiftnotizen verwischen und den Kaffeerand ausbluten lassen (passt zu P10 Wetter).
 - 2026-11-08, P02: Ältere Kartenblätter einer Kampagne könnten Radierspuren früherer Grabenverläufe zeigen, wo eine Linie aufgegeben wurde.
+- 2026-11-08, T1: Lasks Schachpartie mit Ruta laeuft in seinen Briefen weiter. Die Uebersetzerin de Groot stellt sie in der Fernmeldestelle nach. Ein Fundstueck oder Erfolg koennte das Brett mit der Stellung am Kriegsende zeigen.
+- 2026-11-08, T1: Geske Harms strickt Socken mit einer laengeren linken Socke. Wenn Harms faellt, schickt sie zwoelf Paar fuer die Truppe: koennte als kleiner Moralbonus fuer eine Gruppe im Spiel auftauchen.

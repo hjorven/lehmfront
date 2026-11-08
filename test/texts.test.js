@@ -51,7 +51,7 @@ const BLAETTER = ['brief', 'telegramm', 'tagebuch', 'gefallenenliste', 'zeitung'
 const RANGE_KEYS = ['ansehen', 'vertrauen'];
 const STATS = [
   'gefallene', 'verwundete', 'verwundete_geborgen', 'verwundete_liegen', 'gefangene',
-  'felder_gewonnen', 'felder_verloren', 'moral', 'runden', 'depot_leer', 'ablosung_verspaetet',
+  'felder_gewonnen', 'felder_verloren', 'moral', 'runden', 'depot_leer', 'abloesung_verspaetet',
 ];
 const WETTER = ['trocken', 'regen', 'schlamm', 'nebel', 'frost', 'schnee'];
 const MISSION_RE = /^a[1-4]m[1-6]$/;
@@ -264,4 +264,81 @@ test('Feldpost-Vorlagen haben eine Tonlage', () => {
     if (e.art === 'ereignis' && e.text.includes('{ereignis}')) errs.push(`${at}: Ereignis darf sich nicht selbst enthalten`);
   });
   assert.deepEqual(errs, []);
+});
+
+// ---- Flags muessen dokumentiert sein (gilt fuer alle Pakete) ----
+
+test('jedes Flag in wann oder setzt steht in data/texts/README.md', () => {
+  const readme = readFileSync(join(ROOT, 'data/texts/README.md'), 'utf8');
+  const used = new Set();
+  const walk = (w) => {
+    if (!w) return;
+    for (const f of [...(w.flags ?? []), ...(w.ohne ?? [])]) used.add(f);
+    for (const x of w.oder ?? []) walk(x);
+  };
+  for (const { e } of entries) {
+    walk(e.wann);
+    for (const o of e.optionen ?? []) for (const f of o.setzt ?? []) used.add(f);
+  }
+  const missing = [...used].sort().filter((f) => !readme.includes('`' + f + '`'));
+  assert.deepEqual(missing, []);
+});
+
+// ---- Umfang T1: Akt 1 und 2 ----
+
+const byId = new Map(entries.map(({ e }) => [e.id, e]));
+const T1_MISSIONS = ['a1m1', 'a1m2', 'a1m3', 'a1m4', 'a1m5', 'a1m6', 'a2m1', 'a2m2', 'a2m3', 'a2m4', 'a2m5', 'a2m6'];
+
+test('T1: jede Mission in Akt 1 und 2 hat Briefing, Stabsbefehl und Tagebuch mit Varianten', () => {
+  const errs = [];
+  for (const m of T1_MISSIONS) {
+    const own = entries.map((x) => x.e).filter((e) => e.mission === m || e.nach === m);
+    if (!own.some((e) => e.art === 'briefing' && e.mission === m && e.wann === undefined)) errs.push(`${m}: Briefing ohne Bedingung fehlt`);
+    if (!own.some((e) => e.art === 'befehl' && e.mission === m)) errs.push(`${m}: Stabsbefehl fehlt`);
+    const diary = own.filter((e) => e.art === 'tagebuch' && e.nach === m);
+    if (diary.length < 2) errs.push(`${m}: weniger als zwei Tagebuch-Varianten`);
+  }
+  assert.deepEqual(errs, []);
+});
+
+test('T1: Entscheidungen, Briefe 1 bis 12 und Lasks Briefe fuer Akt 1 und 2', () => {
+  const all = entries.map((x) => x.e);
+  for (const akt of ['a1', 'a2']) {
+    const dec = all.filter((e) => e.art === 'entscheidung' && (e.nach ?? e.mission ?? '').startsWith(akt));
+    assert.ok(dec.length >= 3, `${akt}: zu wenige Entscheidungen`);
+    const lask = all.filter((e) => e.art === 'lask' && e.nach.startsWith(akt) && !e.wann);
+    assert.ok(lask.length >= 2, `${akt}: zu wenige Lask-Briefe`);
+  }
+  const nrs = new Set(all.filter((e) => e.art === 'brief').map((e) => e.nr));
+  for (let n = 1; n <= 12; n++) assert.ok(nrs.has(n), `Brief ${n} fehlt`);
+});
+
+test('T1: mindestens 40 Feldpost-Vorlagen, jede Tonlage mit Rueckfall ohne Bedingung', () => {
+  const fp = entries.map((x) => x.e).filter((e) => e.art === 'feldpost');
+  assert.ok(fp.length >= 40, `nur ${fp.length} Vorlagen`);
+  for (const t of TONES) {
+    const list = fp.filter((e) => e.ton === t);
+    assert.ok(list.length >= 10, `${t}: nur ${list.length}`);
+    assert.ok(list.some((e) => !e.wann), `${t}: keine Vorlage ohne Bedingung`);
+    for (const e of list) {
+      assert.ok(e.text.startsWith('{anrede},'), `${e.id}: beginnt nicht mit {anrede},`);
+      assert.ok(e.text.includes('{ereignis}') && e.text.includes('{absender}'), `${e.id}: {ereignis} oder {absender} fehlt`);
+    }
+  }
+  const ev = entries.map((x) => x.e).filter((e) => e.art === 'ereignis');
+  const cats = new Set(ev.map((e) => e.kategorie));
+  for (const c of cats) assert.ok(ev.some((e) => e.kategorie === c && !e.ton), `Kategorie ${c}: kein Satz ohne Tonlage`);
+  assert.ok(cats.has('ruhig'), 'Rueckfall-Kategorie ruhig fehlt');
+});
+
+test('T1: etwa 20 Erfahrungsberichte und Tutorial-Hinweise ohne Doppelungen', () => {
+  const all = entries.map((x) => x.e);
+  const rep = all.filter((e) => e.art === 'bericht');
+  assert.ok(rep.length >= 18, `nur ${rep.length} Berichte`);
+  for (const r of rep) assert.ok(r.titel && r.ausloeser && r.wirkung && r.zaehler?.ereignis && Number.isInteger(r.zaehler?.anzahl), `${r.id}: Felder fehlen`);
+  const hints = all.filter((e) => e.art === 'hinweis');
+  const mech = hints.map((h) => h.mechanik);
+  assert.equal(new Set(mech).size, mech.length, 'eine Mechanik wird doppelt erklaert');
+  for (const h of hints) assert.ok(h.text.length <= 160, `${h.id}: Hinweis zu lang (${h.text.length})`);
+  assert.ok(byId.has('a1.titel') && byId.has('a2.titel'), 'Aktkarten fehlen');
 });

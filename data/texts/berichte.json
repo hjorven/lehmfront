@@ -1,0 +1,286 @@
+{
+  "format": 1,
+  "beschreibung": "Erfahrungsberichte (Plan 4.3). Text, Ausloeser und Wirkung als Beschreibung; zaehler ist ein Vorschlag fuer P14 (js/config/reports.js), welches Protokollereignis wie oft gezaehlt wird.",
+  "eintraege": [
+    {
+      "id": "bericht.faschinenbau",
+      "art": "bericht",
+      "blatt": "telegramm",
+      "ab": "a1",
+      "titel": "Faschinenbau",
+      "ausloeser": "200 Felder Graben ausgehoben",
+      "zaehler": {
+        "ereignis": "graben_feld",
+        "anzahl": 200
+      },
+      "wirkung": "Grabenstufe 3 (ausgebauter Graben mit Faschinen) verfügbar",
+      "text": "Feldwebel Fedders meldet: Die Grabenwände rutschen nach jedem Regen nach. Reisigbündel aus dem Krähenholz, mit Draht gebunden und mit Pfählen an die Wand geschlagen, halten den Lehm. Vorschlag: Faschinen als Regelbauweise für alle Gräben, die länger als eine Woche besetzt bleiben."
+    },
+    {
+      "id": "bericht.traversen",
+      "art": "bericht",
+      "blatt": "telegramm",
+      "ab": "a1",
+      "titel": "Traversen",
+      "ausloeser": "Eine Gruppe hat durch Längsfeuer Verluste erlitten",
+      "zaehler": {
+        "ereignis": "verlust_laengsfeuer",
+        "anzahl": 1
+      },
+      "wirkung": "„Traversen einfügen“ kostet keine zusätzliche Bauzeit",
+      "text": "Der Feind hat einen geraden Grabenabschnitt von dessen Ende aus bestrichen. Die Gruppe hatte keine Deckung zur Seite. Künftig wird jeder Graben beim Ausheben spätestens nach drei bis vier Feldern durch einen Erdklotz unterbrochen. Das kostet keine Zeit, wenn man es gleich tut, und viel, wenn man es nicht tut."
+    },
+    {
+      "id": "bericht.lattenroste",
+      "art": "bericht",
+      "blatt": "telegramm",
+      "ab": "a1",
+      "titel": "Lattenroste",
+      "ausloeser": "Erste Stellungsrunde mit Schlamm in eigenen Gräben",
+      "zaehler": {
+        "ereignis": "schlamm_im_graben",
+        "anzahl": 1
+      },
+      "wirkung": "Entwässerung als Grabenverbesserung baubar",
+      "text": "Nach dem ersten Gewitter stand die Kuhle knietief unter Wasser. Holzroste auf Querbalken, darunter eine Rinne zur nächsten Sickergrube, halten die Füße trocken und die Leute gesund. Das Sägewerk kann sie in Serie liefern."
+    },
+    {
+      "id": "bericht.tiefer_unterstand",
+      "art": "bericht",
+      "blatt": "telegramm",
+      "ab": "a1",
+      "titel": "Tiefer Unterstand",
+      "ausloeser": "Ein Unterstand hat ein Vorbereitungsfeuer überstanden",
+      "zaehler": {
+        "ereignis": "unterstand_ueberstanden",
+        "anzahl": 1
+      },
+      "wirkung": "Stollenunterstand baubar",
+      "text": "Der Unterstand an der Mühle hat sechs Stunden Vorbereitungsfeuer überstanden, weil er vier Meter tief liegt und zwei Ausgänge hat. Alle Insassen unverletzt. Vorschlag: Unterstände künftig als Stollen mit Treppe und zweitem Ausgang anlegen."
+    },
+    {
+      "id": "bericht.drahtscheren",
+      "art": "bericht",
+      "blatt": "telegramm",
+      "ab": "a1",
+      "titel": "Drahtscheren",
+      "ausloeser": "Ein eigener Sturm ist am Draht gescheitert",
+      "zaehler": {
+        "ereignis": "sturm_am_draht_gescheitert",
+        "anzahl": 1
+      },
+      "wirkung": "Schützengruppen können Draht schneiden",
+      "text": "Der Sturm blieb am feindlichen Draht hängen, den das Vorbereitungsfeuer nicht zerschnitten hatte. Pioniere waren nicht zur Stelle. Jede Schützengruppe erhält zwei Drahtscheren und übt, sich liegend durch drei Reihen zu schneiden."
+    },
+    {
+      "id": "bericht.feuerwalze",
+      "art": "bericht",
+      "blatt": "telegramm",
+      "ab": "a1",
+      "titel": "Feuerwalze",
+      "ausloeser": "Drei Vorbereitungsfeuer geplant",
+      "zaehler": {
+        "ereignis": "feuerplan_vorbereitung",
+        "anzahl": 3
+      },
+      "wirkung": "Feuerwalze als Feuerplan verfügbar",
+      "text": "Ein Vorbereitungsfeuer endet, und der Feind hat Zeit, an die Brüstung zu kommen. Wandert das Feuer stattdessen in festen Schritten vor dem eigenen Sturm her, bleibt er im Unterstand, bis unsere Leute da sind. Voraussetzung: genaue Uhren, genaue Batterien und Leute, die dem Feuer vertrauen."
+    },
+    {
+      "id": "bericht.doppelleitung",
+      "art": "bericht",
+      "blatt": "telegramm",
+      "ab": "a1",
+      "titel": "Doppelleitung",
+      "ausloeser": "Eine Fernsprechleitung wurde im Gefecht durchtrennt",
+      "zaehler": {
+        "ereignis": "leitung_durchtrennt",
+        "anzahl": 1
+      },
+      "wirkung": "Leitungen können doppelt verlegt werden",
+      "text": "Die Leitung zum Beobachter riss in der ersten Minute. Der Melder brauchte zehn. Künftig werden wichtige Leitungen auf zwei getrennten Wegen verlegt, mindestens fünfzig Meter auseinander."
+    },
+    {
+      "id": "bericht.stahlhelme",
+      "art": "bericht",
+      "blatt": "telegramm",
+      "ab": "a1",
+      "titel": "Stahlhelme",
+      "ausloeser": "50 Verwundete durch Artillerie",
+      "zaehler": {
+        "ereignis": "verwundet_artillerie",
+        "anzahl": 50
+      },
+      "wirkung": "Verluste durch Splitter sinken",
+      "text": "Dr. Selin meldet: Mehr als die Hälfte der Verwundungen durch Artillerie betreffen den Kopf und stammen von kleinen Splittern, die eine Stahlschale aufgehalten hätte. Sie bittet, die Mützen gegen Helme zu tauschen, und fügt hinzu, dass sie diese Bitte nicht noch einmal stellen möchte."
+    },
+    {
+      "id": "bericht.leichtes_mg",
+      "art": "bericht",
+      "blatt": "telegramm",
+      "ab": "a1",
+      "titel": "Leichtes MG",
+      "ausloeser": "Ein MG-Trupp hat einen Sturm abgewehrt",
+      "zaehler": {
+        "ereignis": "sturm_abgewehrt_mg",
+        "anzahl": 1
+      },
+      "wirkung": "Schützengruppen können ein leichtes MG tragen",
+      "text": "Unteroffizier Lohmann meldet: Ein MG an der richtigen Stelle hält eine Weide. Die Werkstatt in Ostervenn hat ein MG auf ein Zweibein gesetzt und um elf Kilo erleichtert. Zwei Leute tragen es. Jede Schützengruppe sollte eines haben."
+    },
+    {
+      "id": "bericht.grabenkeulen",
+      "art": "bericht",
+      "blatt": "telegramm",
+      "ab": "a1",
+      "titel": "Nahkampf im Graben",
+      "ausloeser": "Drei Nahkämpfe im Graben gewonnen",
+      "zaehler": {
+        "ereignis": "nahkampf_gewonnen",
+        "anzahl": 3
+      },
+      "wirkung": "Nahkampfbonus",
+      "text": "Im Graben ist ein langes Gewehr im Weg. Gruppen, die mit kurzen Waffen und Spaten in den Graben gingen, kamen schneller voran und mit weniger Verlusten. Ausbildung im Grabenkampf wird für alle Gruppen eingeführt. Über die Einzelheiten schreibt dieser Bericht nicht."
+    },
+    {
+      "id": "bericht.sanitaetsloren",
+      "art": "bericht",
+      "blatt": "telegramm",
+      "ab": "a1",
+      "titel": "Sanitätsloren",
+      "ausloeser": "20 Verwundete per Lore zurückgefahren",
+      "zaehler": {
+        "ereignis": "verwundeter_per_lore",
+        "anzahl": 20
+      },
+      "wirkung": "Eine Lore nimmt doppelt so viele Verwundete",
+      "text": "Die Werkstatt hat eine Lore mit zwei Etagen aus Tragegestellen gebaut. Sie nimmt vier Liegende statt zwei. Dr. Selin hat den Bau überwacht und die Höhe der oberen Etage dreimal ändern lassen."
+    },
+    {
+      "id": "bericht.feldbahn_ausbauen",
+      "art": "bericht",
+      "blatt": "telegramm",
+      "ab": "a1",
+      "titel": "Zweites Gleis",
+      "ausloeser": "Das Depot ist zweimal leer gelaufen",
+      "zaehler": {
+        "ereignis": "depot_leer",
+        "anzahl": 2
+      },
+      "wirkung": "Zweite Gleisstrecke baubar",
+      "text": "Auf einem Gleis begegnen sich Loren nach vorn und Loren zurück, und eine wartet immer. Ein zweites Gleis, eines für jede Richtung, verdoppelt nicht die Loren, aber es halbiert das Warten. Schienen sind in Ostervenn vorhanden. Es fehlen Hände."
+    },
+    {
+      "id": "bericht.kochkisten",
+      "art": "bericht",
+      "blatt": "telegramm",
+      "ab": "a1",
+      "titel": "Kochkisten",
+      "ausloeser": "10 warme Mahlzeiten nach vorn gebracht",
+      "zaehler": {
+        "ereignis": "warme_mahlzeit",
+        "anzahl": 10
+      },
+      "wirkung": "Warme Mahlzeiten erreichen auch Gräben ohne Gleisanschluss",
+      "text": "Das Essen aus der Feldküche ist kalt, bevor es vorn ist. In mit Heu ausgestopften Kisten bleibt ein Kessel Suppe vier Stunden warm. Die Truppe nennt sie „Großmutters Kiste“. Die Moral in den versorgten Gräben ist messbar besser."
+    },
+    {
+      "id": "bericht.grabenpumpe",
+      "art": "bericht",
+      "blatt": "telegramm",
+      "ab": "a2",
+      "titel": "Grabenpumpe",
+      "ausloeser": "Drei Stellungsrunden mit Wasser in Gräben, die bereits Lattenroste haben",
+      "zaehler": {
+        "ereignis": "wasser_trotz_entwaesserung",
+        "anzahl": 3
+      },
+      "wirkung": "Handpumpe als Grabenverbesserung, leert vollgelaufene Felder in einer Runde",
+      "text": "Lattenroste helfen, solange das Wasser abfließen kann. In der Senke kann es nirgends hin. Die Werft in Kelling schickt Schwengelpumpen, wie sie in Booten benutzt werden. Zwei Leute pumpen eine Stunde, dann ist der Graben wieder ein Graben."
+    },
+    {
+      "id": "bericht.horchgeraet",
+      "art": "bericht",
+      "blatt": "telegramm",
+      "ab": "a2",
+      "titel": "Horchgerät",
+      "ausloeser": "Ein feindlicher Stollen wurde entdeckt",
+      "zaehler": {
+        "ereignis": "stollen_entdeckt",
+        "anzahl": 1
+      },
+      "wirkung": "Horchposten haben einen größeren Radius",
+      "text": "Gefreite Albers meldet: Mit einem Stethoskop aus dem Lazarett, an einen Holzstab gebunden, hört man durch Kreide doppelt so weit wie mit dem Ohr. Dr. Selin hat drei Stethoskope abgegeben und um ihre Rückgabe nach dem Krieg gebeten."
+    },
+    {
+      "id": "bericht.leuchtpistolen",
+      "art": "bericht",
+      "blatt": "telegramm",
+      "ab": "a2",
+      "titel": "Leuchtzeichen",
+      "ausloeser": "Fünf Nachtgefechte im eigenen Abschnitt",
+      "zaehler": {
+        "ereignis": "nachtgefecht",
+        "anzahl": 5
+      },
+      "wirkung": "Leuchtkugeln erhellen einen größeren Kreis und brennen länger",
+      "text": "Unsere Leuchtkugeln brennen zu kurz. Die von drüben brennen länger und hängen an kleinen Schirmen. Ein eingebrachter Blindgänger wurde in der Werkstatt zerlegt. Nachbau möglich."
+    },
+    {
+      "id": "bericht.sappenkopf",
+      "art": "bericht",
+      "blatt": "telegramm",
+      "ab": "a2",
+      "titel": "Sappenkopf",
+      "ausloeser": "100 Felder Sappe vorgetrieben",
+      "zaehler": {
+        "ereignis": "sappe_feld",
+        "anzahl": 100
+      },
+      "wirkung": "Sappen kommen schneller voran",
+      "text": "Wer die Sappe vorn gräbt, steht allein. Ein Schild aus Stahlblech und Sandsäcken, auf Kufen vorgeschoben, deckt die Spitze. Zwei Leute graben, einer schiebt, einer reicht Säcke nach. So kommt man im Lehm doppelt so weit."
+    },
+    {
+      "id": "bericht.tarnung",
+      "art": "bericht",
+      "blatt": "telegramm",
+      "ab": "a2",
+      "titel": "Tarnung der Batterien",
+      "ausloeser": "Eine eigene Batterie wurde zweimal durch Gegenbatteriefeuer getroffen",
+      "zaehler": {
+        "ereignis": "batterie_getroffen",
+        "anzahl": 2
+      },
+      "wirkung": "Batteriestellungen sind schwerer aufzuklären",
+      "text": "Batterie 2 wurde zweimal getroffen, beide Male, nachdem sie geschossen hatte. Der Feind sieht das Mündungsfeuer vom Förderturm in Schacht Drei. Netze mit eingeflochtenem Laub über den Geschützen und Scheinstellungen mit Holzrohren zweihundert Meter daneben."
+    },
+    {
+      "id": "bericht.lichtsignale",
+      "art": "bericht",
+      "blatt": "telegramm",
+      "ab": "a2",
+      "titel": "Blinklampen",
+      "ausloeser": "Fünf durchtrennte Leitungen",
+      "zaehler": {
+        "ereignis": "leitung_durchtrennt",
+        "anzahl": 5
+      },
+      "wirkung": "Beobachter mit Sichtverbindung melden per Lampe: eine Runde Verzögerung wie mit Telefon, auch ohne Leitung",
+      "text": "Leutnant de Groot von der Fernmeldestelle schlägt Blinklampen vor, wie sie auf Schiffen benutzt werden. Wo der Beobachter den Gefechtsstand sehen kann, geht die Meldung auch ohne Draht. Sie hat einen Lehrgang angeboten und darauf bestanden, dass Feldwebel dazukommen."
+    },
+    {
+      "id": "bericht.gefangenenbefragung",
+      "art": "bericht",
+      "blatt": "telegramm",
+      "ab": "a2",
+      "titel": "Befragung",
+      "ausloeser": "10 Gefangene eingebracht",
+      "zaehler": {
+        "ereignis": "gefangener",
+        "anzahl": 10
+      },
+      "wirkung": "Nach jedem eingebrachten Gefangenen wird die Lage einer feindlichen Gruppe aufgedeckt",
+      "text": "Die Gefangenen sprechen, wenn man ihnen zu essen gibt und sie nicht anschreit. Leutnant de Groot von der Fernmeldestelle übersetzt. Ein Gefangener, der Tee bekommt, erzählt mehr als einer, der verhört wird. Der Stab hat diese Methode als „weich“ bezeichnet und gleichzeitig um mehr ihrer Ergebnisse gebeten."
+    }
+  ]
+}

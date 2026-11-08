@@ -28,6 +28,14 @@ Jeder Thread traegt hier nach dem Merge ein, was fertig ist und was offen bleibt
 - Dynamische Ebene (Einheiten, Overlays) als zweites Canvas darüber, Weltkoordinaten per `applyCameraTransform(ctx, cam, dpr)`.
 - Neuer Graben: Zelle in `map.cells` ändern, dann `layer.setMap(map)` (baut die Geometrie neu, etwa 5 bis 10 ms auf dem Desktop).
 - Tageszeit: `applyTheme(themeAt(darkness))`; Regeln lesen dieselbe Zahl über `visibilityFromDarkness`. `theme.flare` ist ab 0,5 wahr (Leuchtkugeln zeichnet P10).
+- T1 Texte Akt 1 und 2, Welt-Bibel:
+  - Format fuer alle Spieltexte: `data/texts/README.md` (Eintraege mit `id`, `art`, `text`, Varianten ueber `slot` + `wann`, Bedingungen, Folgen, Flags, Platzhalter, Reihenfolge zwischen Missionen, Vorschlag fuer die Feldpost-Erzeugung). Platzhalter in `data/texts/placeholders.json`.
+  - Welt-Bibel `data/texts/welt.md`: Orte im Lehmgau (Ostervenn, Velde, Velder Muehle, Krähenholz, Lehmkuhle, Huegel 214, Schacht Drei, Raudas), Heimatorte beider Fraktionen (jetzt auch in `data/names.json`), Heer und Dienstgrade, Stimmen aller Hauptfiguren, Nebenfiguren, Lasks Doktrinen, Zeitungen.
+  - `data/texts/akt1.json`, `akt2.json`: Aktkarten, 12 Briefings (a2m5 und a2m6 mit Varianten), 12 Stabsbefehle, 10 Entscheidungen, Tagebuch je Mission mit 3 bis 4 Varianten.
+  - `data/letters/briefe-akt1-2.json`: handgeschriebene Briefe 1 bis 12 (mit Varianten, wenn Harms oder Vell fallen) und 5 abgefangene Briefe von Lask mit Uebersetzungsvermerk.
+  - `data/letters/templates.json`: 48 Feldpost-Vorlagen (16 je Tonlage), 43 Ereignis-Saetze in 18 Kategorien, 11 Anreden.
+  - `data/texts/berichte.json`: 20 Erfahrungsberichte mit Ausloeser, Zaehler-Vorschlag und Wirkung. `data/texts/tutorial.json`: 19 Tutorial-Hinweise fuer Akt 1 als Bleistiftnotizen der Figuren.
+  - `test/texts.test.js` prueft alle Text-Dateien automatisch (auch die von T2).
 
 ## Offen und bekannte Macken
 
@@ -43,6 +51,9 @@ Jeder Thread traegt hier nach dem Merge ein, was fertig ist und was offen bleibt
 - P02: Doppelklick zum Zoomen zählt in der Szene `karte` auch als zwei Antipp-Vorgänge (Weg/Sicht-Anzeige wird dabei zurückgesetzt). Nur Demo-Szene; P03 sollte Antippen mit kurzer Verzögerung von Doppelklick trennen.
 - P02: Szenen haben noch kein Abmelden: Kamera-Listener, ResizeObserver und `onThemeChange` bleiben bestehen. Harmlos, solange `main.js` Szenen nicht wechselt.
 - P02: Diagonale Grabenstücke werden als schräge Rechteckwelle gezeichnet; das sieht etwas unruhiger aus als gerade Abschnitte.
+
+- T1: Die Zaehler der Erfahrungsberichte (`zaehler.ereignis`) sind Vorschlaege; P14 muss sie auf die echten Ereignistypen aus dem Protokoll abbilden. Die Statistiken fuer `wann.werte` (README) muss P07/P14 aus dem Protokoll zaehlen.
+- T1: Flags `harms_gefallen`, `vell_gefallen`, `trichter_gehalten` setzt die Mission (P16 bzw. Akt-2-Paket), nicht eine Entscheidung.
 
 ## Freigaben und Entscheidungen von Jorven
 
@@ -66,3 +77,5 @@ Stand 2026-11-08, von Jorven bestaetigt:
 - P01: Ein Gruppenfuehrer bekommt moeglichst einen auf seiner Seite einmaligen Nachnamen, und die Nachnamen der Hauptfiguren (Brandt, Harms, Vell, Lask) werden nicht zufaellig vergeben. Meldungen sagen "Gruppe Lohmann", das soll eindeutig sein.
 - P02, Tinte beim Tag-Nacht-Übergang: Plan 7.7 lässt Tinte und Signaturfarben zwischen darkness 0,45 und 0,7 linear wandern. Nachgemessen fällt dabei der Kontrast Tinte auf Papier bis 1,1 : 1. Jetzt springt jede Farbe innerhalb dieses Fensters an ihrem eigenen Kreuzungspunkt (dort, wo die Nachtfarbe auf dem dann gültigen Papier besser lesbar ist). Tinte bleibt damit immer über 3 : 1, im Übergang wirkt es wie Tinte, die aufleuchtet.
 - P02, Kartenblatt: Die Karte liegt als Papierblatt mit Rand auf einem Tisch: Spalten- und Zeilennummern am Rand (passend zu Meldungen wie „Feld 31/9"), Titel, Maßstab, Nordpfeil. Das war im Plan nicht vorgesehen, macht Feldangaben im Protokoll aber auffindbar.
+- T1: Die Heimatorte in `data/names.json` wurden durch die der Welt-Bibel ersetzt, damit Briefe und Gefallenenliste dieselben Orte nennen.
+- T1: Tutorial-Hinweise sind Bleistiftnotizen von Harms, Lohmann, Fedders und Selin am Kartenrand statt neutraler Hinweisfenster (Feld `von`).

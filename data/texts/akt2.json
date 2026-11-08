@@ -1,0 +1,719 @@
+{
+  "format": 1,
+  "beschreibung": "Akt 2: Lehm und Regen (Herbst). Briefings, Stabsbefehle, Entscheidungen und Brandts Tagebuch.",
+  "eintraege": [
+    {
+      "id": "a2.titel",
+      "art": "akt",
+      "blatt": "aktkarte",
+      "titel": "Lehm und Regen",
+      "zeit": "Erster Kriegsherbst",
+      "text": "Der Herbst kommt nicht, er sickert ein. Die Gräben laufen voll, die Wege werden zu Bächen, und unter Hügel 214 beginnen beide Seiten, im Dunkeln zu graben."
+    },
+    {
+      "id": "a2m1.briefing.velde",
+      "art": "briefing",
+      "mission": "a2m1",
+      "blatt": "telegramm",
+      "titel": "Wasser im Graben",
+      "ort": "Asse-Nord, vor Hügel 214",
+      "zeit": "Herbst, Tag 61",
+      "text": "Nach zwei Wochen Ruhe und zwei Wochen in Asse-Mitte kehren Sie in Ihren alten Abschnitt zurück. Velde, das Sie im Sommer verloren haben, haben die Kellinger im Spätsommer zurückgenommen. Die Kellinger Schützen haben dafür bezahlt, und man sieht es dem Dorf an: Von der Mühle stehen nur noch die Mauern. Seit zehn Tagen regnet es. Die Gräben in der Senke stehen bis zum Gürtel unter Wasser.\n\nDer Stab hat Ihnen einen Zugführer geschickt: Leutnant Jost Vell aus Haverstadt, dreiundzwanzig, mit Empfehlungsschreiben. Er möchte Hügel 214 sehen. Er wird ihn sehen, von unten.\n\nZwischen den Linien kommt man nur noch in Sappen vorwärts, gedeckten Gräben, die sich Meter für Meter nach vorne fressen.",
+      "ziele": [
+        "Lattenroste in den tiefsten Gräben verlegen",
+        "Eine Sappe bis zum Heuwagen vortreiben",
+        "Vells Zug einweisen, ohne ihn zu verlieren"
+      ],
+      "slot": "a2m1.briefing",
+      "wann": {
+        "flags": [
+          "velde_verloren"
+        ]
+      }
+    },
+    {
+      "id": "a2m1.briefing",
+      "art": "briefing",
+      "mission": "a2m1",
+      "blatt": "telegramm",
+      "titel": "Wasser im Graben",
+      "ort": "Asse-Nord, vor Hügel 214",
+      "zeit": "Herbst, Tag 61",
+      "text": "Nach zwei Wochen Ruhe und zwei Wochen in Asse-Mitte kehren Sie in Ihren alten Abschnitt zurück. Die Kellinger haben ihn besetzt gehalten, aber nicht gepflegt. Seit zehn Tagen regnet es. Die Gräben in der Senke stehen bis zum Gürtel unter Wasser.\n\nDer Stab hat Ihnen einen Zugführer geschickt: Leutnant Jost Vell aus Haverstadt, dreiundzwanzig, mit Empfehlungsschreiben. Er möchte Hügel 214 sehen. Er wird ihn sehen, von unten.\n\nZwischen den Linien kommt man nur noch in Sappen vorwärts, gedeckten Gräben, die sich Meter für Meter nach vorne fressen.",
+      "ziele": [
+        "Lattenroste in den tiefsten Gräben verlegen",
+        "Eine Sappe bis zum Heuwagen vortreiben",
+        "Vells Zug einweisen, ohne ihn zu verlieren"
+      ],
+      "slot": "a2m1.briefing"
+    },
+    {
+      "id": "a2m1.befehl",
+      "art": "befehl",
+      "mission": "a2m1",
+      "blatt": "telegramm",
+      "nr": "S-61/01",
+      "von": "Oberst van Aurach",
+      "an": "Major Brandt",
+      "abschnitt": "Asse-Nord",
+      "frist": "TAG 64 18:00",
+      "eilt": false,
+      "text": "LEUTNANT VELL IHREM ABSCHNITT ZUGETEILT STOP SAPPE RICHTUNG HÜGEL 214 BEGINNEN STOP AUSGANGSSTELLUNG FÜR SPÄTERE OPERATIONEN STOP",
+      "folgen": {
+        "erfuellt": {
+          "ansehen": 5
+        },
+        "verfehlt": {
+          "ansehen": -4
+        }
+      }
+    },
+    {
+      "id": "a2m1.tagebuch.niederlage",
+      "art": "tagebuch",
+      "nach": "a2m1",
+      "slot": "a2m1.tagebuch",
+      "blatt": "tagebuch",
+      "titel": "Tag 64",
+      "wann": {
+        "ausgang": "niederlage"
+      },
+      "text": "Die Sappe ist eingestürzt, zwölf Meter vor dem Heuwagen. Der Lehm hat sie einfach zugemacht, wie man ein Buch zuschlägt. Fedders sagt, nasser Lehm hat keine Meinung, er hat nur Gewicht.\n\nVell hat gefragt, warum wir nicht einfach oben hinübergehen. Ich habe ihm die Weide gezeigt. Er hat lange hingesehen."
+    },
+    {
+      "id": "a2m1.tagebuch.verluste",
+      "art": "tagebuch",
+      "nach": "a2m1",
+      "slot": "a2m1.tagebuch",
+      "blatt": "tagebuch",
+      "titel": "Tag 64",
+      "wann": {
+        "werte": {
+          "gefallene": {
+            "min": 3
+          }
+        }
+      },
+      "text": "Die Sappe reicht bis zum Heuwagen. Drei Tage für hundertzehn Meter, und am letzten Tag hat Morrow gemerkt, wohin sie führt.\n\nVell hat heute zum ersten Mal jemanden aus seinem Zug verloren. Er stand danach lange im Regen, ohne Mütze. Dann kam er zu mir und fragte nach Lattenrosten. Das war richtig."
+    },
+    {
+      "id": "a2m1.tagebuch",
+      "art": "tagebuch",
+      "nach": "a2m1",
+      "slot": "a2m1.tagebuch",
+      "blatt": "tagebuch",
+      "titel": "Tag 64",
+      "text": "Zurück an der Asse. Die Mühle steht noch, ohne Dach, und Lohmann hat in ihrem Keller den Nagel wiedergefunden, an dem im Sommer seine Feldflasche hing.\n\nVell spricht viel und gut. Er zitiert Feldherren, deren Namen ich in der Schule auswendig gelernt und wieder vergessen habe. Er hat die Sappe mit Begeisterung gegraben, als wäre sie ein Weg zu etwas. Vielleicht ist sie das. Sie führt zum Hügel."
+    },
+    {
+      "id": "a2m2.entscheidung",
+      "art": "entscheidung",
+      "nach": "a2m1",
+      "titel": "Klopfen im Hügel",
+      "text": "Die Gefreite Albers meldet aus dem Horchposten am Heuwagen ein Klopfen unter dem Boden, regelmäßig, alle paar Minuten. Morrow gräbt einen Stollen unter Ihre Linie. Fedders' Pionierzug ist nach Asse-Mitte ausgeliehen und kommt erst in drei Tagen zurück; nur Fedders selbst ist hier. Sie könnten sofort mit einem Gegenstollen beginnen, mit Schützen, die nie unter Tage waren.",
+      "optionen": [
+        {
+          "id": "sofort",
+          "label": "Gegenstollen sofort graben",
+          "text": "Albers zeigt den Schützen, wie man einen Stollen abstützt. Sie lernt schnell, die anderen langsamer. Am zweiten Tag gibt eine Stütze nach. Alle kommen heraus, mit Lehm im Mund und ohne zu reden.",
+          "folgen": {
+            "ansehen": 3,
+            "vertrauen": -3
+          },
+          "setzt": [
+            "stollen_frueh"
+          ]
+        },
+        {
+          "id": "warten",
+          "label": "Auf die Pioniere warten",
+          "text": "Sie verdoppeln die Horchposten und warten. Drei Tage lang horcht Albers jede Stunde. Das Klopfen wird lauter.",
+          "folgen": {
+            "ansehen": -2,
+            "vertrauen": 3
+          }
+        }
+      ]
+    },
+    {
+      "id": "a2m2.briefing",
+      "art": "briefing",
+      "mission": "a2m2",
+      "blatt": "telegramm",
+      "titel": "Unter Hügel 214",
+      "ort": "Hügel 214, unter Tage",
+      "zeit": "Herbst, Tag 66",
+      "text": "Unter Hügel 214 liegt Kreide, darunter der Lehm. In der Kreide hört man jeden Spaten auf hundert Meter. Morrow gräbt auf die Sappe am Heuwagen zu. Wer zuerst unter dem Gegner ist, kann sprengen.\n\nHorchposten erkennen Stollen in ihrem Umkreis, aber nicht immer. Ein Gegenstollen kann den feindlichen treffen, bevor er sein Ziel erreicht. Er kann ihn auch verfehlen und nur Lärm machen.\n\nAlbers sagt, sie habe drüben jemanden pfeifen hören. Immer dasselbe Lied.",
+      "ziele": [
+        "Horchposten so legen, dass sie den feindlichen Stollen finden",
+        "Einen Gegenstollen vortreiben",
+        "Den feindlichen Stollen sprengen, bevor er die eigene Linie erreicht"
+      ]
+    },
+    {
+      "id": "a2m2.befehl",
+      "art": "befehl",
+      "mission": "a2m2",
+      "blatt": "telegramm",
+      "nr": "S-66/02",
+      "von": "Oberst van Aurach",
+      "an": "Major Brandt",
+      "abschnitt": "Asse-Nord",
+      "frist": "TAG 70 06:00",
+      "eilt": true,
+      "text": "FEINDLICHE MINIERTÄTIGKEIT BESTÄTIGT STOP GEGENMASSNAHMEN SOFORT STOP SPRENGSTOFF WIRD ZUGEFÜHRT STOP",
+      "folgen": {
+        "erfuellt": {
+          "ansehen": 6
+        },
+        "verfehlt": {
+          "ansehen": -6
+        }
+      }
+    },
+    {
+      "id": "a2m2.tagebuch.niederlage",
+      "art": "tagebuch",
+      "nach": "a2m2",
+      "slot": "a2m2.tagebuch",
+      "blatt": "tagebuch",
+      "titel": "Tag 70",
+      "wann": {
+        "ausgang": "niederlage"
+      },
+      "text": "Sie waren zuerst da. Um drei Uhr früh hob sich der Boden unter dem Horchposten am Heuwagen. Ich habe es im Gefechtsstand gespürt, bevor ich es gehört habe, wie eine Tür, die im Keller zufällt.\n\nDort ist jetzt ein Loch, in dem man ein Haus verstecken könnte. Tjark Boysen, Gruppe 2, Wessel. Folkert Ubben, Pioniere, Kelling. Albers war in einem anderen Posten. Sie hat seither nicht gesprochen. Sie horcht nur."
+    },
+    {
+      "id": "a2m2.tagebuch.verluste",
+      "art": "tagebuch",
+      "nach": "a2m2",
+      "slot": "a2m2.tagebuch",
+      "blatt": "tagebuch",
+      "titel": "Tag 70",
+      "wann": {
+        "werte": {
+          "gefallene": {
+            "min": 3
+          }
+        }
+      },
+      "text": "Unser Gegenstollen hat ihren getroffen. Die Sprengung hat ihren Gang verschüttet und einen Teil unseres. Wir haben unsere Leute ausgegraben. Nicht alle rechtzeitig. Tjark Boysen, Gruppe 2, Wessel. Folkert Ubben, Pioniere, Kelling. Und die anderen auf der Liste.\n\nDrüben gräbt auch jemand. Seit heute Abend pfeift niemand mehr. Albers hat es mir gemeldet, als wäre es eine Meldung."
+    },
+    {
+      "id": "a2m2.tagebuch",
+      "art": "tagebuch",
+      "nach": "a2m2",
+      "slot": "a2m2.tagebuch",
+      "blatt": "tagebuch",
+      "titel": "Tag 70",
+      "text": "Wir waren zuerst unter ihnen. Fedders hat die Ladung gesetzt, Albers hat gehorcht, bis drüben keiner mehr grub. Dann haben wir gezündet. Der Hügel hat sich geschüttelt wie ein nasser Hund.\n\nVorher, im Gegenstollen, hat eine Stütze nachgegeben. Tjark Boysen, Gruppe 2, Wessel. Folkert Ubben, Pioniere, Kelling. Zwei Namen an einem Tag, an dem wir gewonnen haben.\n\nIch habe heute gelernt, dass man im Krieg auch nach unten fallen kann. Morgen werden sie neu anfangen. Wir auch."
+    },
+    {
+      "id": "a2m3.briefing",
+      "art": "briefing",
+      "mission": "a2m3",
+      "blatt": "telegramm",
+      "titel": "Leuchtkugeln",
+      "ort": "Asse-Nord, vordere Linie",
+      "zeit": "Herbst, Tag 74",
+      "text": "Lask hat seine Art zu kämpfen geändert. Keine Wellen mehr bei Tag. Nachts kommen kleine Trupps durch den Draht, ohne Gewehrfeuer, mit Keulen und Handgranaten. Sie nehmen einen Posten, zwei Gefangene, und sind weg, bevor jemand eine Leuchtkugel schießt.\n\nIm Dunkeln sieht niemand weit. Eine Leuchtkugel erhellt einen Kreis für kurze Zeit und verrät jede Bewegung darin, auch die eigene.\n\nFeldwebel Fedders rät, die Posten nachts zu verdoppeln und tagsüber schlafen zu lassen. Die Leute sind schon müde.",
+      "ziele": [
+        "Horch- und Sicherungsposten nachts besetzen",
+        "Leuchtkugeln sparsam und im richtigen Moment schießen",
+        "Keine Gefangenen an Morrow verlieren"
+      ]
+    },
+    {
+      "id": "a2m3.befehl",
+      "art": "befehl",
+      "mission": "a2m3",
+      "blatt": "telegramm",
+      "nr": "S-74/03",
+      "von": "Oberst van Aurach",
+      "an": "Major Brandt",
+      "abschnitt": "Asse-Nord",
+      "frist": "TAG 77 06:00",
+      "eilt": false,
+      "text": "WIEDERHOLTE NÄCHTLICHE VERLUSTE AN POSTEN NICHT HINNEHMBAR STOP WACHSAMKEIT ERHÖHEN STOP MELDUNG ÜBER JEDEN VERMISSTEN STOP",
+      "folgen": {
+        "erfuellt": {
+          "ansehen": 4
+        },
+        "verfehlt": {
+          "ansehen": -5
+        }
+      }
+    },
+    {
+      "id": "a2m3.tagebuch.niederlage",
+      "art": "tagebuch",
+      "nach": "a2m3",
+      "slot": "a2m3.tagebuch",
+      "blatt": "tagebuch",
+      "titel": "Tag 77",
+      "wann": {
+        "ausgang": "niederlage"
+      },
+      "text": "Drei Nächte, drei Posten. Sie kommen, wenn der Regen am lautesten ist. Morgens fehlt jemand, und auf der Liste steht nicht „gefallen“, sondern „vermisst“. Ich weiß nicht, welches Wort schwerer ist.\n\nVell will einen eigenen Stoßtrupp. Ich habe gesagt, wir reden darüber. Er hat gehört: ja."
+    },
+    {
+      "id": "a2m3.tagebuch.verluste",
+      "art": "tagebuch",
+      "nach": "a2m3",
+      "slot": "a2m3.tagebuch",
+      "blatt": "tagebuch",
+      "titel": "Tag 77",
+      "wann": {
+        "werte": {
+          "moral": {
+            "max": 40
+          }
+        }
+      },
+      "text": "Kein Posten verloren. Aber niemand schläft mehr. Die Leute sitzen nachts mit offenen Augen auf dem Schützenauftritt und tagsüber mit offenen Augen im Unterstand.\n\nLohmann hat heute eine Ratte erschossen, weil sie im Draht raschelte. Danach hat er sich entschuldigt. Bei mir, nicht bei der Ratte."
+    },
+    {
+      "id": "a2m3.tagebuch",
+      "art": "tagebuch",
+      "nach": "a2m3",
+      "slot": "a2m3.tagebuch",
+      "blatt": "tagebuch",
+      "titel": "Tag 77",
+      "text": "In der zweiten Nacht hat Gruppe 3 eine Leuchtkugel geschossen, genau als der Trupp von drüben am Draht hing. Für zehn Sekunden war die Weide taghell, und sechs Kronsoldaten standen darin wie auf einer Bühne. Vier sind zurückgekommen. Zwei haben wir hereingeholt.\n\nEiner von ihnen ist siebzehn, sagt Selin. Er hat ihr seinen Namen gesagt und dann gefragt, ob er jetzt erschossen wird. Arvo Kalnis hat ihm im Lazarett einen Becher Tee gebracht und in seiner Sprache etwas gesagt. Ich habe nicht gefragt, was."
+    },
+    {
+      "id": "a2m3.entscheidung",
+      "art": "entscheidung",
+      "nach": "a2m3",
+      "titel": "Rufe von der Weide",
+      "text": "Nach dem letzten Überfall liegt ein verwundeter Kronsoldat im Niemandsland, zwanzig Meter vor Ihrem Draht. Er ruft seit Stunden. Eine Sanitäterin aus Gruppe 2 will hinaus. Bei Nacht ist es möglich, aber jede Leuchtkugel von drüben macht sie zum Ziel.",
+      "optionen": [
+        {
+          "id": "holen",
+          "label": "Die Sanitäterin gehen lassen",
+          "text": "Sie kriecht hinaus, ohne Gewehr, mit einer Zeltbahn. Drüben steigt eine Leuchtkugel. Niemand schießt. Zwanzig Minuten später ist sie mit dem Mann zurück. Die ganze Gruppe 2 hat zugesehen.",
+          "folgen": {
+            "ansehen": -2,
+            "vertrauen": 6
+          },
+          "setzt": [
+            "verwundeter_geholt"
+          ]
+        },
+        {
+          "id": "liegen",
+          "label": "Niemand geht hinaus",
+          "text": "Sie verbieten es. Die Rufe hören gegen Morgen auf. Die Sanitäterin meldet sich zum Dienst und spricht nur noch dienstlich mit Ihnen.",
+          "folgen": {
+            "ansehen": 1,
+            "vertrauen": -5
+          }
+        }
+      ]
+    },
+    {
+      "id": "a2m4.briefing",
+      "art": "briefing",
+      "mission": "a2m4",
+      "blatt": "telegramm",
+      "titel": "Stoßtrupp",
+      "ort": "Niemandsland vor Morrows Linie am Hügel 214",
+      "zeit": "Herbst, Tag 81",
+      "text": "Der Stab will wissen, wer gegenüber liegt und wie viele. Dafür braucht er Gefangene, und Gefangene holt man nachts.\n\nVell hat sich freiwillig gemeldet, den ersten Stoßtrupp des Abschnitts zu führen. Acht Leute, geschwärzte Gesichter, keine Gewehre, nur Pistolen, Keulen und Drahtscheren. Sie gehen in der Neumondnacht.\n\nEin Stoßtrupp ist schnell und leise. Er ist auch allein, sobald er im fremden Graben ist.",
+      "ziele": [
+        "Einen Stoßtrupp bei Nacht durch den Draht bringen",
+        "Mindestens einen Gefangenen einbringen",
+        "Den Trupp vor der Dämmerung zurückholen"
+      ]
+    },
+    {
+      "id": "a2m4.befehl",
+      "art": "befehl",
+      "mission": "a2m4",
+      "blatt": "telegramm",
+      "nr": "S-81/04",
+      "von": "Oberst van Aurach",
+      "an": "Major Brandt",
+      "abschnitt": "Asse-Nord",
+      "frist": "TAG 83 06:00",
+      "eilt": true,
+      "text": "GEFANGENE ZUR FESTSTELLUNG GEGNERISCHER VERBÄNDE ERFORDERLICH STOP MINDESTENS ZWEI STOP OFFIZIER BEVORZUGT STOP",
+      "folgen": {
+        "erfuellt": {
+          "ansehen": 7
+        },
+        "verfehlt": {
+          "ansehen": -5
+        }
+      }
+    },
+    {
+      "id": "a2m4.tagebuch.niederlage",
+      "art": "tagebuch",
+      "nach": "a2m4",
+      "slot": "a2m4.tagebuch",
+      "blatt": "tagebuch",
+      "titel": "Tag 83",
+      "wann": {
+        "ausgang": "niederlage"
+      },
+      "text": "Der Trupp kam ohne Gefangene zurück, und nicht vollständig. Morrow hatte den Graben geräumt und wartete im zweiten. Lask hat damit gerechnet. Er rechnet wie ich.\n\nVell hat die ganze Nacht seinen Bericht geschrieben, dreimal neu. Am Ende stand darin nur, was geschehen ist. Das ist mehr, als in den meisten Berichten steht."
+    },
+    {
+      "id": "a2m4.tagebuch.verluste",
+      "art": "tagebuch",
+      "nach": "a2m4",
+      "slot": "a2m4.tagebuch",
+      "blatt": "tagebuch",
+      "titel": "Tag 83",
+      "wann": {
+        "werte": {
+          "gefallene": {
+            "min": 2
+          }
+        }
+      },
+      "text": "Zwei Gefangene, wie befohlen. Zwei von uns sind drüben geblieben. Der Stab wird die erste Zahl lesen.\n\nDie Gefangenen kommen aus Velsk, Garnisonsstadt. Einer hat Lohmann nach Tabak gefragt, und Lohmann hat ihm seinen gegeben. Ich habe Lohmann noch nie etwas hergeben sehen."
+    },
+    {
+      "id": "a2m4.tagebuch",
+      "art": "tagebuch",
+      "nach": "a2m4",
+      "slot": "a2m4.tagebuch",
+      "blatt": "tagebuch",
+      "titel": "Tag 83",
+      "text": "Vell hat sie alle zurückgebracht. Und drei Gefangene, einer davon Feldwebel. Er stand im Morgengrauen vor mir, schwarz im Gesicht und strahlend, und hat gemeldet wie auf dem Kasernenhof.\n\nIch habe ihm gratuliert. Ich meine es auch. Ich habe ihm nicht gesagt, dass ich die ganze Nacht neben dem Telefon gesessen habe, als könnte es klingeln."
+    },
+    {
+      "id": "a2m4.entscheidung",
+      "art": "entscheidung",
+      "nach": "a2m4",
+      "titel": "Wie wir kämpfen",
+      "text": "Der Stab verlangt eine Festlegung für den Abschnitt bis zum Winter: wie Sie Ihre Leute einsetzen, wo Sie Material verbrauchen, was die Ausbildung übt. Drei Denkschriften liegen auf dem Tisch. Eine davon wird für diesen Akt gelten.",
+      "optionen": [
+        {
+          "id": "tiefe",
+          "label": "Tiefe Verteidigung",
+          "text": "Vorn wenige Posten, dahinter starke Linien und Unterstände. Wer angreift, läuft sich in der Tiefe fest. Fedders nickt. Vell nennt es „Graben für Feiglinge“, aber nur leise.",
+          "folgen": {
+            "ansehen": -2,
+            "vertrauen": 4
+          },
+          "setzt": [
+            "doktrin_tiefe"
+          ]
+        },
+        {
+          "id": "infiltration",
+          "label": "Infiltration",
+          "text": "Kleine Trupps, Nacht, Überraschung. Stoßtrupps bekommen Vorrang bei Ausbildung und Ausrüstung. Vell strahlt. Lohmann fragt, wer die Gräben gräbt, wenn alle nachts unterwegs sind.",
+          "folgen": {
+            "ansehen": 3,
+            "vertrauen": -1
+          },
+          "setzt": [
+            "doktrin_infiltration"
+          ]
+        },
+        {
+          "id": "material",
+          "label": "Materialschlacht",
+          "text": "Granaten statt Menschen. Die Batterien bekommen Vorrang bei den Loren. Der Stab ist begeistert, weil Kaldern Fabriken hat und Morrow nicht. Selin fragt, wie viele Loren dann noch für sie fahren.",
+          "folgen": {
+            "ansehen": 5,
+            "vertrauen": -2
+          },
+          "setzt": [
+            "doktrin_material"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "a2m5.entscheidung",
+      "art": "entscheidung",
+      "nach": "a2m4",
+      "titel": "Vell will angreifen",
+      "text": "Leutnant Vell legt Ihnen einen Plan vor: Mit seinem Zug durch die Sappe bis an den Fuß von Hügel 214, im Morgennebel, ohne Vorbereitungsfeuer, damit Morrow nichts merkt. Der Plan ist mutig und nicht dumm. Die Vorschau zeigt erwartete Verluste von über der Hälfte. Vell hat bereits beim Stab um Zustimmung gebeten, und der Stab hat geantwortet: „Ermessen der Kommandantin.“",
+      "optionen": [
+        {
+          "id": "aufhalten",
+          "label": "Vell zurückhalten",
+          "text": "Sie verbieten den Angriff. Vell salutiert, geht hinaus und schlägt draußen mit der Faust gegen einen Stützbalken. Am Abend telegrafiert der Stab, man habe von einer „verpassten Gelegenheit“ gehört.",
+          "folgen": {
+            "ansehen": -8,
+            "vertrauen": 6
+          },
+          "setzt": [
+            "vell_zurueckgehalten"
+          ]
+        },
+        {
+          "id": "gehen",
+          "label": "Vell gehen lassen",
+          "text": "Sie geben die Erlaubnis. Vell drückt Ihnen die Hand, zu fest. Sein Zug verbringt den Abend damit, Briefe zu schreiben. Fedders sammelt sie ein und sagt nichts.",
+          "folgen": {
+            "ansehen": 6,
+            "vertrauen": -6
+          },
+          "setzt": [
+            "vell_angriff"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "a2m5.briefing.angriff",
+      "art": "briefing",
+      "mission": "a2m5",
+      "slot": "a2m5.briefing",
+      "blatt": "telegramm",
+      "titel": "Morgennebel",
+      "ort": "Sappe am Heuwagen, Fuß von Hügel 214",
+      "zeit": "Herbst, Tag 86",
+      "wann": {
+        "flags": [
+          "vell_angriff"
+        ]
+      },
+      "text": "Vells Zug steht um fünf Uhr in der Sappe. Der Nebel liegt dicht über der Weide, wie er es vorhergesagt hat. Ohne Vorbereitungsfeuer sitzt Morrow nicht im Unterstand, sondern am Rand des Grabens, wach oder schlafend.\n\nSie können den Angriff jetzt nur noch begleiten: Sperrfeuer hinter dem Hügel, damit keine Reserven nachkommen, Sanitäter in der Sappe, Loren bereit für den Rückweg.\n\nWenn der Nebel sich hebt, bevor der Zug oben ist, steht er auf einem offenen Hang.",
+      "ziele": [
+        "Vells Zug bis an den Fuß von Hügel 214 bringen",
+        "Den vorderen Graben am Hang nehmen und gegen den Gegenstoß halten",
+        "Verwundete durch die Sappe zurückholen"
+      ]
+    },
+    {
+      "id": "a2m5.briefing",
+      "art": "briefing",
+      "mission": "a2m5",
+      "slot": "a2m5.briefing",
+      "blatt": "telegramm",
+      "titel": "Morgennebel",
+      "ort": "Asse-Nord, Sappe am Heuwagen",
+      "zeit": "Herbst, Tag 86",
+      "text": "Vell ist nicht gegangen. Lask schon. Im Morgennebel kommt ein Stoßtrupp von drüben durch die Sappe, die wir selbst gegraben haben, und versucht, den Heuwagen zu nehmen.\n\nVell bittet darum, den Gegenstoß führen zu dürfen. Es wäre ein Kampf im Graben, Feld für Feld, ohne Artillerie, weil man im Nebel die eigenen Leute nicht von den anderen unterscheidet.\n\nDie Sappe ist unser Weg zum Hügel. Wir brauchen sie.",
+      "ziele": [
+        "Den Einbruch in der Sappe abriegeln",
+        "Die Sappe bis zum Heuwagen zurücknehmen",
+        "Vells Zug geschlossen zurückbringen"
+      ]
+    },
+    {
+      "id": "a2m5.befehl",
+      "art": "befehl",
+      "mission": "a2m5",
+      "blatt": "telegramm",
+      "nr": "S-86/05",
+      "von": "Oberst van Aurach",
+      "an": "Major Brandt",
+      "abschnitt": "Asse-Nord",
+      "frist": "TAG 86 12:00",
+      "eilt": true,
+      "text": "LAGE AN HÜGEL 214 MELDEN STOP GEWONNENES GELÄNDE UNBEDINGT HALTEN STOP",
+      "folgen": {
+        "erfuellt": {
+          "ansehen": 6
+        },
+        "verfehlt": {
+          "ansehen": -6
+        }
+      }
+    },
+    {
+      "id": "a2m5.tagebuch.vell_gefallen",
+      "art": "tagebuch",
+      "nach": "a2m5",
+      "slot": "a2m5.tagebuch",
+      "blatt": "tagebuch",
+      "titel": "Tag 86",
+      "wann": {
+        "flags": [
+          "vell_gefallen"
+        ]
+      },
+      "text": "Jost Vell, Leutnant, Haverstadt. Am Hang von Hügel 214, Tag 86, gegen sechs Uhr, als der Nebel aufging.\n\nEr war dreiundzwanzig. Er hat mich einmal gefragt, ob ich glaube, dass man einen Orden spürt, wenn man ihn trägt. Ich habe gesagt, ich wüsste es nicht. Der Stab hat heute Nachmittag telegrafiert, dass er ihn vorschlägt.\n\nIch schreibe seinem Vater. Ich werde schreiben, dass er tapfer war. Das stimmt. Ich werde nicht schreiben, dass ich ihn hätte aufhalten können. Das stimmt auch."
+    },
+    {
+      "id": "a2m5.tagebuch.angriff_niederlage",
+      "art": "tagebuch",
+      "nach": "a2m5",
+      "slot": "a2m5.tagebuch",
+      "blatt": "tagebuch",
+      "titel": "Tag 86",
+      "wann": {
+        "flags": [
+          "vell_angriff"
+        ],
+        "ausgang": "niederlage"
+      },
+      "text": "Der Nebel hat sich zu früh gehoben. Für alle. Wir sind dort, wo wir heute Morgen waren, und es fehlen Leute.\n\nFedders hat die Briefe, die Vells Zug gestern Abend geschrieben hat, in eine Kiste gelegt. Sie hat sie nicht abgeschickt. Sie wartet, welche sie abschicken muss."
+    },
+    {
+      "id": "a2m5.tagebuch.zurueck_niederlage",
+      "art": "tagebuch",
+      "nach": "a2m5",
+      "slot": "a2m5.tagebuch",
+      "blatt": "tagebuch",
+      "titel": "Tag 86",
+      "wann": {
+        "flags": [
+          "vell_zurueckgehalten"
+        ],
+        "ausgang": "niederlage"
+      },
+      "text": "Vell hat den Gegenstoß geführt, wie er es wollte, nur in die andere Richtung. Es hat nicht gereicht. Die Sappe gehört bis zum Heuwagen Morrow, und unser Weg zum Hügel ist zu.\n\nVell saß danach neben mir auf einer Munitionskiste und sagte: „Wenn ich heute früh gegangen wäre, Frau Major, wäre ich jetzt oben.“ Vielleicht. Vielleicht wäre er jetzt auf der Liste. Ich habe es ihm nicht gesagt. Er weiß es."
+    },
+    {
+      "id": "a2m5.tagebuch.zurueck",
+      "art": "tagebuch",
+      "nach": "a2m5",
+      "slot": "a2m5.tagebuch",
+      "blatt": "tagebuch",
+      "titel": "Tag 86",
+      "wann": {
+        "flags": [
+          "vell_zurueckgehalten"
+        ]
+      },
+      "text": "Vell hat den Gegenstoß geführt, wie er es wollte, nur in die andere Richtung. Er hat die Sappe zurückgeholt, Feld für Feld. Danach saß er neben mir auf einer Munitionskiste und hat lange nichts gesagt.\n\nDann: „Sie hatten recht, Frau Major. Ich mag es trotzdem nicht.“ Ich auch nicht. Recht haben ist hier kein Gefühl, es ist eine Bilanz."
+    },
+    {
+      "id": "a2m5.tagebuch",
+      "art": "tagebuch",
+      "nach": "a2m5",
+      "slot": "a2m5.tagebuch",
+      "blatt": "tagebuch",
+      "titel": "Tag 86",
+      "text": "Vell ist oben. Ein Graben am Hang, zwanzig Meter breit, mit Blick über die ganze Weide. Er hat ihn genommen und gehalten, und er lebt.\n\nDer Stab ist begeistert. Vell auch. Ich zähle die Liste und denke an die Vorschau, die über die Hälfte sagte. Es war weniger. Diesmal. Ich weiß nicht, was Vell daraus lernt. Ich fürchte, er lernt das Falsche, und ich lerne es mit."
+    },
+    {
+      "id": "a2m6.briefing.stollen",
+      "art": "briefing",
+      "mission": "a2m6",
+      "slot": "a2m6.briefing",
+      "blatt": "telegramm",
+      "titel": "Der Trichter",
+      "ort": "Hügel 214",
+      "zeit": "Herbst, Tag 92",
+      "wann": {
+        "flags": [
+          "stollen_frueh"
+        ]
+      },
+      "text": "Der Gegenstollen, den Sie früh begonnen haben, hat sich ausgezahlt. Fedders' Pioniere liegen seit gestern unter Morrows Graben auf der Kuppe von Hügel 214. Die Ladung ist gesetzt.\n\nNach der Sprengung bleibt ein Trichter, in dem eine ganze Kompanie Platz hat. Wer ihn zuerst besetzt, hat den Hügel. Wer ihn hat, muss ihn umbauen, denn der Rand zeigt in die falsche Richtung. Und er muss ihn gegen den Gegenstoß halten, der sicher kommt.",
+      "ziele": [
+        "Nach der Sprengung den Trichter besetzen",
+        "Den Trichterrand zur Feuerstellung umbauen",
+        "Den Gegenstoß abwehren und bis zur Dämmerung halten"
+      ]
+    },
+    {
+      "id": "a2m6.briefing",
+      "art": "briefing",
+      "mission": "a2m6",
+      "slot": "a2m6.briefing",
+      "blatt": "telegramm",
+      "titel": "Der Trichter",
+      "ort": "Hügel 214",
+      "zeit": "Herbst, Tag 92",
+      "text": "Morrow hat zuerst gesprengt. Nicht unter Ihrer Linie, sondern unter der eigenen Kuppe, um einen Trichter zu schaffen, aus dem man auf Ihre Gräben hinunterschießen kann. Der Trichter liegt noch leer. Die Erde fällt noch.\n\nWer ihn zuerst besetzt, hat den Hügel. Wer ihn hat, muss ihn umbauen, denn der Rand zeigt in alle Richtungen zugleich. Und er muss ihn gegen den Gegenstoß halten, der sicher kommt.",
+      "ziele": [
+        "Den Trichter vor Morrow erreichen",
+        "Den Trichterrand zur Feuerstellung umbauen",
+        "Den Gegenstoß abwehren und bis zur Dämmerung halten"
+      ]
+    },
+    {
+      "id": "a2m6.befehl",
+      "art": "befehl",
+      "mission": "a2m6",
+      "blatt": "telegramm",
+      "nr": "S-92/06",
+      "von": "Oberst van Aurach",
+      "an": "Major Brandt",
+      "abschnitt": "Asse-Nord",
+      "frist": "TAG 93 06:00",
+      "eilt": true,
+      "text": "HÜGEL 214 IST ZU NEHMEN UND ZU HALTEN STOP VORBEREITUNGSFEUER GENEHMIGT STOP VERLUSTE NACHRANGIG STOP",
+      "folgen": {
+        "erfuellt": {
+          "ansehen": 12
+        },
+        "verfehlt": {
+          "ansehen": -10
+        }
+      }
+    },
+    {
+      "id": "a2m6.tagebuch.niederlage",
+      "art": "tagebuch",
+      "nach": "a2m6",
+      "slot": "a2m6.tagebuch",
+      "blatt": "tagebuch",
+      "titel": "Tag 93",
+      "wann": {
+        "ausgang": "niederlage"
+      },
+      "text": "Der Trichter gehört Morrow. Von seinem Rand aus sieht man unsere Gräben, wie ich sie auf meiner Karte sehe: von oben, ganz und gar. Ich habe heute zum ersten Mal verstanden, wie sich Lask in diesem Sommer gefühlt haben muss.\n\nDer Herbst ist vorbei. Der Regen nicht."
+    },
+    {
+      "id": "a2m6.tagebuch.verluste",
+      "art": "tagebuch",
+      "nach": "a2m6",
+      "slot": "a2m6.tagebuch",
+      "blatt": "tagebuch",
+      "titel": "Tag 93",
+      "wann": {
+        "werte": {
+          "gefallene": {
+            "min": 10
+          }
+        }
+      },
+      "text": "Hügel 214 gehört uns. Das heißt, ein Loch auf seiner Kuppe gehört uns, voller Wasser, Kreide und allem, was die Sprengung hochgeworfen hat. Der Stab hat „Anerkennung“ telegrafiert und eine Liste angefordert, wer einen Orden bekommen soll.\n\nIch habe eine andere Liste. Sie ist länger. Ich schicke beide."
+    },
+    {
+      "id": "a2m6.tagebuch",
+      "art": "tagebuch",
+      "nach": "a2m6",
+      "slot": "a2m6.tagebuch",
+      "blatt": "tagebuch",
+      "titel": "Tag 93",
+      "text": "Wir haben den Trichter. Von seinem Rand sieht man bis Raudas und bis Ostervenn, beide Kirchtürme, oder was davon übrig ist. Fedders hat einen Pflock in die Kuppe geschlagen und „214“ daraufgeschrieben, damit niemand vergisst, wo der Hügel war.\n\nAlbers hat heute Nacht im Trichter gehorcht. Nichts. Zum ersten Mal seit Wochen gräbt drüben niemand. Sie sagt, die Stille sei schlimmer. Ich glaube, sie meint: Es kommt etwas anderes."
+    },
+    {
+      "id": "a2m6.entscheidung",
+      "art": "entscheidung",
+      "nach": "a2m6",
+      "titel": "Die Ordensliste",
+      "text": "Der Stab verlangt bis morgen eine Liste mit Vorschlägen für Auszeichnungen. Er hat zwölf Orden für den Abschnitt bewilligt. Gleichzeitig liegt ein Antrag von Feldwebel Fedders vor: Heimaturlaub für die Gruppen, die seit dem Sommer ohne Unterbrechung im Abschnitt sind. Der Stab wird nicht beides großzügig behandeln.",
+      "optionen": [
+        {
+          "id": "orden",
+          "label": "Die Ordensliste schreiben",
+          "text": "Sie schreiben zwölf Namen auf. Die Orden kommen nach zwei Wochen in einer Kiste mit Stroh. Einige tragen sie, die meisten schicken sie nach Hause. Der Urlaubsantrag wird vertagt.",
+          "folgen": {
+            "ansehen": 5,
+            "vertrauen": -3
+          },
+          "setzt": [
+            "orden_liste"
+          ]
+        },
+        {
+          "id": "urlaub",
+          "label": "Urlaub statt Orden beantragen",
+          "text": "Sie schicken keine Liste, sondern Fedders' Antrag, mit Ihrer Unterschrift darunter und dem Satz: „Ich bitte, die zwölf Orden in Urlaubsscheine umzurechnen.“ Der Stab antwortet mit einer Rüge und vierzig Urlaubsscheinen.",
+          "folgen": {
+            "ansehen": -5,
+            "vertrauen": 8
+          },
+          "setzt": [
+            "urlaub_statt_orden"
+          ]
+        }
+      ]
+    }
+  ]
+}

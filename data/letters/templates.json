@@ -1,0 +1,708 @@
+{
+  "format": 1,
+  "beschreibung": "Vorlagen fuer generierte Feldpost (art feldpost, drei Tonlagen), Ereignis-Saetze fuer {ereignis} (art ereignis, nach kategorie) und Anreden (art anrede). Erzeugung siehe data/texts/README.md.",
+  "eintraege": [
+    {
+      "id": "anrede.mutter",
+      "art": "anrede",
+      "empfaenger": "Mutter",
+      "text": "Liebe Mutter"
+    },
+    {
+      "id": "anrede.vater",
+      "art": "anrede",
+      "empfaenger": "Vater",
+      "text": "Lieber Vater"
+    },
+    {
+      "id": "anrede.schwester",
+      "art": "anrede",
+      "empfaenger": "Schwester",
+      "text": "Liebe Schwester"
+    },
+    {
+      "id": "anrede.bruder",
+      "art": "anrede",
+      "empfaenger": "Bruder",
+      "text": "Lieber Bruder"
+    },
+    {
+      "id": "anrede.kaldern.antje",
+      "art": "anrede",
+      "fraktion": "kaldern",
+      "empfaenger": "Antje",
+      "text": "Liebe Antje"
+    },
+    {
+      "id": "anrede.kaldern.swantje",
+      "art": "anrede",
+      "fraktion": "kaldern",
+      "empfaenger": "Swantje",
+      "text": "Liebe Swantje"
+    },
+    {
+      "id": "anrede.kaldern.folkert",
+      "art": "anrede",
+      "fraktion": "kaldern",
+      "empfaenger": "Folkert",
+      "text": "Lieber Folkert"
+    },
+    {
+      "id": "anrede.kaldern.dirk",
+      "art": "anrede",
+      "fraktion": "kaldern",
+      "empfaenger": "Dirk",
+      "text": "Lieber Dirk"
+    },
+    {
+      "id": "anrede.morrow.ludmila",
+      "art": "anrede",
+      "fraktion": "morrow",
+      "empfaenger": "Ludmila",
+      "text": "Liebe Ludmila"
+    },
+    {
+      "id": "anrede.morrow.vesna",
+      "art": "anrede",
+      "fraktion": "morrow",
+      "empfaenger": "Vesna",
+      "text": "Liebe Vesna"
+    },
+    {
+      "id": "anrede.morrow.edvin",
+      "art": "anrede",
+      "fraktion": "morrow",
+      "empfaenger": "Edvin",
+      "text": "Lieber Edvin"
+    },
+    {
+      "id": "ereignis.verluste.1",
+      "art": "ereignis",
+      "kategorie": "verluste",
+      "beschreibung": "Ein Mitglied der Gruppe ist gefallen",
+      "text": "Wir haben {gefallener} verloren, {ort}."
+    },
+    {
+      "id": "ereignis.verluste.2",
+      "art": "ereignis",
+      "kategorie": "verluste",
+      "ton": "erschoepft",
+      "text": "{gefallener} ist nicht mehr da. Gestern lag noch das Essgeschirr neben meinem."
+    },
+    {
+      "id": "ereignis.verluste.3",
+      "art": "ereignis",
+      "kategorie": "verluste",
+      "ton": "verbittert",
+      "text": "{gefallener} ist gefallen, {ort}, für ein Stück Graben, das morgen wieder drüben liegt."
+    },
+    {
+      "id": "ereignis.verluste.4",
+      "art": "ereignis",
+      "kategorie": "verluste",
+      "ton": "zuversichtlich",
+      "text": "Wir haben {gefallener} verloren. Wir sagen jeden Abend den Namen, damit er nicht leiser wird."
+    },
+    {
+      "id": "ereignis.verwundet.1",
+      "art": "ereignis",
+      "kategorie": "verwundet",
+      "beschreibung": "Jemand aus der Gruppe wurde verwundet und zurückgebracht",
+      "text": "{kamerad} ist verwundet und mit der Lore nach hinten gefahren."
+    },
+    {
+      "id": "ereignis.verwundet.2",
+      "art": "ereignis",
+      "kategorie": "verwundet",
+      "ton": "zuversichtlich",
+      "text": "{kamerad} hat einen Splitter in den Arm bekommen und ist im Lazarett. Die Ärztin dort soll streng sein und gut."
+    },
+    {
+      "id": "ereignis.artillerie.1",
+      "art": "ereignis",
+      "kategorie": "artillerie",
+      "beschreibung": "Die Gruppe lag unter Artilleriefeuer",
+      "text": "Sie haben uns {ort} mit Granaten zugedeckt, und wir haben im Unterstand gesessen und gezählt."
+    },
+    {
+      "id": "ereignis.artillerie.2",
+      "art": "ereignis",
+      "kategorie": "artillerie",
+      "ton": "erschoepft",
+      "text": "Seit zwei Tagen kommt alle paar Minuten eine Granate. Man hört auf, sie zu hören, und dann hört man nichts anderes mehr."
+    },
+    {
+      "id": "ereignis.artillerie.3",
+      "art": "ereignis",
+      "kategorie": "artillerie",
+      "ton": "verbittert",
+      "text": "Unsere eigene Batterie hat zu kurz geschossen, {ort}. Niemand hinten wird das je erfahren."
+    },
+    {
+      "id": "ereignis.sturm_abgewehrt.1",
+      "art": "ereignis",
+      "kategorie": "sturm_abgewehrt",
+      "beschreibung": "Ein feindlicher Angriff auf die Gruppe wurde abgewehrt",
+      "text": "Sie sind gegen uns angelaufen, {ort}, und wir haben gehalten."
+    },
+    {
+      "id": "ereignis.sturm_abgewehrt.2",
+      "art": "ereignis",
+      "kategorie": "sturm_abgewehrt",
+      "ton": "zuversichtlich",
+      "text": "Sie kamen {ort} über die Weide, und wir waren rechtzeitig oben. {gruppenfuehrer_nachname} sagt, das lag am Üben."
+    },
+    {
+      "id": "ereignis.sturm_abgewehrt.3",
+      "art": "ereignis",
+      "kategorie": "sturm_abgewehrt",
+      "ton": "erschoepft",
+      "text": "Sie kamen wieder, und wir haben wieder gehalten. Ich weiß nicht mehr, zum wievielten Mal."
+    },
+    {
+      "id": "ereignis.sturm_eigen.1",
+      "art": "ereignis",
+      "kategorie": "sturm_eigen",
+      "beschreibung": "Die Gruppe war an einem eigenen Sturm beteiligt",
+      "text": "Wir sind {ort} hinübergegangen, auf den Pfiff hin."
+    },
+    {
+      "id": "ereignis.sturm_eigen.2",
+      "art": "ereignis",
+      "kategorie": "sturm_eigen",
+      "ton": "verbittert",
+      "text": "Wir mussten {ort} hinüber, obwohl jeder wusste, dass drüben das MG noch steht."
+    },
+    {
+      "id": "ereignis.sturm_eigen.3",
+      "art": "ereignis",
+      "kategorie": "sturm_eigen",
+      "ton": "zuversichtlich",
+      "text": "Wir haben {ort} einen Graben genommen, und jetzt sitzen wir darin und bauen ihn um, damit er in die richtige Richtung schaut."
+    },
+    {
+      "id": "ereignis.graben.1",
+      "art": "ereignis",
+      "kategorie": "graben_gebaut",
+      "beschreibung": "Die Gruppe hat Graben ausgehoben oder ausgebaut",
+      "text": "Wir haben {anzahl} Felder Graben ausgehoben, {ort}, jedes zehn Meter lang."
+    },
+    {
+      "id": "ereignis.graben.2",
+      "art": "ereignis",
+      "kategorie": "graben_gebaut",
+      "ton": "zuversichtlich",
+      "text": "Unser Graben hat jetzt Faschinen und eine Traverse, die so schön ist, dass {kamerad_nachname} ihr einen Namen geben will."
+    },
+    {
+      "id": "ereignis.graben.3",
+      "art": "ereignis",
+      "kategorie": "graben_gebaut",
+      "ton": "erschoepft",
+      "text": "Wir graben. Morgens, abends, nachts. Ich habe Blasen auf den Blasen."
+    },
+    {
+      "id": "ereignis.graben.4",
+      "art": "ereignis",
+      "kategorie": "graben_gebaut",
+      "text": "Wir haben gegraben, {ort}, bis die Hände nicht mehr wollten. Der Graben ist jetzt tiefer als ich."
+    },
+    {
+      "id": "ereignis.schlamm.1",
+      "art": "ereignis",
+      "kategorie": "schlamm",
+      "beschreibung": "Schlamm oder Wasser im Abschnitt der Gruppe",
+      "text": "Der Graben {ort} ist voll Wasser, und der Lehm zieht einem die Stiefel aus."
+    },
+    {
+      "id": "ereignis.schlamm.2",
+      "art": "ereignis",
+      "kategorie": "schlamm",
+      "ton": "verbittert",
+      "text": "Wir stehen seit Tagen bis zu den Knien im Wasser, weil jemand hinten befohlen hat, dass dieser Graben gehalten wird."
+    },
+    {
+      "id": "ereignis.schlamm.3",
+      "art": "ereignis",
+      "kategorie": "schlamm",
+      "ton": "zuversichtlich",
+      "text": "Endlich sind Lattenroste gekommen. Man steht auf Holz, und das Wasser läuft darunter durch. Es ist das schönste Holz der Welt."
+    },
+    {
+      "id": "ereignis.regen.1",
+      "art": "ereignis",
+      "kategorie": "regen",
+      "beschreibung": "Regenwetter während der Mission",
+      "text": "Es regnet seit Tagen, und alles, was ich besitze, ist nass, außer diesem Papier, und das auch nicht mehr lange."
+    },
+    {
+      "id": "ereignis.lore.1",
+      "art": "ereignis",
+      "kategorie": "versorgung",
+      "beschreibung": "Nachschub per Lore hat die Gruppe erreicht",
+      "text": "Die Lore hat Munition und Brot gebracht, und {kamerad_nachname} hat das Brot verteilt, als wäre es Gold."
+    },
+    {
+      "id": "ereignis.lore.2",
+      "art": "ereignis",
+      "kategorie": "versorgung",
+      "ton": "erschoepft",
+      "text": "Die Lore ist {ort} stecken geblieben, und wir haben die Kisten den letzten Kilometer getragen."
+    },
+    {
+      "id": "ereignis.depot_leer.1",
+      "art": "ereignis",
+      "kategorie": "mangel",
+      "beschreibung": "Das Depot lief leer oder der Abschnitt war abgeschnitten",
+      "text": "Zwei Tage kam nichts nach vorn. Wir haben die eiserne Ration gegessen und dann die Hoffnung."
+    },
+    {
+      "id": "ereignis.depot_leer.2",
+      "art": "ereignis",
+      "kategorie": "mangel",
+      "ton": "verbittert",
+      "text": "Hinten stapeln sie die Kisten, und vorn zählen wir die Patronen. Die Loren fahren woandershin."
+    },
+    {
+      "id": "ereignis.essen.1",
+      "art": "ereignis",
+      "kategorie": "warme_mahlzeit",
+      "beschreibung": "Die Gruppe bekam warmes Essen aus der Feldküche",
+      "text": "Heute gab es warme Suppe, mit Speck. Es war die erste seit einer Woche."
+    },
+    {
+      "id": "ereignis.essen.2",
+      "art": "ereignis",
+      "kategorie": "warme_mahlzeit",
+      "ton": "zuversichtlich",
+      "text": "Die Feldküche hat Erbsensuppe geschickt, und sie war noch warm, als sie ankam. Wir haben gejubelt wie Kinder."
+    },
+    {
+      "id": "ereignis.post.1",
+      "art": "ereignis",
+      "kategorie": "post",
+      "beschreibung": "Feldpost ist angekommen",
+      "text": "Heute kam Post. Deine Zeilen habe ich dreimal gelesen und dann {kamerad_nachname} vorgelesen. Für {kamerad_nachname} war nichts dabei."
+    },
+    {
+      "id": "ereignis.abloesung.1",
+      "art": "ereignis",
+      "kategorie": "abloesung",
+      "beschreibung": "Die Gruppe wurde rechtzeitig abgelöst und ist im Ruhelager",
+      "text": "Wir sind abgelöst und liegen im Ruhelager. Ich habe geschlafen wie ein Stein und von nichts geträumt."
+    },
+    {
+      "id": "ereignis.abloesung.2",
+      "art": "ereignis",
+      "kategorie": "abloesung",
+      "ton": "verbittert",
+      "text": "Die Ablösung kam zwei Tage zu spät. Sie hatten uns vergessen, sagt man, oder sie hatten niemanden."
+    },
+    {
+      "id": "ereignis.nacht.1",
+      "art": "ereignis",
+      "kategorie": "nacht",
+      "beschreibung": "Nachtgefecht, Stoßtrupp oder Leuchtkugeln im Abschnitt der Gruppe",
+      "text": "Letzte Nacht kamen sie {ort} durch den Draht, ganz leise. Eine Leuchtkugel hat sie verraten."
+    },
+    {
+      "id": "ereignis.nacht.2",
+      "art": "ereignis",
+      "kategorie": "nacht",
+      "ton": "erschoepft",
+      "text": "Nachts schläft hier keiner. Man sitzt auf dem Schützenauftritt und hört, ob im Draht etwas raschelt."
+    },
+    {
+      "id": "ereignis.stollen.1",
+      "art": "ereignis",
+      "kategorie": "stollen",
+      "beschreibung": "Stollen, Horchposten oder Sprengung",
+      "text": "Unter uns wird gegraben, und man weiß nicht, von wem. Man horcht auf den Boden wie auf einen Bauch."
+    },
+    {
+      "id": "ereignis.stollen.2",
+      "art": "ereignis",
+      "kategorie": "stollen",
+      "text": "Eine Sprengung ist {ort} hochgegangen. Der ganze Graben hat gewackelt wie ein Fuhrwerk."
+    },
+    {
+      "id": "ereignis.gefangene.1",
+      "art": "ereignis",
+      "kategorie": "gefangene",
+      "beschreibung": "Die Gruppe hat Gefangene eingebracht",
+      "text": "Wir haben {anzahl} von drüben gefangen. Einer hatte Bilder von seinen Kindern dabei und hat sie uns gezeigt, als könnten wir sie kennen."
+    },
+    {
+      "id": "ereignis.gefangene.2",
+      "art": "ereignis",
+      "kategorie": "gefangene",
+      "text": "Wir haben einen von drüben gefangen. Er hatte mehr Angst als wir und hat uns seinen Tabak angeboten."
+    },
+    {
+      "id": "ereignis.geborgen.1",
+      "art": "ereignis",
+      "kategorie": "verwundete_geborgen",
+      "beschreibung": "Die Gruppe hat Verwundete geborgen",
+      "text": "Wir haben {anzahl} Verwundete von der Weide geholt, bei Nacht, auf Zeltbahnen."
+    },
+    {
+      "id": "ereignis.geborgen.2",
+      "art": "ereignis",
+      "kategorie": "verwundete_geborgen",
+      "text": "Wir haben {kamerad} von der Weide geholt, bei Nacht, auf einer Zeltbahn. Jetzt liegt {kamerad_nachname} im Lazarett und schimpft."
+    },
+    {
+      "id": "ereignis.ruhig.1",
+      "art": "ereignis",
+      "kategorie": "ruhig",
+      "beschreibung": "Nichts Besonderes, Rückfall wenn kein passendes Ereignis gefunden wird",
+      "text": "Es war ruhig. Wir haben gegraben, gegessen und gewartet."
+    },
+    {
+      "id": "ereignis.ruhig.2",
+      "art": "ereignis",
+      "kategorie": "ruhig",
+      "ton": "zuversichtlich",
+      "text": "Es war ein ruhiger Tag. Über der Weide hat eine Lerche gesungen, und niemand hat geschossen."
+    },
+    {
+      "id": "ereignis.ruhig.3",
+      "art": "ereignis",
+      "kategorie": "ruhig",
+      "ton": "verbittert",
+      "text": "Es war ruhig. Hier heißt das nur, dass die anderen auch warten."
+    },
+    {
+      "id": "feldpost.zuversichtlich.01",
+      "art": "feldpost",
+      "ton": "zuversichtlich",
+      "text": "{anrede},\n\nes geht mir gut, wirklich. {ereignis} Wir sind gute Leute hier, und {gruppenfuehrer_nachname} passt auf uns auf.\n\nGrüß alle in {heimatort}.\n\n{absender}"
+    },
+    {
+      "id": "feldpost.zuversichtlich.02",
+      "art": "feldpost",
+      "ton": "zuversichtlich",
+      "text": "{anrede},\n\nkurz nur, die Post geht gleich. {ereignis}\n\nMach Dir keine Sorgen. Ich bin vorsichtig und habe gute Leute um mich.\n\n{absender}"
+    },
+    {
+      "id": "feldpost.zuversichtlich.03",
+      "art": "feldpost",
+      "ton": "zuversichtlich",
+      "text": "{anrede},\n\nhier ist {jahreszeit} anders als in {heimatort}, aber man gewöhnt sich. {ereignis}\n\n{kamerad} lässt grüßen. Wir teilen alles, sogar die Läuse.\n\n{absender}"
+    },
+    {
+      "id": "feldpost.zuversichtlich.04",
+      "art": "feldpost",
+      "ton": "zuversichtlich",
+      "text": "{anrede},\n\nich habe Deinen Brief bekommen und trage ihn in der Brusttasche. {ereignis}\n\nWenn das hier vorbei ist, gehen wir zusammen an den Fluss und sagen eine ganze Stunde nichts.\n\n{absender}"
+    },
+    {
+      "id": "feldpost.zuversichtlich.05",
+      "art": "feldpost",
+      "ton": "zuversichtlich",
+      "text": "{anrede},\n\n{ereignis} Ich schreibe Dir das, damit Du weißt, dass es hier auch gute Tage gibt.\n\nSchick mir, wenn Du kannst, Zwirn und ein Stück Seife. Die Seife ist für {kamerad_nachname}. Frag nicht, warum.\n\n{absender}"
+    },
+    {
+      "id": "feldpost.zuversichtlich.06",
+      "art": "feldpost",
+      "ton": "zuversichtlich",
+      "wann": {
+        "wetter": "trocken"
+      },
+      "text": "{anrede},\n\ndie Sonne scheint, und der Lehm ist hart wie Ziegel. {ereignis}\n\nIch denke oft an {heimatort}, besonders abends, wenn es still wird.\n\n{absender}"
+    },
+    {
+      "id": "feldpost.zuversichtlich.07",
+      "art": "feldpost",
+      "ton": "zuversichtlich",
+      "text": "{anrede},\n\nwir sind {gruppe}, und man sagt, wir seien die Besten im Abschnitt. Das sagt hier jeder von sich. {ereignis}\n\nGib auf Dich acht.\n\n{absender}"
+    },
+    {
+      "id": "feldpost.zuversichtlich.08",
+      "art": "feldpost",
+      "ton": "zuversichtlich",
+      "text": "{anrede},\n\n{ereignis}\n\nIch habe hier Dinge gelernt, die ich nie lernen wollte, und ein paar, die ich zu Hause brauchen kann: wie man einen Graben entwässert, wie man in fünf Minuten schläft und wie man jemanden zum Lachen bringt, der nicht lachen will.\n\n{absender}"
+    },
+    {
+      "id": "feldpost.zuversichtlich.09",
+      "art": "feldpost",
+      "ton": "zuversichtlich",
+      "text": "{anrede},\n\nnur damit Du nicht wartest: Ich bin gesund. {ereignis} Heute Abend gibt es Tee, und {kamerad} hat irgendwo Zucker gefunden.\n\n{absender}"
+    },
+    {
+      "id": "feldpost.zuversichtlich.10",
+      "art": "feldpost",
+      "ton": "zuversichtlich",
+      "text": "{anrede},\n\n{ereignis} Danach saßen wir zusammen und haben uns erzählt, was wir als Erstes essen, wenn wir nach Hause kommen. Bei mir ist es Dein Brot.\n\n{absender}"
+    },
+    {
+      "id": "feldpost.zuversichtlich.11",
+      "art": "feldpost",
+      "ton": "zuversichtlich",
+      "text": "{anrede},\n\nich schreibe auf einer Munitionskiste, darum ist die Schrift schief. {ereignis}\n\nWie geht es allen in {heimatort}? Schreib mir alles, auch das Langweilige. Gerade das Langweilige.\n\n{absender}"
+    },
+    {
+      "id": "feldpost.zuversichtlich.12",
+      "art": "feldpost",
+      "ton": "zuversichtlich",
+      "text": "{anrede},\n\n{gruppenfuehrer} hat uns heute gelobt, und das tut {gruppenfuehrer_nachname} selten. {ereignis}\n\nIch bin stolz auf meine Leute. Nicht auf den Krieg. Auf die Leute.\n\n{absender}"
+    },
+    {
+      "id": "feldpost.zuversichtlich.13",
+      "art": "feldpost",
+      "ton": "zuversichtlich",
+      "wann": {
+        "wetter": [
+          "regen",
+          "schlamm"
+        ]
+      },
+      "text": "{anrede},\n\nes regnet, aber wir haben einen Unterstand mit Dach, der fast dicht ist. {ereignis}\n\nIch habe gelernt, nasse Socken am Körper zu trocknen. Erzähl das niemandem.\n\n{absender}"
+    },
+    {
+      "id": "feldpost.zuversichtlich.14",
+      "art": "feldpost",
+      "ton": "zuversichtlich",
+      "text": "{anrede},\n\n{ereignis}\n\nMan sagt, die Ablösung kommt bald. Man sagt hier viel, aber diesmal glaube ich es.\n\nBis bald, hoffentlich.\n\n{absender}"
+    },
+    {
+      "id": "feldpost.zuversichtlich.15",
+      "art": "feldpost",
+      "ton": "zuversichtlich",
+      "text": "{anrede},\n\nheute hat mir {kamerad} beigebracht, wie man mit einem Spaten Brot schneidet. {ereignis}\n\nEs gibt hier Menschen, die ich nicht mehr missen möchte. Das hätte ich nicht gedacht.\n\n{absender}"
+    },
+    {
+      "id": "feldpost.zuversichtlich.16",
+      "art": "feldpost",
+      "ton": "zuversichtlich",
+      "text": "{anrede},\n\n{ereignis} Es war ein guter Tag, so gut, wie sie hier werden.\n\nGrüß den Garten von mir.\n\n{absender}"
+    },
+    {
+      "id": "feldpost.erschoepft.01",
+      "art": "feldpost",
+      "ton": "erschoepft",
+      "text": "{anrede},\n\nich bin müde. {ereignis}\n\nIch schreibe heute nicht mehr, sonst schlafe ich über dem Papier ein. Ich denke an Dich.\n\n{absender}"
+    },
+    {
+      "id": "feldpost.erschoepft.02",
+      "art": "feldpost",
+      "ton": "erschoepft",
+      "text": "{anrede},\n\n{ereignis}\n\nIch weiß nicht, welcher Tag heute ist. Hier zählt man in halben Tagen, zwölf Stunden hell, zwölf Stunden dunkel. Sag mir, welcher Tag ist, wenn Du antwortest.\n\n{absender}"
+    },
+    {
+      "id": "feldpost.erschoepft.03",
+      "art": "feldpost",
+      "ton": "erschoepft",
+      "text": "{anrede},\n\nes geht. {ereignis} Mehr kann ich nicht sagen, ohne dass die Zensur es schwärzt, und mehr will ich auch nicht sagen.\n\n{absender}"
+    },
+    {
+      "id": "feldpost.erschoepft.04",
+      "art": "feldpost",
+      "ton": "erschoepft",
+      "text": "{anrede},\n\n{ereignis}\n\nIch versuche, mir {heimatort} vorzustellen, die Straße, die Bäume, Dein Fenster. Es wird jeden Tag ein bisschen blasser. Schick mir etwas, das riecht wie zu Hause.\n\n{absender}"
+    },
+    {
+      "id": "feldpost.erschoepft.05",
+      "art": "feldpost",
+      "ton": "erschoepft",
+      "text": "{anrede},\n\nwir sind seit Tagen vorn. {ereignis}\n\n{kamerad} und ich wechseln uns beim Wachen ab. Einer schläft, einer horcht. Das ist alles, was wir noch tun.\n\n{absender}"
+    },
+    {
+      "id": "feldpost.erschoepft.06",
+      "art": "feldpost",
+      "ton": "erschoepft",
+      "wann": {
+        "wetter": [
+          "regen",
+          "schlamm"
+        ]
+      },
+      "text": "{anrede},\n\nder Regen hört nicht auf. {ereignis}\n\nIch habe vergessen, wie es ist, trocken zu sein. Wenn ich heimkomme, setze ich mich drei Tage an den Ofen.\n\n{absender}"
+    },
+    {
+      "id": "feldpost.erschoepft.07",
+      "art": "feldpost",
+      "ton": "erschoepft",
+      "text": "{anrede},\n\nentschuldige die kurze Antwort. {ereignis}\n\nIch habe Deinen letzten Brief noch nicht ganz gelesen. Ich lese jeden Abend nur einen Absatz, damit er länger hält.\n\n{absender}"
+    },
+    {
+      "id": "feldpost.erschoepft.08",
+      "art": "feldpost",
+      "ton": "erschoepft",
+      "text": "{anrede},\n\n{ereignis}\n\nIch habe keine Kraft für einen langen Brief. Aber ich wollte, dass Du siehst, dass meine Schrift noch dieselbe ist.\n\n{absender}"
+    },
+    {
+      "id": "feldpost.erschoepft.09",
+      "art": "feldpost",
+      "ton": "erschoepft",
+      "text": "{anrede},\n\n{jahreszeit} hier ist lang. {ereignis}\n\nManchmal sitze ich da und weiß nicht mehr, worauf ich warte. Dann kommt Post, und ich weiß es wieder.\n\n{absender}"
+    },
+    {
+      "id": "feldpost.erschoepft.10",
+      "art": "feldpost",
+      "ton": "erschoepft",
+      "text": "{anrede},\n\nwir haben wieder gegraben, bis es dunkel war, und dann weiter. {ereignis}\n\nIch träume von Spaten. Lach nicht.\n\n{absender}"
+    },
+    {
+      "id": "feldpost.erschoepft.11",
+      "art": "feldpost",
+      "ton": "erschoepft",
+      "text": "{anrede},\n\n{ereignis}\n\n{gruppenfuehrer_nachname} sagt, wir halten durch. {gruppenfuehrer_nachname} sieht so müde aus wie wir alle. Ich glaube es trotzdem.\n\n{absender}"
+    },
+    {
+      "id": "feldpost.erschoepft.12",
+      "art": "feldpost",
+      "ton": "erschoepft",
+      "text": "{anrede},\n\nes gibt nicht viel Neues. {ereignis} Morgen wird es wieder so sein und übermorgen auch.\n\nVergiss mich nicht in {heimatort}.\n\n{absender}"
+    },
+    {
+      "id": "feldpost.erschoepft.13",
+      "art": "feldpost",
+      "ton": "erschoepft",
+      "wann": {
+        "tageszeit": "nacht"
+      },
+      "text": "{anrede},\n\nich schreibe im Dunkeln, darum ist die Schrift so krumm. {ereignis}\n\nDrüben steigt ab und zu eine Leuchtkugel. Dann sehe ich kurz das Papier und schreibe schnell weiter.\n\n{absender}"
+    },
+    {
+      "id": "feldpost.erschoepft.14",
+      "art": "feldpost",
+      "ton": "erschoepft",
+      "text": "{anrede},\n\n{ereignis}\n\nIch habe Dir viel zu erzählen und kann es nicht aufschreiben. Später. Wenn ich da bin. Frag mich dann nicht gleich, warte, bis ich anfange.\n\n{absender}"
+    },
+    {
+      "id": "feldpost.erschoepft.15",
+      "art": "feldpost",
+      "ton": "erschoepft",
+      "text": "{anrede},\n\ndie Hände zittern ein bisschen, das ist nur die Kälte. {ereignis}\n\nSchick mir Handschuhe, wenn Du welche hast. Und schreib mir, dass alles gut ist, auch wenn es nicht stimmt.\n\n{absender}",
+      "wann": {
+        "wetter": [
+          "frost",
+          "schnee"
+        ]
+      }
+    },
+    {
+      "id": "feldpost.erschoepft.16",
+      "art": "feldpost",
+      "ton": "erschoepft",
+      "text": "{anrede},\n\n{ereignis}\n\nIch lebe, ich esse, ich schlafe ein wenig. Das muss für heute reichen.\n\n{absender}"
+    },
+    {
+      "id": "feldpost.verbittert.01",
+      "art": "feldpost",
+      "ton": "verbittert",
+      "text": "{anrede},\n\n{ereignis}\n\nIn der Zeitung steht sicher, dass wir vorangekommen sind. Glaub der Zeitung nicht. Glaub mir.\n\n{absender}"
+    },
+    {
+      "id": "feldpost.verbittert.02",
+      "art": "feldpost",
+      "ton": "verbittert",
+      "text": "{anrede},\n\nich will Dir nicht schreiben, wie es hier ist, also schreibe ich nur das: {ereignis}\n\nDer Rest bleibt hier.\n\n{absender}"
+    },
+    {
+      "id": "feldpost.verbittert.03",
+      "art": "feldpost",
+      "ton": "verbittert",
+      "text": "{anrede},\n\n{ereignis} Hinten sitzen sie im Warmen und schicken Telegramme. Vorn sitzen wir und lesen sie.\n\nPass auf Dich auf. Auf uns passt keiner auf.\n\n{absender}"
+    },
+    {
+      "id": "feldpost.verbittert.04",
+      "art": "feldpost",
+      "ton": "verbittert",
+      "wann": {
+        "werte": {
+          "gefallene": {
+            "min": 1
+          }
+        }
+      },
+      "text": "{anrede},\n\nwir sind weniger geworden. {ereignis}\n\nMan schreibt die Namen auf eine Liste, und die Liste geht nach hinten. Ich frage mich, ob dort jemand liest.\n\n{absender}"
+    },
+    {
+      "id": "feldpost.verbittert.05",
+      "art": "feldpost",
+      "ton": "verbittert",
+      "text": "{anrede},\n\n{ereignis}\n\nDu fragst, wofür wir hier sind. Ich habe es früher gewusst. Jetzt weiß ich nur noch, für wen: für {kamerad} und die anderen, damit keiner allein ist.\n\n{absender}"
+    },
+    {
+      "id": "feldpost.verbittert.06",
+      "art": "feldpost",
+      "ton": "verbittert",
+      "text": "{anrede},\n\nkein langer Brief heute. {ereignis}\n\nWenn Dir jemand in {heimatort} von Ehre erzählt, frag ihn, ob er mal hier war.\n\n{absender}"
+    },
+    {
+      "id": "feldpost.verbittert.07",
+      "art": "feldpost",
+      "ton": "verbittert",
+      "wann": {
+        "wetter": [
+          "regen",
+          "schlamm"
+        ]
+      },
+      "text": "{anrede},\n\nwir stehen im Wasser, seit Tagen. {ereignis}\n\nJemand hat befohlen, dass wir hierbleiben. Er hat diesen Graben nie gesehen.\n\n{absender}"
+    },
+    {
+      "id": "feldpost.verbittert.08",
+      "art": "feldpost",
+      "ton": "verbittert",
+      "text": "{anrede},\n\n{ereignis}\n\nIch habe aufgehört, auf die Ablösung zu hoffen. Man hofft hier am besten auf gar nichts, dann wird man nicht enttäuscht.\n\n{absender}"
+    },
+    {
+      "id": "feldpost.verbittert.09",
+      "art": "feldpost",
+      "ton": "verbittert",
+      "text": "{anrede},\n\nich habe drei Briefe angefangen und alle zerrissen. Dieser bleibt. {ereignis}\n\nMehr ist nicht zu sagen.\n\n{absender}"
+    },
+    {
+      "id": "feldpost.verbittert.10",
+      "art": "feldpost",
+      "ton": "verbittert",
+      "text": "{anrede},\n\n{ereignis}\n\nDrüben liegen Leute wie wir, mit Briefen wie diesem in der Tasche. Ich hasse sie nicht. Ich weiß nicht mehr, wen ich hassen soll, und das ist vielleicht das Schlimmste.\n\n{absender}"
+    },
+    {
+      "id": "feldpost.verbittert.11",
+      "art": "feldpost",
+      "ton": "verbittert",
+      "text": "{anrede},\n\nman verspricht uns Urlaub, seit Wochen. {ereignis}\n\nSchreib mir nicht, dass ich durchhalten soll. Das schreiben sie hier schon auf jedes Telegramm.\n\n{absender}"
+    },
+    {
+      "id": "feldpost.verbittert.12",
+      "art": "feldpost",
+      "ton": "verbittert",
+      "text": "{anrede},\n\n{ereignis}\n\n{gruppenfuehrer_nachname} sagt, wir sollen nicht so viel denken. Hier nützt Denken nichts. Hier nützt nur Glück.\n\n{absender}"
+    },
+    {
+      "id": "feldpost.verbittert.13",
+      "art": "feldpost",
+      "ton": "verbittert",
+      "text": "{anrede},\n\n{jahreszeit} geht vorbei, und wir sind immer noch hier, im selben Graben, vor demselben Hügel. {ereignis}\n\nIch will nach Hause.\n\n{absender}"
+    },
+    {
+      "id": "feldpost.verbittert.14",
+      "art": "feldpost",
+      "ton": "verbittert",
+      "text": "{anrede},\n\n{ereignis}\n\nIch lache nicht mehr so viel wie früher. Wenn ich zurückkomme, musst Du es mir wieder beibringen. Versprich mir das.\n\n{absender}"
+    },
+    {
+      "id": "feldpost.verbittert.15",
+      "art": "feldpost",
+      "ton": "verbittert",
+      "text": "{anrede},\n\nheute habe ich auf der Liste nachgesehen, wer aus {heimatort} noch hier ist. Als wir kamen, waren es mehr. {ereignis}\n\nSag den Eltern der anderen nichts, bevor der amtliche Brief kommt.\n\n{absender}",
+      "wann": {
+        "werte": {
+          "gefallene": {
+            "min": 1
+          }
+        }
+      }
+    },
+    {
+      "id": "feldpost.verbittert.16",
+      "art": "feldpost",
+      "ton": "verbittert",
+      "text": "{anrede},\n\n{ereignis}\n\nIch bin noch da. Das ist die einzige gute Nachricht, die ich habe. Halte sie fest.\n\n{absender}"
+    }
+  ]
+}

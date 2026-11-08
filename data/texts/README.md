@@ -60,17 +60,18 @@ Echte Umlaute in allen Texten. Keine Emojis. Keine realen Länder, Personen, Sym
 
 | `art` | Zusatzfelder | Wofür |
 |---|---|---|
-| `briefing` | `titel`, `ort`, `zeit`, `ziele` (Liste von Texten) | Missionsbriefing vor einer Mission |
+| `akt` | `titel`, `zeit` | Aktkarte (Linolschnitt) beim Aktwechsel, id `a1.titel` usw. |
+| `briefing` | `titel`, `ort`, `zeit`, `ziele` (Liste von Texten) | Missionsbriefing vor einer Mission, auch mit `slot` und Varianten |
 | `befehl` | `nr`, `von`, `an`, `abschnitt`, `frist`, `eilt` (bool), `folgen` (`erfuellt`, `verfehlt`) | Stabsbefehl als Telegramm. Text in Großbuchstaben, Sätze enden mit ` STOP` |
 | `entscheidung` | `titel`, `optionen` | Entscheidung mit Folgen für Ansehen und Vertrauen |
 | `tagebuch` | `titel` | Brandts Tagebucheintrag, immer mit `slot` und Varianten |
 | `brief` | `nr`, `absender`, `empfaenger`, `ort` | Handgeschriebener Brief (24 im ganzen Spiel, `nr` 1 bis 24) |
-| `lask` | `absender`, `empfaenger`, `vermerk`, `doktrin` | Abgefangener Brief von Hauptmann Lask |
+| `lask` | `absender`, `empfaenger`, `vermerk`, `doktrin` | Abgefangener Brief von Hauptmann Lask. `vermerk` ist der Übersetzungsvermerk der Fernmeldestelle, unter den Brief gesetzt (Schreibmaschine) |
 | `feldpost` | `ton` (Pflicht), `fraktion` | Vorlage für generierte Feldpost |
 | `ereignis` | `kategorie` | Satz, der in `{ereignis}` einer Feldpost eingesetzt wird |
 | `anrede` | `empfaenger`, `fraktion` | Anrede für generierte Feldpost, Text z. B. `Lieber Vater` |
-| `bericht` | `titel`, `ausloeser`, `zaehler`, `wirkung` | Erfahrungsbericht (Plan 4.3) |
-| `hinweis` | `mechanik`, `ausloeser`, `anker` | Kurzer Tutorial-Hinweis im Spiel |
+| `bericht` | `titel`, `ab`, `ausloeser`, `zaehler`, `wirkung` | Erfahrungsbericht (Plan 4.3). `zaehler` = `{ "ereignis": "<protokoll-typ>", "anzahl": n }` ist ein Vorschlag für P14 |
+| `hinweis` | `mechanik`, `von`, `ausloeser`, `anker` | Tutorial-Hinweis als Bleistiftnotiz einer Figur (`von`) am Kartenrand, höchstens 160 Zeichen. Jede `mechanik` nur einmal |
 
 T2 und spätere Pakete dürfen neue Arten einführen (`zeitung`, `fundstueck`, `ende`, `erfolg`,
 `endlos-befehl`, `jahreszeit` ...). Sie tragen sie hier in die Tabelle ein; der Test prüft
@@ -109,6 +110,19 @@ Bei `befehl` gibt es zwei: `"folgen": { "erfuellt": {...}, "verfehlt": {...} }`.
 
 Options-IDs sind frei, für Stabsbefehle aber nach Plan 2.5 bevorzugt `befolgen`, `umdeuten`, `verweigern`.
 `setzt` setzt Flags im Kampagnenzustand, die spätere `wann`-Bedingungen lesen.
+
+## Reihenfolge zwischen den Missionen
+
+Nach dem Ende einer Mission zeigt P15 die Einträge mit `nach` gleich dieser Mission in dieser Reihenfolge:
+Gefallenenliste, Tagebuch, Briefe (`brief`, dann `lask`), Entscheidungen, dann Briefing und Stabsbefehl der
+nächsten Mission. Entscheidungen kommen zuletzt, weil Briefe sie vorbereiten (Selin bittet um Loren, dann
+entscheidet Brandt). Flags aus einer Entscheidung wirken deshalb erst ab der nächsten Mission.
+
+Harms ist in Akt 1 als Figur auf der Karte und kann nur in Mission a1m6 fallen (P16 setzt `harms_gefallen`).
+In Akt 2 führt er den Gefechtsstand und steht nicht auf der Karte; ab Akt 3 entscheidet T2. Vell kann nur in
+a2m5 fallen, und nur nach `vell_angriff`. Texte danach erwähnen beide nur in Varianten mit `flags`/`ohne`,
+sonst übernimmt Feldwebel Fedders ihre Rolle. Erzählte Tode in festen Texten (Tjark Boysen und Folkert Ubben
+in a2m2) trägt P15 zusätzlich in die Gefallenenliste ein.
 
 ## Varianten: `slot` und `wann`
 
@@ -152,7 +166,7 @@ Werden von P07/P14 aus dem Ereignisprotokoll gezählt.
 | `moral` | Abschnittsmoral am Ende, 0 bis 100 |
 | `runden` | Gespielte Stellungsrunden |
 | `depot_leer` | Wie oft das Depot leer lief |
-| `ablosung_verspaetet` | Gruppen, die länger vorn blieben als vorgesehen |
+| `abloesung_verspaetet` | Gruppen, die länger vorn blieben als vorgesehen |
 
 ### Flags
 
@@ -164,7 +178,11 @@ Bekannte Flags aus Akt 1 und 2:
 | `harms_gefallen` | Mission, wenn Feldwebel Harms fällt |
 | `vell_gefallen` | Mission, wenn Leutnant Vell fällt (ab Akt 2) |
 | `selin_loren` | Entscheidung a1m3: Brandt gibt dem Lazarett feste Loren |
-| `faehre_gesprengt` | Entscheidung a1m2 |
+| `faehre_sofort`, `faehre_spaet` | Entscheidung a1m2 (Fähre sofort oder erst um Mitternacht gesprengt) |
+| `velde_verloren` | Mission a1m6, wenn sie verloren geht (Velde fällt, die Kellinger nehmen es vor Akt 2 zurück) |
+| `kuhle_gehalten`, `kuhle_umgedeutet`, `kuhle_verweigert` | Entscheidung a1m5 |
+| `verwundeter_geholt` | Entscheidung a2m3 |
+| `orden_liste`, `urlaub_statt_orden` | Entscheidung a2m6 |
 | `kirchturm_gesprengt` | Entscheidung a1m4 |
 | `lask_bild_zurueck` | Entscheidung a1m6 |
 | `stollen_frueh` | Entscheidung a2m2 |

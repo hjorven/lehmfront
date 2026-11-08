@@ -1,0 +1,196 @@
+{
+  "format": 1,
+  "beschreibung": "Tutorial-Hinweise fuer Akt 1. Jeder Hinweis erklaert genau eine Mechanik genau einmal. Sie erscheinen als Bleistiftnotizen der Figuren am Kartenrand (Feld von), nicht als Lehrmodus. anker nennt das UI-Element, an dem die Notiz klebt; ausloeser beschreibt, wann sie erscheint.",
+  "eintraege": [
+    {
+      "id": "hinweis.graben",
+      "art": "hinweis",
+      "mission": "a1m1",
+      "mechanik": "graben",
+      "von": "Harms",
+      "anker": "werkzeug-graben",
+      "ausloeser": "Erste Stellungsrunde, noch kein Graben gezeichnet",
+      "text": "Graben zieht man wie eine Linie, Frau Major. Von der Mühle bis zum Wald, in einem Strich. Pioniere graben doppelt so schnell."
+    },
+    {
+      "id": "hinweis.feuerrichtung",
+      "art": "hinweis",
+      "mission": "a1m1",
+      "mechanik": "feuerrichtung",
+      "von": "Harms",
+      "anker": "graben-feld",
+      "ausloeser": "Erstes Grabenfeld fertig",
+      "text": "Der Auftritt zeigt nach vorn, der Pfeil sagt, wohin. Ein Graben, der falsch herum schaut, schützt nur halb."
+    },
+    {
+      "id": "hinweis.laengsfeuer",
+      "art": "hinweis",
+      "mission": "a1m1",
+      "mechanik": "laengsfeuer",
+      "von": "Harms",
+      "anker": "warnung-laengsfeuer",
+      "ausloeser": "Ein gerades Grabenstück mit mehr als vier Feldern wird gezeichnet",
+      "text": "Gerade Gräben kann man von der Seite bestreichen. Knicken lassen oder Traversen einfügen. Kostet wenig, spart viel."
+    },
+    {
+      "id": "hinweis.runde",
+      "art": "hinweis",
+      "mission": "a1m1",
+      "mechanik": "runde_ausfuehren",
+      "von": "Harms",
+      "anker": "knopf-runde",
+      "ausloeser": "Erste Befehle gegeben",
+      "text": "Wer keinen Befehl hat, hält. Wenn alles steht: Runde ausführen. Drüben befiehlt man gleichzeitig. Was falsch ist, kann man vorher zurücknehmen."
+    },
+    {
+      "id": "hinweis.bericht",
+      "art": "hinweis",
+      "mission": "a1m1",
+      "mechanik": "bericht",
+      "von": "Harms",
+      "anker": "telegramm-bericht",
+      "ausloeser": "Erster Rundenbericht",
+      "text": "Jede Zeile im Bericht sagt, warum. Antippen zeigt, wo. Lesen Sie das Warum, Frau Major, nicht nur die Zahl."
+    },
+    {
+      "id": "hinweis.unterdrueckung",
+      "art": "hinweis",
+      "mission": "a1m2",
+      "mechanik": "unterdrueckung",
+      "von": "Lohmann",
+      "anker": "gruppe-niedergehalten",
+      "ausloeser": "Erste Gruppe wird niedergehalten",
+      "text": "Niedergehalten heißt: Kopf unten, nicht unbedingt verletzt, aber keiner schießt gut. Darum schießen wir auch auf das, was wir nicht treffen."
+    },
+    {
+      "id": "hinweis.mg_sektor",
+      "art": "hinweis",
+      "mission": "a1m2",
+      "mechanik": "mg_sektor",
+      "von": "Lohmann",
+      "anker": "werkzeug-sektor",
+      "ausloeser": "MG-Trupp ausgewählt",
+      "text": "Mein MG braucht einen Kegel, keinen Punkt. Ziehen Sie ihn über die Weide, schräg zum Draht. Dann laufen sie hinein, nicht darauf zu."
+    },
+    {
+      "id": "hinweis.unterstand",
+      "art": "hinweis",
+      "mission": "a1m2",
+      "mechanik": "unterstand",
+      "von": "Harms",
+      "anker": "gruppe-unterstand",
+      "ausloeser": "Erstes feindliches Vorbereitungsfeuer",
+      "text": "Unter Feuer gehen die Leute von selbst in den Unterstand. Hört es auf, brauchen sie eine Gefechtsrunde, bis sie oben sind. Wer zuerst am Rand ist, gewinnt."
+    },
+    {
+      "id": "hinweis.draht",
+      "art": "hinweis",
+      "mission": "a1m2",
+      "mechanik": "draht",
+      "von": "Fedders",
+      "anker": "werkzeug-draht",
+      "ausloeser": "Zweite Stellungsrunde",
+      "text": "Draht hält niemanden auf. Er hält ihn fest, dort, wo das MG hinschaut. Ziehen Sie ihn in den Kegel."
+    },
+    {
+      "id": "hinweis.lorenplan",
+      "art": "hinweis",
+      "mission": "a1m3",
+      "mechanik": "lorenplan",
+      "von": "Selin",
+      "anker": "lorenplan",
+      "ausloeser": "Lorenplan zum ersten Mal geöffnet",
+      "text": "Jede Lore fährt nach vorn und wieder zurück. Auf dem Rückweg ist Platz für meine Leute. Vergessen Sie den Rückweg nicht. M. S."
+    },
+    {
+      "id": "hinweis.etappe",
+      "art": "hinweis",
+      "mission": "a1m3",
+      "mechanik": "etappe",
+      "von": "Fedders",
+      "anker": "etappe-feld",
+      "ausloeser": "Erstes Feld in der Etappe angetippt",
+      "text": "Gebäude helfen einander. Küche neben Ruhelager, Depot neben Bahnhof. Die Vorschau zeigt, was es bringt, bevor man baut."
+    },
+    {
+      "id": "hinweis.feuerplan",
+      "art": "hinweis",
+      "mission": "a1m4",
+      "mechanik": "feuerplan",
+      "von": "Harms",
+      "anker": "werkzeug-feuerplan",
+      "ausloeser": "Batterie zum ersten Mal verfügbar",
+      "text": "Die Batterien schießen nach Plan, und den Plan legt man in der Stellungsrunde fest: wohin, wie lange, wie viele Granaten."
+    },
+    {
+      "id": "hinweis.beobachter",
+      "art": "hinweis",
+      "mission": "a1m4",
+      "mechanik": "beobachter",
+      "von": "Harms",
+      "anker": "leitung",
+      "ausloeser": "Beobachter ausgewählt",
+      "text": "Im Gefecht verlegt nur der Beobachter das Feuer. Über Telefon wirkt es eine Runde später. Reißt die Leitung, läuft ein Melder: zwei Runden."
+    },
+    {
+      "id": "hinweis.moerser",
+      "art": "hinweis",
+      "mission": "a1m4",
+      "mechanik": "grabenmoerser",
+      "von": "Fedders",
+      "anker": "einheit-moerser",
+      "ausloeser": "Grabenmörser verfügbar",
+      "text": "Der Mörser schießt steil. Was im Graben sitzt, ist für ihn nicht gedeckt. Kurze Reichweite, also nah heran."
+    },
+    {
+      "id": "hinweis.schlamm",
+      "art": "hinweis",
+      "mission": "a1m5",
+      "mechanik": "schlamm",
+      "von": "Fedders",
+      "anker": "feld-schlamm",
+      "ausloeser": "Erstes Feld wird zu Schlamm",
+      "text": "Wasser sucht die Senke, und Krater halten es fest. Wer im Schlamm steht, läuft langsam, gräbt langsam und wird mürrisch. Ich auch."
+    },
+    {
+      "id": "hinweis.wetter",
+      "art": "hinweis",
+      "mission": "a1m5",
+      "mechanik": "wetter",
+      "von": "Harms",
+      "anker": "uhr-wetter",
+      "ausloeser": "Erste Regenrunde angekündigt",
+      "text": "Die Uhr zeigt das Wetter der nächsten Runde. Regen kommt nie überraschend, nur zu früh."
+    },
+    {
+      "id": "hinweis.abloesung",
+      "art": "hinweis",
+      "mission": "a1m6",
+      "mechanik": "abloesung",
+      "von": "Fedders",
+      "anker": "gruppe-erschoepfung",
+      "ausloeser": "Erste Gruppe erreicht hohe Erschöpfung",
+      "text": "Müde Leute halten nicht, sie stehen nur noch da. Zurück ins Ruhelager, eine frische Gruppe nach vorn. Die Reserve ist zum Benutzen da."
+    },
+    {
+      "id": "hinweis.ersatz",
+      "art": "hinweis",
+      "mission": "a1m6",
+      "mechanik": "ersatz",
+      "von": "Fedders",
+      "anker": "gruppe-staerke",
+      "ausloeser": "Erste Gruppe unter halber Stärke",
+      "text": "Ersatz ist grün. Füllen Sie eine erfahrene Gruppe auf, wird sie größer und dümmer. Manchmal ist klein und klug besser."
+    },
+    {
+      "id": "hinweis.sturm_halten",
+      "art": "hinweis",
+      "mission": "a1m6",
+      "mechanik": "sturm",
+      "von": "Fedders",
+      "anker": "knopf-runde",
+      "ausloeser": "Erster eigener Sturmbefehl",
+      "text": "Steht ein Sturm im Plan, wird „Runde ausführen“ gedrückt gehalten, nicht nur getippt. Man überlegt es sich dabei noch einmal."
+    }
+  ]
+}
