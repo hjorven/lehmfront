@@ -42,7 +42,7 @@ node tools/shot.mjs --path "/?scene=gefecht" --name gefecht --dark
 node tools/shot.mjs --check                # nur Konsolenfehler und fehlende Dateien pruefen (laeuft auch in CI)
 ```
 
-Fuer Debug- und Screenshot-Zustaende Query-Parameter anbieten (z. B. `?scene=gefecht&seed=42&night=1`), damit Screenshots reproduzierbar sind.
+Ansichten sind Szenen: `index.html?scene=<name>` laedt `js/scenes/<name>.js` und ruft `mount(root, params)` auf (Muster: `js/scenes/beispiel.js`). Jedes Paket legt eigene Szenen an, statt `js/main.js` zu aendern. Weitere Query-Parameter (z. B. `&seed=42&night=1`) machen Screenshots reproduzierbar.
 
 ## Ablauf pro Arbeitspaket
 

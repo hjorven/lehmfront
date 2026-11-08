@@ -54,9 +54,32 @@ function drawBackground(canvas) {
   ctx.globalAlpha = 1;
 }
 
-const canvas = document.getElementById('bg');
-const redraw = () => drawBackground(canvas);
-redraw();
-addEventListener('resize', redraw);
-matchMedia('(prefers-color-scheme: dark)').addEventListener('change', redraw);
-document.getElementById('version').textContent = 'v' + VERSION;
+// Szenen: ?scene=<name> laedt js/scenes/<name>.js und ruft dessen mount(root, params) auf.
+// Jedes Paket legt seine Demo- und Spielansichten als eigene Szene an, ohne main.js zu aendern.
+const params = new URLSearchParams(location.search);
+const scene = params.get('scene');
+
+async function mountScene(name) {
+  if (!/^[a-z0-9-]+$/.test(name)) throw new Error('Ungueltiger Szenenname: ' + name);
+  const mod = await import(`./scenes/${name}.js`);
+  document.body.classList.remove('menu');
+  document.body.dataset.scene = name;
+  const root = document.createElement('div');
+  root.id = 'scene';
+  document.body.replaceChildren(root);
+  await mod.mount(root, params);
+}
+
+if (scene) {
+  mountScene(scene).catch((e) => {
+    console.error(e);
+    document.body.textContent = 'Szene konnte nicht geladen werden: ' + scene;
+  });
+} else {
+  const canvas = document.getElementById('bg');
+  const redraw = () => drawBackground(canvas);
+  redraw();
+  addEventListener('resize', redraw);
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', redraw);
+  document.getElementById('version').textContent = 'v' + VERSION;
+}
