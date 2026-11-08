@@ -4,7 +4,7 @@ Jeder Thread traegt hier nach dem Merge ein, was fertig ist und was offen bleibt
 
 ## Fertig
 
-- P00 Grundgeruest: Ordnerstruktur, Titelbild, Schriften lokal, `js/rng.js`, `js/rules.js` mit Tests, Screenshot- und Pruefwerkzeug (`tools/shot.mjs`), CI mit Tests und Browser-Pruefung, Deployment auf GitHub Pages ueber GitHub Actions.
+- P00 Grundgeruest: Ordnerstruktur, Titelbild, Schriften lokal, `js/rng.js`, `js/rules.js` mit Tests, Screenshot- und Pruefwerkzeug (`tools/shot.mjs`), CI mit Tests und Browser-Pruefung, GitHub Pages baut direkt aus `main` (Wurzel, `.nojekyll`).
 
 ## Offen und bekannte Macken
 
