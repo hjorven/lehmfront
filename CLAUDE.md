@@ -42,7 +42,7 @@ node tools/shot.mjs --path "/?scene=gefecht" --name gefecht --dark
 node tools/shot.mjs --check                # nur Konsolenfehler und fehlende Dateien pruefen (laeuft auch in CI)
 ```
 
-Fuer Debug- und Screenshot-Zustaende Query-Parameter anbieten (z. B. `?scene=gefecht&seed=42&night=1`), damit Screenshots reproduzierbar sind.
+Ansichten sind Szenen: `index.html?scene=<name>` laedt `js/scenes/<name>.js` und ruft `mount(root, params)` auf (Muster: `js/scenes/beispiel.js`). Jedes Paket legt eigene Szenen an, statt `js/main.js` zu aendern. Weitere Query-Parameter (z. B. `&seed=42&night=1`) machen Screenshots reproduzierbar.
 
 ## Ablauf pro Arbeitspaket
 
@@ -51,9 +51,9 @@ Fuer Debug- und Screenshot-Zustaende Query-Parameter anbieten (z. B. `?scene=gef
 3. Bauen, mit Tests fuer jede Regel. `npm test` muss gruen sein.
 4. Bei jeder sichtbaren Aenderung: Screenshots mit `node tools/shot.mjs ... --dark` machen, selbst ansehen und gegen Mockup und Plan pruefen (Lesbarkeit, Kontrast, Handy-Layout, Ueberlappungen, abgeschnittene Texte).
 5. Review mit frischem Blick: einen Subagenten ohne deinen Kontext den Diff reviewen lassen (Korrektheit, Determinismus, offensichtliche Fehler, UX-Bruchstellen) und die Screenshots beurteilen lassen. Funde beheben, dann erneut testen.
-6. PR gegen `main` oeffnen, CI abwarten (Tests und Browser-Pruefung). Bei Gruen selbst mergen (Squash). Kein Merge mit roter CI, keine Tests abschalten.
+6. PR gegen `main` oeffnen, CI abwarten (Tests und Browser-Pruefung). Bei Gruen selbst mergen (Squash). Kein Merge mit roter CI, keine Tests abschalten. GitHub Pages baut direkt aus `main` (Wurzel, `.nojekyll`): jeder Merge ist sofort live.
 7. `docs/status.md` aktualisieren (was fertig ist, was offen ist, bekannte Macken). Kreative Zusatzideen, die nicht ins Paket passen, nach `docs/ideen.md`.
-8. Nach dem Merge pruefen, dass die Seite auf GitHub Pages laedt: https://hjorven.github.io/lehmfront/
+8. Nach dem Merge pruefen, dass der Workflow-Lauf "pages build and deployment" auf `main` erfolgreich war (GitHub-MCP `actions_list`). Die Seite https://hjorven.github.io/lehmfront/ ist aus dem Container nicht direkt abrufbar.
 
 ## Kreativitaet
 

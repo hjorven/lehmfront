@@ -1,6 +1,6 @@
 # Lehmfront: Arbeitspakete
 
-Stand: 2026-11-08. Grundlage: `docs/plan.md` (Plan v2.1) und das Mockup in `docs/mockup/`.
+Stand: 2026-11-08 (Umfang: alle Stufen und Akte, bis 15 Threads parallel). Grundlage: `docs/plan.md` (Plan v2.1) und das Mockup in `docs/mockup/`.
 
 Jedes Paket ist ein eigener Thread. Der Prompt unter jedem Paket ist so geschrieben, dass er allein reicht. Die Arbeitsregeln (Tests, Screenshots, Review mit frischem Blick, Merge) stehen in `CLAUDE.md` und gelten fuer alle Pakete.
 
@@ -8,7 +8,8 @@ Jedes Paket ist ein eigener Thread. Der Prompt unter jedem Paket ist so geschrie
 
 | Welle | Paket | Inhalt | Haengt ab von | Parallel moeglich mit |
 |---|---|---|---|---|
-| 0 | P00 | Grundgeruest, CI, Pages (erledigt in diesem Thread) | - | - |
+| 0 | P00 | Grundgeruest, CI, Pages (erledigt) | - | - |
+| 1 | T1, T2, K1, Z1, E1 | Texte, Klang, Papierebene, Etappenmodell als eigenstaendige Bausteine | P00 | alle |
 | 1 | P01 | Spielzustand, Rundenmotor, Phasen-Register, Speichern | P00 | P02 |
 | 1 | P02 | Lagekarte: Kartenmodell, Renderer, Kamera, Tag/Nacht-Thema | P00 | P01 |
 | 2 | P03 | Gefechtsbildschirm: Kaertchen, Schild, Werkzeugreihe, Befehle, Commit | P01, P02 | - |
@@ -19,15 +20,15 @@ Jedes Paket ist ein eigener Thread. Der Prompt unter jedem Paket ist so geschrie
 | 4 | P06 | Gefechtsrunde: Sturm, Draht, Unterstaende, Nahkampf, Uhr | P04, P05 | P09, P10, P11 |
 | 4 | P09 | Artillerie: Feuerplan-Editor, Feuerwalze, Beobachter, Leitungen | P05 | P06, P10, P11 |
 | 4 | P10 | Wetter, Schlamm, Krater, Tag-Nacht-Uebergang, Leuchtkugeln | P02, P05 | P06, P09, P11 |
-| 4 | P11 | Etappe: Gebaeude, Nachbarboni, Etappenstufen, 3D-Etappenfenster | P08 | P06, P09, P10 |
+| 4 | P11 | Etappe einhaengen: Gebaeude, Nachbarboni, Etappenstufen, 3D-Etappenfenster | P08, E1 | P06, P09, P10 |
 | 5 | P12 | Moral, Erschoepfung, Abloesung, Ersatz | P06, P08 | P13 |
 | 5 | P13 | KI-Kommandant, Taktik-Lehrling, Headless-Simulator | P06, P09 | P12 |
 | 6 | P14 | Kampagnenrahmen: Feldzugskarte, Ansehen, Vertrauen, Stabsbefehle, Erfahrungsberichte | P12 | P15, P17 |
-| 6 | P15 | Papierebene und Erzaehlung: Briefe, Feldpost, Tagebuch, Gefallenenliste | P07 | P14, P17 |
+| 6 | P15 | Papierebene und Erzaehlung einhaengen: Briefe, Feldpost, Tagebuch, Gefallenenliste | P07, Z1, T1 | P14, P17 |
 | 6 | P17 | Modi: Gefecht frei, Zufallskarten, Hotseat, Tageslage (lokal) | P13 | P14, P15 |
 | 7 | P16 | Akt 1: sechs Missionen mit integriertem Tutorial | P14, P15 | P18, P19 |
 | 7 | P18 | Offline-Spiel: Service Worker, Spielstaende, Einstellungen, Barrierefreiheit | P17 | P16, P19 |
-| 7 | P19 | Klang und Feinschliff | P07 | P16, P18 |
+| 7 | P19 | Klang einhaengen und Feinschliff | P07, K1 | P16, P18 |
 | 8 | P20 | Online mit Supabase: Cloud-Spielstand, Bestenliste, asynchrone Gefechte, Replay-Link | P17, P18, Freigabe Supabase | P21 |
 | 8 | P21 | Release 1.0: Gesamtreview, Balancing-Turnier, Handy-Performance | P16 bis P19 | P20 |
 | 9 | P22 | 1.1: Endlosmodus "Frontabschnitt", Wochenlage | P21 | P23 |
@@ -37,7 +38,101 @@ Jedes Paket ist ein eigener Thread. Der Prompt unter jedem Paket ist so geschrie
 | 11 | P26 | 1.4 Akt 4: Verweigerung, Panzerwagen, Mine, vier Enden | P24 | - |
 | 11 | P27 | Abschluss: Gesamtreview des fertigen Spiels | alle | - |
 
-Hoechstens drei bis vier Threads gleichzeitig, damit sich die Merges nicht ueberholen. Ein Paket der naechsten Welle startet, sobald seine Abhaengigkeiten auf `main` gemerged sind.
+Bis zu 15 Threads gleichzeitig (Freigabe Jorven). Ein Paket startet, sobald seine Abhaengigkeiten auf `main` gemerged sind. Damit gleich zu Beginn mehr parallel laufen kann, gibt es Pakete ohne Code-Abhaengigkeit (T1, T2, K1, Z1, E1); sie bauen eigenstaendige Bausteine mit eigener Demo-Szene, die spaetere Pakete nur noch einhaengen.
+
+### Welle 1 (sofort, alle parallel)
+
+| Paket | Inhalt | Beruehrt |
+|---|---|---|
+| P01 | Spielzustand, Rundenmotor, Phasen-Register, Speichern | `js/state.js`, `js/resolve.js`, `js/orders.js`, `js/view.js`, `js/save.js`, `js/phases/`, `js/config/units.js`, `js/config/factions.js`, `data/names.json` |
+| P02 | Lagekarte, Kamera, Tag/Nacht-Thema | `js/map.js`, `js/theme.js`, `js/render/`, `data/maps/asse.json` |
+| T1 | Texte Akt 1 und 2, Welt-Bibel | `data/texts/`, `data/letters/` (Akt 1, 2) |
+| T2 | Texte Akt 3 und 4, Endlosmodus, Zeitungen, Fundstuecke | `data/texts/`, `data/letters/` (Akt 3, 4) |
+| K1 | Klang-Engine prozedural | `js/audio/`, `js/scenes/klang.js` |
+| Z1 | Papierebene als Baustein | `js/ui/paper/`, `css/paper.css`, `js/scenes/papier.js` |
+| E1 | Etappenfenster-Modell als Baustein | `js/config/buildings.js`, `js/ui/etappe3d/`, `js/scenes/etappe.js` |
+
+Gemeinsame Dateien (`index.html`, `css/style.css`, `js/main.js`) moeglichst nicht anfassen; eigene CSS-Dateien laedt die Szene selbst.
+
+---
+
+## T1 Texte Akt 1 und 2, Welt-Bibel
+
+```
+Repo hjorven/lehmfront. Lies CLAUDE.md und docs/plan.md Abschnitte 2 (Welt und Lore), 8.1 (Akt 1 und 2), 8.2, 4.3, 7.8 (Stile 03, 06, 10).
+
+Du bist der zentrale Text-Thread fuer Akt 1 und 2. Schreibe alle Spieltexte als Daten, nicht als Code:
+- data/texts/README.md: Datenformat fuer alle Texte (IDs, Platzhalter wie {gruppenfuehrer}, {heimatort}, {ereignis}, Tonlage zuversichtlich|erschoepft|verbittert, Bedingungen). Stimme das Format so ab, dass T2 und P15 es ohne Rueckfrage nutzen koennen.
+- data/texts/welt.md: Welt-Bibel (Orte im Lehmgau, Heimatorte beider Fraktionen, Einheitenbezeichnungen, Stimme jeder Hauptfigur mit Beispielsaetzen). T2 baut darauf auf, schreib sie zuerst und merge sie frueh.
+- Akt 1 und 2: je 6 Missionsbriefings, Stabsbefehle (Telegrammstil mit STOP), Entscheidungen mit Folgen fuer Ansehen und Vertrauen, Brandts Tagebucheintraege (je Mission mindestens zwei Varianten nach Verlauf), handgeschriebene Briefe (Anteil Akt 1 und 2 der 24), Lasks abgefangene Briefe.
+- data/letters/templates.json: Vorlagen fuer generierte Feldpost, mindestens 40, in drei Tonlagen.
+- Erfahrungsberichte (etwa 20) als Text mit Ausloeser-Beschreibung.
+- Tutorial-Hinweise fuer Akt 1 (kurz, im Spiel eingebettet, nichts doppelt erklaeren).
+Ton: ernst, menschlich, nichts Verherrlichendes, keine realen Laender oder Personen, echte Umlaute.
+Pruefe mit einem Test (test/texts.test.js), dass alle JSON-Dateien gueltig sind, alle Platzhalter bekannt sind und keine ID doppelt ist.
+Danach Review mit frischem Blick (ein Subagent liest die Texte auf Ton, Widersprueche zur Welt-Bibel und Tippfehler), PR, CI gruen, mergen, docs/status.md.
+```
+
+## T2 Texte Akt 3 und 4, Endlosmodus, Zeitungen, Fundstuecke
+
+```
+Repo hjorven/lehmfront. Lies CLAUDE.md, docs/plan.md Abschnitte 2, 8.1 (Akt 3 und 4), 8.3, 2.6 (vier Enden), 7.8 (Stile 08, 10). Warte, bis data/texts/README.md und data/texts/welt.md von T1 auf main sind (git fetch origin main), und halte dich an deren Format und Welt. Bis dahin kannst du an Entwuerfen arbeiten.
+
+Schreibe als Daten unter data/texts/ und data/letters/:
+- Akt 3 und 4: je 6 Missionsbriefings, Stabsbefehle, Entscheidungen (Waffenruhe, Befehl umdeuten oder verweigern, Verweigerung der Truppe), Tagebuch, Briefe (Rest der 24), Lasks Briefe.
+- Die vier Enden aus Plan 2.6 als ausfuehrliche Schlusssequenzen.
+- Zeitungs-Zwischentexte ("Was die Zeitungen schreiben") zwischen allen Akten, beide Fraktionen, mit Propaganda-Kontrast zur Front.
+- 24 Fundstuecke (Fotos, Feldpostkarten, Karten) mit kurzer Nebengeschichte.
+- Endlosmodus: Vorlagen fuer generierte Stabsbefehle pro Woche, Jahreszeit-Texte.
+- 40 Erfolge mit Titel und Beschreibung (ohne Orden-Zaehlerei, Plan 13).
+Erweitere test/texts.test.js um deine Dateien. Review mit frischem Blick, PR, CI gruen, mergen, docs/status.md.
+```
+
+## K1 Klang-Engine prozedural
+
+```
+Repo hjorven/lehmfront. Lies CLAUDE.md und docs/plan.md 7.1, 7.7, 13. Klang wird komplett prozedural mit WebAudio erzeugt (Freigabe Jorven), keine Aufnahmen.
+
+Baue js/audio/ als eigenstaendigen Baustein:
+- engine.js: AudioContext erst nach erster Nutzerinteraktion, Master-, Musik-, Effekt- und Umgebungsbus, Lautstaerke, Stummschalten, reduzierte Lautstaerke im Hintergrund-Tab.
+- Klaenge als Funktionen: Papier rascheln, Bleistift kratzen, Stempel, Fernschreiber-Tippen, Uhr ticken und einrasten, ferne Artillerie, naher Einschlag, MG-Salve in der Ferne, Gewehrschuss, Pfeife zum Sturm, Leuchtkugel, Regen, Wind, Lore auf Schienen, Schlamm-Schritte.
+- Umgebung je nach Tageszeit (darkness 0..1) und Wetter, sanft ueberblendet.
+- Eine leise, karge Musik-Schicht (prozedural, zurueckhaltend, kein Heldenpathos).
+- API: playSfx(name, { x, pan, intensity }), setAmbience({ darkness, rain, wind, battle }), setVolume(bus, v).
+- js/scenes/klang.js: Demo-Szene mit Knoepfen fuer jeden Klang und Reglern fuer Tageszeit und Wetter.
+Tests fuer die reine Logik (z. B. Ueberblend-Kurven, Parameter-Mapping) mit node --test, ohne AudioContext.
+Screenshot der Demo-Szene, Review mit frischem Blick (auch: keine Klicks und Knackser, keine Endlosschleifen ohne Stop), PR, CI gruen, mergen, docs/status.md.
+```
+
+## Z1 Papierebene als Baustein
+
+```
+Repo hjorven/lehmfront. Lies CLAUDE.md, docs/plan.md 2.5, 7.5 (Papierebene), 7.7 (Gedrucktes immer Stil 03), 7.8, Bilder docs/bilder/feature-10-papierebene.png, stil-03-feldtelegramm.png, stil-06-aquarell.png, stil-10-zeitungsdruck.png, stil-08-linolschnitt.png, und den Mockup-Teil __f10 in docs/mockup/template.html.
+
+Baue js/ui/paper/ als eigenstaendigen Baustein (DOM + CSS, eigene css/paper.css):
+- Blattarten: Brief (Handschrift Caveat auf Briefpapier), Telegramm/Stabsbefehl (Stil 03 mit Stempel EILT, Formularfeldern), Tagebuchseite (Aquarell, Stil 06), Gefallenenliste (Schreibmaschine, Formular), Zeitung (Stil 10), Fundstueck-Foto, Aktkarte (Linolschnitt, Stil 08).
+- Blaetter liegen ueber der Karte, kippen mit der Maus/dem Neigungssensor, kommen beim Antippen nach vorn, lassen sich wegwischen und stapeln.
+- Telegramme koennen Zeile fuer Zeile "getippt" erscheinen (Hook fuer K1-Klang, optional).
+- Inhalt kommt als Daten (Format aus data/texts/README.md von T1, falls schon auf main, sonst eigenes einfaches Format, das du dokumentierst).
+- js/scenes/papier.js: Demo mit allen Blattarten, hell und dunkel, Desktop und Handy.
+- Reduzierte Bewegung respektieren (prefers-reduced-motion).
+Screenshots aller Blattarten, Review mit frischem Blick, PR, CI gruen, mergen, docs/status.md.
+```
+
+## E1 Etappenfenster-Modell als Baustein
+
+```
+Repo hjorven/lehmfront. Lies CLAUDE.md, docs/plan.md Abschnitt 6 komplett, Bilder docs/bilder/feature-01-etappe-3d.png und etappe-3d.gif, Mockup-Teil __f1 in docs/mockup/template.html.
+
+Baue:
+- js/config/buildings.js: alle Gebaeude aus Plan 6 (Wirkung, Nachbarbonus, Kosten, Bauzeit, ab welcher Stufe/Akt), reine Daten.
+- js/etappe.js (rein, testbar): Ertragsvorschau pro Feld inklusive Nachbarboni, Etappenstufen und Belohnungswahl. Tests.
+- js/ui/etappe3d/: das drehbare Pappmodell der Etappe (CSS-3D oder Canvas, kein Framework): Ziehen dreht und kippt, Doppelklick setzt zurueck, Felder antippbar, Gebaeude als Pappkaesten, Gleise, Wald, Boden. Rechts bzw. auf dem Handy unten die Bauoptionen mit Ertragsvorschau.
+- js/scenes/etappe.js: Demo mit einer Beispiel-Etappe.
+Das Einhaengen in Spielzustand und Runden macht spaeter P11. Halte die Schnittstelle klein: renderEtappe(root, { fields, buildings, selected, onSelect, onBuild }).
+Ueberraschung: z. B. Rauch aus der Feldkueche, kleine Figuren, die zwischen Gebaeuden laufen.
+Screenshots Desktop und Handy, Review mit frischem Blick, PR, CI gruen, mergen, docs/status.md.
+```
 
 ---
 
@@ -223,7 +318,7 @@ Screenshots Tag, Daemmerung, Nacht, Regen. Review mit frischem Blick, PR, CI gru
 ## P11 Etappe: Gebaeude, Nachbarboni, Etappenstufen, 3D-Etappenfenster
 
 ```
-Repo hjorven/lehmfront. Voraussetzung: P08 auf main. Lies CLAUDE.md, docs/plan.md 4.1 Nr. 11 und Abschnitt 6 komplett, Bilder feature-01-etappe-3d.png, etappe-3d.gif, Mockup-Teil __f1.
+Repo hjorven/lehmfront. Voraussetzung: P08 und E1 auf main. E1 hat Gebaeudedaten, Ertragslogik und das 3D-Fenster schon gebaut; dieses Paket haengt sie in Spielzustand, Runden und Gefechtsbildschirm ein und ergaenzt, was fehlt. Lies CLAUDE.md, docs/plan.md 4.1 Nr. 11 und Abschnitt 6 komplett, Bilder feature-01-etappe-3d.png, etappe-3d.gif, Mockup-Teil __f1.
 
 Baue:
 - js/config/buildings.js mit allen 1.0-Gebaeuden aus Plan 6, Nachbarboni, Bauzeit, Kosten.
@@ -278,7 +373,7 @@ Screenshots, Review mit frischem Blick, PR, CI gruen, mergen, docs/status.md.
 ## P15 Papierebene und Erzaehlung
 
 ```
-Repo hjorven/lehmfront. Voraussetzung: P07 auf main. Lies CLAUDE.md, docs/plan.md 2.3 bis 2.5, 7.5 (Papierebene), 7.8 (Stile 03, 06, 08, 10), Bilder feature-10-papierebene.png, stil-06-aquarell.png, stil-08-linolschnitt.png, stil-10-zeitungsdruck.png.
+Repo hjorven/lehmfront. Voraussetzung: P07, Z1 und T1 auf main. Z1 hat die Papierebene, T1 die Texte; dieses Paket verdrahtet sie mit Ereignisprotokoll und Kampagne und baut die Feldpost-Erzeugung. Lies CLAUDE.md, docs/plan.md 2.3 bis 2.5, 7.5 (Papierebene), 7.8 (Stile 03, 06, 08, 10), Bilder feature-10-papierebene.png, stil-06-aquarell.png, stil-08-linolschnitt.png, stil-10-zeitungsdruck.png.
 
 Baue:
 - Papierebene: Briefe, Telegramme, Fundstuecke als Blaetter ueber der Karte, kippen mit der Maus, kommen beim Antippen nach vorn.
@@ -330,7 +425,7 @@ Screenshots, Review mit frischem Blick, PR, CI gruen, mergen, docs/status.md, au
 ## P19 Klang und Feinschliff
 
 ```
-Repo hjorven/lehmfront. Voraussetzung: P07 auf main. Lies CLAUDE.md, docs/plan.md 7.1, 13.
+Repo hjorven/lehmfront. Voraussetzung: P07 und K1 auf main. K1 hat die Klang-Engine; dieses Paket haengt die Klaenge an alle Ereignisse und Ansichten. Lies CLAUDE.md, docs/plan.md 7.1, 13.
 
 Baue Klang mit WebAudio (prozedural erzeugt; Aufnahmen nur unter CC0 mit Lizenzdatei unter assets/sounds/): Papier, Bleistift, Fernschreiber, ferne Artillerie, Regen, Wind, Uhr, Pfeife beim Sturm. Leiser Grundton der Front je nach Tageszeit. Lautstaerke-Regler (Einstellungen aus P18, falls schon da). Dazu Feinschliff aller bisherigen Ansichten: Uebergaenge, Mikroanimationen, Konsistenz der Token.
 
@@ -358,7 +453,7 @@ Spiele das ganze Spiel per Playwright-Skript und von Hand durch (Kampagne Akt 1,
 
 ## P22 bis P27 Ausbaustufen
 
-Die Prompts fuer P22 bis P27 folgen dem gleichen Muster und werden nach Release 1.0 mit dem dann aktuellen Stand geschrieben:
+Die Prompts fuer P22 bis P27 folgen dem gleichen Muster und werden geschrieben, sobald P21 laeuft, mit dem dann aktuellen Stand. Sie gehoeren fest zum Umfang (Freigabe Jorven: alle Stufen, alle Akte):
 
 - **P22 1.1 Endlosmodus und Wochenlage**: Plan 8.3, Wochen als Zyklen, Jahreszeiten, generierte Stabsbefehle, Score.
 - **P23 1.2 Akt 2 "Lehm und Regen"**: Plan 4.2 Nr. 13 bis 19, Sappen, Stollen als gestrichelte Linie, Horchposten, Stosstrupps, Nacht, Leuchtkugeln im Angriff, Offiziere (Vell), Veteranen, Doktrinen, erweiterte Aufklaerung, sechs Missionen.
