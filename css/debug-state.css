@@ -1,0 +1,30 @@
+/* Debug-Ansicht ?scene=debug-state: Zustand als Text, Stil 03 Feldtelegramm (Plan 7.8) */
+.dbg{height:100%;overflow:auto;-webkit-overflow-scrolling:touch;padding:16px 16px 40px;font-family:var(--font-num);font-size:13px;line-height:1.5}
+.dbg h1{font:400 22px/1.2 var(--font-head);margin:0 0 4px;letter-spacing:.03em}
+.dbg h2{font:400 15px/1.2 var(--font-head);margin:22px 0 8px;letter-spacing:.06em;text-transform:uppercase;border-bottom:var(--border);padding-bottom:4px}
+.dbg .sub{color:var(--ink2);margin:0 0 12px}
+.dbg-bar{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.dbg-bar button{min-height:44px;padding:8px 14px;background:var(--card);border:var(--border);border-radius:var(--radius);box-shadow:var(--shadow);cursor:pointer;font:13px var(--font-ui)}
+.dbg-bar button:hover{border-color:var(--ink)}
+.dbg-bar button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.dbg-grid{display:grid;grid-template-columns:1fr;gap:0 28px}
+@media (min-width:900px){.dbg-grid{grid-template-columns:minmax(0,1.1fr) minmax(0,1fr)}}
+.dbg-kv{display:grid;grid-template-columns:auto 1fr;gap:2px 14px;margin:0}
+.dbg-kv dt{color:var(--ink2)}
+.dbg-kv dd{margin:0;min-width:0;overflow-wrap:anywhere}
+.dbg-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.dbg-grid>section{min-width:0}
+.dbg-groups{width:100%;border-collapse:collapse;white-space:nowrap}
+.dbg-groups th,.dbg-groups td{text-align:left;padding:3px 8px 3px 0;border-bottom:1px dotted var(--line);vertical-align:top}
+.dbg-groups th{font-weight:400;color:var(--ink2)}
+.dbg-groups .side-a{color:var(--own)}
+.dbg-groups .side-b{color:var(--enemy)}
+.dbg-tape{background:var(--card);border:var(--border);border-radius:var(--radius);padding:10px 12px;margin:0 0 8px;box-shadow:var(--shadow)}
+.dbg-tape p{margin:0 0 4px;font-family:var(--font-head);font-size:13px}
+.dbg-tape p.minor{color:var(--ink2)}
+.dbg-tape .ph{display:inline-block;min-width:4.5em;font-family:var(--font-num);font-size:11px;color:var(--ink2);text-transform:uppercase}
+.dbg-tape .stop{font-family:var(--font-num);font-size:11px;color:var(--ink2)}
+.dbg pre{white-space:pre-wrap;word-break:break-word;background:var(--card);border:var(--border);border-radius:var(--radius);padding:10px 12px;margin:0;font-size:12px;max-height:60vh;overflow:auto}
+.dbg-stamp{position:relative}
+.dbg-stamp .stamp{position:absolute;right:10px;top:-14px;transform:rotate(-7deg);border:2px solid var(--danger);color:var(--danger);padding:2px 8px;font:400 13px var(--font-head);letter-spacing:.08em;background:var(--card);opacity:.9}
+.dbg-stamp .stamp.ok{border-color:var(--own);color:var(--own)}
