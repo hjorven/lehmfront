@@ -57,7 +57,7 @@ export async function mount(root, params) {
   // Kamera: Desktop zeigt das ganze Blatt, Handy startet auf der eigenen Stellung
   // Breite Ansicht: unter dem Blatt Platz fuer Infokarte und Knoepfe lassen, damit sie Massstab und Legende nicht verdecken
   const sheet = sheetBounds(map);
-  const boundsFor = (w) => ({ ...sheet, h: sheet.h + (w >= 700 ? 4.5 : 0) });
+  const boundsFor = (w) => ({ ...sheet, h: sheet.h + (w >= 700 ? 6 : 0) });
   const vw = root.clientWidth, vh = root.clientHeight;
   const cam = createCamera({ bounds: boundsFor(vw), maxZoom: 110 });
   resizeCamera(cam, vw, vh);

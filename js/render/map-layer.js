@@ -49,7 +49,9 @@ function facingSign(map, chain) {
     const tx = b[0] - a[0], ty = b[1] - a[1];
     sum += -ty * f.dx + tx * f.dy; // Normale (-ty, tx)
   }
-  return sum > 0 ? 1 : sum < 0 ? -1 : 0;
+  // Laeuft der Zug ueberwiegend in Feuerrichtung (Sappe), gibt es keine Seite
+  if (Math.abs(sum) * 2 < pts.length - 1) return 0;
+  return sum > 0 ? 1 : -1;
 }
 
 /**
@@ -487,7 +489,7 @@ export function drawMapLayer(ctx, geo, cam, th, dpr = 1) {
     ctx.lineWidth = clamp(0.06 * z, 1.2, 2.2) * px;
     ctx.strokeRect(b.x + inset, b.y + inset, b.w - 2 * inset, b.h - 2 * inset);
     text(ctx, cam, b.letter, b.x + b.w / 2, b.y + b.h / 2 + 0.02, { size: Math.min(0.62, b.h * 0.42), family: 'num', weight: '700', color: th.ink, minPx: 5 });
-    text(ctx, cam, b.label, b.x + b.w / 2, b.y + b.h + 0.42, { size: 0.42, family: 'num', color: th.ink, alpha: 0.78, minPx: 6.5 });
+    text(ctx, cam, b.label, b.x + b.w / 2, b.y + b.h + 0.42, { size: 0.42, family: 'num', color: th.ink, alpha: 0.78, minPx: 6 });
   }
 
   // Beschriftungen
@@ -631,7 +633,7 @@ function drawFrame(ctx, cam, map, th, px) {
   ctx.beginPath(); ctx.moveTo(nx, ny - 0.9); ctx.lineTo(nx + 0.3, ny + 0.3); ctx.lineTo(nx, ny + 0.1); ctx.lineTo(nx - 0.3, ny + 0.3); ctx.closePath(); ctx.fill();
   ctx.restore();
   text(ctx, cam, 'N', nx, ny + 0.75, { size: 0.45, color: th.ink, weight: '700', minPx: 6 });
-  text(ctx, cam, 'Eigene Linie blau · Feind rot · 1 Feld = 10 m', 0, H + 1.9, { size: 0.42, color: th.ink, align: 'left', alpha: 0.7, minPx: 6.5 });
+  text(ctx, cam, 'Eigene Linie blau · Feind rot · 1 Feld = 10 m', 0, H + 1.9, { size: 0.42, color: th.ink, align: 'left', alpha: 0.7, minPx: 6 });
 }
 
 /**
