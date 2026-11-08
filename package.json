@@ -1,0 +1,13 @@
+{
+  "name": "lehmfront",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Taktisches Grabenkriegsspiel in 2D fuer den Browser",
+  "scripts": {
+    "test": "node --test \"test/**/*.test.js\"",
+    "serve": "node tools/serve.mjs 8080",
+    "shot": "node tools/shot.mjs",
+    "check": "node --test \"test/**/*.test.js\" && node tools/shot.mjs --check"
+  }
+}
