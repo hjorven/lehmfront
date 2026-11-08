@@ -1,0 +1,26 @@
+/* Szene karte (P02). Farben nur ueber CSS-Variablen aus js/theme.js */
+#scene.karte{position:fixed;inset:0;overflow:hidden;background:var(--paper);user-select:none;-webkit-user-select:none}
+.karte canvas{position:absolute;inset:0;display:block}
+.karte-dyn{cursor:grab}
+.karte-dyn:active{cursor:grabbing}
+
+.card{background:var(--card);color:var(--ink);border:var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
+
+.karte-info{position:absolute;left:12px;bottom:calc(12px + env(safe-area-inset-bottom));max-width:min(440px,calc(100% - 24px));padding:8px 12px;font-size:13px;line-height:1.4}
+.karte-info-head{display:flex;justify-content:space-between;gap:16px;align-items:baseline}
+.karte-title{font:400 15px/1.2 var(--font-head)}
+.karte-time{font:12px var(--font-num);color:var(--ink2);white-space:nowrap}
+.karte-cell{margin-top:4px;font-family:var(--font-ui)}
+.karte-cell b{font-family:var(--font-num)}
+.karte-cell .k{color:var(--ink2)}
+
+.karte-tools{position:absolute;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));display:flex;gap:8px}
+.karte-tools .btn{min-width:44px;min-height:44px;justify-content:center;font-family:var(--font-num);font-weight:700}
+.karte-daynight{padding:0 14px}
+
+.karte.no-ui .karte-info,.karte.no-ui .karte-tools{display:none}
+
+@media (max-width:600px){
+  .karte-info{left:8px;right:8px;top:8px;bottom:auto;max-width:none;padding:7px 10px;font-size:12.5px}
+  .karte-tools{right:8px;bottom:calc(8px + env(safe-area-inset-bottom))}
+}
