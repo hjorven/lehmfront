@@ -5,6 +5,7 @@ Jeder Thread traegt hier nach dem Merge ein, was fertig ist und was offen bleibt
 ## Fertig
 
 - P00 Grundgeruest: Ordnerstruktur, Titelbild, Schriften lokal, `js/rng.js`, `js/rules.js` mit Tests, Screenshot- und Pruefwerkzeug (`tools/shot.mjs`), CI mit Tests und Browser-Pruefung, GitHub Pages baut direkt aus `main` (Wurzel, `.nojekyll`).
+- K1 Klang-Engine: `js/audio/` (Engine mit Bussen master/music/sfx/ambience, 16 prozedurale Klaenge plus Kraehen, Grillen, Tropfen, Umgebung nach Tageszeit und Wetter, karge Musik-Schicht), Demo `?scene=klang` (Tonpult mit Schreibstreifen), API siehe `js/audio/README.md`. Ueberraschung: nach einem nahen Einschlag hoert man kurz dumpf mit Ohrensausen (abschaltbar per `setOption('shellshock', false)`), und die Musik verstummt unter Beschuss und kommt danach mit einem einzelnen Ton zurueck.
 
 - P01 Spielzustand und Rundenmotor:
   - `js/state.js` (Zustand als reines JSON, `createInitialState(map, scenario, seed)`, Helfer `groupsOf`, `getGroup`, `patchCell`, `cellKeys`, `compareId`), `js/events.js` (`makeEvent` prueft phase, type, reason, at).
@@ -24,6 +25,8 @@ Jeder Thread traegt hier nach dem Merge ein, was fertig ist und was offen bleibt
 - `resolveTurn` wirft, wenn `seed` oder `turn` nicht zum Zustand passen. Die Karte (`env.map`) wird nicht kopiert: Phasen duerfen sie nur lesen, Veraenderungen gehoeren in `state.cells`.
 - Geister (zuletzt gesehene Feinde) reicht `viewFor` aus `state.sides[side].intel.lastSeen` durch; befuellen muss P05.
 - Gruppen-IDs sind `a01`, `b01` ... (Seite plus zwei Ziffern), sortiert wird ohne Locale.
+- K1: Klaenge sind noch nirgends im Spiel eingehaengt, das macht P19 (und P03/P06/P07 duerfen `playSfx` direkt aufrufen). Lautstaerke-Regler gehoeren spaeter in die Einstellungen aus P18 (`setVolume`, Werte werden schon in localStorage gespeichert).
+- K1: In Safari auf iOS vor 16.4 bleibt der Klang stumm, wenn der Stummschalter am Geraet aktiv ist (ab 16.4 setzt die Engine `navigator.audioSession.type = 'playback'`).
 
 ## Freigaben und Entscheidungen von Jorven
 
