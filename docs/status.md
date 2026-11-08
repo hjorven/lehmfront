@@ -20,6 +20,14 @@ Jeder Thread traegt hier nach dem Merge ein, was fertig ist und was offen bleibt
   - `test/purity.test.js` prueft alle reinen Dateien (inkl. kuenftiger `js/map.js`, `js/supply.js`, `js/phases/*`) auf Math.random, Date, DOM, transzendente Mathematik und localeCompare.
 
 - Z1 Papierebene: Baustein `js/ui/paper/` mit `css/paper.css`, Demo `?scene=papier`. Sieben Blattarten (Brief, Telegramm/Stabsbefehl, Tagebuch, Gefallenenliste, Zeitung, Fundstück-Foto mit Rückseite, Aktkarte), prozedurale Bilder, Kippen mit Maus und Neigungssensor, nach vorn holen, Verschieben, Wegwischen in die Ablage, getippte Telegramme mit Klang-Hooks, Zensur `[[...]]`, Tag/Nacht, reduzierte Bewegung, Tastatur. Format und Schnittstelle: `js/ui/paper/README.md`.
+- P02 Lagekarte: `js/map.js` (Boden, Höhe 0..3, Zonen, Gräben mit Stufe und Feuerrichtung, Krater, Draht, Gleise, Gebäude; `loadMap`, `neighbors`, `lineCells`, `lineOfSight` mit Höhe und Wald/Dorf als Hindernis, `findPath` (A*), `cellChains`, `cellLabel`), Karte `data/maps/asse.json` 60 x 40 aus `tools/maps/asse.mjs` (Format: `data/maps/README.md`), `js/theme.js` (DAY, NIGHT, `lerpTheme`, `themeAt`, `applyTheme`, `animateDarkness`, `onThemeChange`), `js/render/geometry.js`, `js/render/map-layer.js` (statische Ebene, Path2D-Geometrie einmal je Karte, zeichnet nur nach `invalidate()`), `js/render/camera.js` (Maus, Rad, Trackpad-Pinch, Pfeiltasten, +/-, Doppelklick, Ziehen mit Nachgleiten, Zwei-Finger-Pinch, Grenzen, Bildschirm/Feld). Szene `?scene=karte` mit `&night=0..1`, `&x=&y=&zoom=`, `&ui=0`. Antippen zeigt Feldinfo, zweites Feld zeigt A*-Weg und Sichtlinie.
+
+### Für die nächsten Pakete (P03, P10)
+
+- Karte einbinden: `createMapLayer(canvas, map, { getCamera, getTheme })`, Kamera mit `createCamera({ bounds: sheetBounds(map) })` und `attachCameraControls(el, cam, { onChange, onTap, onHover })`. Muster: `js/scenes/karte.js`.
+- Dynamische Ebene (Einheiten, Overlays) als zweites Canvas darüber, Weltkoordinaten per `applyCameraTransform(ctx, cam, dpr)`.
+- Neuer Graben: Zelle in `map.cells` ändern, dann `layer.setMap(map)` (baut die Geometrie neu, etwa 5 bis 10 ms auf dem Desktop).
+- Tageszeit: `applyTheme(themeAt(darkness))`; Regeln lesen dieselbe Zahl über `visibilityFromDarkness`. `theme.flare` ist ab 0,5 wahr (Leuchtkugeln zeichnet P10).
 
 ## Offen und bekannte Macken
 
@@ -31,6 +39,10 @@ Jeder Thread traegt hier nach dem Merge ein, was fertig ist und was offen bleibt
 - K1: In Safari auf iOS vor 16.4 bleibt der Klang stumm, wenn der Stummschalter am Geraet aktiv ist (ab 16.4 setzt die Engine `navigator.audioSession.type = 'playback'`).
 - Z1: Die Blätter haben ein eigenes Datenformat (`js/ui/paper/README.md`); T1 kam erst während Z1 auf `main`. P15 setzt Texte aus `data/texts/` in dieses Format um.
 - Z1: Zeitung nutzt die Systemschrift Georgia/Times (keine Fraktur, keine neue Schriftdatei). Den Neigungssensor kann der Container nicht prüfen; abgesichert sind nur die Rechenfunktionen (Tests), nicht das Verhalten auf echten Geräten.
+- P02: In der Mitte des Übergangs (darkness etwa 0,45 bis 0,7) sind die Kartensignaturen (Blau, Rot, Draht, Wald) auf dem mittelbraunen Papier schwächer (bis 1,4 : 1). Tinte auf Papier und Schrift auf Kärtchen bleiben über 3 : 1 (Test), Kärtchen springen dazu mit der Tinte von hell nach dunkel.
+- P02: Doppelklick zum Zoomen zählt in der Szene `karte` auch als zwei Antipp-Vorgänge (Weg/Sicht-Anzeige wird dabei zurückgesetzt). Nur Demo-Szene; P03 sollte Antippen mit kurzer Verzögerung von Doppelklick trennen.
+- P02: Szenen haben noch kein Abmelden: Kamera-Listener, ResizeObserver und `onThemeChange` bleiben bestehen. Harmlos, solange `main.js` Szenen nicht wechselt.
+- P02: Diagonale Grabenstücke werden als schräge Rechteckwelle gezeichnet; das sieht etwas unruhiger aus als gerade Abschnitte.
 
 ## Freigaben und Entscheidungen von Jorven
 
@@ -52,3 +64,5 @@ Stand 2026-11-08, von Jorven bestaetigt:
 - P01: Konfiguration liegt in `js/config/*.js` (units, factions, orders, names) statt in einer `js/config.js` (Plan 10.3), damit parallele Pakete nicht dieselbe Datei aendern.
 - P01: Zufall pro Phase statt ein Strom pro Runde (Plan 10.6). Weiterhin aus Seed und Runde abgeleitet und einzeln nachrechenbar, aber robust gegen neue Phasen.
 - P01: Ein Gruppenfuehrer bekommt moeglichst einen auf seiner Seite einmaligen Nachnamen, und die Nachnamen der Hauptfiguren (Brandt, Harms, Vell, Lask) werden nicht zufaellig vergeben. Meldungen sagen "Gruppe Lohmann", das soll eindeutig sein.
+- P02, Tinte beim Tag-Nacht-Übergang: Plan 7.7 lässt Tinte und Signaturfarben zwischen darkness 0,45 und 0,7 linear wandern. Nachgemessen fällt dabei der Kontrast Tinte auf Papier bis 1,1 : 1. Jetzt springt jede Farbe innerhalb dieses Fensters an ihrem eigenen Kreuzungspunkt (dort, wo die Nachtfarbe auf dem dann gültigen Papier besser lesbar ist). Tinte bleibt damit immer über 3 : 1, im Übergang wirkt es wie Tinte, die aufleuchtet.
+- P02, Kartenblatt: Die Karte liegt als Papierblatt mit Rand auf einem Tisch: Spalten- und Zeilennummern am Rand (passend zu Meldungen wie „Feld 31/9"), Titel, Maßstab, Nordpfeil. Das war im Plan nicht vorgesehen, macht Feldangaben im Protokoll aber auffindbar.
