@@ -4,8 +4,6 @@
 .karte-dyn{cursor:grab}
 .karte-dyn:active{cursor:grabbing}
 
-.card{background:var(--card);color:var(--ink);border:var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
-
 .karte-info{position:absolute;left:12px;bottom:calc(12px + env(safe-area-inset-bottom));max-width:min(440px,calc(100% - 24px));padding:8px 12px;font-size:13px;line-height:1.4}
 .karte-info-head{display:flex;justify-content:space-between;gap:16px;align-items:baseline}
 .karte-title{font:400 15px/1.2 var(--font-head)}

@@ -32,3 +32,6 @@ jobs:
           node tools/shot.mjs --check --path "/?scene=karte"
           node tools/shot.mjs --check --path "/?scene=karte&night=1"
           node tools/shot.mjs --check --path "/?scene=etappe"
+          node tools/shot.mjs --check --path "/?scene=gefecht"
+          node tools/shot.mjs --check --path "/?scene=gefecht&demo=bericht"
+          node tools/shot.mjs --check --path "/?scene=gefecht&mode=hotseat&demo=uebergabe&night=1"
