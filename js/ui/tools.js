@@ -6,7 +6,7 @@
 //   begin(ctx) startet den Befehl. ctx (vom Gefechtsbildschirm):
 //     group, state, map, side            gewaehlte Gruppe und Lage (nur lesen)
 //     setOrder(order)                    Befehl ins Befehlsbuch (mit Undo)
-//     pickCell({ hint, preview(cell) -> { path?, text? } | null, pick(cell) -> true wenn erledigt })
+//     pickCell({ title?, hint, preview(cell) -> { path?, text? } | null, pick(cell) -> true wenn erledigt })
 //                                        Zielwahl auf der Karte; preview zeichnet Vorschau und Text im Schild
 //     hint(text)                         Hinweis-Kaertchen setzen
 //     cancel()                           Werkzeug beenden

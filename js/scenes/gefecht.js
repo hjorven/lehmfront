@@ -174,7 +174,7 @@ export async function mount(root, params) {
     onJump: (l) => { if (l?.at) { centerOn(cam, l.at.x + 0.5, l.at.y + 0.5, Math.max(cam.zoom, narrow() ? 26 : 22)); if (l.group) selectedId = l.group; onCamera(); refresh(); } },
   });
   const radial = createRadial(ui, {
-    onPick: (it) => { radial.hide(); if (it.id === '__clear') { book = clearOrder(book, side, it.group); refresh(); } else startTool(it.def, getGroup(state, it.group)); },
+    onPick: (it) => { radial.hide(); dynCv.focus({ preventScroll: true }); if (it.id === '__clear') { book = clearOrder(book, side, it.group); refresh(); } else startTool(it.def, getGroup(state, it.group)); },
     onClose: () => { radial.hide(); dynCv.focus({ preventScroll: true }); },
   });
 
@@ -190,7 +190,7 @@ export async function mount(root, params) {
   }
 
   function currentHint() {
-    if (tool?.pick) return { title: tool.def.label, text: tool.pickHint, tone: 'tool' };
+    if (tool?.pick) return { title: tool.pick.title ?? tool.def.label, text: tool.pickHint, tone: 'tool' };
     if (transient && performance.now() < transient.until) return { title: 'Hinweis', text: transient.text, tone: transient.tone };
     if (!helpShown && !ordersNow().length && state.turn === 1) {
       return { title: 'Hinweis', text: narrow()
@@ -282,6 +282,7 @@ export async function mount(root, params) {
   // ---------- Auswahl und Werkzeuge ----------
   function select(id, { center = false } = {}) {
     if (tool) cancelTool(false);
+    radial.hide();
     selectedId = id;
     const g = id ? getGroup(state, id) : null;
     if (g && center) {
@@ -298,6 +299,7 @@ export async function mount(root, params) {
     const u = usable(def, g, state, env);
     if (!u.ok) { flash(u.why, 'warn'); return; }
     cancelTool(false);
+    radial.hide();
     helpShown = true;
     selectedId = g.id;
     tool = { def, group: g, pick: null, preview: null, hoverCell: null, pickHint: '' };
@@ -387,6 +389,7 @@ export async function mount(root, params) {
   // ---------- Runde ausfuehren ----------
   function openSummary(preset = 0) {
     if (modalOpen) return;
+    if (state.result) { flash(state.result.reason); return; }
     cancelTool(false);
     radial.hide();
     const orders = ordersNow();
@@ -407,6 +410,9 @@ export async function mount(root, params) {
     playSfx('stamp');
     selectedId = null;
     closeList();
+    report.hide();
+    overlaysOn = new Set();
+    transient = null;
     const waiting = humans.find((s) => !book[s].sealed);
     if (waiting) {
       modalOpen = true;
@@ -415,11 +421,29 @@ export async function mount(root, params) {
         title: 'Befehle versiegelt',
         text: `Die Befehle von ${faction(state.sides[side].faction).name} sind verschlossen. Gib das Gerät an ${faction(state.sides[waiting].faction).name} weiter.`,
         button: `Weiter als ${faction(state.sides[waiting].faction).short}`,
-        onGo: () => { modalOpen = false; side = waiting; homeView(); onCamera(); refresh(); dynCv.focus({ preventScroll: true }); },
+        onGo: () => {
+          modalOpen = false; side = waiting; homeView(); onCamera();
+          if (reportDue.has(side)) showReport();
+          refresh(); dynCv.focus({ preventScroll: true });
+        },
       });
       return;
     }
     resolveNow();
+  }
+
+  // Meldungen der letzten Runde fuer die planende Seite, jede Seite sieht nur ihre eigenen (Hotseat)
+  let reportDue = new Set();
+  let lastTurn = 0;
+  function showReport() {
+    reportDue.delete(side);
+    const v = viewFor(state, lastLog, side);
+    const lines = v.log.filter((e) => e.phase !== 'orders' || e.side === side).map((e) => ({
+      text: e.reason, at: e.at, group: e.side === side ? e.group : null,
+      tone: e.type === 'order_invalid' || e.blocked ? 'warn' : e.type === 'hold' ? 'quiet' : '',
+    }));
+    report.show(`Meldungen · Runde ${lastTurn}`, lines.slice(0, 12));
+    if (state.result) flash(state.result.reason);
   }
 
   function resolveNow() {
@@ -432,7 +456,7 @@ export async function mount(root, params) {
     // Unvollendete Wege laufen als Befehl weiter, solange die Rundenart passt
     const carry = { a: [], b: [] };
     for (const e of r.log) {
-      if ((e.type === 'move' || e.type === 'redeploy') && e.rest?.length) {
+      if ((e.type === 'move' || e.type === 'redeploy') && e.rest?.length && !e.blocked) {
         const g = getGroup(state, e.group);
         const type = state.turnKind === 'battle' ? 'move' : 'redeploy';
         if (g && g.status !== 'lost' && e.type === type) carry[g.side].push({ group: g.id, type, path: e.rest, carried: true });
@@ -443,18 +467,11 @@ export async function mount(root, params) {
     playSfx('clock-lock');
     const target = forcedDark ?? darknessAt(state.clock, state.turnKind, state.night);
     if (target !== darkness) {
-      if (reducedMotion()) applyTheme(themeAt(target));
+      if (reducedMotion() || params.has('demo')) applyTheme(themeAt(target));
       else animateDarkness(darkness, target, { duration: 2200 });
     }
-    const showReport = () => {
-      const v = viewFor(state, lastLog, side);
-      const lines = v.log.filter((e) => e.phase !== 'orders' || e.side === side).map((e) => ({
-        text: e.reason, at: e.at, group: e.side === side ? e.group : null,
-        tone: e.type === 'order_invalid' || e.blocked ? 'warn' : e.type === 'hold' ? 'quiet' : '',
-      }));
-      report.show(`Meldungen · Runde ${before.turn}`, lines.slice(0, 12));
-      if (r.finished) flash(state.result.reason);
-    };
+    reportDue = new Set(humans);
+    lastTurn = before.turn;
     if (humans.length > 1) {
       modalOpen = true;
       refresh();
@@ -506,7 +523,13 @@ export async function mount(root, params) {
     drawDyn();
   }
 
+  // Pfeiltasten und +/- nur, wenn kein Dialog offen ist
+  const keyTarget = {
+    addEventListener: (t, fn) => window.addEventListener(t, (e) => { if (!modalOpen) fn(e); }),
+    removeEventListener: () => {},
+  };
   attachCameraControls(dynCv, cam, {
+    keyTarget,
     onChange: onCamera,
     onHover: (p) => {
       if (!tool?.pick) return;
@@ -541,10 +564,17 @@ export async function mount(root, params) {
 
   // Langer Druck (Touch und Maus) und Rechtsklick oeffnen das radiale Menue
   let press = null;
+  const down = new Set();
+  const forget = (e) => { down.delete(e.pointerId); };
+  dynCv.addEventListener('pointerup', forget);
+  dynCv.addEventListener('pointercancel', forget);
   dynCv.addEventListener('pointerdown', (e) => {
-    if (!e.isTrusted || modalOpen) return;
-    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    if (!e.isTrusted) return;
+    down.add(e.pointerId);
+    suppressTap = false; // falls ein frueheres Loslassen nie ankam
     if (press) { clearTimeout(press.timer); press = null; return; } // zweiter Finger: Pinch
+    if (modalOpen || down.size > 1) return;
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
     const r = root.getBoundingClientRect();
     const p = { x: e.clientX - r.left, y: e.clientY - r.top };
     const g = groupAtScreen(p);
@@ -566,7 +596,7 @@ export async function mount(root, params) {
   dynCv.addEventListener('pointermove', (e) => {
     if (!press || e.pointerId !== press.id) return;
     if (press.open) { radial.hover(e.clientX, e.clientY); return; }
-    if (Math.abs(e.clientX - press.x) + Math.abs(e.clientY - press.y) > 9) { clearTimeout(press.timer); press = null; }
+    if (Math.abs(e.clientX - press.x) + Math.abs(e.clientY - press.y) > 5) { clearTimeout(press.timer); press = null; }
   });
   const pressEnd = (e) => {
     if (!press || e.pointerId !== press.id || !e.isTrusted) return;
@@ -621,6 +651,7 @@ export async function mount(root, params) {
     }
     // Ab hier nur, wenn kein Knopf den Tastendruck selbst braucht
     const onButton = t && t.tagName === 'BUTTON';
+    if ((e.key === ' ' || e.key === 'Enter') && e.repeat) { e.preventDefault(); return; }
     if (e.key === ' ' && !onButton) { e.preventDefault(); if (!tool) nextIdle(); return; }
     if (e.key === 'Enter' && !onButton) { e.preventDefault(); openSummary(); return; }
     if (/^[1-4]$/.test(e.key)) { toggleOverlay(Number(e.key)); return; }

@@ -140,7 +140,7 @@
 .ring svg{position:absolute;inset:0;width:100%;height:100%}
 .ring .trk{fill:var(--card);stroke:var(--track);stroke-width:9}
 .ring .val{fill:none;stroke:var(--accent);stroke-width:9}
-.ring:not(.hold) .val{stroke-dashoffset:0}
+.ring:not(.hold) .val{stroke-dashoffset:0;stroke:var(--ink);stroke-width:3}
 .ring:not(.hold):hover .trk{stroke:var(--line)}
 .ring-face{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
 .ring-face b{font:400 18px var(--font-head)}
@@ -152,7 +152,7 @@
 .ho-title{display:block;font:400 22px var(--font-head);margin-bottom:8px}
 .handover p{margin:0 0 18px;color:var(--ink2)}
 .handover .go{justify-content:center;min-height:48px;width:100%;font-weight:700}
-.stamp{position:absolute;right:18px;top:16px;padding:2px 8px;border:2px solid var(--danger);color:var(--danger);font:400 14px var(--font-head);text-transform:uppercase;letter-spacing:.08em;transform:rotate(-8deg);opacity:.85}
+.stamp{display:inline-block;margin:0 0 12px;padding:2px 8px;border:2px solid var(--danger);color:var(--danger);font:400 14px var(--font-head);text-transform:uppercase;letter-spacing:.08em;transform:rotate(-8deg);opacity:.85}
 
 /* ---------- Handy hochkant (Plan 7.2: Kaertchen klappen zu einer Leiste, Stil 07 Seitenleiste) ---------- */
 @media (max-width:699px){

@@ -267,3 +267,29 @@ test('Optik: Pfeil abschneiden, radiales Menue bleibt im Bild', async () => {
   assert.equal(L.items[0].x, 0);
   assert.equal(L.items[0].y, -74);
 });
+
+test('Kolonne: Gruppe hinter einer abziehenden Gruppe kommt nach, unabhaengig von der ID', () => {
+  const s = fresh();
+  s.turnKind = 'battle';
+  s.battle = { round: 0 };
+  const a1 = s.groups.find((x) => x.id === 'a01');
+  const a2 = s.groups.find((x) => x.id === 'a02');
+  a1.pos = { x: 30, y: 9 };
+  a2.pos = { x: 29, y: 9 };   // a02 steht vor a01, a01 hat die kleinere ID
+  const r = resolveTurn(s, [
+    { group: 'a01', type: 'move', path: [{ x: 29, y: 9 }, { x: 28, y: 9 }] },
+    { group: 'a02', type: 'move', path: [{ x: 28, y: 9 }, { x: 27, y: 9 }] },
+  ], [], 7, 1, env);
+  const ev = (id) => r.log.find((e) => e.type === 'move' && e.group === id);
+  assert.equal(ev('a02').steps, 2);
+  assert.equal(ev('a01').steps, 2);
+  assert.equal(ev('a01').blocked, false);
+  assert.match(ev('a01').reason, /2 Felder/);
+});
+
+test('Ein Feld: Begruendung im Singular', () => {
+  const s = fresh();
+  const g = s.groups.find((x) => x.id === 'a01');
+  const r = resolveTurn(s, [{ group: 'a01', type: 'redeploy', path: [{ x: g.pos.x - 1, y: g.pos.y }] }], [], 7, 1, env);
+  assert.match(r.log.find((e) => e.type === 'redeploy').reason, /verlegt 1 Feld und/);
+});

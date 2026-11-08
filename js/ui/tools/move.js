@@ -64,6 +64,7 @@ registerTool({
     const { group, state, map } = ctx;
     const verb = moveTypeFor(state) === 'move' ? 'Bewegen' : 'Verlegen';
     ctx.pickCell({
+      title: verb,
       hint: `${verb}: Zielfeld für ${groupName(state, group)} antippen. Esc bricht ab.`,
       preview(cell) {
         const plan = cell ? planMove(map, state, group, cell) : null;

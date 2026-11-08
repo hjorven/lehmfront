@@ -24,6 +24,8 @@ function modal(root, cls, label, onClose) {
     e.stopPropagation();
   };
   back.addEventListener('keydown', trap);
+  // Gehaltene Enter- oder Leertaste darf keine Knoepfe im neuen Dialog ausloesen (Serien-Commit)
+  back.addEventListener('keydown', (e) => { if (e.repeat && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); e.stopPropagation(); } }, true);
   back.addEventListener('pointerdown', (e) => { if (e.target === back && onClose) onClose(); });
   return {
     el: back, box,

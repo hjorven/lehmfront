@@ -4,7 +4,7 @@
 //   tone: 'warn' (rot, etwas fehlt) oder 'ok' (blau, alles gut). Beispiele: P08 "abgeschnitten", P09 "Leitung unterbrochen".
 import { groupsOf, getGroup } from '../state.js';
 import { ORDER_TYPES } from '../config/orders.js';
-import { groupName, plural } from './labels.js';
+import { groupName } from './labels.js';
 import { cellLabel } from '../map.js';
 
 const checks = new Map();
@@ -51,11 +51,12 @@ export function checklist(ctx) {
   return out.map((e, i) => ({ e, i })).sort((p, q) => (p.e.tone === q.e.tone ? p.i - q.i : p.e.tone === 'warn' ? -1 : 1)).map((x) => x.e);
 }
 
+// Die Zahl steht in der Zusammenfassung schon in der eigenen Spalte
 const VERBS = {
-  hold: (n) => `${plural(n, 'Gruppe hält', 'Gruppen halten')} ausdrücklich`,
-  move: (n) => `${plural(n, 'Gruppe bewegt sich', 'Gruppen bewegen sich')}`,
-  redeploy: (n) => `${plural(n, 'Gruppe verlegt', 'Gruppen verlegen')}`,
-  assault: (n) => `${plural(n, 'Gruppe stürmt', 'Gruppen stürmen')}`,
+  hold: (n) => (n === 1 ? 'Gruppe hält ausdrücklich' : 'Gruppen halten ausdrücklich'),
+  move: (n) => (n === 1 ? 'Gruppe bewegt sich' : 'Gruppen bewegen sich'),
+  redeploy: (n) => (n === 1 ? 'Gruppe verlegt' : 'Gruppen verlegen'),
+  assault: (n) => (n === 1 ? 'Gruppe stürmt' : 'Gruppen stürmen'),
 };
 
 /** Befehlsarten, die den Knopf "halten" verlangen (Plan 3.4: Sturm) */
@@ -81,13 +82,13 @@ export function summarize({ state, side, orders, map = null }) {
       const dest = o.path?.length ? o.path[o.path.length - 1] : o.target;
       return g ? groupName(state, g) + (dest ? ` nach ${cellLabel(dest.x, dest.y)}` : '') : o.group;
     });
-    const head = VERBS[t] ? VERBS[t](list.length) : `${list.length} × ${ORDER_TYPES[t]?.label ?? t}`;
+    const head = VERBS[t] ? VERBS[t](list.length) : ORDER_TYPES[t]?.label ?? t;
     lines.push({ tone: 'own', count: String(list.length), text: `${head}: ${who.join(', ')}`, type: t });
   }
   const has = new Set(orders.map((o) => o.group));
   const idle = groupsOf(state, side).filter((g) => !has.has(g.id));
   if (idle.length) {
-    lines.push({ tone: 'warn', count: String(idle.length), text: `${plural(idle.length, 'Gruppe', 'Gruppen')} ohne Befehl (${idle.map((g) => groupName(state, g)).join(', ')}), ${idle.length === 1 ? 'hält' : 'halten'}` });
+    lines.push({ tone: 'warn', count: String(idle.length), text: `${idle.length === 1 ? 'Gruppe' : 'Gruppen'} ohne Befehl (${idle.map((g) => groupName(state, g)).join(', ')}), ${idle.length === 1 ? 'hält' : 'halten'}` });
   }
   const warnings = checklist({ state, side, orders, map }).filter((c) => c.tone === 'warn' && c.check !== 'ohne-befehl');
   for (const w of warnings) lines.push({ tone: 'warn', count: '!', text: w.text });
