@@ -1,0 +1,498 @@
+{
+  "format": 1,
+  "beschreibung": "Akt 1: Erstarrung (Sommer). Briefings, Stabsbefehle, Entscheidungen und Brandts Tagebuch.",
+  "eintraege": [
+    {
+      "id": "a1.titel",
+      "art": "akt",
+      "blatt": "aktkarte",
+      "titel": "Erstarrung",
+      "zeit": "Kriegssommer",
+      "text": "Drei Wochen sollte der Feldzug dauern. In der vierten Woche liegen beide Heere im Lehm an der Asse und warten darauf, dass die andere Seite zuerst nachgibt. Niemand gibt nach. Man beginnt zu graben."
+    },
+
+    {
+      "id": "a1m1.briefing",
+      "art": "briefing",
+      "mission": "a1m1",
+      "blatt": "telegramm",
+      "titel": "Der erste Spatenstich",
+      "ort": "Velde, Ostufer der Asse",
+      "zeit": "Kriegssommer, Tag 1",
+      "text": "Sie übernehmen den Abschnitt Asse-Nord von Hauptmann Oltmanns, der mit Fieber nach hinten gebracht wurde. Was er Ihnen übergibt, ist kein Graben, sondern eine Reihe von Schützenlöchern zwischen den Höfen von Velde und dem Krähenholz.\n\nDrüben, vierhundert Meter östlich, gräbt Haus Morrow bereits. Man hört die Spaten bis in die Mühle. Wer zuerst eine zusammenhängende Linie hat, bestimmt, wo diese Front verläuft.\n\nFeldwebel Harms erwartet Sie an der Velder Mühle. Er hat Spaten für vier Gruppen und eine Meinung zu jedem Meter Boden.",
+      "ziele": [
+        "Eine zusammenhängende Linie von der Mühle bis zum Krähenholz ausheben",
+        "Den Schützenauftritt nach Osten richten",
+        "Lange gerade Stücke mit Traversen brechen"
+      ]
+    },
+    {
+      "id": "a1m1.befehl",
+      "art": "befehl",
+      "mission": "a1m1",
+      "blatt": "telegramm",
+      "nr": "S-1/01",
+      "von": "Oberst van Aurach",
+      "an": "Major Brandt",
+      "abschnitt": "Asse-Nord",
+      "frist": "TAG 3 06:00",
+      "eilt": true,
+      "text": "ABSCHNITT A-NORD ÜBERNEHMEN STOP DURCHGEHENDE LINIE VELDE BIS KRÄHENHOLZ BIS TAG 3 FRÜH STOP GELÄNDE NICHT AUFGEBEN STOP",
+      "folgen": { "erfuellt": { "ansehen": 6 }, "verfehlt": { "ansehen": -6 } }
+    },
+    {
+      "id": "a1m1.tagebuch.niederlage",
+      "art": "tagebuch",
+      "nach": "a1m1",
+      "slot": "a1m1.tagebuch",
+      "blatt": "tagebuch",
+      "titel": "Tag 3",
+      "wann": { "ausgang": "niederlage" },
+      "text": "Die Linie hat Lücken. Zwischen Mühle und Wald liegen drei Löcher, die kein Graben sind, nur Löcher. Harms sagt nichts, was schlimmer ist, als wenn er etwas sagen würde.\n\nIch habe Brücken gebaut, die zweihundert Tonnen tragen. Hier trägt nichts. Morgen fange ich von vorne an, diesmal mit einer Zeichnung."
+    },
+    {
+      "id": "a1m1.tagebuch.verluste",
+      "art": "tagebuch",
+      "nach": "a1m1",
+      "slot": "a1m1.tagebuch",
+      "blatt": "tagebuch",
+      "titel": "Tag 3",
+      "wann": { "werte": { "gefallene": { "min": 3 } } },
+      "text": "Die Linie steht. Sie hat uns mehr gekostet, als ein Graben kosten sollte. Wo das Stück gerade war, haben sie uns von der Seite gefasst. Ich habe es auf der Karte gesehen, bevor es geschah, und habe es trotzdem so gelassen, weil es schneller ging.\n\nIch schreibe die Namen auf die erste Seite dieses Buchs. Ich weiß, dass es nicht die letzte Seite bleibt."
+    },
+    {
+      "id": "a1m1.tagebuch",
+      "art": "tagebuch",
+      "nach": "a1m1",
+      "slot": "a1m1.tagebuch",
+      "blatt": "tagebuch",
+      "titel": "Tag 3",
+      "text": "Eine Linie von der Mühle bis zum Krähenholz. Sie ist nicht schön, sie knickt alle zwanzig Meter, aber Harms sagt, das soll sie auch. „Gerade Gräben sind für Leute, die nicht beschossen werden, Frau Major.“\n\nDer Lehm ist gelb und klebt bis zum Knie. Ich habe ihn heute Abend aus den Stiefeln gekratzt und mich gefragt, wie lange man das tut, bis man es nicht mehr tut."
+    },
+
+    {
+      "id": "a1m2.entscheidung",
+      "art": "entscheidung",
+      "nach": "a1m1",
+      "titel": "Die Fähre von Ostervenn",
+      "text": "Der Stab befiehlt, die alte Seilfähre beim Fährhaus zu sprengen, damit Morrows Späher sie nachts nicht nutzen. Bis die Pioniere ihre Behelfsbrücke fertig haben, ist sie der einzige Übergang im Abschnitt. Am Ufer warten noch fünf Familien aus Velde mit Handkarren. Der Fährmann sagt, bis Mitternacht hat er sie drüben. Harms sagt, Morrows Späher waren letzte Nacht schon am Wasser.",
+      "optionen": [
+        {
+          "id": "befolgen",
+          "label": "Sofort sprengen",
+          "text": "Die Fähre geht um 19 Uhr in die Luft. Die Familien ziehen am Ostufer nach Süden zur Straßenbrücke in Asse-Mitte, zwei Tage Weg. Die Leute in Gruppe 2 kennen einige von ihnen.",
+          "folgen": { "ansehen": 4, "vertrauen": -4 },
+          "setzt": ["faehre_sofort"]
+        },
+        {
+          "id": "umdeuten",
+          "label": "Bis Mitternacht warten",
+          "text": "Die letzte Fuhre legt um halb zwölf ab. Um Mitternacht fliegt die Fähre. Im Bericht steht: Sprengung wegen Zündermangel verzögert. Der Stab fragt nach, woher der Zündermangel kam.",
+          "folgen": { "ansehen": -3, "vertrauen": 5 },
+          "setzt": ["faehre_spaet"]
+        }
+      ]
+    },
+    {
+      "id": "a1m2.briefing",
+      "art": "briefing",
+      "mission": "a1m2",
+      "blatt": "telegramm",
+      "titel": "Die Weide",
+      "ort": "Velde, vordere Linie",
+      "zeit": "Kriegssommer, Tag 5",
+      "text": "Zwischen den Linien liegt eine Kuhweide. Die Leute nennen sie schon „die Weide“, als gäbe es nur eine. Drüben hat man begonnen, Draht zu ziehen, und letzte Nacht kamen zwei Rotten bis an unseren Draht heran.\n\nUnteroffizier Lohmann hat sein MG in der Mühle in Stellung gebracht. Ein MG, das richtig steht, hält eine Weide. Eines, das falsch steht, verrät nur, wo es ist.\n\nHarms meint, Morrow wird es heute bei Tag versuchen, mit Masse, um zu sehen, wie viel wir aushalten.",
+      "ziele": [
+        "Den Feuersektor des MG über die Weide legen",
+        "Angreifer niederhalten, bevor sie den Draht erreichen",
+        "Unter Beschuss in die Unterstände gehen und rechtzeitig wieder oben sein"
+      ]
+    },
+    {
+      "id": "a1m2.befehl",
+      "art": "befehl",
+      "mission": "a1m2",
+      "blatt": "telegramm",
+      "nr": "S-5/02",
+      "von": "Oberst van Aurach",
+      "an": "Major Brandt",
+      "abschnitt": "Asse-Nord",
+      "frist": "TAG 6 06:00",
+      "eilt": false,
+      "text": "FEINDLICHE AUFKLÄRUNG VOR VELDE GEMELDET STOP LINIE HALTEN STOP KEIN FUSSBREIT ZURÜCK STOP",
+      "folgen": { "erfuellt": { "ansehen": 5 }, "verfehlt": { "ansehen": -8 } }
+    },
+    {
+      "id": "a1m2.tagebuch.niederlage",
+      "art": "tagebuch",
+      "nach": "a1m2",
+      "slot": "a1m2.tagebuch",
+      "blatt": "tagebuch",
+      "titel": "Tag 6",
+      "wann": { "ausgang": "niederlage" },
+      "text": "Sie sind in den Graben bei Hof Klaas gekommen, weil unsere Leute noch im Unterstand saßen, als das Feuer aufhörte. Fünf Minuten zu spät. Ich habe heute gelernt, dass fünf Minuten eine Strecke sind, so lang wie die Weide.\n\nWir haben den Hof wieder. Er ist jetzt ein Haufen Ziegel, und Lohmann sagt, von dort aus schießt es sich besser als vorher. Das ist kein Trost. Es ist eine Beobachtung."
+    },
+    {
+      "id": "a1m2.tagebuch.verluste",
+      "art": "tagebuch",
+      "nach": "a1m2",
+      "slot": "a1m2.tagebuch",
+      "blatt": "tagebuch",
+      "titel": "Tag 6",
+      "wann": { "werte": { "gefallene": { "min": 4 } } },
+      "text": "Die Linie hat gehalten. Drüben liegen Kronsoldaten auf der Weide, so viele, dass Lohmann aufgehört hat zu zählen. Auf unserer Seite habe ich gezählt. Ich zähle weiter.\n\nHeute Abend hat einer von drüben gerufen, immer wieder dasselbe Wort. Niemand hier versteht es. Gegen elf hörte es auf."
+    },
+    {
+      "id": "a1m2.tagebuch",
+      "art": "tagebuch",
+      "nach": "a1m2",
+      "slot": "a1m2.tagebuch",
+      "blatt": "tagebuch",
+      "titel": "Tag 6",
+      "text": "Sie kamen um vier, in breiter Reihe, als wäre die Weide ein Exerzierplatz. Lohmanns MG hat sie hingelegt, bevor sie den Draht erreichten. Die meisten sind zurückgekrochen. Ich bin froh darum, und ich weiß nicht, ob ich das hier schreiben darf.\n\nHarms sagt, sie haben nur getastet. „Morgen wissen sie, wo das MG steht, Frau Major.“ Wir verlegen es heute Nacht."
+    },
+
+    {
+      "id": "a1m3.briefing",
+      "art": "briefing",
+      "mission": "a1m3",
+      "blatt": "telegramm",
+      "titel": "Zwölf Loren",
+      "ort": "Ostervenn, Depot und Feldbahn",
+      "zeit": "Kriegssommer, Tag 9",
+      "text": "Die Feldbahn ist fertig: ein Gleis vom Depot in Ostervenn über die Behelfsbrücke bis hinter die Mühle. Sie fährt zwölf Loren pro Stellungsrunde. Es könnten fünfzig sein, und es wäre zu wenig.\n\nVorn fehlt Munition für das MG, die Gruppen am Krähenholz haben seit gestern kein warmes Essen, und die Pioniere brauchen Holz für die Unterstände. Dr. Selin im Lazarett hat ausrichten lassen, dass jede Lore, die leer zurückfährt, einen Verwundeten mitnehmen kann.\n\nSie stellen den Lorenplan. Was fährt, wohin, und was zurückkommt.",
+      "ziele": [
+        "Alle Grabenabschnitte mit Munition und Verpflegung versorgen",
+        "Verwundete mit den Loren zurückbringen",
+        "Das Depot nicht leer laufen lassen"
+      ]
+    },
+    {
+      "id": "a1m3.befehl",
+      "art": "befehl",
+      "mission": "a1m3",
+      "blatt": "telegramm",
+      "nr": "S-9/03",
+      "von": "Oberst van Aurach",
+      "an": "Major Brandt",
+      "abschnitt": "Asse-Nord",
+      "frist": "TAG 11 18:00",
+      "eilt": false,
+      "text": "FELDBAHN A-NORD IN BETRIEB STOP MUNITIONSVORRAT VORN AUF DREI TAGE BRINGEN STOP VERBRAUCH MELDEN STOP",
+      "folgen": { "erfuellt": { "ansehen": 5 }, "verfehlt": { "ansehen": -4 } }
+    },
+    {
+      "id": "a1m3.tagebuch.niederlage",
+      "art": "tagebuch",
+      "nach": "a1m3",
+      "slot": "a1m3.tagebuch",
+      "blatt": "tagebuch",
+      "titel": "Tag 11",
+      "wann": { "ausgang": "niederlage" },
+      "text": "Das Depot war zweimal leer. Ich habe Munition geschickt, wo Essen fehlte, und Holz, wo man Munition brauchte. Ein Lorenplan ist eine Gleichung, bei der jede Unbekannte ein Mensch ist, der wartet.\n\nMorgen lege ich ihn neu. Mit Bleistift, damit ich radieren kann."
+    },
+    {
+      "id": "a1m3.tagebuch.liegen",
+      "art": "tagebuch",
+      "nach": "a1m3",
+      "slot": "a1m3.tagebuch",
+      "blatt": "tagebuch",
+      "titel": "Tag 11",
+      "wann": { "werte": { "verwundete_liegen": { "min": 2 } } },
+      "text": "Die Munition ist vorn. Drei Tage, wie befohlen. Der Stab wird zufrieden sein.\n\nAm Gleisende lagen heute Abend Verwundete auf Zeltbahnen und warteten auf eine Lore, die nicht kam, weil alle Loren voll nach vorne fuhren. Ich habe es so geplant. Selin wird mir schreiben. Sie hat recht, bevor sie den Brief anfängt."
+    },
+    {
+      "id": "a1m3.tagebuch",
+      "art": "tagebuch",
+      "nach": "a1m3",
+      "slot": "a1m3.tagebuch",
+      "blatt": "tagebuch",
+      "titel": "Tag 11",
+      "text": "Zwölf Loren. Ich habe sie heute so oft gezählt, dass ich sie im Schlaf fahren höre. Jede bringt etwas nach vorn und etwas zurück, und wenn man es richtig macht, fährt keine leer.\n\nDie Leute am Krähenholz haben warmes Essen bekommen. Fedders hat mir eine Kartoffel geschickt, mit Bleistift „Danke“ in die Schale geritzt. Ich habe sie gegessen. Was sonst."
+    },
+    {
+      "id": "a1m3.entscheidung",
+      "art": "entscheidung",
+      "nach": "a1m3",
+      "titel": "Loren für das Lazarett",
+      "text": "Dr. Selin kommt selbst in den Gefechtsstand und bittet um zwei feste Loren pro Stellungsrunde, die nur Verwundete fahren, gleich was vorn gebraucht wird. Ohne feste Loren, sagt sie, hängt jedes Leben davon ab, ob gerade Munition gebraucht wird. Mit festen Loren fehlen vorn zwei Ladungen in jeder Runde.",
+      "optionen": [
+        {
+          "id": "zusagen",
+          "label": "Zwei Loren fest zusagen",
+          "text": "Zwei Loren tragen ab jetzt ein weißes Tuch und fahren nur zum Lazarett. Selin schickt keinen Dank, sondern eine Liste: wer seitdem rechtzeitig kam.",
+          "folgen": { "ansehen": -3, "vertrauen": 6 },
+          "setzt": ["selin_loren"]
+        },
+        {
+          "id": "ablehnen",
+          "label": "Loren bleiben im Plan",
+          "text": "Der Lorenplan bleibt flexibel. Sie entscheiden jede Runde neu, wer fährt. Selin schreibt: „Dann bitte ich Sie, jede Runde an mich zu denken.“",
+          "folgen": { "ansehen": 2, "vertrauen": -3 }
+        }
+      ]
+    },
+
+    {
+      "id": "a1m4.briefing",
+      "art": "briefing",
+      "mission": "a1m4",
+      "blatt": "telegramm",
+      "titel": "Der Turm von Ostervenn",
+      "ort": "Ostervenn und Velde",
+      "zeit": "Kriegssommer, Tag 14",
+      "text": "Hinter Ostervenn stehen jetzt zwei Batterien Feldhaubitzen. Sie schießen nur, wohin man ihnen sagt, und sagen kann es nur jemand, der sieht. Der einzige Punkt mit Sicht über die Weide ist der Kirchturm von Ostervenn. Von Schacht Drei aus sieht Morrow uns genauso.\n\nDer Feuerplan wird in der Stellungsrunde gelegt. Im Gefecht kann ihn nur noch der Beobachter verlegen, über die Leitung zum Turm oder per Melder, wenn sie reißt.\n\nDie Pioniere haben außerdem einen Grabenmörser gebracht. Er schießt steil und trifft, was in einem Graben sitzt.",
+      "ziele": [
+        "Einen Beobachter in den Kirchturm bringen und die Leitung legen",
+        "Einen Feuerplan gegen Morrows vordere Gräben anlegen",
+        "Den Grabenmörser gegen das MG-Nest vor dem Heuwagen einsetzen"
+      ]
+    },
+    {
+      "id": "a1m4.befehl",
+      "art": "befehl",
+      "mission": "a1m4",
+      "blatt": "telegramm",
+      "nr": "S-14/04",
+      "von": "Oberst van Aurach",
+      "an": "Major Brandt",
+      "abschnitt": "Asse-Nord",
+      "frist": "TAG 16 06:00",
+      "eilt": true,
+      "text": "BATTERIEN 1 UND 2 UNTERSTELLT STOP FEINDLICHES MG VOR HEUWAGEN AUSSCHALTEN STOP MUNITION SPARSAM STOP",
+      "folgen": { "erfuellt": { "ansehen": 6 }, "verfehlt": { "ansehen": -5 } }
+    },
+    {
+      "id": "a1m4.tagebuch.niederlage",
+      "art": "tagebuch",
+      "nach": "a1m4",
+      "slot": "a1m4.tagebuch",
+      "blatt": "tagebuch",
+      "titel": "Tag 16",
+      "wann": { "ausgang": "niederlage" },
+      "text": "Die Leitung zum Turm riss in der ersten Minute. Der Melder brauchte zehn. In der Zeit hat die Batterie dorthin geschossen, wo das MG gestern war. Es war nicht mehr dort.\n\nIch habe einmal eine Brücke gesehen, die eingestürzt ist, weil ein Bolzen fehlte. Ein Bolzen. Heute war es ein Draht von drei Millimetern."
+    },
+    {
+      "id": "a1m4.tagebuch.verluste",
+      "art": "tagebuch",
+      "nach": "a1m4",
+      "slot": "a1m4.tagebuch",
+      "blatt": "tagebuch",
+      "titel": "Tag 16",
+      "wann": { "werte": { "gefallene": { "min": 3 } } },
+      "text": "Das MG am Heuwagen schweigt. Die Batterie hat es beim dritten Mal getroffen. Die ersten zwei Male hat sie die Weide umgepflügt, und unsere Leute, die zu früh losgelaufen sind, lagen im eigenen Feuer.\n\nDer Beobachter im Turm hat es gesehen und konnte nichts tun als telefonieren. Er hat mir hinterher gesagt, er habe die ganze Zeit gezählt, wie lange die Batterie braucht. Ich habe nicht gefragt, wie lange."
+    },
+    {
+      "id": "a1m4.tagebuch",
+      "art": "tagebuch",
+      "nach": "a1m4",
+      "slot": "a1m4.tagebuch",
+      "blatt": "tagebuch",
+      "titel": "Tag 16",
+      "text": "Ich war heute im Turm. Von oben sieht der Abschnitt aus wie meine Karte, nur ohne die Linien, die ich darauf gezeichnet habe. Die Gräben sind Kratzer. Die Weide ist grün. Man könnte meinen, es sei nichts.\n\nDie Batterie hat das MG am Heuwagen beim zweiten Mal getroffen. Der Beobachter hat „Treffer“ ins Telefon gesagt, so ruhig wie ein Bahnbeamter. Unten hat es niemand gehört, aber alle haben es gemerkt."
+    },
+    {
+      "id": "a1m4.entscheidung",
+      "art": "entscheidung",
+      "nach": "a1m4",
+      "titel": "Der Kirchturm",
+      "text": "Morrows Batterien schießen sich auf den Kirchturm ein. Er ist ihr Richtpunkt für ganz Ostervenn, auch für das Lazarett in der Schule. Der Stab befiehlt, den Turm zu sprengen. Ohne Turm verlieren Sie Ihren besten Beobachtungsposten, bis ein Beobachtungsturm gebaut ist.",
+      "optionen": [
+        {
+          "id": "befolgen",
+          "label": "Den Turm sprengen",
+          "text": "Fedders' Pioniere legen die Ladung. Der Turm fällt nach Westen, wie berechnet. Die Leute aus Ostervenn, die noch da sind, stehen auf der Straße und sehen zu. Niemand sagt etwas.",
+          "folgen": { "ansehen": 4, "vertrauen": -2 },
+          "setzt": ["kirchturm_gesprengt"]
+        },
+        {
+          "id": "umdeuten",
+          "label": "Turm halten, Lazarett verlegen",
+          "text": "Sie melden, der Turm sei als Beobachtungsposten unersetzlich, und verlegen stattdessen das Lazarett aus der Schule in den Gewölbekeller des Fährhauses am Westufer. Selin flucht drei Tage. Dann hat sie es eingerichtet.",
+          "folgen": { "ansehen": -4, "vertrauen": 3 }
+        }
+      ]
+    },
+
+    {
+      "id": "a1m5.briefing",
+      "art": "briefing",
+      "mission": "a1m5",
+      "blatt": "telegramm",
+      "titel": "Gewitter",
+      "ort": "Velde und die Lehmkuhle",
+      "zeit": "Spätsommer, Tag 19",
+      "text": "Nach drei Wochen Hitze kommt das Gewitter. Der Lehm, der beim Graben wie Stein war, wird in einer Nacht zu Brei. Die Lehmkuhle vor der Linie läuft zuerst voll, dann die Gräben, die in der Senke liegen.\n\nWo die Batterien geschossen haben, sind Krater. Sie geben Deckung, aber sie halten das Wasser. Wer am meisten geschossen hat, kann jetzt am schlechtesten laufen.\n\nDrüben liegen die Gräben höher. Sie bleiben trocken.",
+      "ziele": [
+        "Gruppen aus den vollgelaufenen Abschnitten herausnehmen, ohne die Linie zu öffnen",
+        "Entwässerung an den tiefsten Stellen anlegen",
+        "Den Abschnitt bis zum Ende des Regens halten"
+      ]
+    },
+    {
+      "id": "a1m5.befehl",
+      "art": "befehl",
+      "mission": "a1m5",
+      "blatt": "telegramm",
+      "nr": "S-19/05",
+      "von": "Oberst van Aurach",
+      "an": "Major Brandt",
+      "abschnitt": "Asse-Nord",
+      "frist": "TAG 21 18:00",
+      "eilt": false,
+      "text": "WETTERLAGE BEKANNT STOP STELLUNG LEHMKUHLE WIRD GEHALTEN STOP RÜCKVERLEGUNG NICHT GENEHMIGT STOP",
+      "folgen": { "erfuellt": { "ansehen": 4 }, "verfehlt": { "ansehen": -6 } }
+    },
+    {
+      "id": "a1m5.tagebuch.niederlage",
+      "art": "tagebuch",
+      "nach": "a1m5",
+      "slot": "a1m5.tagebuch",
+      "blatt": "tagebuch",
+      "titel": "Tag 21",
+      "wann": { "ausgang": "niederlage" },
+      "text": "Die Kuhle ist verloren. Nicht an Morrow, an das Wasser. Morrow musste sie nur noch nehmen.\n\nIch habe Wasser immer gemocht. Man kann es berechnen. Es geht immer nach unten, sagt Harms, auch im Krieg. Ich habe meine Gräben nach unten gelegt."
+    },
+    {
+      "id": "a1m5.tagebuch.verluste",
+      "art": "tagebuch",
+      "nach": "a1m5",
+      "slot": "a1m5.tagebuch",
+      "blatt": "tagebuch",
+      "titel": "Tag 21",
+      "wann": { "werte": { "moral": { "max": 40 } } },
+      "text": "Wir haben die Kuhle gehalten. Die Leute standen zwei Tage bis zur Hüfte im Wasser, weil der Stab sie dort haben wollte und ich es nicht verhindert habe.\n\nHeute Abend hat Gruppe 4 nicht gesungen. Harms sagt, Gruppe 4 singt immer, auch wenn es niemand hören will. Ich habe erst gemerkt, dass sie singen, als sie aufgehört hatten."
+    },
+    {
+      "id": "a1m5.tagebuch",
+      "art": "tagebuch",
+      "nach": "a1m5",
+      "slot": "a1m5.tagebuch",
+      "blatt": "tagebuch",
+      "titel": "Tag 21",
+      "text": "Regen. Ich habe heute alles gemacht, was ich als Ingenieurin kann: Gefälle gemessen, Sickergruben gegraben, Lattenroste bestellt, die es noch nicht gibt. Fedders kam aus der Kuhle und sagte, in Grauwarf hätten sie für so ein Loch einen Namen, aber den sage sie nicht vor der Frau Major.\n\nDer Regen hat aufgehört. Der Lehm bleibt."
+    },
+    {
+      "id": "a1m5.entscheidung",
+      "art": "entscheidung",
+      "nach": "a1m5",
+      "titel": "Die Kuhle",
+      "wann": { "ausgang": "sieg" },
+      "text": "Die Stellung in der Lehmkuhle steht noch knietief unter Wasser. Fünfzig Meter dahinter liegt trockener Boden. Harms schlägt vor, die Gruppen dorthin zurückzunehmen und in der Kuhle nur Horchposten zu lassen. Der Stab hat die Rückverlegung ausdrücklich verboten.",
+      "optionen": [
+        {
+          "id": "befolgen",
+          "label": "Kuhle besetzt halten",
+          "text": "Die Gruppen bleiben im Wasser. Die Ablösung kommt alle zwölf Stunden statt alle vierundzwanzig. Es reicht nicht, aber es hilft.",
+          "folgen": { "ansehen": 3, "vertrauen": -5 },
+          "setzt": ["kuhle_gehalten"]
+        },
+        {
+          "id": "umdeuten",
+          "label": "Zurücknehmen, als Umbau melden",
+          "text": "Sie melden „Umbau der Stellung Lehmkuhle wegen Wassereinbruch“. Die Gruppen ziehen in der Nacht fünfzig Meter zurück. In der Kuhle bleiben zwei Horchposten auf Kisten. Der Stab hat es nicht gemerkt. Noch nicht.",
+          "folgen": { "ansehen": -2, "vertrauen": 5 },
+          "setzt": ["kuhle_umgedeutet"]
+        },
+        {
+          "id": "verweigern",
+          "label": "Offen zurücknehmen",
+          "text": "Sie telegrafieren, dass Sie die Kuhle räumen, und warum. Der Stab antwortet nicht. Das ist die Antwort.",
+          "folgen": { "ansehen": -7, "vertrauen": 7 },
+          "setzt": ["kuhle_verweigert"]
+        }
+      ]
+    },
+
+    {
+      "id": "a1m6.briefing",
+      "art": "briefing",
+      "mission": "a1m6",
+      "blatt": "telegramm",
+      "titel": "Die Welle",
+      "ort": "Abschnitt Asse-Nord, ganze Breite",
+      "zeit": "Spätsommer, Tag 24",
+      "text": "Die Fernmeldestelle hat einen Brief von Hauptmann Lask abgefangen. Morrow zieht hinter Raudas drei Regimenter zusammen. Lask schreibt, der Stab zähle Köpfe, nicht Gräben.\n\nDie Ablösung durch die Kellinger Schützen ist für Tag 28 zugesagt. Bis dahin muss der Abschnitt halten, und die Gruppen, die seit Tag 1 vorn sind, müssen vorher heraus, sonst halten sie nicht mehr.\n\nAlles, was Sie in diesem Sommer gelernt haben, gilt jetzt gleichzeitig: Gräben, Feuer, Loren, Batterien, Wasser und die Frage, wer wann ruht.",
+      "ziele": [
+        "Den Abschnitt halten, bis die Ablösung eintrifft",
+        "Erschöpfte Gruppen rechtzeitig zurück ins Ruhelager bringen",
+        "Keine Gruppe länger als vier Stellungsrunden ohne Ablösung vorn lassen"
+      ]
+    },
+    {
+      "id": "a1m6.befehl",
+      "art": "befehl",
+      "mission": "a1m6",
+      "blatt": "telegramm",
+      "nr": "S-24/06",
+      "von": "Oberst van Aurach",
+      "an": "Major Brandt",
+      "abschnitt": "Asse-Nord",
+      "frist": "TAG 28 06:00",
+      "eilt": true,
+      "text": "FEINDLICHE OFFENSIVE ERWARTET STOP A-NORD HÄLT BIS ZUR ABLÖSUNG STOP VERLORENES GELÄNDE SOFORT ZURÜCKNEHMEN STOP DIE REPUBLIK BLICKT AUF SIE STOP",
+      "folgen": { "erfuellt": { "ansehen": 10 }, "verfehlt": { "ansehen": -10 } }
+    },
+    {
+      "id": "a1m6.tagebuch.harms",
+      "art": "tagebuch",
+      "nach": "a1m6",
+      "slot": "a1m6.tagebuch",
+      "blatt": "tagebuch",
+      "titel": "Tag 28",
+      "wann": { "flags": ["harms_gefallen"] },
+      "text": "Otto Harms, Feldwebel, Ostmoor. Gefallen in den letzten Tagen vor der Ablösung.\n\nEr hatte die Pfeife im Mund, nicht angezündet, wegen der Scharfschützen. Sie haben sie mir gebracht. Ich weiß nicht, was ich mit ihr tun soll, also liegt sie auf der Karte, genau auf der Mühle, wo er immer saß.\n\nDie Ablösung ist gekommen. Was aus dem Abschnitt geworden ist, steht im Bericht. Was aus uns geworden ist, steht nirgends. Ich werde Geske schreiben, und ich weiß jetzt schon, dass kein Satz trägt."
+    },
+    {
+      "id": "a1m6.tagebuch.niederlage",
+      "art": "tagebuch",
+      "nach": "a1m6",
+      "slot": "a1m6.tagebuch",
+      "blatt": "tagebuch",
+      "titel": "Tag 28",
+      "wann": { "ausgang": "niederlage" },
+      "text": "Wir haben Velde verloren. Die Mühle, die Höfe, den Graben, den wir am ersten Tag gezogen haben. Die Kellinger Schützen sind in einer Linie hinter der Asse angekommen, die wir nie halten wollten.\n\nDer Stab schreibt, es sei eine Begradigung der Front. Ich habe die Begradigung auf meiner Karte nachgezeichnet. Sie ist nicht gerade."
+    },
+    {
+      "id": "a1m6.tagebuch.verluste",
+      "art": "tagebuch",
+      "nach": "a1m6",
+      "slot": "a1m6.tagebuch",
+      "blatt": "tagebuch",
+      "titel": "Tag 28",
+      "wann": { "werte": { "gefallene": { "min": 10 } } },
+      "text": "Die Ablösung ist da. Die Kellinger haben unsere Gräben übernommen und gefragt, warum die Traversen so dicht stehen. Niemand hat geantwortet.\n\nDie Liste dieses Sommers hat jetzt zwei Seiten. Ich habe heute jeden Namen einmal laut gelesen, allein im Unterstand. Es hat eine halbe Stunde gedauert. Morrow hat eine Welle nach der anderen geschickt, und jede Welle war ein Dorf wie Wessel oder Fennhusen. Ich weiß nicht, wer drüben ihre Namen liest."
+    },
+    {
+      "id": "a1m6.tagebuch",
+      "art": "tagebuch",
+      "nach": "a1m6",
+      "slot": "a1m6.tagebuch",
+      "blatt": "tagebuch",
+      "titel": "Tag 28",
+      "text": "Gehalten. Die Kellinger Schützen sind heute früh gekommen, mit sauberen Stiefeln und Fragen. Unsere Leute sind hinausgegangen, ohne sich umzusehen.\n\nHarms hat mir zum Abschied auf den Rücken geklopft, was er noch nie getan hat, und gesagt: „Ein Sommer, Frau Major. Den haben wir.“ Dann hat er sich die Stiefel ausgezogen und vierzehn Stunden geschlafen.\n\nIch habe gerechnet, wie viele Sommer dieser Krieg noch hat. Dann habe ich aufgehört zu rechnen."
+    },
+    {
+      "id": "a1m6.entscheidung",
+      "art": "entscheidung",
+      "nach": "a1m6",
+      "titel": "Das Bild",
+      "text": "Bei einem toten Kronsoldaten im Draht vor der eigenen Linie findet eine Sanitäterin eine Brieftasche: ein Foto einer Frau mit zwei Kindern vor einer Scheune, auf der Rückseite „Sarneva“. Feldwebel Fedders schlägt vor, sie bei Nacht an Morrows Draht zu hängen, mit einem weißen Tuch. Der Stab verbietet jeden Kontakt mit dem Feind.",
+      "optionen": [
+        {
+          "id": "zurueckgeben",
+          "label": "Das Bild zurückgeben",
+          "text": "In der Nacht hängt die Brieftasche an Morrows Draht. Am Morgen ist sie fort. Am Abend liegt an derselben Stelle eine Dose Tabak. Niemand meldet es.",
+          "folgen": { "ansehen": -4, "vertrauen": 5 },
+          "setzt": ["lask_bild_zurueck"]
+        },
+        {
+          "id": "abgeben",
+          "label": "Beim Stab abgeben",
+          "text": "Die Brieftasche geht mit der Feldpost nach Haverstadt-Land, zur Auswertung. Ob jemand sie dort ansieht, erfahren Sie nie.",
+          "folgen": { "ansehen": 3, "vertrauen": -2 }
+        }
+      ]
+    }
+  ]
+}

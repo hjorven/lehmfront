@@ -23,6 +23,15 @@ Jeder Thread traegt hier nach dem Merge ein, was fertig ist und was offen bleibt
 - Z1 Papierebene: Baustein `js/ui/paper/` mit `css/paper.css`, Demo `?scene=papier`. Sieben Blattarten (Brief, Telegramm/Stabsbefehl, Tagebuch, Gefallenenliste, Zeitung, Fundstück-Foto mit Rückseite, Aktkarte), prozedurale Bilder, Kippen mit Maus und Neigungssensor, nach vorn holen, Verschieben, Wegwischen in die Ablage, getippte Telegramme mit Klang-Hooks, Zensur `[[...]]`, Tag/Nacht, reduzierte Bewegung, Tastatur. Format und Schnittstelle: `js/ui/paper/README.md`.
 - P02 Lagekarte: `js/map.js` (Boden, Höhe 0..3, Zonen, Gräben mit Stufe und Feuerrichtung, Krater, Draht, Gleise, Gebäude; `loadMap`, `neighbors`, `lineCells`, `lineOfSight` mit Höhe und Wald/Dorf als Hindernis, `findPath` (A*), `cellChains`, `cellLabel`), Karte `data/maps/asse.json` 60 x 40 aus `tools/maps/asse.mjs` (Format: `data/maps/README.md`), `js/theme.js` (DAY, NIGHT, `lerpTheme`, `themeAt`, `applyTheme`, `animateDarkness`, `onThemeChange`), `js/render/geometry.js`, `js/render/map-layer.js` (statische Ebene, Path2D-Geometrie einmal je Karte, zeichnet nur nach `invalidate()`), `js/render/camera.js` (Maus, Rad, Trackpad-Pinch, Pfeiltasten, +/-, Doppelklick, Ziehen mit Nachgleiten, Zwei-Finger-Pinch, Grenzen, Bildschirm/Feld). Szene `?scene=karte` mit `&night=0..1`, `&x=&y=&zoom=`, `&ui=0`. Antippen zeigt Feldinfo, zweites Feld zeigt A*-Weg und Sichtlinie.
 
+- T1 Texte Akt 1 und 2, Welt-Bibel:
+  - Format fuer alle Spieltexte: `data/texts/README.md` (Eintraege mit `id`, `art`, `text`, Varianten ueber `slot` + `wann`, Bedingungen, Folgen, Flags, Platzhalter, Reihenfolge zwischen Missionen, Vorschlag fuer die Feldpost-Erzeugung). Platzhalter in `data/texts/placeholders.json`.
+  - Welt-Bibel `data/texts/welt.md`: Orte im Lehmgau (Ostervenn, Velde, Velder Muehle, Krähenholz, Lehmkuhle, Huegel 214, Schacht Drei, Raudas), Heimatorte beider Fraktionen (jetzt auch in `data/names.json`), Heer und Dienstgrade, Stimmen aller Hauptfiguren, Nebenfiguren, Lasks Doktrinen, Zeitungen.
+  - `data/texts/akt1.json`, `akt2.json`: Aktkarten, 12 Briefings (a2m5 und a2m6 mit Varianten), 12 Stabsbefehle, 10 Entscheidungen, Tagebuch je Mission mit 3 bis 4 Varianten.
+  - `data/letters/briefe-akt1-2.json`: handgeschriebene Briefe 1 bis 12 (mit Varianten, wenn Harms oder Vell fallen) und 5 abgefangene Briefe von Lask mit Uebersetzungsvermerk.
+  - `data/letters/templates.json`: 48 Feldpost-Vorlagen (16 je Tonlage), 43 Ereignis-Saetze in 18 Kategorien, 11 Anreden.
+  - `data/texts/berichte.json`: 20 Erfahrungsberichte mit Ausloeser, Zaehler-Vorschlag und Wirkung. `data/texts/tutorial.json`: 19 Tutorial-Hinweise fuer Akt 1 als Bleistiftnotizen der Figuren.
+  - `test/texts.test.js` prueft alle Text-Dateien automatisch (auch die von T2).
+
 ### Für die nächsten Pakete (P03, P10)
 
 - Karte einbinden: `createMapLayer(canvas, map, { getCamera, getTheme })`, Kamera mit `createCamera({ bounds: sheetBounds(map) })` und `attachCameraControls(el, cam, { onChange, onTap, onHover })`. Muster: `js/scenes/karte.js`.
@@ -50,6 +59,9 @@ Jeder Thread traegt hier nach dem Merge ein, was fertig ist und was offen bleibt
 - E1: Erreichte Belohnungsstufen hängen an der aktuellen Leistung; fällt sie vor der Wahl unter die Schwelle (Beschuss), verschwindet das Angebot wieder. P11 kann die höchste erreichte Stufe im Spielzustand merken.
 - E1: Figuren laufen auf gerader Linie zwischen Nachbargebäuden und gehen dabei sichtbar "durch die Tür" in den Kasten; auf Hängen schweben sie leicht.
 
+- T1: Die Zaehler der Erfahrungsberichte (`zaehler.ereignis`) sind Vorschlaege; P14 muss sie auf die echten Ereignistypen aus dem Protokoll abbilden. Die Statistiken fuer `wann.werte` (README) muss P07/P14 aus dem Protokoll zaehlen.
+- T1: Flags `harms_gefallen`, `vell_gefallen`, `trichter_gehalten` setzt die Mission (P16 bzw. Akt-2-Paket), nicht eine Entscheidung.
+
 ## Freigaben und Entscheidungen von Jorven
 
 Stand 2026-11-08, von Jorven bestaetigt:
@@ -72,6 +84,8 @@ Stand 2026-11-08, von Jorven bestaetigt:
 - P01: Ein Gruppenfuehrer bekommt moeglichst einen auf seiner Seite einmaligen Nachnamen, und die Nachnamen der Hauptfiguren (Brandt, Harms, Vell, Lask) werden nicht zufaellig vergeben. Meldungen sagen "Gruppe Lohmann", das soll eindeutig sein.
 - P02, Tinte beim Tag-Nacht-Übergang: Plan 7.7 lässt Tinte und Signaturfarben zwischen darkness 0,45 und 0,7 linear wandern. Nachgemessen fällt dabei der Kontrast Tinte auf Papier bis 1,1 : 1. Jetzt springt jede Farbe innerhalb dieses Fensters an ihrem eigenen Kreuzungspunkt (dort, wo die Nachtfarbe auf dem dann gültigen Papier besser lesbar ist). Tinte bleibt damit immer über 3 : 1, im Übergang wirkt es wie Tinte, die aufleuchtet.
 - P02, Kartenblatt: Die Karte liegt als Papierblatt mit Rand auf einem Tisch: Spalten- und Zeilennummern am Rand (passend zu Meldungen wie „Feld 31/9"), Titel, Maßstab, Nordpfeil. Das war im Plan nicht vorgesehen, macht Feldangaben im Protokoll aber auffindbar.
+- T1: Die Heimatorte in `data/names.json` wurden durch die der Welt-Bibel ersetzt, damit Briefe und Gefallenenliste dieselben Orte nennen.
+- T1: Tutorial-Hinweise sind Bleistiftnotizen von Harms, Lohmann, Fedders und Selin am Kartenrand statt neutraler Hinweisfenster (Feld `von`).
 - E1: "Angrenzend" heißt nur die vier Felder mit gemeinsamer Kante, keine Diagonalen (klarer lesbar im Modell).
 - E1: Depot braucht ein angrenzendes Gleis oder einen Feldbahnhof, sonst kommen keine Loren weg. Ein stillstehender Bahnhof gibt keinen Nachbarbonus.
 - E1: Die Etappenstufe zählt nur die Loren aus eigenen Gebäuden; Loren aus Belohnungen (Zweite Gleisstrecke) heben die Stufe nicht selbst an.

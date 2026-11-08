@@ -1,0 +1,369 @@
+{
+  "format": 1,
+  "beschreibung": "Handgeschriebene Briefe 1 bis 12 (Akt 1 und 2) und Lasks abgefangene Briefe aus Akt 1 und 2.",
+  "eintraege": [
+    {
+      "id": "brief.01",
+      "art": "brief",
+      "nr": 1,
+      "nach": "a1m1",
+      "blatt": "brief",
+      "absender": "Hinrich Tiedemann",
+      "empfaenger": "Maren Tiedemann",
+      "ort": "Velde",
+      "text": "Liebe Maren,\n\nwir sind angekommen und graben. Mehr tun wir nicht, und das ist gut so. Der Boden hier ist gelb wie Eidotter und schwer wie nasse Wäsche. Tjark Boysen gräbt neben mir und erzählt mir jeden Tag, wie viel Mehl seine Mutter aus einem Sack Korn bekommt. Ich weiß es jetzt auswendig.\n\nUnsere Kommandantin ist eine Ingenieurin aus Hollerbrügge. Sie kam gestern durch den Graben, hat einen Zollstock angelegt und gesagt, die Traverse sei zwanzig Zentimeter zu schmal. Wir haben sie breiter gemacht. Harms, unser Feldwebel, sagt, wer so misst, verschwendet keine Leute. Ich hoffe, er hat recht.\n\nWie steht der Garten? Wenn die frühen Äpfel kommen, heb mir einen auf. Ich weiß, dass er nicht hält. Heb ihn trotzdem auf.\n\nDein Hinrich"
+    },
+    {
+      "id": "brief.02",
+      "art": "brief",
+      "nr": 2,
+      "nach": "a1m2",
+      "blatt": "brief",
+      "absender": "Wiebke Albers",
+      "empfaenger": "Jan Albers",
+      "ort": "Velde, Pionierunterstand",
+      "text": "Lieber Vater,\n\nDu hast gesagt, wer Torf stechen kann, kann alles stechen. Lehm kann man nicht stechen. Lehm hält den Spaten fest und lässt ihn erst los, wenn er will. Ich habe gelernt, ihn zu überreden. Feldwebel Fedders sagt, ich hätte ein Händchen dafür. Sie kommt aus Grauwarf, da machen sie Ziegel aus dem Zeug.\n\nGestern Nacht haben wir Draht gezogen. Man kniet in der Weide, und jedes Mal, wenn drüben eine Leuchtkugel hochgeht, wird man zu einem Busch. Ich war ein sehr guter Busch, Vater. Ich habe mich nicht bewegt.\n\nAm Tag kamen sie dann, viele, in einer langen Reihe. Wir saßen im Unterstand, bis das Feuer aufhörte, und dann sind wir hoch. Mehr schreibe ich nicht darüber. Es ist vorbei, und ich bin hier.\n\nGrüß die Moorhühner. Wenn der Torf trocken ist, lass ihn nicht im Regen stehen wie letztes Jahr.\n\nDeine Wiebke"
+    },
+    {
+      "id": "brief.03.liegen",
+      "art": "brief",
+      "nr": 3,
+      "nach": "a1m3",
+      "slot": "brief.03",
+      "blatt": "brief",
+      "absender": "Dr. Mira Selin",
+      "empfaenger": "Major Ilse Brandt",
+      "ort": "Feldlazarett Ostervenn",
+      "wann": {
+        "werte": {
+          "verwundete_liegen": {
+            "min": 2
+          }
+        }
+      },
+      "text": "Frau Major,\n\nich schreibe Ihnen einen Brief, weil Meldungen in einem Stapel landen und Briefe geöffnet werden.\n\nGestern Abend lagen am Gleisende Verwundete auf Zeltbahnen. Die Loren fuhren voll nach vorn und kamen voll mit leeren Kisten zurück, weil leere Kisten im Lorenplan stehen und Verwundete nicht. Zwei meiner Leute sind auf den Zeltbahnen gestorben. Sie hätten hier auf dem Tisch liegen können. Ich nenne Ihnen die Namen nicht, Sie haben sie auf Ihrer Liste.\n\nIch bitte nicht um Mitleid, Frau Major. Ich bitte um Loren.\n\nIn meinem Lazarett hilft seit einer Woche ein Gefangener, Arvo Kalnis aus Ravelsk, achtzehn. Er trägt Wasser und spricht mit den Verwundeten von drüben. Er hat mich heute gefragt, warum bei uns die Loren nicht für die Verwundeten fahren. Ich wusste keine Antwort.\n\nMit Gruß\nMira Selin"
+    },
+    {
+      "id": "brief.03",
+      "art": "brief",
+      "nr": 3,
+      "nach": "a1m3",
+      "slot": "brief.03",
+      "blatt": "brief",
+      "absender": "Dr. Mira Selin",
+      "empfaenger": "Major Ilse Brandt",
+      "ort": "Feldlazarett Ostervenn",
+      "text": "Frau Major,\n\nich schreibe Ihnen einen Brief, weil Meldungen in einem Stapel landen und Briefe geöffnet werden.\n\nDiese Woche kamen siebenundzwanzig mit den Loren. Neunzehn davon gehen in vierzehn Tagen zurück in Ihre Gräben, mit einem Verband und mehr Erfahrung, als ihnen lieb ist. Das ist eine gute Zahl. Ich möchte, dass sie so bleibt.\n\nSie bleibt so, solange die Loren zurückfahren. Ich weiß, dass Sie jede Runde rechnen müssen, was nach vorn geht. Ich bitte Sie nur, bei jeder Rechnung auch an den Rückweg zu denken.\n\nIn meinem Lazarett hilft seit einer Woche ein Gefangener, Arvo Kalnis aus Ravelsk, achtzehn. Er trägt Wasser und spricht mit den Verwundeten von drüben. Er hat Angst gehabt, dass wir ihn erschießen. Ich habe ihm Tee gegeben. Jetzt kocht er ihn.\n\nMit Gruß\nMira Selin"
+    },
+    {
+      "id": "brief.04",
+      "art": "brief",
+      "nr": 4,
+      "nach": "a1m4",
+      "blatt": "brief",
+      "absender": "Otto Harms",
+      "empfaenger": "Geske Harms",
+      "ort": "Velder Mühle",
+      "text": "Liebe Geske,\n\ndie Socken sind angekommen. Sie passen wieder nicht, und ich trage sie trotzdem. Die linke ist länger. Ich steige trotzdem jeden Morgen hinein und denke an dich.\n\nWir haben jetzt Kanonen hinter uns und einen Mann oben im Kirchturm von Ostervenn, der ihnen sagt, wohin. Das ist neu für die Jungen. Für mich ist es nur lauter.\n\nDie Frau Major ist eine gute. Sie rechnet. Vorgestern hat sie einen Angriff abgesagt, weil die Rechnung nicht aufging, und der Stab hat geschimpft. Die Leute haben nicht geschimpft. Die Leute merken sich so etwas.\n\nDie Pfeife zünde ich nicht an, wegen der Scharfschützen. Ich kaue sie nur. Sie schmeckt trotzdem nach zu Hause.\n\nWie steht der Deich? Wenn die Herbststürme kommen, geh nicht allein hinaus. Nimm den jungen Wessels mit, der schuldet mir noch was.\n\nDein Otto"
+    },
+    {
+      "id": "brief.05",
+      "art": "brief",
+      "nr": 5,
+      "nach": "a1m5",
+      "blatt": "brief",
+      "absender": "Tjark Boysen",
+      "empfaenger": "Hilke Boysen",
+      "ort": "Lehmkuhle bei Velde",
+      "text": "Liebe Mutter,\n\nes hat geregnet. Ich schreibe das nur, damit Du verstehst, warum das Papier wellig ist. Wir stehen in einer Senke, die heißt die Kuhle, und die Kuhle hat sich in einer Nacht gefüllt wie der Mühlteich nach der Schneeschmelze. Hinrich Tiedemann sagt, wenn wir hier Forellen einsetzen, können wir im Herbst angeln.\n\nWir dürfen nicht zurück, sagt der Stab. Hinrich sagt, die Kommandantin rechnet noch, ob sie das hinnimmt. Bis dahin trocknen wir, wenn wir abgelöst werden. Trocknen ist hier ein großes Wort. Man wird weniger nass.\n\nMach Dir keine Sorgen. Ich esse gut. Das ist gelogen, aber ich esse.\n\nGrüß Vater. Sag ihm, das Wehr an der Wessel-Au muss vor dem Herbst nachgesehen werden, der linke Schieber klemmt. Ich hätte es ihm vor dem Abmarsch sagen sollen.\n\nDein Tjark"
+    },
+    {
+      "id": "brief.06.harms",
+      "art": "brief",
+      "nr": 6,
+      "nach": "a1m6",
+      "slot": "brief.06",
+      "blatt": "brief",
+      "absender": "Ilse Brandt",
+      "empfaenger": "Geske Harms",
+      "ort": "Ostervenn",
+      "wann": {
+        "flags": [
+          "harms_gefallen"
+        ]
+      },
+      "text": "Sehr geehrte Frau Harms,\n\nich muss Ihnen schreiben, dass Ihr Mann, Feldwebel Otto Harms, in den letzten Tagen vor unserer Ablösung gefallen ist. Die Einzelheiten stehen in dem amtlichen Schreiben, das Sie vor diesem Brief erhalten haben.\n\nIch habe keinen Satz, der das leichter macht, und ich will Ihnen keinen schreiben, der nicht stimmt. Was stimmt, ist dies: Ihr Mann hat diesen Abschnitt gehalten, lange bevor ich gelernt hatte, wie man das tut. Die Leute in seiner Nähe haben ruhiger geschlafen. Ich auch.\n\nSeine Pfeife schicke ich Ihnen mit dieser Post. Er hat sie nie angezündet, wegen der Scharfschützen. Er trug Ihre Socken, die linke länger als die rechte. Er sagte, das sei Absicht.\n\nWenn Sie mir schreiben möchten, schreiben Sie. Wenn nicht, verstehe ich das.\n\nIlse Brandt, Major"
+    },
+    {
+      "id": "brief.06",
+      "art": "brief",
+      "nr": 6,
+      "nach": "a1m6",
+      "slot": "brief.06",
+      "blatt": "brief",
+      "absender": "Hinrich Tiedemann",
+      "empfaenger": "Maren Tiedemann",
+      "ort": "Ruhelager hinter Ostervenn",
+      "text": "Liebe Maren,\n\nwir sind draußen. Die Kellinger haben uns abgelöst, und wir liegen in einer Scheune hinter Ostervenn, im Stroh, und niemand schießt. Ich habe vierzehn Stunden geschlafen und dann noch einmal acht.\n\nDie letzten Tage waren schwer. Sie kamen immer wieder, Welle auf Welle, und irgendwann hört man auf, die Wellen zu zählen, und zählt nur noch die eigenen Leute. Uns sind genug geblieben. Tjark ist bei mir. Er hat sich die Haare abgeschnitten, weil der Lehm nicht mehr herausging.\n\nIch weiß nicht, wie lange wir hier sind. Man sagt, zwei Wochen. Man sagt viel. Wenn Du kannst, schick mir Garn für die Socken und eins von den Bildern, auf denen Du lachst. Nicht das vom Fotografen. Das aus dem Garten.\n\nDein Hinrich"
+    },
+    {
+      "id": "brief.07",
+      "art": "brief",
+      "nr": 7,
+      "nach": "a2m1",
+      "blatt": "brief",
+      "absender": "Jost Vell",
+      "empfaenger": "Konrad Vell",
+      "ort": "Asse-Nord, Gefechtsstand",
+      "text": "Verehrter Vater,\n\nich bin endlich vorn! Man hat mir einen Zug im Abschnitt Asse-Nord gegeben, vierunddreißig Leute, Männer und Frauen, die seit dem Sommer hier liegen und mich ansehen, als käme ich vom Mond. Ich werde sie überzeugen.\n\nDie Kommandantin, Major Brandt, ist eine Ingenieurin. Sie denkt in Gräben und Loren. Sie ist klug, das gebe ich zu, aber ich fürchte, sie hat sich an das Graben gewöhnt. Vor uns liegt Hügel 214, und wer ihn hat, sieht bis Ostervenn. Seit dem Sommer schaut man ihn an. Ich glaube, man sollte ihn nehmen.\n\nBitte sagen Sie Mutter, dass es mir gut geht und dass es regnet. Mehr muss sie nicht wissen. Und sagen Sie dem Stadtrat, dass Haverstadt an der Asse gut vertreten ist.\n\nIhr gehorsamer Sohn\nJost"
+    },
+    {
+      "id": "brief.08",
+      "art": "brief",
+      "nr": 8,
+      "nach": "a2m2",
+      "blatt": "brief",
+      "absender": "Hinrich Tiedemann",
+      "empfaenger": "Maren Tiedemann",
+      "ort": "Velde",
+      "text": "Liebe Maren,\n\nder Regen hat aufgehört, dafür steht das Wasser jetzt kniehoch bei Abschnitt B. Fedders sagt, Lattenroste kommen morgen mit der Lore. Sie sagt das seit einer Woche.\n\nWir haben gestern zwei verloren, Tjark Boysen aus Wessel, den Jungen von der Mühle, und einen aus Kelling, den Du nicht kennst. Es war im Stollen unter dem Hügel. Die Decke ist heruntergekommen. Ich war dreißig Meter weiter und habe es mehr gefühlt als gehört.\n\nGeh bitte zu Hilke Boysen. Nicht gleich, der Brief vom Abschnitt kommt vor meinem an. Geh, wenn ein paar Tage vergangen sind, und bring ihr etwas mit, was Du gebacken hast. Sie wird nichts essen. Bring es trotzdem. Sag ihr, das mit dem Wehr hat er noch erledigt, in einem Brief nach Hause. Das hat er mir erzählt.\n\nSchreib mir, ob die Äpfel reif sind.\n\nDein Hinrich"
+    },
+    {
+      "id": "brief.09.loren",
+      "art": "brief",
+      "nr": 9,
+      "nach": "a2m3",
+      "slot": "brief.09",
+      "blatt": "brief",
+      "absender": "Dr. Mira Selin",
+      "empfaenger": "Major Ilse Brandt",
+      "ort": "Feldlazarett Ostervenn",
+      "wann": {
+        "flags": [
+          "selin_loren"
+        ]
+      },
+      "text": "Frau Major,\n\ndie beiden Loren mit dem weißen Tuch fahren jetzt seit sechs Wochen. Ich habe nachgerechnet: Einunddreißig Leute sind rechtzeitig hier gewesen, die es sonst nicht gewesen wären. Ich schreibe Ihnen die Zahl, weil Sie Zahlen glauben.\n\nVorgestern brachte die Lore einen Jungen von drüben, siebzehn, aus Velsk, mit einem Bein, das wir behalten konnten. Arvo Kalnis hat die ganze Nacht neben ihm gesessen und ihm erzählt, dass man hier nicht erschossen wird. Am Morgen hat der Junge mich gefragt, ob die Lore mit dem weißen Tuch auch für ihn gefahren ist. Ich habe ja gesagt.\n\nMit Dank, den ich sonst nicht schreibe,\nMira Selin"
+    },
+    {
+      "id": "brief.09",
+      "art": "brief",
+      "nr": 9,
+      "nach": "a2m3",
+      "slot": "brief.09",
+      "blatt": "brief",
+      "absender": "Dr. Mira Selin",
+      "empfaenger": "Major Ilse Brandt",
+      "ort": "Feldlazarett Ostervenn",
+      "text": "Frau Major,\n\nseit die Nächte unruhig sind, kommen die Verwundeten im Dunkeln. Man trägt sie über die Weide, ohne Licht, und lädt sie am Gleisende auf, wenn gerade eine Lore da ist. Wenn nicht, warten sie bis zum Morgen. Der Morgen ist hier oft zu spät.\n\nVorgestern brachte man mir einen Jungen von drüben, siebzehn, aus Velsk. Arvo Kalnis hat die ganze Nacht neben ihm gesessen und ihm erzählt, dass man hier nicht erschossen wird. Der Junge hat ihm nicht geglaubt, bis die Sonne aufging.\n\nIch bitte Sie wieder um Loren. Ich werde nicht aufhören, darum zu bitten. Sie dürfen das als Eigenschaft von mir notieren.\n\nMit Gruß\nMira Selin"
+    },
+    {
+      "id": "brief.10.niederlage",
+      "art": "brief",
+      "nr": 10,
+      "nach": "a2m4",
+      "blatt": "brief",
+      "absender": "Wiebke Albers",
+      "empfaenger": "Jan Albers",
+      "ort": "Horchposten am Heuwagen",
+      "text": "Lieber Vater,\n\nich bin jetzt Horcherin. Das heißt, ich sitze unter der Erde in einem Gang, nicht breiter als unser Torfgraben, und lege das Ohr an die Wand. Man hört alles. Wasser, das tropft. Mäuse. Das Herz. Und weiter weg, durch die Kreide, die anderen.\n\nDrüben hat jemand beim Graben gepfiffen, wochenlang, immer dasselbe Lied, vier Töne hoch, drei herunter. Ich kannte es nach zwei Tagen. Ich habe es abends vor mich hin gesummt, ohne es zu merken. Dann waren sie schneller. Der Boden unter dem Posten am Heuwagen ist hochgegangen, und ich saß zwei Gänge weiter. Seitdem pfeift drüben keiner mehr, und hier redet keiner mehr. Tjark Boysen war in dem Posten.\n\nIch horche weiter. Ich schreibe Dir das, weil Du der Einzige bist, der versteht, dass man ein Moor mögen kann, das einen verschluckt.\n\nWenn ich nach Hause komme, möchte ich eine Woche lang nur draußen sitzen, in der Sonne, wo man nichts hört.\n\nDeine Wiebke",
+      "slot": "brief.10",
+      "wann": {
+        "ausgang": "niederlage"
+      }
+    },
+    {
+      "id": "brief.10",
+      "art": "brief",
+      "nr": 10,
+      "nach": "a2m4",
+      "blatt": "brief",
+      "absender": "Wiebke Albers",
+      "empfaenger": "Jan Albers",
+      "ort": "Horchposten am Heuwagen",
+      "text": "Lieber Vater,\n\nich bin jetzt Horcherin. Das heißt, ich sitze unter der Erde in einem Gang, nicht breiter als unser Torfgraben, und lege das Ohr an die Wand. Man hört alles. Wasser, das tropft. Mäuse. Das Herz. Und weiter weg, durch die Kreide, die anderen.\n\nDrüben hat jemand beim Graben gepfiffen, wochenlang, immer dasselbe Lied, vier Töne hoch, drei herunter. Ich kannte es nach zwei Tagen. Ich habe es abends vor mich hin gesummt, ohne es zu merken. Dann haben wir gesprengt, und jetzt pfeift dort niemand mehr.\n\nIch weiß, dass es so sein musste. Ich schreibe es Dir trotzdem, weil Du der Einzige bist, der versteht, dass man ein Moor mögen kann, das einen verschluckt.\n\nWenn ich nach Hause komme, möchte ich eine Woche lang nur draußen sitzen, in der Sonne, wo man nichts hört.\n\nDeine Wiebke",
+      "slot": "brief.10"
+    },
+    {
+      "id": "brief.11.gefallen",
+      "art": "brief",
+      "nr": 11,
+      "nach": "a2m5",
+      "slot": "brief.11",
+      "blatt": "brief",
+      "absender": "Jost Vell",
+      "empfaenger": "Konrad Vell",
+      "ort": "Sappe am Heuwagen",
+      "wann": {
+        "flags": [
+          "vell_gefallen"
+        ]
+      },
+      "text": "Verehrter Vater,\n\nmorgen früh gehe ich mit meinem Zug auf Hügel 214. Ich habe die Kommandantin überzeugt. Ich glaube, sie hat nicht ganz nachgegeben, sondern mir eher erlaubt, mich zu irren. Ich werde mich nicht irren.\n\nFalls doch, wünsche ich mir, dass Sie nicht dem Stadtrat davon erzählen, sondern Mutter zuerst. Und dass Sie ihr sagen, dass ich keine Angst hatte. Das ist nicht wahr, Vater. Ich habe sehr große Angst. Aber ich möchte, dass sie das glaubt.\n\nIch schreibe das alles nur, weil man es so macht. Morgen Abend lache ich darüber.\n\nIhr Sohn\nJost\n\n(Gefunden in der Kartentasche von Leutnant Vell. Nicht abgeschickt. Weitergeleitet durch Major Brandt.)"
+    },
+    {
+      "id": "brief.11.zurueck",
+      "art": "brief",
+      "nr": 11,
+      "nach": "a2m5",
+      "slot": "brief.11",
+      "blatt": "brief",
+      "absender": "Jost Vell",
+      "empfaenger": "Konrad Vell",
+      "ort": "Asse-Nord, Gefechtsstand",
+      "wann": {
+        "flags": [
+          "vell_zurueckgehalten"
+        ]
+      },
+      "text": "Verehrter Vater,\n\nich habe um Erlaubnis gebeten, Hügel 214 zu nehmen, und die Kommandantin hat sie mir verweigert. Ich war wütend. Ich bin es noch, ein wenig.\n\nAm selben Morgen kam Morrow durch die Sappe, die ich nehmen wollte, und ich habe meinen Zug in den Gegenstoß geführt. Ich habe dabei gesehen, wie es ist, wenn man durch einen Graben voller Menschen muss, Meter für Meter. Ich hatte es mir anders vorgestellt. In meinen Büchern war es breiter.\n\nIch weiß nicht, ob ich einen Orden bekomme. Ich habe festgestellt, dass ich heute weniger daran denke als im Sommer.\n\nIhr Sohn\nJost"
+    },
+    {
+      "id": "brief.11.angriff_niederlage",
+      "art": "brief",
+      "nr": 11,
+      "nach": "a2m5",
+      "slot": "brief.11",
+      "blatt": "brief",
+      "absender": "Jost Vell",
+      "empfaenger": "Konrad Vell",
+      "ort": "Sappe am Heuwagen",
+      "wann": {
+        "flags": [
+          "vell_angriff"
+        ],
+        "ausgang": "niederlage"
+      },
+      "text": "Verehrter Vater,\n\nich bin mit meinem Zug auf Hügel 214 gegangen, und der Nebel hat sich gehoben, als wir am Hang waren. Wir sind zurück, nicht alle. Die Kommandantin hat mir nichts vorgeworfen. Das ist schlimmer, als wenn sie es getan hätte.\n\nIch habe heute Abend die Briefe meiner Leute aus der Kiste genommen, die Feldwebel Fedders aufbewahrt hat, und die von denen, die nicht zurückgekommen sind, selbst zur Post gebracht. Ich wollte, dass es jemand tut, der dabei war.\n\nBitte sagen Sie dem Stadtrat nichts. Sagen Sie Mutter, dass ich lebe.\n\nIhr Sohn\nJost"
+    },
+    {
+      "id": "brief.11",
+      "art": "brief",
+      "nr": 11,
+      "nach": "a2m5",
+      "slot": "brief.11",
+      "blatt": "brief",
+      "absender": "Jost Vell",
+      "empfaenger": "Konrad Vell",
+      "ort": "Hügel 214, vorderer Graben am Hang",
+      "text": "Verehrter Vater,\n\nwir haben ihn! Nicht den ganzen Hügel, aber einen Graben an seinem Hang, und von dort aus sieht man die ganze Weide. Der Nebel hat gehalten, genau wie ich es berechnet hatte. Die Kommandantin hat mir die Hand gegeben.\n\nWir haben Leute verloren. Ich schreibe Ihnen ihre Namen nicht, weil Sie sie nicht kennen, aber ich kenne sie jetzt alle. Das ist seltsam. Im Sommer hätte ich gesagt, das sei der Preis. Heute kann ich das Wort nicht mehr schreiben, ohne dass es wie Geld klingt.\n\nSagen Sie Mutter, dass ich gesund bin. Das ist wahr.\n\nIhr Sohn\nJost"
+    },
+    {
+      "id": "brief.12.geske",
+      "art": "brief",
+      "nr": 12,
+      "nach": "a2m6",
+      "slot": "brief.12",
+      "blatt": "brief",
+      "absender": "Geske Harms",
+      "empfaenger": "Major Ilse Brandt",
+      "ort": "Ostmoor",
+      "wann": {
+        "flags": [
+          "harms_gefallen"
+        ]
+      },
+      "text": "Frau Major,\n\nIhr Brief ist im Sommer gekommen, und die Pfeife auch. Ich habe lange nicht geantwortet, weil ich nicht wusste, was. Jetzt ist Herbst, und am Deich ist der erste Sturm gewesen, und ich bin nicht allein hinausgegangen, wie Otto es wollte.\n\nSie haben geschrieben, dass er die linke Socke länger fand. Er hatte recht. Ich habe sie mit Absicht so gestrickt, seit dreißig Jahren. Er hat es nie gesagt, bis zu Ihnen. Danke, dass Sie es mir erzählt haben. Jetzt weiß ich, dass er es gemerkt hat.\n\nIch stricke jetzt für Ihre Leute. Es kommen zwölf Paar mit der nächsten Post. Die linke ist bei allen länger. Sagen Sie ihnen nicht, warum.\n\nGeske Harms"
+    },
+    {
+      "id": "brief.12.niederlage",
+      "art": "brief",
+      "nr": 12,
+      "nach": "a2m6",
+      "slot": "brief.12",
+      "blatt": "brief",
+      "absender": "Otto Harms",
+      "empfaenger": "Geske Harms",
+      "ort": "Velder Mühle",
+      "wann": {
+        "ausgang": "niederlage"
+      },
+      "text": "Liebe Geske,\n\nder Hügel ist jetzt ein Loch, und das Loch gehört denen drüben. Sie schauen von seinem Rand auf uns herunter, und wir schauen hinauf. Die Jungen tun so, als wäre das nicht wichtig. Es ist wichtig.\n\nDer Stab will trotzdem eine Ordensliste. Fedders hat stattdessen einen Urlaubsantrag geschrieben, und jetzt liegt beides bei der Frau Major. Ich weiß, was ich täte. Wenn sie es auch tut, komme ich vielleicht zum Winter. Wenn nicht, schick Socken.\n\nHier ist es jetzt still. Zu still, sagt die Albers, die mit den Ohren. Sie hat meistens recht.\n\nDein Otto"
+    },
+    {
+      "id": "brief.12",
+      "art": "brief",
+      "nr": 12,
+      "nach": "a2m6",
+      "slot": "brief.12",
+      "blatt": "brief",
+      "absender": "Otto Harms",
+      "empfaenger": "Geske Harms",
+      "ort": "Velder Mühle",
+      "text": "Liebe Geske,\n\nder Hügel ist jetzt ein Loch. Wir haben ihn genommen, und da war er weg. Die Jungen stehen am Rand und schauen nach Osten, als käme von dort etwas Besseres. Ich schaue nach Westen. Da ist der Deich, auch wenn man ihn nicht sieht.\n\nDer Stab will eine Ordensliste. Fedders hat stattdessen einen Urlaubsantrag geschrieben, und jetzt liegt beides bei der Frau Major. Ich weiß, was ich täte. Wenn sie es auch tut, komme ich vielleicht zum Winter. Wenn nicht, schick Socken. Die linke länger, wie immer. Ich weiß, dass du das mit Absicht machst. Ich habe es dir nie gesagt.\n\nHier ist es jetzt still. Zu still, sagt die Albers, die mit den Ohren. Sie hat meistens recht.\n\nDein Otto"
+    },
+    {
+      "id": "lask.a1.1",
+      "art": "lask",
+      "nach": "a1m2",
+      "blatt": "brief",
+      "absender": "Teodor Lask",
+      "empfaenger": "Ruta Lask",
+      "doktrin": "masse",
+      "vermerk": "Abschrift, aus dem Morrowschen übertragen. Abgefangen bei einem Melder, Weide vor Velde. Fernmeldestelle Ostervenn, Lt. de Groot.\nZusatz der Übersetzerin: Den Schachzug habe ich auf meinem Brett nachgestellt. Er ist gut.",
+      "text": "Meine liebe Ruta,\n\nDein Läufer auf c4 ist frech, aber ich lasse ihn stehen. Ich antworte mit dem Springer nach f6. Du wirst sehen, warum.\n\nHier ist es ruhig, wenn man von den Krämern absieht, die gegenüber graben, als wollten sie bis nach Hause durch. Sie graben im Zickzack. Mein Stab sagt, das sei Feigheit. Ich sage, das sei Rechnen, und wer rechnet, ist nicht feige, sondern teuer.\n\nDer Stab zählt Köpfe. Er sagt mir jeden Morgen, wie viele Männer ich habe, und nie, wie viele Gräben. Gestern habe ich zwei Rotten über die Weide geschickt, um zu sehen, was drüben steht. Ich weiß es jetzt. Es hat zu viel gekostet, es zu wissen.\n\nKüss Milan von mir. Und sag Ignas, dass siebzehn kein Alter ist, um Soldat zu werden, sondern eines, um Latein zu lernen.\n\nDein Teodor"
+    },
+    {
+      "id": "lask.a1.2",
+      "art": "lask",
+      "nach": "a1m5",
+      "blatt": "brief",
+      "absender": "Teodor Lask",
+      "empfaenger": "Ruta Lask",
+      "doktrin": "masse",
+      "vermerk": "Abschrift, aus dem Morrowschen übertragen. Abgefangen an der Leitung nach Raudas. Fernmeldestelle Ostervenn, Lt. de Groot.\nZusatz: Sofort an Major Brandt. Seine Partie bitte nicht weitergeben, ich möchte wissen, wie sie ausgeht.",
+      "text": "Meine liebe Ruta,\n\nman sagt, drüben befehle eine Frau. Eine Ingenieurin, aus einer Brückenstadt. Ich habe gelacht, als ich es hörte. Dann habe ich ihre Gräben gesehen: wie sie knicken, wie sie das Wasser ableiten, wie jede Traverse dort steht, wo ich sie hingesetzt hätte. Ich habe aufgehört zu lachen.\n\nDer Stab schickt mir drei Regimenter. Sarneva ist dabei, unsere Leute vom Gut, Jurgis Dravin, die Mirek-Brüder, der alte Ozols. Man will mit ihnen über die Weide gehen, breit, in Wellen, damit die Krämer nicht genug Kugeln haben. Ich habe gesagt, dass sie genug Kugeln haben. Man hat mir gesagt, ich solle zählen, wie viele Männer wir haben, nicht wie viele Kugeln sie haben.\n\nIch werde tun, was befohlen ist, und so wenig davon, wie ich kann.\n\nDein Turm auf e1 steht schlecht. Ich nehme ihn nicht. Ich habe diese Woche keine Lust, etwas zu nehmen.\n\nDein Teodor"
+    },
+    {
+      "id": "lask.a2.1.bild",
+      "art": "lask",
+      "nach": "a2m1",
+      "slot": "lask.a2.1",
+      "blatt": "brief",
+      "absender": "Teodor Lask",
+      "empfaenger": "Ruta Lask",
+      "doktrin": "masse",
+      "wann": {
+        "flags": [
+          "lask_bild_zurueck"
+        ]
+      },
+      "vermerk": "Abschrift, aus dem Morrowschen übertragen. Abgefangen bei einem Gefangenen aus dem Regiment Sarneva. Fernmeldestelle Ostervenn, Lt. de Groot.\nZusatz: Ich habe den Satz über den Tabak dreimal gelesen.\nDas Bild lag bei. Ich habe es in der nächsten Nacht mit einem weißen Tuch wieder an den Draht hängen lassen, mit einem Zettel in ihrer Sprache: Für Ona Dravin. Major Brandt hat es genehmigt, ohne es aufzuschreiben.",
+      "text": "Meine liebe Ruta,\n\nwir haben die Weide nicht bekommen, oder wir haben sie bekommen und wieder verloren, es kommt auf dasselbe heraus. Wir haben die Hälfte des Regiments Sarneva dort gelassen. Ich habe die Liste. Du wirst die meisten Namen kennen. Ich bitte Dich, zu den Familien zu gehen, bevor das amtliche Schreiben kommt. Es kommt immer zu spät und immer zu kurz.\n\nNach der Offensive hing eines Nachts an unserem Draht eine Brieftasche, mit einem weißen Tuch daran. Darin das Bild von Jurgis Dravins Frau und den beiden Kleinen vor der Scheune. Die Krämer haben es zurückgegeben. Ich lege es diesem Brief bei. Bring es Ona Dravin. Sag ihr nicht, woher es kommt. Oder sag es ihr. Ich weiß nicht, was richtiger ist.\n\nWir haben am nächsten Abend eine Dose Tabak an dieselbe Stelle gelegt. Mein Adjutant hat gefragt, ob das erlaubt sei. Ich habe gesagt, ich hätte nichts gesehen.\n\nDer Stab lernt. Langsam. Er hat begriffen, dass Wellen bei Tag nicht über die Weide kommen. Nun will er es bei Nacht versuchen.\n\nDein Teodor"
+    },
+    {
+      "id": "lask.a2.1",
+      "art": "lask",
+      "nach": "a2m1",
+      "slot": "lask.a2.1",
+      "blatt": "brief",
+      "absender": "Teodor Lask",
+      "empfaenger": "Ruta Lask",
+      "doktrin": "masse",
+      "vermerk": "Abschrift, aus dem Morrowschen übertragen. Abgefangen bei einem Gefangenen aus dem Regiment Sarneva. Fernmeldestelle Ostervenn, Lt. de Groot.",
+      "text": "Meine liebe Ruta,\n\nwir haben die Weide nicht bekommen, oder wir haben sie bekommen und wieder verloren, es kommt auf dasselbe heraus. Wir haben die Hälfte des Regiments Sarneva dort gelassen. Ich habe die Liste. Du wirst die meisten Namen kennen. Ich bitte Dich, zu den Familien zu gehen, bevor das amtliche Schreiben kommt. Es kommt immer zu spät und immer zu kurz.\n\nJurgis Dravin ist dabei. Er trug ein Bild von Ona und den Kleinen bei sich. Es ist drüben geblieben, bei ihm.\n\nDer Stab lernt. Langsam. Er hat begriffen, dass Wellen bei Tag nicht über die Weide kommen. Nun will er es bei Nacht versuchen.\n\nSpiel ohne mich weiter. Ich kann im Moment keine Figuren sehen, ohne sie zu zählen.\n\nDein Teodor"
+    },
+    {
+      "id": "lask.a2.2",
+      "art": "lask",
+      "nach": "a2m2",
+      "blatt": "brief",
+      "absender": "Teodor Lask",
+      "empfaenger": "Ruta Lask",
+      "doktrin": "nachtangriffe",
+      "vermerk": "Abschrift, aus dem Morrowschen übertragen. Abgefangen bei einem Stoßtrupp, Draht vor Gruppe 3. Fernmeldestelle Ostervenn, Lt. de Groot.\nZusatz: Nachtangriffe. Bitte die Posten warnen. Die Partie steht inzwischen remis.",
+      "text": "Meine liebe Ruta,\n\nwir lernen, im Dunkeln zu sehen. Das heißt: Wir lernen, ohne zu sehen. Kleine Trupps, schwarze Gesichter, keine Gewehre, die man hört. Sie gehen in der Nacht durch den Draht, nehmen einen Posten und sind zurück, bevor drüben jemand eine Leuchtkugel findet. Mein Stab nennt das eine neue Doktrin. Meine Leute nennen es Wildern.\n\nUnter dem Hügel graben wir. Die Krämer graben auch. Man hört sie durch die Kreide, und sie hören uns. Einer meiner Pioniere pfeift beim Graben. Ich habe es ihm verboten. Er pfeift weiter, leiser. Ich habe es ihm nicht noch einmal verboten.\n\nDu schreibst, dass Ignas sich melden will. Sag ihm, dass ich es ihm verbiete. Sag ihm auch, dass ich weiß, dass er nicht gehorchen wird, weil er mein Sohn ist. Dann sag ihm, er soll wenigstens zu den Pionieren gehen. Die sind unter der Erde, und die Erde ist manchmal gnädiger als die Weide.\n\nDein Teodor"
+    },
+    {
+      "id": "lask.a2.3",
+      "art": "lask",
+      "nach": "a2m6",
+      "blatt": "brief",
+      "absender": "Teodor Lask",
+      "empfaenger": "Ruta Lask",
+      "doktrin": "nachtangriffe",
+      "vermerk": "Abschrift, aus dem Morrowschen übertragen. Abgefangen in Raudas durch einen Überläufer, der ihn bei sich trug. Fernmeldestelle Ostervenn, Lt. de Groot.\nZusatz: Er hat ihn nicht abgeschickt. Ich weiß nicht, ob wir ihn hätten lesen dürfen.",
+      "text": "Meine liebe Ruta,\n\nder Hügel ist ein Loch. Wer ihn hat, steht in einem Trichter und schaut nach allen Seiten, und nach allen Seiten schaut jemand zurück. Vom Pfarrhaus in Raudas aus sieht er durch das Glas aus wie ein Auge, das nicht blinzelt. Ich weiß nicht mehr, wem es gehört. Ich glaube, es gehört niemandem.\n\nIgnas ist bei den Pionieren in Velsk. Er hat mir geschrieben, dass er stolz ist. Ich habe ihm geantwortet, dass ich es auch bin. Ich habe nicht geschrieben, worauf.\n\nIch habe gestern einen Brief an die Ingenieurin drüben geschrieben. Nichts Verbotenes. Nur, dass ihre Traversen gut sind und dass sie ihre Posten nachts nicht allein lassen soll, weil ich es sonst ausnutzen muss. Ich habe ihn danach verbrannt. Man kann einem Gegner nicht schreiben, dass man ihn versteht. Dann wäre er keiner mehr.\n\nDer Winter kommt. Der Stab spricht von Munition, Granaten, Zügen voller Granaten. Ich glaube, er hat aufgehört, Köpfe zu zählen. Ich weiß nicht, ob ich darüber froh sein soll.\n\nDein Teodor"
+    }
+  ]
+}

@@ -2,23 +2,95 @@
   "format": 1,
   "beschreibung": "Alle erlaubten Platzhalter in Spieltexten. Neue Platzhalter hier eintragen, sonst schlaegt test/texts.test.js fehl.",
   "platzhalter": [
-    { "name": "anrede", "beschreibung": "Ganze Anrede eines Briefs ohne Komma, aus den Eintraegen der Art anrede", "beispiel": "Liebe Maren" },
-    { "name": "empfaenger", "beschreibung": "Nackter Name oder Rolle der Empfaengerin oder des Empfaengers", "beispiel": "Maren" },
-    { "name": "absender", "beschreibung": "Vorname der schreibenden Person, fuer die Unterschrift", "beispiel": "Hinrich" },
-    { "name": "gruppenfuehrer", "beschreibung": "Voller Name der Gruppenfuehrerin oder des Gruppenfuehrers", "beispiel": "Wiebke Albers" },
-    { "name": "gruppenfuehrer_nachname", "beschreibung": "Nur der Nachname, so wie die Truppe ihn nennt", "beispiel": "Albers" },
-    { "name": "gruppe", "beschreibung": "Bezeichnung der Gruppe", "beispiel": "Gruppe 3" },
-    { "name": "heimatort", "beschreibung": "Heimatort der schreibenden Person aus welt.md", "beispiel": "Wessel" },
-    { "name": "ereignis", "beschreibung": "Ganzer Satz mit Punkt aus einem Eintrag der Art ereignis, aus dem Protokoll der letzten Mission", "beispiel": "Die Lore ist am Gleisende im Schlamm stecken geblieben." },
-    { "name": "ort", "beschreibung": "Ortsangabe auf der Karte mit Praeposition", "beispiel": "an der Velder Muehle" },
-    { "name": "anzahl", "beschreibung": "Zahl aus dem Ereignis, als Wort fuer 1 bis 12, sonst als Ziffer", "beispiel": "drei" },
-    { "name": "gefallener", "beschreibung": "Voller Name einer gefallenen Person aus der Gefallenenliste", "beispiel": "Tjark Boysen" },
-    { "name": "kamerad", "beschreibung": "Voller Name einer lebenden Person aus derselben Gruppe", "beispiel": "Geske Fedders" },
-    { "name": "kamerad_nachname", "beschreibung": "Nur der Nachname der lebenden Person aus derselben Gruppe", "beispiel": "Fedders" },
-    { "name": "wetter", "beschreibung": "Wetter als Substantiv mit Artikel", "beispiel": "der Regen" },
-    { "name": "jahreszeit", "beschreibung": "Jahreszeit als Substantiv ohne Artikel", "beispiel": "Herbst" },
-    { "name": "tag", "beschreibung": "Tag des Abschnitts als Zahl", "beispiel": "14" },
-    { "name": "frist", "beschreibung": "Frist eines Befehls", "beispiel": "MORGEN 06:00" },
-    { "name": "abschnitt", "beschreibung": "Name des eigenen Abschnitts", "beispiel": "Asse-Nord" }
+    {
+      "name": "anrede",
+      "beschreibung": "Ganze Anrede eines Briefs ohne Komma, aus den Eintraegen der Art anrede",
+      "beispiel": "Liebe Maren"
+    },
+    {
+      "name": "empfaenger",
+      "beschreibung": "Nackter Name oder Rolle der Empfaengerin oder des Empfaengers",
+      "beispiel": "Maren"
+    },
+    {
+      "name": "absender",
+      "beschreibung": "Vorname der schreibenden Person, fuer die Unterschrift",
+      "beispiel": "Hinrich"
+    },
+    {
+      "name": "gruppenfuehrer",
+      "beschreibung": "Voller Name der Gruppenfuehrerin oder des Gruppenfuehrers",
+      "beispiel": "Wiebke Albers"
+    },
+    {
+      "name": "gruppenfuehrer_nachname",
+      "beschreibung": "Nur der Nachname, so wie die Truppe ihn nennt",
+      "beispiel": "Albers"
+    },
+    {
+      "name": "gruppe",
+      "beschreibung": "Bezeichnung der Gruppe",
+      "beispiel": "Gruppe 3"
+    },
+    {
+      "name": "heimatort",
+      "beschreibung": "Heimatort der schreibenden Person aus welt.md",
+      "beispiel": "Wessel"
+    },
+    {
+      "name": "ereignis",
+      "beschreibung": "Ganzer Satz mit Punkt aus einem Eintrag der Art ereignis, aus dem Protokoll der letzten Mission",
+      "beispiel": "Die Lore ist am Gleisende im Schlamm stecken geblieben."
+    },
+    {
+      "name": "ort",
+      "beschreibung": "Ortsangabe auf der Karte mit Praeposition, klein, nie am Satzanfang",
+      "beispiel": "an der Velder Muehle"
+    },
+    {
+      "name": "anzahl",
+      "beschreibung": "Zahl aus dem Ereignis als Wort (zwei bis zwölf, sonst Ziffer). Nur ab 2 einsetzen; bei 1 einen Satz derselben Kategorie ohne {anzahl} waehlen",
+      "beispiel": "drei"
+    },
+    {
+      "name": "gefallener",
+      "beschreibung": "Voller Name einer gefallenen Person aus der Gefallenenliste",
+      "beispiel": "Tjark Boysen"
+    },
+    {
+      "name": "kamerad",
+      "beschreibung": "Voller Name einer lebenden Person aus derselben Gruppe",
+      "beispiel": "Swantje Fedders"
+    },
+    {
+      "name": "kamerad_nachname",
+      "beschreibung": "Nur der Nachname der lebenden Person aus derselben Gruppe",
+      "beispiel": "Fedders"
+    },
+    {
+      "name": "wetter",
+      "beschreibung": "Wetter als Substantiv mit Artikel",
+      "beispiel": "der Regen"
+    },
+    {
+      "name": "jahreszeit",
+      "beschreibung": "Jahreszeit mit Artikel im Nominativ, klein (der Sommer, der Herbst, der Winter, das Frühjahr). Darf nur direkt nach der Anrede am Zeilenanfang stehen, sonst nie am Satzanfang",
+      "beispiel": "der Herbst"
+    },
+    {
+      "name": "tag",
+      "beschreibung": "Tag des Abschnitts als Zahl",
+      "beispiel": "14"
+    },
+    {
+      "name": "frist",
+      "beschreibung": "Frist eines Befehls",
+      "beispiel": "MORGEN 06:00"
+    },
+    {
+      "name": "abschnitt",
+      "beschreibung": "Name des eigenen Abschnitts",
+      "beispiel": "Asse-Nord"
+    }
   ]
 }

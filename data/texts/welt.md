@@ -48,9 +48,9 @@ Etappe reicht über den Fluss zurück. Von West nach Ost:
 | Ort | Wo | Was dort ist | Taucht auf |
 |---|---|---|---|
 | **Ostervenn** | Etappe, westlich der Asse | Dorf mit Kirche und Kirchturm, Depot, Feldlazarett in der Schule. Halb verlassen | Akt 1 bis 4 |
-| **Fährhaus Ostervenn** | Westufer der Asse | Alte Seilfähre, später Behelfsbrücke der Pioniere | Akt 1 |
-| **Die Asse** | Fluss | Breit, braun, im Herbst über die Ufer. Brücke nur bei Ostervenn | immer |
-| **Velde** | Ostufer, eigene Stellung | Zerschossenes Bauerndorf, sieben Höfe. Die **Velder Mühle** ist Gefechtsstand von Harms | Akt 1 bis 2 |
+| **Fährhaus Ostervenn** | Westufer der Asse | Alte Seilfähre, einziger Übergang im Abschnitt, ab Mission a1m3 ersetzt durch die Behelfsbrücke der Pioniere. Gewölbekeller | Akt 1 bis 4 |
+| **Die Asse** | Fluss | Breit, braun, im Herbst über die Ufer. Im Abschnitt nur ein Übergang bei Ostervenn, die nächste Straßenbrücke liegt in Asse-Mitte | immer |
+| **Velde** | Ostufer, eigene Stellung | Zerschossenes Bauerndorf, sieben Höfe, darunter **Hof Klaas** am Ostrand. Die **Velder Mühle** ist Gefechtsstand von Harms | Akt 1 bis 2 |
 | **Ziegelei Tamm** | Etappe, nahe Velde | Ziegelei mit hohem Schornstein, Material für ausgebaute Gräben | Akt 1 bis 3 |
 | **Krähenholz** | Nordflanke | Kleiner Buchenwald, im Herbst nur noch Stümpfe | Akt 1 bis 4 |
 | **Die Lehmkuhle** | Senke vor der eigenen Linie | Läuft bei Regen als erstes voll. „Die Kuhle“ | Akt 1 bis 2 |
@@ -163,7 +163,7 @@ immer beim Namen. Benutzt nie „Heldentod“ oder „Opfer“.
 >
 > „Der Lehm trägt nichts. Er nimmt nur.“
 >
-> „Heute Arend Fedders, Gruppe 4, 14:20 Uhr, Splitter. Ich habe seine Frau nie gesehen und werde ihr heute Abend schreiben.“
+> „Heute Remmer Siebels, Gruppe 4, 14:20 Uhr, Splitter. Ich habe seine Frau nie gesehen und werde ihr heute Abend schreiben.“
 
 ### Feldwebel Otto Harms
 
@@ -214,7 +214,7 @@ desto kürzer seine Telegramme.
 
 > „VORBEREITUNGSFEUER GENEHMIGT STOP VERLUSTE NACHRANGIG STOP“
 >
-> „ABSCHNITT A-NORD HAELT STOP ANERKENNUNG STOP WEITER SO STOP“
+> „ABSCHNITT A-NORD HÄLT STOP ANERKENNUNG STOP WEITER SO STOP“
 
 ### Hauptmann Teodor Lask
 
@@ -239,7 +239,7 @@ Zärtlichkeit für die Familie, die er hinter Förmlichkeit versteckt.
 | **Hinrich Tiedemann** | 31, aus Wessel, Schütze in Gruppe 2, Obstbauer, verheiratet mit **Maren** | Briefe an Maren, Akt 1 bis 2 |
 | **Tjark Boysen** | 19, aus Wessel, Schütze in Gruppe 2, Müllerssohn, Tiedemanns Nachbar | fällt in Akt 2 |
 | **Unteroffizier Dirk Lohmann** | 38, aus Kelling, MG-Trupp, Nieter | Akt 1 bis 3 |
-| **Feldwebel Geske Fedders** | 44, aus Grauwarf, Pionierzug, Zieglerin, kennt den Lehm | Akt 1 bis 4 |
+| **Feldwebel Swantje Fedders** | 44, aus Grauwarf, Pionierzug, Zieglerin, kennt den Lehm | Akt 1 bis 4 |
 | **Leutnant Hanne de Groot** | 26, Fernmeldestelle Ostervenn, übersetzt Lasks Briefe | Vermerke unter Lasks Briefen |
 | **Kronsoldat Arvo Kalnis** | 18, aus Ravelsk, gefangen in Akt 1, hilft im Lazarett | Selins Briefe |
 
