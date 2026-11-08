@@ -53,7 +53,7 @@ Fuer Debug- und Screenshot-Zustaende Query-Parameter anbieten (z. B. `?scene=gef
 5. Review mit frischem Blick: einen Subagenten ohne deinen Kontext den Diff reviewen lassen (Korrektheit, Determinismus, offensichtliche Fehler, UX-Bruchstellen) und die Screenshots beurteilen lassen. Funde beheben, dann erneut testen.
 6. PR gegen `main` oeffnen, CI abwarten (Tests und Browser-Pruefung). Bei Gruen selbst mergen (Squash). Kein Merge mit roter CI, keine Tests abschalten. GitHub Pages baut direkt aus `main` (Wurzel, `.nojekyll`): jeder Merge ist sofort live.
 7. `docs/status.md` aktualisieren (was fertig ist, was offen ist, bekannte Macken). Kreative Zusatzideen, die nicht ins Paket passen, nach `docs/ideen.md`.
-8. Nach dem Merge pruefen, dass die Seite auf GitHub Pages laedt: https://hjorven.github.io/lehmfront/
+8. Nach dem Merge pruefen, dass der Workflow-Lauf "pages build and deployment" auf `main` erfolgreich war (GitHub-MCP `actions_list`). Die Seite https://hjorven.github.io/lehmfront/ ist aus dem Container nicht direkt abrufbar.
 
 ## Kreativitaet
 
