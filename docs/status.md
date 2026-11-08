@@ -37,6 +37,13 @@ Jeder Thread traegt hier nach dem Merge ein, was fertig ist und was offen bleibt
   - `data/texts/enden.json`: Auswahl des Endes (Slot `ende.wahl`, Grenzen 50/60, im Test fuer jede Wertekombination geprueft), vier Schlusssequenzen mit Gefallenenliste, vorzeitige Enden, Nachwort je Figur.
   - `data/texts/zeitungen.json` (16 Seiten vor und zwischen den Akten, je zwei Zeitungen pro Fraktion, Randnotizen von der Front, Zensur als `[[...]]` wie in Z1), `fundstuecke.json` (24 Stuecke in 6 Ketten mit Abschluss), `endlos.json` (Wochenbefehle fuer beide Fraktionen, Wochenanfang, Jahreszeiten mit Wetter, Enden), `erfolge.json` (40, ohne Punkte und Orden).
   - Neue Arten, Flags und Ablauf der Enden in `data/texts/README.md`, neue Orte und Figuren in `welt.md`.
+- P03 Gefechtsbildschirm: Szene `?scene=gefecht` (Hauptmenü „Gefecht frei“ und „Hotseat“), Szenario `data/scenarios/asse-frei.json` (3 gegen 3, Seite b hält per Platzhalter-KI `js/ai/dummy.js`).
+  - Kärtchen (`js/ui/hud.js`): Loren, Munition, Material, Moral, Ansehen/Vertrauen, Runde mit Tageszeit und Wetter, Hinweis, „Vor der Runde“, Overlays 1 bis 4. Handy: Leiste oben, klappt zur Seitenleiste wie Stil 07 auf.
+  - Schild am gewählten Objekt (`js/ui/shield.js`), Werkzeugreihe (`js/ui/toolbar.js`), Befehlsliste (Tab, `js/ui/orderlist.js`), radiales Menü bei langem Druck oder Rechtsklick (`js/ui/radial.js`, Finger zum Befehl ziehen und loslassen), Zusammenfassung mit Halten-Ring bei Sturm und Übergabe für Hotseat (`js/ui/commit.js`).
+  - Befehlsbuch pro Seite mit Undo (`js/ui/orderbook.js`, rein), Zusammenfassung und Checkliste mit Register (`js/ui/summary.js`), Bezeichnungen (`js/ui/labels.js`), Tageszeit aus der Uhr (`js/ui/daytime.js`).
+  - Erste Bewegungsphase `js/phases/move.js`: Bewegen (Gefecht, speed Felder) und Verlegen (Stellung, speed x 4 Felder, nur hinter der eigenen Linie), besetzte Felder halten an, Rest läuft als Befehl in der nächsten Runde weiter.
+  - Dynamische Ebene `js/render/units-layer.js`: Gruppensymbole wie im Mockup, Bleistiftpfeile (diese Runde durchgezogen, Rest gestrichelt), Zielvorschau, Fragezeichen an Gruppen ohne Befehl.
+  - Demo-Zustände für Screenshots: `&demo=befehle|liste|radial|zusammenfassung|sturm|bericht|uebergabe|zeichnen|overlays`, außerdem `&mode=hotseat`, `&kind=battle`, `&night=0..1`, `&seed=`.
 
 ### Für die nächsten Pakete (P03, P10)
 
@@ -44,6 +51,15 @@ Jeder Thread traegt hier nach dem Merge ein, was fertig ist und was offen bleibt
 - Dynamische Ebene (Einheiten, Overlays) als zweites Canvas darüber, Weltkoordinaten per `applyCameraTransform(ctx, cam, dpr)`.
 - Neuer Graben: Zelle in `map.cells` ändern, dann `layer.setMap(map)` (baut die Geometrie neu, etwa 5 bis 10 ms auf dem Desktop).
 - Tageszeit: `applyTheme(themeAt(darkness))`; Regeln lesen dieselbe Zahl über `visibilityFromDarkness`. `theme.flare` ist ab 0,5 wahr (Leuchtkugeln zeichnet P10).
+
+### Für die nächsten Pakete (nach P03)
+
+- Werkzeug anmelden: Datei `js/ui/tools/<name>.js` mit `registerTool({ id, key, label, icon, order, canUse(group, state, env), begin(ctx) })`, eine Import-Zeile in `js/ui/tools/index.js`. `ctx` bietet `setOrder`, `pickCell({ hint, preview(cell), pick(cell) })`, `hint`, `cancel` (Beschreibung in `js/ui/tools.js`, Muster `js/ui/tools/move.js`). Tasten laut Plan 7.6: G Graben, U Umbauen, F Feuern, D Draht, L Lorenplan (B und H sind belegt).
+- Overlay anmelden: `registerOverlay({ slot: 1..4, id, label, draw(ctx, { cam, theme, map, state, side, px }) })` aus `js/ui/overlays.js`; Platz 1 Versorgung (P08) und 2 Bedrohung (P05) sind frei, 3 Sicht und 4 Höhe sind belegt und dürfen ersetzt werden.
+- Pruefpunkt für „Vor der Runde“ und die Zusammenfassung: `registerCheck(id, ({ state, side, orders, map }) => [{ tone: 'warn'|'ok', text, group?, at? }])` aus `js/ui/summary.js`. Befehlsarten, die den Halten-Ring auslösen: `HOLD_TYPES` (bisher `assault`).
+- P06 erweitert `js/phases/move.js` (Draht, Begegnungen, Sturm). Ereignisse `move`/`redeploy` tragen `rest`; der Gefechtsbildschirm übernimmt den Rest als Befehl der nächsten Runde.
+- P07 ersetzt das Meldungen-Kärtchen (`createReport` in `js/ui/commit.js`) durch Phasenfilm und Telegramm. P13 ersetzt `js/ai/dummy.js` (`planOrders(view, { map, seed })`). P17 baut den Übergabebildschirm aus.
+- Gemeinsame Kärtchen-Klasse `.card` steht jetzt in `css/style.css` (vorher nur in `css/karte.css`).
 
 ## Offen und bekannte Macken
 
@@ -69,6 +85,11 @@ Jeder Thread traegt hier nach dem Merge ein, was fertig ist und was offen bleibt
 
 - T1: Die Zaehler der Erfahrungsberichte (`zaehler.ereignis`) sind Vorschlaege; P14 muss sie auf die echten Ereignistypen aus dem Protokoll abbilden. Die Statistiken fuer `wann.werte` (README) muss P07/P14 aus dem Protokoll zaehlen.
 - T1: Flags `harms_gefallen`, `vell_gefallen`, `trichter_gehalten` setzt die Mission (P16 bzw. Akt-2-Paket), nicht eine Entscheidung.
+
+- P03: Doppelklick zum Zoomen löst in der Zielwahl auch ein Antippen aus (Ziel wird gesetzt, Strg+Z nimmt es zurück). Antippen und Doppelklick werden nicht mit Verzögerung getrennt, damit das Antippen sofort reagiert.
+- P03: Im Hotseat bleiben die Kartenfarben fest (Kaldern blau, Morrow rot); die Seite b plant also mit roten Symbolen. Der Nebel gilt pro planender Seite.
+- P03: Die Bewegungsregeln sind eine erste Fassung (keine Begegnungen, kein Draht-Abbremsen außer über die Feldkosten); Verlegen in Stellungsrunden darf nicht ins Niemandsland.
+- P03: Die Szene nutzt `requestAnimationFrame` und `performance.now()` nur für Optik (Bleistift, Ring); die Spiellogik bleibt rein.
 
 ## Freigaben und Entscheidungen von Jorven
 
@@ -102,3 +123,7 @@ Stand 2026-11-08, von Jorven bestaetigt:
 - E1: Verbandsplatz/Feldlazarett, Ziegelei/Betonmischer und Kapelle/Gedenkstätte sind jeweils zwei Gebäude statt einer Zeile im Plan.
 - E1: Etappenstufen: Stufe 2 ab 5 Loren, Stufe 3 ab 8, Stufe 4 ab 12. Stufe 4 bietet zusätzlich Pionierpark (Bauzeit −1) oder Materialzug (+3 Material).
 - E1: Ist die Modellbühne hochkant (schmale Fenster), steht das Brett längs gedreht, damit die Felder groß genug zum Antippen sind.
+- P03: Langer Druck öffnet das radiale Menü auch mit der Maus, zusätzlich Rechtsklick. Der Finger kann vom Druckpunkt direkt zum Befehl gleiten und loslassen (Marking-Menü), Antippen geht ebenso.
+- P03: „Bewegen“ ist ein Werkzeug für beide Rundenarten: in Stellungsrunden wird daraus „Verlegen“ (redeploy), in Gefechtsrunden „Bewegen“ (move). Unfertige Wege laufen als Befehl weiter („läuft weiter“ in der Befehlsliste).
+- P03: Gruppen ohne Befehl tragen auf der Karte ein Bleistift-Fragezeichen; der Plan nennt das nur in der Checkliste.
+- P03: Nach der Runde zeigt ein schlichtes Meldungen-Kärtchen alle Begründungen (Klick springt zum Ort), bis P07 das Telegramm bringt.

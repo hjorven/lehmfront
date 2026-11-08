@@ -1,0 +1,31 @@
+{
+  "id": "asse-frei",
+  "name": "Gefecht frei: Asse-Nord",
+  "map": "asse",
+  "startHour": 6,
+  "turnKind": "position",
+  "weather": { "kind": "clear" },
+  "sides": {
+    "a": {
+      "faction": "kaldern",
+      "supplies": { "carts": 4, "cartsTotal": 6 },
+      "reputation": 61,
+      "trust": 48,
+      "groups": [
+        { "type": "rifles", "pos": { "x": 32, "y": 8 }, "morale": 72 },
+        { "type": "mg", "pos": { "x": 33, "y": 19 }, "morale": 64 },
+        { "type": "pioneers", "pos": { "x": 27, "y": 27 }, "morale": 70 }
+      ]
+    },
+    "b": {
+      "faction": "morrow",
+      "control": "ai",
+      "supplies": { "carts": 3, "cartsTotal": 5 },
+      "groups": [
+        { "type": "rifles", "pos": { "x": 45, "y": 9 } },
+        { "type": "mg", "pos": { "x": 46, "y": 20 } },
+        { "type": "rifles", "pos": { "x": 45, "y": 30 } }
+      ]
+    }
+  }
+}
