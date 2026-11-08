@@ -37,6 +37,7 @@ Jeder Thread traegt hier nach dem Merge ein, was fertig ist und was offen bleibt
 - Dynamische Ebene (Einheiten, Overlays) als zweites Canvas darüber, Weltkoordinaten per `applyCameraTransform(ctx, cam, dpr)`.
 - Neuer Graben: Zelle in `map.cells` ändern, dann `layer.setMap(map)` (baut die Geometrie neu, etwa 5 bis 10 ms auf dem Desktop).
 - Tageszeit: `applyTheme(themeAt(darkness))`; Regeln lesen dieselbe Zahl über `visibilityFromDarkness`. `theme.flare` ist ab 0,5 wahr (Leuchtkugeln zeichnet P10).
+
 ## Offen und bekannte Macken
 
 - `data/names.json` wird per Import-Attribut (`with { type: 'json' }`) geladen: braucht Chrome 123+, Safari 17.2+, Firefox 138+. Falls aeltere Geraete wichtig werden, nur `js/config/names.js` auf fetch umstellen.
