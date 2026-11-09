@@ -1,4 +1,4 @@
-// Werkzeug Etappe (Taste P, Pappmodell; Plan 6): oeffnet das Etappenfenster mit dem Pappmodell. Gilt fuer die ganze Seite.
+// Werkzeug Etappe (Taste M fuer Modell; Plan 6): oeffnet das Etappenfenster mit dem Pappmodell. Gilt fuer die ganze Seite.
 // Dazu der Pruefpunkt "Vor der Runde" (Belohnung offen, zerschossene Gebaeude, Bauauftraege) und die Zeichnung
 // auf der Lagekarte: vorgemerkte Bauten mit Bleistift, Rauch ueber der Feldkueche bei Tag (Ueberraschung:
 // der Rauch verraet die Kueche), roter Kringel um Gebaeude, die der Gegner kennt.
@@ -17,7 +17,7 @@ export const ETAPPE_ICON = '<path d="M3 20 H21"/><path d="M5 20 V11 L10 7 L15 11
 
 registerTool({
   id: 'etappe',
-  key: 'p',
+  key: 'm',
   label: 'Etappe',
   order: 85,
   shown: (state) => state.turnKind !== 'battle',
