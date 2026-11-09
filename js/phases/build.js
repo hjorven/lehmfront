@@ -20,8 +20,9 @@ import { BUILDINGS, ETAPPE_LEVELS } from '../config/buildings.js';
 import {
   placeBuilding, repairBuilding, advanceConstruction, etappeYield, etappeLevel, chooseReward, buildTimeFor,
 } from '../etappe.js';
-import { etappeOf, plotCells, plotCenter, plotName, plotAt, syncRails, isBuilt } from '../etappe-map.js';
+import { etappeOf, plotCells, plotCenter, plotName, plotAt, plotRect, syncRails, isBuilt } from '../etappe-map.js';
 import { sideSeesCell, darknessOf } from '../sight.js';
+import { addBattery } from '../artillery.js';
 
 /** Hoechstens so viele Bauauftraege je Stellungsrunde */
 export const MAX_BUILDS = 8;
@@ -29,6 +30,8 @@ export const MAX_BUILDS = 8;
 export const SILENCED_WHILE_DAMAGED = 99;
 /** Rauch der Feldkueche ist am Tag bis so weit zu sehen (Kartenfelder, Schachbrett) */
 export const SMOKE_RANGE = 28;
+/** Reihenfolge, in der die Werkstatt von selbst repariert */
+export const WORKSHOP_FIRST = ['depot', 'feldbahnhof', 'batteriestellung', 'fernmeldestelle', 'feldlazarett', 'verbandsplatz', 'feldkueche'];
 
 const cmp = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
 const byId = (a, b) => cmp(a.id, b.id);
@@ -50,6 +53,31 @@ registerOrderValidator('etappe', (order, group, state, env, side) => {
   return null;
 });
 
+/**
+ * Fertige Batteriestellungen bekommen eine Batterie (leer, Munition kommt aus dem Depot), eine fertige
+ * Fernmeldestelle wird Vermittlung, wenn die Seite noch keine hat (Streuung naher Batterien sinkt).
+ */
+function armNewBuildings(state, side, et, finished, emit, where) {
+  if (!finished.length) return;
+  const sideState = state.sides[side];
+  for (const id of [...finished].sort(cmp)) {
+    const b = et.buildings.find((x) => x.id === id);
+    if (!b || (b.type !== 'batteriestellung' && b.type !== 'fernmeldestelle')) continue;
+    sideState.artillery ??= { batteries: [], exchange: null, lines: [], plans: [], pending: [], known: {} };
+    const art = sideState.artillery;
+    const r = plotRect(et, b.x, b.y);
+    if (b.type === 'fernmeldestelle') {
+      if (art.exchange) continue;
+      art.exchange = { x: r.x + 1, y: r.y + 1 };
+      emit('exchange_ready', { building: id, reason: `Die Fernmeldestelle ${plotName(b.x, b.y)} vermittelt jetzt: Batterien in der Nähe schießen genauer.`, at: where(et, b) });
+      continue;
+    }
+    if (art.batteries.some((ab) => { const p = plotAt(et, ab.pos.x, ab.pos.y); return p && p.x === b.x && p.y === b.y; })) continue;
+    const bat = addBattery(art, { id: 'e' + id, type: 'feldhaubitzen', x: r.x, y: r.y, w: 2, h: 2, label: `Batterie ${plotName(b.x, b.y)}` }, sideState.faction);
+    emit('battery_ready', { building: id, battery: bat.id, reason: `In der Batteriestellung ${plotName(b.x, b.y)} stehen Geschütze. Munition kommt mit dem nächsten Nachschub aus dem Depot.`, at: where(et, b) });
+  }
+}
+
 /** Treffer auf ein Kartenfeld der Etappe einer Seite: Gebaeude dort ist beschaedigt. Liefert das Gebaeude oder null. */
 export function damageBuildingAt(state, side, x, y) {
   const et = etappeOf(state, side);
@@ -58,6 +86,7 @@ export function damageBuildingAt(state, side, x, y) {
   const b = [...et.buildings].sort(byId).find((q) => q.x === p.x && q.y === p.y && BUILDINGS[q.type]?.kind !== 'rail');
   if (!b) return null;
   b.damaged = true;
+  b.damagedAt ??= state.turn;
   return b;
 }
 
@@ -88,10 +117,12 @@ export function runEtappeSide(state, side, ctx) {
     const b = [...et.buildings].sort(byId).find((q) => q.x === f.x && q.y === f.y && BUILDINGS[q.type]?.kind !== 'rail');
     if (b && !b.damaged) {
       b.damaged = true;
+      b.damagedAt = state.turn;
       delete b.repairing;
     }
   }
   for (const b of [...et.buildings].sort(byId)) {
+    if (b.damaged) b.damagedAt ??= state.turn; // aeltere Staende und direkt gesetzte Treffer: ab jetzt
     if (b.damaged && !b.reported) {
       b.reported = true;
       emit('building_damaged', {
@@ -133,6 +164,22 @@ export function runEtappeSide(state, side, ctx) {
     emit('repair_started', { building: id, cost: r.cost, reason: `Pioniere reparieren ${nameOf(nb.type)} ${plotName(nb.x, nb.y)} für ${r.cost} Material.`, at: where(et, nb) });
   }
 
+  // 3b. Werkstatt: setzt von selbst zerschossene Gebaeude instand (je 2 Punkte Reparatur ein Gebaeude je Runde,
+  //     ohne Material, eine Stellungsrunde). Zuerst, was die Versorgung traegt.
+  const crews = Math.floor((etappeYield(et).total.reparatur ?? 0) / 2);
+  if (crews > 0) {
+    const rank = (b) => { const i = WORKSHOP_FIRST.indexOf(b.type); return i < 0 ? WORKSHOP_FIRST.length : i; };
+    const todo = et.buildings.filter((b) => b.damaged && !(b.remaining > 0) && (b.damagedAt ?? -1) < state.turn).sort((p, q) => rank(p) - rank(q) || byId(p, q)).slice(0, crews);
+    for (const b of todo) {
+      b.damaged = false;
+      b.remaining = 1;
+      b.repairing = true;
+      delete b.reported;
+      delete b.damagedAt;
+      emit('repair_started', { building: b.id, cost: 0, workshop: true, reason: `Die Werkstatt setzt ${nameOf(b.type)} ${plotName(b.x, b.y)} instand, ohne Material aus dem Depot.`, at: where(et, b) });
+    }
+  }
+
   // 4. Neue Bauauftraege in der befohlenen Reihenfolge
   for (const want of (order?.builds ?? []).slice(0, MAX_BUILDS)) {
     const time = buildTimeFor(et, want.type);
@@ -168,6 +215,7 @@ export function runEtappeSide(state, side, ctx) {
     });
   }
   syncRails(state, side);
+  armNewBuildings(state, side, et, adv.finished, emit, where);
 
   // P09: Eine zerschossene Batteriestellung schweigt, bis sie repariert ist (die Artillerie-Phase setzt
   // silenced zu Beginn jeder Stellungsrunde zurueck, diese Phase setzt es danach wieder).

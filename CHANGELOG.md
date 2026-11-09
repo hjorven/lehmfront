@@ -1,5 +1,35 @@
 # Änderungen
 
+## 1.6.0 (2026-11-09)
+
+Besser für Einsteiger, offene Macken geschlossen, Lagen online teilen.
+
+### Für Einsteiger
+
+- **Grundausbildung** (Hauptmenü, oberster Eintrag): eine echte Partie an der Asse gegen den Rekruten. Ein Zettel führt in 14 Schritten durch Karte, Gruppen, Bewegen, Graben mit Traversen, MG-Sektor, Runde ausführen, Film und Telegramm, Lorenplan und Lehrling. Erledigte Schritte hakt er selbst ab, das Bedienelement ist mit Bleistift umkringelt. Auf dem Handy setzt sich der Zettel über das Schild der Gruppe.
+- **Handbuch** (`?scene=handbuch`, Hauptmenü, Dienstbuch > Tasten): eine Runde in fünf Schritten, alle Werte, Begriffe von A bis Z, Tasten und Fingergesten, zehn Ratschläge.
+- **Anleitung mit Bildern** in `docs/tutorial.md`; die Bilder erzeugt `node tools/tutorial-shots.mjs`.
+- Hauptmenü: „Neu hier? Hier anfangen.“ für alle ohne Grundausbildung und Feldzug. Gefecht frei wählt für Neue den Rekruten vor.
+- Werte oben links und Ansehen/Vertrauen erklären sich beim Überfahren mit der Maus.
+- **Bleistiftnotizen aus dem Protokoll**: geht etwas schief, steht an der Stelle, was gefehlt hat („Traverse fehlt!“, „Draht! Erst Gasse schneiden“, „Wasser: entwässern (W)“, „Lorenplan prüfen (L)“, „eigene Walze zu dicht!“). Die Notizen bleiben für die Mission auf dem Blatt.
+
+### Macken behoben
+
+- **Kartenschrift in Chrome**: Schrift unter 2 px auf der vergrößerten Karte setzte Chrome falsch, alle Buchstaben landeten übereinander. Gruppenkürzel („MG“, „Beo“, „Pi“), Geisternotizen („MG? vor 2 Runden“) und Sichtlinien-Beschriftungen waren unlesbar. Eine kleine Schicht (`js/render/text-fix.js`) zeichnet kleine Schrift jetzt in Bildschirmgröße.
+- **KI löst ab**: Stehen alle Gruppen vorn, schickt die KI (Veteran, Lask) die müdeste ins Ruhelager, wenn vor ihr Ruhe ist; ausgeruht löst sie die nächste ab. Vorher lagen KI-Gruppen bis zu 24 Runden bei Erschöpfung 100 vorn.
+- **Etappe**: Eine fertige Batteriestellung bringt eine Batterie Feldhaubitzen (Munition aus dem Depot), eine fertige Fernmeldestelle wird Vermittlung, wenn es keine gibt. Die **Werkstatt** setzt zerschossene Gebäude von selbst instand (ab der Runde nach dem Treffer, ohne Material).
+- **Schnee** hat eine Regel: Im Winter fällt Schnee statt Regen, die Decke wächst bis knietief, bremst Wege ab Knöcheltiefe, nachts frieren Posten ohne Unterstand, Tauwetter macht den Lehm nass. Auf der Karte als heller Hauch mit Tupfen und fallenden Flocken.
+- **Sichtlinie mit dem Finger**: Mit gewählter Gruppe zeigt das Antippen eines leeren Feldes die Sichtlinie, ein zweites Antippen hebt die Auswahl auf.
+- Durchspiel-Werkzeug fand den Knopf „Zum Wochentisch“ nicht (Endlos „Szene nicht geladen“); jetzt laufen alle 16 Modi durch.
+
+### Online
+
+- **Lageaustausch** in der Werkstatt: eigene Lagen ins Netz stellen, die neuesten Lagen anderer spielen oder öffnen, eigene wieder herausnehmen, Link `?scene=werkstatt&netz=<Kennung>`. Neue Tabelle `lagen` (`supabase/migrations/0002_lagen.sql`, `0003_lagen_haerten.sql`, RLS: lesen alle, anlegen und löschen nur eigene, höchstens 20 je Spieler).
+
+### Überraschung
+
+- Hotseat: Auf den versiegelten Umschlag kann die abgebende Seite mit Bleistift eine Zeile für drüben schreiben.
+
 ## 1.5.0 (2026-11-09)
 
 Das ganze Spiel: alle vier Akte, alle Ausbaustufen bis 1.5, online spielbar.

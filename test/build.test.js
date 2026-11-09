@@ -336,3 +336,58 @@ test('P09: Batterie in zerschossener Stellung schweigt, nach der Reparatur nicht
   r = turn(r.state);
   assert.equal(r.state.sides.a.artillery.batteries.find((b) => b.id === ab.id).silenced, 0);
 });
+
+test('Fertige Batteriestellung bekommt eine leere Batterie, Munition kommt aus dem Depot', () => {
+  const s = start();
+  const before = s.sides.a.artillery?.batteries?.length ?? 0;
+  let r = turn(s, { builds: [{ type: 'batteriestellung', x: 4, y: 4 }] });
+  for (let i = 0; i < 3 && !ofPhase(r.log, 'battery_ready').length; i++) r = turn(r.state);
+  const ready = ofPhase(r.log, 'battery_ready');
+  assert.equal(ready.length, 1, 'Meldung kommt genau einmal');
+  assert.match(ready[0].reason, /Batteriestellung E5/);
+  const art = r.state.sides.a.artillery;
+  assert.equal(art.batteries.length, before + 1);
+  const bat = art.batteries.find((b) => b.id === ready[0].battery);
+  assert.deepEqual(plotAt(r.state.sides.a.etappe, bat.pos.x, bat.pos.y), { x: 4, y: 4 });
+  // naechste Stellungsrunde: Nachschub aus dem Depot, keine zweite Batterie
+  const r2 = turn(r.state);
+  assert.equal(r2.state.sides.a.artillery.batteries.length, before + 1);
+  assert.ok(r2.state.sides.a.artillery.batteries.find((b) => b.id === bat.id).ammo > 0, 'Geschütze haben Granaten');
+});
+
+test('Fertige Fernmeldestelle wird Vermittlung nur, wenn noch keine da ist', () => {
+  const run = (s) => { let r = turn(s, { builds: [{ type: 'fernmeldestelle', x: 4, y: 4 }] }); for (let i = 0; i < 3; i++) r = turn(r.state); return r.state; };
+  const s = start();
+  const had = s.sides.a.artillery.exchange;
+  assert.ok(had, 'Asse hat eine Vermittlung');
+  assert.deepEqual(run(s).sides.a.artillery.exchange, had, 'vorhandene bleibt');
+  const t = start();
+  t.sides.a.artillery.exchange = null;
+  const rect = plotRect(t.sides.a.etappe, 4, 4);
+  assert.deepEqual(run(t).sides.a.artillery.exchange, { x: rect.x + 1, y: rect.y + 1 });
+});
+
+test('Werkstatt repariert zerschossene Gebäude von selbst, ohne Material; ohne Werkstatt nicht', () => {
+  const s = start();
+  const et = s.sides.a.etappe;
+  const dep = et.buildings.find((b) => b.type === 'depot');
+  const rect = plotRect(et, dep.x, dep.y);
+  s.cells[rect.x + ',' + rect.y] = { buildingDamaged: true };
+  const mat = s.sides.a.supplies.material;
+  let r = turn(s);
+  assert.equal(ofPhase(r.log, 'repair_started').length, 0, 'in der Runde des Treffers wird nicht repariert');
+  r = turn(r.state);
+  const rep = ofPhase(r.log, 'repair_started');
+  assert.equal(rep.length, 1);
+  assert.equal(rep[0].workshop, true);
+  assert.match(rep[0].reason, /Werkstatt setzt Depot/);
+  assert.equal(ofPhase(r.log, 'building_repaired').length, 1, 'eine Stellungsrunde Arbeit');
+  assert.equal(at(r.state.sides.a.etappe, dep.x, dep.y).damaged, false);
+  assert.ok(r.state.sides.a.supplies.material >= mat - 1, 'kein Material für die Reparatur');
+  // ohne Werkstatt bleibt es kaputt
+  const t = start();
+  t.sides.a.etappe.buildings = t.sides.a.etappe.buildings.filter((b) => b.type !== 'werkstatt');
+  t.cells[rect.x + ',' + rect.y] = { buildingDamaged: true };
+  let q = turn(t); q = turn(q.state); q = turn(q.state);
+  assert.equal(at(q.state.sides.a.etappe, dep.x, dep.y).damaged, true);
+});

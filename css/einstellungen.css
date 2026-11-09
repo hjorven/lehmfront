@@ -147,3 +147,4 @@ html[data-signs="on"] .set-line .tg-head::before{content:"!";margin-right:4px;fo
 .menu-list .btn[hidden]{display:none}
 .title .menu-akte{margin-top:14px;min-width:min(320px,100%);min-height:44px;background:transparent;box-shadow:none;border-style:dashed}
 #menu-weiter{border-width:2px;border-color:var(--ink)}
+.set-hand{margin:16px 0 0}.set-hand .btn{display:inline-flex;min-height:44px;align-items:center}

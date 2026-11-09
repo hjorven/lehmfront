@@ -12,14 +12,14 @@ export function createHud(root, { onToggleList, onToggleOverlay, onCheck, onTogg
     </button>
     <div class="hud-sheet" id="hud-sheet">
       <div class="res-row">
-        <section class="card res" data-k="carts"><span class="k">Loren</span><b class="v"></b></section>
-        <section class="card res" data-k="ammo"><span class="k">Munition</span><b class="v"></b></section>
-        <section class="card res" data-k="material"><span class="k">Material</span><b class="v"></b></section>
-        <section class="card res" data-k="morale"><span class="k">Moral</span><b class="v"></b></section>
+        <section class="card res" data-k="carts" title="Loren: Wagen der Feldbahn je Runde (frei/gesamt). Lorenplan mit L."><span class="k">Loren</span><b class="v"></b></section>
+        <section class="card res" data-k="ammo" title="Munition im Depot. Vorn zählt der Vorrat des Abschnitts."><span class="k">Munition</span><b class="v"></b></section>
+        <section class="card res" data-k="material" title="Material für Draht, ausgebaute Gräben, Entwässern und Gebäude."><span class="k">Material</span><b class="v"></b></section>
+        <section class="card res" data-k="morale" title="Moral des Abschnitts. Sinkt bei Verlusten, Schlamm, Hunger und zu langer Zeit vorn."><span class="k">Moral</span><b class="v"></b></section>
       </div>
       <section class="card axes" aria-label="Ansehen und Vertrauen">
-        <div class="axis"><span>Ansehen beim Stab</span><b class="rep"></b><i class="bar"><i class="fill own"></i></i></div>
-        <div class="axis"><span>Vertrauen der Truppe</span><b class="tru"></b><i class="bar"><i class="fill accent"></i></i></div>
+        <div class="axis" title="Ansehen beim Stab: Nachschub und Ersatz. Unter 10 wirst du abgelöst."><span>Ansehen beim Stab</span><b class="rep"></b><i class="bar"><i class="fill own"></i></i></div>
+        <div class="axis" title="Vertrauen der Truppe: Ablösung, Essen, Post und geborgene Verwundete heben es. Unter 10 meutert die Truppe."><span>Vertrauen der Truppe</span><b class="tru"></b><i class="bar"><i class="fill accent"></i></i></div>
       </section>
       <section class="card round" aria-live="polite"><span class="round-clock"></span><div class="round-text"><b class="round-title"></b><span class="round-sub"></span>
         <button type="button" class="btn round-act" hidden></button></div></section>

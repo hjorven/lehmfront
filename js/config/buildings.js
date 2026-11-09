@@ -101,7 +101,7 @@ export const BUILDINGS = {
   },
   werkstatt: {
     name: 'Werkstatt', letter: 'W',
-    effect: 'Repariert Waffen und baut Verbesserungen aus den Erfahrungsberichten.',
+    effect: 'Setzt zerschossene Gebäude von selbst instand, ohne Material (je 2 Reparatur ein Gebäude je Runde).',
     yield: { reparatur: 2 },
     bonus: [{ per: { building: ['saegewerk', 'ziegelei'] }, add: { reparatur: 1 } }],
     missing: 'kein Sägewerk und keine Ziegelei angrenzend',
@@ -155,7 +155,7 @@ export const BUILDINGS = {
   },
   batteriestellung: {
     name: 'Batteriestellung', letter: 'A',
-    effect: 'Platz für eine Batterie. Munition kommt aus dem Depot.',
+    effect: 'Neue Batterie Feldhaubitzen, sobald fertig. Munition kommt aus dem Depot.',
     yield: { batterie: 1 },
     bonus: [{ per: { building: ['fernmeldestelle'] }, add: { streuung: 1 } }],
     missing: 'keine Fernmeldestelle angrenzend',

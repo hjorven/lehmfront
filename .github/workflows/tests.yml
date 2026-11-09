@@ -43,3 +43,6 @@ jobs:
           node tools/shot.mjs --check --path "/?scene=gefecht-frei"
           node tools/shot.mjs --check --path "/?scene=tageslage&tag=20261109&online=aus"
           node tools/shot.mjs --check --path "/?scene=gefecht&karte=zufall&kseed=7&runden=8&demo=ende"
+          node tools/shot.mjs --check --path "/?scene=handbuch"
+          node tools/shot.mjs --check --path "/?scene=gefecht&karte=asse&ki=rekrut&runden=0&seed=1917&ausbildung=1"
+          node tools/shot.mjs --check --path "/?scene=gefecht&weather=snow&snow=3&demo=notizen"

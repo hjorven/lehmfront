@@ -182,6 +182,10 @@
 .env-addr span{display:inline-block;width:3.2em;font:12px var(--font-num);color:var(--ink2);text-transform:uppercase;letter-spacing:.06em}
 .ho-text{margin-bottom:10px !important}
 .env-note{font:700 21px/1.1 var(--font-hand);color:var(--ink2) !important;transform:rotate(-2deg);margin:0 0 14px 8px !important}
+.env-note.own{color:var(--ink) !important}
+.env-write{display:flex;flex-direction:column;gap:2px;margin:0 0 12px;font:500 12px/1.2 var(--font-num);color:var(--ink2)}
+.env-write input{font:700 19px/1.2 var(--font-hand);color:var(--ink);background:transparent;border:0;border-bottom:1px dashed var(--line);padding:4px 2px;min-height:36px}
+.env-write input:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 .seal{position:relative;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
 .seal-fill{position:absolute;left:0;top:0;bottom:0;width:calc(var(--p,0) * 100%);background:var(--danger);opacity:.22}
 .seal-label{position:relative}

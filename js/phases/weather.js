@@ -13,9 +13,10 @@ import { cellKey, getCell, patchCell, otherSide } from '../state.js';
 import { darknessAt } from '../ui/daytime.js';
 import { surname } from './hold.js';
 import { addStepCostRule } from './move.js';
+import { postOf } from '../morale.js';
 import { reportOpen } from '../config/reports.js';
 import {
-  rollWeather, stepWet, waterGain, waterLoss, mudAt, mudMoveCost, trenchOf, isSink, flareAt, flareProblem,
+  rollWeather, stepWet, stepSnow, snowAt, snowMoveCost, SNOW_COLD, SNOW_WORDS, MAX_WET, waterGain, waterLoss, mudAt, mudMoveCost, trenchOf, isSink, flareAt, flareProblem,
   MAX_WATER, MUD_MORALE, WATER_MORALE, FLARE_RADIUS, FLARE_HEAR, FLARE_DARKNESS, WEATHER_NAMES, MUD_IN, WATER_IN,
 } from '../weather.js';
 
@@ -53,6 +54,7 @@ function weatherSentence(w, wet) {
     case 'rain': return `Regen setzt ein. ${ground}`.trim();
     case 'storm': return `Wolkenbruch, starker Wind. ${ground}`.trim();
     case 'fog': return 'Nebel liegt über dem Abschnitt. Sicht stark eingeschränkt.';
+    case 'snow': return 'Es schneit. Der Schnee schluckt die Geräusche, jeder Schritt wird schwer.';
     case 'overcast': return `Der Himmel zieht zu. ${ground}`.trim();
     default: return wet ? `Es klart auf. ${ground}`.trim() : 'Es klart auf, der Boden trocknet.';
   }
@@ -70,6 +72,22 @@ function runWeather(ctx) {
   w.fog = w.fog ?? (w.kind === 'fog' ? 0.8 : 0);
   const prevWet = prev.wet ?? 0;
   w.wet = stepWet(prevWet, w.kind, s.night);
+  // Schnee (nur wenn es ihn gibt oder er faellt): Tauwasser macht den Boden nass
+  const prevSnow = prev.snow ?? 0;
+  if (prevSnow || w.kind === 'snow') {
+    const sn = stepSnow(prevSnow, w.kind, s.night);
+    w.snow = sn.snow;
+    if (sn.melt) w.wet = Math.min(MAX_WET, w.wet + Math.min(2, sn.melt));
+    if (sn.snow !== prevSnow) {
+      ctx.emit('snow', {
+        snow: sn.snow, from: prevSnow, melt: sn.melt, minor: sn.snow > 0 && sn.melt === 0 && prevSnow > 0,
+        reason: sn.snow > prevSnow ? `Neuschnee: ${SNOW_WORDS[sn.snow]}. Bewegung kostet Kraft${sn.snow >= 2 ? ', Wege dauern länger' : ''}.`
+          : sn.snow === 0 ? 'Tauwetter: Der Schnee ist weg, das Tauwasser weicht den Lehm auf.'
+            : `Tauwetter: noch ${SNOW_WORDS[sn.snow]}, der Boden wird nass.`,
+        at: center(s),
+      });
+    }
+  }
   if (w.wet > 0) w.wasWet = true;
   s.weather = w;
   if (w.kind !== prevKind || w.wet !== prevWet) {
@@ -106,6 +124,25 @@ function runWeather(ctx) {
     });
   }
 
+  // Kaelte: bei hohem Schnee frieren nachts die Posten vorn, die nicht im Unterstand sitzen (eine Meldung je Seite)
+  const frozen = { a: [], b: [] };
+  for (const g of s.night ? ctx.groups() : []) {
+    const cold = SNOW_COLD[snowAt(s, map, g.pos.x, g.pos.y)] ?? 0;
+    if (!cold || g.inDugout || (map && postOf(map, g) !== 'front')) continue;
+    g.morale = Math.max(0, g.morale - cold);
+    frozen[g.side]?.push({ g, cold });
+  }
+  for (const side of ['a', 'b']) {
+    const list = frozen[side];
+    if (!list.length) continue;
+    const most = Math.max(...list.map((f) => f.cold));
+    ctx.emit('snow_cold', {
+      side, group: list[0].g.id, groups: list.map((f) => f.g.id), secret: true, minor: true, amount: most,
+      reason: `${list.length === 1 ? name(list[0].g) + ' friert' : list.length + ' Gruppen frieren'} vorn im Schnee: Moral sinkt um ${most === 1 ? '1' : 'bis zu ' + most}. Im Unterstand wäre es wärmer.`,
+      at: { ...list[0].g.pos },
+    });
+  }
+
   // Schlamm und Wasser druecken auf die Moral (nur wer drin steht, Unterstand schuetzt nicht vor Naesse)
   for (const g of ctx.groups()) {
     const m = mudAt(s, map, g.pos.x, g.pos.y);
@@ -130,6 +167,8 @@ registerPhase({ id: 'weather', kind: 'position', order: WEATHER_ORDER, run: runW
 
 // Schlamm bremst jede Bewegung (Plan 4.1 Nr. 6): Zusatzkosten je Feld, auch in der Vorschau
 addStepCostRule((state, map, p) => mudMoveCost(state, map, p.x, p.y));
+// Schnee bremst zusaetzlich (ab Knoecheltiefe)
+addStepCostRule((state, map, p) => snowMoveCost(state, map, p.x, p.y));
 
 // ---------- Entwaesserung ----------
 

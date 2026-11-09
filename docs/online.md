@@ -17,6 +17,7 @@ Server und geht immer. Für das zweite freie Projekt wurde Flussreich pausiert.
 | Spiellogik für die Functions (auf einen Commit gepinnt) | `supabase/functions/_lib/logic.ts` |
 | Reine Logik (Server und Client) | `js/online/replay.js`, `js/online/match.js` |
 | Client | `js/net.js` (supabase-js als UMD aus `vendor/`), Szene `?scene=fernamt` |
+| Lageaustausch (Werkstatt) | Tabelle `lagen` aus `supabase/migrations/0002_lagen.sql`, Client `shareLage`, `listLagen`, `getLage`, `deleteLage` in `js/net.js` |
 | Replay-Link | `js/online/link.js`, im Gefecht `wiedergabe=1` mit Protokoll im Anker `#w=` |
 
 ## Einrichten (einmal)
@@ -73,6 +74,18 @@ supabase functions deploy join resolve submit-daily --project-ref trxetnkronmurx
 Den neuen Pin danach mit einem kleinen PR einchecken. Laufende Partien rechnen ab dann mit den neuen Regeln
 weiter; ihr Replay-Link nutzt die Regeln der Seite, kann also nach großen Regeländerungen abweichen.
 `node tools/sync-functions.mjs` ohne Argument zeigt den gepinnten Stand.
+
+## Lageaustausch (seit 1.6.0)
+
+Migrationen `0002_lagen.sql` und `0003_lagen_haerten.sql` sind eingespielt (2026-11-09, Management-API; 0003: Anlegen nur mit title, author, code, Code nur base64url). Keine Edge Function nötig: Lesen
+darf jeder, Anlegen und Löschen nur der Verfasser (RLS), Ändern niemand, höchstens 20 Lagen je Spieler
+(Trigger). Der Server prüft nur Form und Größe des Codes; ob eine Lage spielbar ist, prüft der Client mit
+`lageProblems` vor dem Spielen und Öffnen. Titel und Verfasser ohne `<>&"`.
+Durchstich mit zwei anonymen Probekonten geprüft: anlegen, ohne Anmeldung lesen, Ändern 403, fremdes
+Löschen wirkungslos, ohne Anmeldung kein Anlegen, kaputter Code und Titel mit spitzen Klammern 400.
+
+Authentication (Stand 2026-11-09): anonyme Anmeldung an, Site URL `https://hjorven.github.io/lehmfront/`,
+Redirect-URLs `https://hjorven.github.io/lehmfront/?scene=fernamt` und `https://hjorven.github.io/lehmfront/**`.
 
 ## Geprüft am 2026-11-09
 

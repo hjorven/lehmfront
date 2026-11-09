@@ -38,14 +38,16 @@ export function fatigueWord(f) {
 export const WEATHER = { clear: 'klar', rain: 'Regen', fog: 'Nebel', snow: 'Schnee', storm: 'Sturm', overcast: 'bedeckt' };
 
 const GROUND = ['', 'Boden weich', 'Schlamm', 'grundlos'];
+const SNOW = ['', 'Schneedecke', 'Schnee knöcheltief', 'Schnee knietief'];
 
 /** Wetter mit Boden (P10): "Regen, Schlamm" */
 export function weatherName(w) {
   const name = WEATHER[w?.kind] ?? 'klar';
   const g = GROUND[Math.max(0, Math.min(3, w?.wet | 0))];
+  const sn = w?.kind === 'snow' && (w?.snow | 0) <= 1 ? '' : SNOW[Math.max(0, Math.min(3, w?.snow | 0))];
   // P24: mit Gas zaehlt der Wind (nur Lagen mit Windvorhersage)
   const wind = w?.windForecast ? windText(windOf({ weather: w })) : null;
-  return [name, g, wind].filter(Boolean).join(', ');
+  return [name, sn, g, wind].filter(Boolean).join(', ');
 }
 
 export function clockText(clock) {

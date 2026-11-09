@@ -40,6 +40,7 @@ const MODES = [
   { id: 'akt4-tag', path: '/?scene=gefecht&scenario=akt4-m6-waffenstillstand&seed=6' },
   { id: 'endlos', path: '/?scene=gefecht&endlos=1&karte=velde&seed=8' },
   { id: 'puzzle', path: '/?scene=gefecht&puzzle=01-laengsfeuer' },
+  { id: 'ausbildung', path: '/?scene=gefecht&karte=asse&ki=rekrut&runden=0&seed=1917&ausbildung=1' },
   { id: 'koop', path: '/?scene=gefecht&karte=kraehenholz&seed=9&mode=koop&runden=6' },
 ];
 const only = opt('only', null);
@@ -70,7 +71,7 @@ try {
       const did = await ev(page, () => {
         if (window.__gefecht) return null;
         const vis = [...document.querySelectorAll('button, a.btn')].filter((b) => b.offsetParent !== null && !b.disabled);
-        const pick = vis.filter((b) => /^\d?(Weiter|Zum Einsatz|Einsatz beginnen|Beginnen|Befolgen|Annehmen|Los|Zur Lage|Lesen beendet|Ablegen|Abschnitt übernehmen|Zur Woche)/i.test(b.textContent.trim())).pop(); // zuletzt eingefuegte zuerst (Blaetter liegen ueber dem Formular)
+        const pick = vis.filter((b) => /^\d?(Weiter|Zum Einsatz|Einsatz beginnen|Beginnen|Befolgen|Annehmen|Los|Zur Lage|Lesen beendet|Ablegen|Abschnitt übernehmen|Zum Wochentisch|Zur Woche)/i.test(b.textContent.trim())).pop(); // zuletzt eingefuegte zuerst (Blaetter liegen ueber dem Formular)
         if (!pick) return '';
         pick.click();
         return pick.textContent.trim().slice(0, 30);

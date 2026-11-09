@@ -198,6 +198,67 @@ export function cloudGet(slot) {
   });
 }
 
+// ---------- Lageaustausch (Werkstatt) ----------
+
+const LAGEN_OFF = 'Der Lageaustausch ist beim Stab noch nicht eingerichtet.';
+const lagenWhy = (error) => {
+  const m = String(error?.message ?? '');
+  if (/does not exist|schema cache/i.test(m)) return LAGEN_OFF;
+  if (/Höchstens 20/.test(m)) return m;
+  if (/check constraint|violates/i.test(m)) return 'Der Stab nimmt diese Lage nicht an (Titel oder Code ungültig).';
+  return why(error);
+};
+const cleanText = (t, n) => String(t ?? '').replace(/[<>&"]/g, '').trim().slice(0, n);
+// Eigene Lagen merkt sich der Browser (user_id ist im Netz nicht lesbar)
+const MINE_KEY = 'lehmfront.lagen.eigene';
+const readMine = () => { try { const v = JSON.parse(localStorage.getItem(MINE_KEY) ?? '[]'); return Array.isArray(v) ? v : []; } catch { return []; } };
+const writeMine = (list) => { try { localStorage.setItem(MINE_KEY, JSON.stringify(list.slice(-40))); } catch { /* ohne Speicher */ } };
+
+/** Lage (Code aus js/modes/lage-code.js) ins Netz stellen; liefert { ok, id } */
+export async function shareLage(code, title, author = '') {
+  if (!/^L1\.[A-Za-z0-9_-]+$/.test(String(code ?? ''))) return { ok: false, why: 'Das ist kein Lage-Code.' };
+  const u = await ensureUser();
+  if (!u.ok) return u;
+  return withClient(async (sb) => {
+    const row = { code, title: cleanText(title, 60) || 'Ohne Titel', author: cleanText(author, 30) || null };
+    const { data, error } = await sb.from('lagen').insert(row).select('id').single();
+    if (error) return { ok: false, why: lagenWhy(error) };
+    writeMine([...readMine().filter((x) => x !== data.id), data.id]);
+    return { ok: true, id: data.id };
+  });
+}
+
+/** Neueste Lagen aus dem Netz: [{ id, title, author, created_at, mine }] */
+export function listLagen(limit = 20) {
+  return withClient(async (sb) => {
+    const mine = new Set(readMine());
+    const { data, error } = await sb.from('lagen').select('id, title, author, created_at')
+      .order('created_at', { ascending: false }).limit(Math.max(1, Math.min(50, limit)));
+    if (error) return { ok: false, why: lagenWhy(error) };
+    return { ok: true, list: (data ?? []).map((r) => ({ id: r.id, title: r.title, author: r.author, created: r.created_at, mine: mine.has(r.id) })) };
+  });
+}
+
+/** Eine Lage mit Code holen */
+export function getLage(id) {
+  return withClient(async (sb) => {
+    const { data, error } = await sb.from('lagen').select('id, title, author, code').eq('id', String(id ?? '')).maybeSingle();
+    if (error) return { ok: false, why: lagenWhy(error) };
+    return data ? { ok: true, lage: data } : { ok: false, why: 'Diese Lage gibt es nicht (mehr).' };
+  });
+}
+
+/** Eigene Lage aus dem Netz nehmen */
+export function deleteLage(id) {
+  return withClient(async (sb) => {
+    const { error, count } = await sb.from('lagen').delete({ count: 'exact' }).eq('id', String(id ?? ''));
+    if (error) return { ok: false, why: lagenWhy(error) };
+    if (!count) return { ok: false, why: 'Nur eigene Lagen lassen sich aus dem Netz nehmen.' };
+    writeMine(readMine().filter((x) => x !== id));
+    return { ok: true };
+  });
+}
+
 // ---------- Tageslage ----------
 
 /** Bestenliste eines Tages: [{ name, code, score, faction, held }] */

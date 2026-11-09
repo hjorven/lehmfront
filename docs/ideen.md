@@ -44,3 +44,6 @@ Neue Ideen landen hier, nicht im Code (Plan 13). Mit Datum und Paket, aus dem si
 - 2026-11-09, P24: Der Flieger könnte Fotos mitbringen, die als Fundstück-Fotos in der Ablage landen, mit Bleistiftkreisen um die Batterien (und um die eigene Attrappe, die drüben jemand für echt hielt).
 - 2026-11-09, P26: Das Wrack des Kastens könnte im Endlosmodus jede Jahreszeit anders aussehen (Rost, Gras, ein Vogelnest im Turm) und am Ende als Fundstück-Foto in der Ablage liegen.
 - 2026-11-09, P26: Nach dem Waffenstillstand könnte die Karte von Raudas noch einmal offen liegen, ohne Einheiten, nur mit den Bleistiftnamen der Gefallenen an den Feldern, wo sie fielen.
+- 2026-11-09, 1.6.0: Die Grundausbildung könnte am Ende eine Bleistiftnote von Harms vergeben (wie der Ausbilder im Sandkasten) und beim zweiten Durchlauf schneller werden („Das kennst du schon.“).
+- 2026-11-09, 1.6.0: Bleistiftnotizen könnten über Missionen hinweg als Radierspuren stehen bleiben, und wer einen Fehler nicht wiederholt, sieht die alte Notiz durchgestrichen.
+- 2026-11-09, 1.6.0: Im Schnee könnten Spuren der eigenen Gruppen eine Runde lang sichtbar bleiben, auch für den Gegner (Fußstapfen verraten den Stoßtrupp).

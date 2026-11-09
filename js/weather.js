@@ -7,6 +7,7 @@
 //   wet    0..3  Naesse des Bodens; waechst mit Regen, trocknet bei klarem Wetter
 //   wind   { dir, speed }
 //   fixed  true = Szenario legt das Wetter fest, es wird nicht gewuerfelt
+//   snow   0..3  Schneedecke (nur Winter): Schneefall legt zu, klarer Tag und Regen tauen, Tauwasser macht nass
 // Feldzustand (state.cells["x,y"]):
 //   water  0..3  Wasser im Graben (nur Grabenfelder), drain 1 = Lattenrost und Pumpe (Entwaesserung)
 //   mud    0..3  zusaetzlicher Schlamm durch Beschuss (P09 darf ihn setzen), crater wie in der Karte
@@ -22,6 +23,12 @@ export const WEATHER_KINDS = ['clear', 'overcast', 'rain', 'storm', 'fog'];
 export const WEATHER_NAMES = { clear: 'klar', overcast: 'bedeckt', rain: 'Regen', storm: 'Sturm', fog: 'Nebel', snow: 'Schnee' };
 
 export const MAX_WET = 3;
+export const MAX_SNOW = 3;
+/** Bewegungskosten je Schneestufe in Zehnteln eines Feldes (Lehm kostet 10) */
+export const SNOW_MOVE = [0, 0, 4, 8];
+/** Moral je Nacht vorn ohne Unterstand bei hohem Schnee (Kaelte) */
+export const SNOW_COLD = [0, 0, 1, 2];
+export const SNOW_WORDS = ['kein Schnee', 'eine dünne Schneedecke', 'Schnee bis an die Knöchel', 'Schnee bis an die Knie'];
 export const MAX_WATER = 3;
 export const MAX_MUD = 3;
 /** Regen je Wetter in Naesse-Stufen pro Stellungsrunde (Sturm: Wolkenbruch) */
@@ -61,7 +68,7 @@ const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 
 /** Wetter der naechsten Stellungsrunde wuerfeln. Liefert ein neues weather-Objekt (ohne wet, das macht stepWet). */
 export function rollWeather(rng, prev) {
-  const from = WEATHER_TABLE[prev?.kind] ? prev.kind : 'clear';
+  const from = prev?.kind === 'snow' ? 'rain' : WEATHER_TABLE[prev?.kind] ? prev.kind : 'clear';
   // P22: Jahreszeit (state.weather.season) schaltet die Tabelle um
   const row = (seasonWeather(prev?.season) ?? WEATHER_TABLE)[from];
   let roll = Math.floor(rng() * 100);
@@ -76,7 +83,35 @@ export function rollWeather(rng, prev) {
   wind.speed = kind === 'storm' ? 3 : kind === 'fog' ? 0 : clamp(wind.speed + (rng() < 0.5 ? -1 : 1), 1, 2);
   const rain = kind === 'storm' ? 1 : kind === 'rain' ? (rng() < 0.5 ? 0.5 : 0.7) : 0;
   const fog = kind === 'fog' ? (rng() < 0.5 ? 0.7 : 0.9) : 0;
+  // Im Winter faellt statt Regen Schnee. Erst nach allen Wuerfen umgestellt, damit die Wurffolge wie vorher bleibt
+  if (prev?.season === 'winter' && kind === 'rain') return { kind: 'snow', rain: 0, fog, wind };
   return { kind, rain, fog, wind };
+}
+
+/**
+ * Schneedecke fortschreiben. Liefert { snow, melt }: melt sind die Stufen, die getaut sind (Tauwasser macht den Boden
+ * nass). Schneefall legt eine Stufe zu, Regen und Sturm tauen alles, ein klarer Tag taut eine Stufe, sonst bleibt er.
+ */
+export function stepSnow(snow, kind, night = false) {
+  const s = clamp(Math.floor(Number(snow) || 0), 0, MAX_SNOW);
+  if (kind === 'snow') return { snow: clamp(s + 1, 0, MAX_SNOW), melt: 0 };
+  if (kind === 'rain' || kind === 'storm') return { snow: 0, melt: s };
+  if (kind === 'clear' && !night && s > 0) return { snow: s - 1, melt: 1 };
+  return { snow: s, melt: 0 };
+}
+
+/** Schneestufe eines Feldes 0..3 (Wasser und Sumpf tragen keinen Schnee) */
+export function snowAt(state, map, x, y) {
+  const s = clamp((state?.weather?.snow ?? 0) | 0, 0, MAX_SNOW);
+  if (!s) return 0;
+  const c = hasTerrain(map) ? cellAt(map, x, y) : null;
+  if (c && !Number.isFinite(TERRAIN[c.terrain]?.move)) return 0;
+  return s;
+}
+
+/** Zusaetzliche Bewegungskosten (Zehntel) durch Schnee */
+export function snowMoveCost(state, map, x, y) {
+  return SNOW_MOVE[snowAt(state, map, x, y)];
 }
 
 /** Naesse fortschreiben: Regen macht nass, klares Wetter am Tag trocknet, sonst bleibt der Boden, wie er ist. */

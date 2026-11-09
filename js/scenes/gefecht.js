@@ -76,6 +76,8 @@ import { carryOrders, recordFrom } from '../online/replay.js';
 import { setupOnline, attachMatch, brokenText, blockMatch, telegramLines } from '../online/session.js';
 import { attachLageRules } from '../ui/lage-rules.js';
 import { createKoop } from '../ui/koop.js';
+import { marginNotes, marginOverlay } from '../ui/margin-notes.js';
+import { attachDrill } from '../ui/drill.js';
 
 const num = (v, d) => (v === null || v === '' || !Number.isFinite(Number(v)) ? d : Number(v));
 const LONG_PRESS_MS = 430;
@@ -156,6 +158,12 @@ export async function mount(root, params) {
   let side = humans[0];
   let book = createOrderBook();
   let decor = null;            // Zeichnung eines offenen Editors (Feuerplan, P09), unter den Gruppen
+  // Bleistiftnotizen aus dem Protokoll ("Traverse fehlt!"), je Seite aus dem Archiv, zwischengespeichert
+  let notesCache = { archive: null, side: null, notes: [] };
+  const notesOverlay = marginOverlay(() => {
+    if (notesCache.archive !== archive || notesCache.side !== side) notesCache = { archive, side, notes: marginNotes(archive?.rounds, side) };
+    return notesCache.notes;
+  });
   let burns = [];              // Brandloecher am Kartenrand nach Einschlaegen (P09, nur Optik)
   let shelledSeen = shelledCount(state); // Einschlaege, die der Film schon gezeigt hat (Papier vibriert bei neuen)
   let sidePlans = { a: {}, b: {} };  // Seitenbefehle dieser Runde nach Art (Lorenplan), nicht im Befehlsbuch
@@ -170,7 +178,7 @@ export async function mount(root, params) {
   let archive = createArchive(scenId);
   let filmFrame = null;         // Bild des laufenden Phasenfilms, sonst null
   let pendingDark = null;       // { from, to }: Tag-Nacht-Uebergang, den der naechste Film zeigt
-  let helpShown = false;
+  let helpShown = params.has('ausbildung'); // Grundausbildung: der Zettel ersetzt den Starthinweis
   let suppressTap = false;
   let modalOpen = false;
   let tidyUi = null;            // aufgeraeumte Kaertchen und Karte frei (js/ui/tidy.js)
@@ -264,7 +272,7 @@ export async function mount(root, params) {
       sightLine: !tool && hoverSight ? hoverSight : null,
       overlays: [artilleryOverlay(state), ...(decor ? [{ draw: decor }] : []), ...activeOverlays(),
         ...(noteMark ? [laskNoteOverlay(noteMark)] : []), ...lehrling.overlays(), ...(missionUi?.overlays(state) ?? []), ...(campaignRun?.overlays?.() ?? []),
-        ...lageOverlays(), ...(koop ? [koop.overlay(() => state.groups)] : [])],
+        ...lageOverlays(), ...(koop ? [koop.overlay(() => state.groups)] : []), notesOverlay],
       plans: sidePlans[side],
       time: performance.now(),
     });
@@ -849,6 +857,7 @@ export async function mount(root, params) {
         text: `Die Befehle von ${faction(state.sides[side].faction).name} sind verschlossen. Gib das Gerät an ${faction(state.sides[waiting].faction).name} weiter.`,
         button: `Weiter als ${faction(state.sides[waiting].faction).short}`,
         to: faction(state.sides[waiting].faction).name, from: faction(state.sides[side].faction).name, note: state.turn,
+        writable: !koop,
         onGo: () => {
           modalOpen = false; side = waiting; updateLiveMap(); homeView(); onCamera();
           if (reportDue.has(side)) showReport();
@@ -1104,7 +1113,20 @@ export async function mount(root, params) {
         select(g.id);
         if (koop && g.side === side && !koop.owns(g)) flash(`Gehört zu ${koop.ownerName(g)}. Pfeile sehen, aber nicht ändern.`);
       }
-      else if (selectedId) select(null);
+      else if (selectedId) {
+        // Finger haben kein Hover: das erste Antippen eines leeren Feldes zeigt die Sichtlinie der gewählten Gruppe
+        // (wie die Maus beim Zeigen), ein zweites Antippen desselben Feldes hebt die Auswahl auf
+        const own = p.touch && !closedSomething ? selectedOwn() : null;
+        const same = hoverSight && cell && hoverSight.to.x === cell.x && hoverSight.to.y === cell.y;
+        if (own && cell && !same && (cell.x !== own.pos.x || cell.y !== own.pos.y)) {
+          hoverSight = sightLabel(sightLine(map, own, cell, darknessOf(state), state));
+          playSfx('pencil', { count: 1, intensity: 0.15 });
+          drawDyn();
+          return;
+        }
+        hoverSight = null;
+        select(null);
+      }
       else if (cell && !closedSomething && state.turnKind === 'position' && !book[side]?.sealed) {
         // P11: Antippen eines Gebaeudes oder vorgemerkten Baus der eigenen Etappe (ohne gewaehlte Gruppe)
         // oeffnet das Etappenfenster auf diesem Feld
@@ -1300,6 +1322,8 @@ export async function mount(root, params) {
     get state() { return state; }, get book() { return book; }, map, cam,
     select: (id) => select(id, { center: false }),
     order: (o) => placeOrder(o),
+    get sight() { return hoverSight ? { to: { ...hoverSight.to }, label: hoverSight.label } : null; },
+    get selected() { return selectedId; },
     get toolInfo() { return tool ? { id: tool.def.id, armed: tool.armed ?? null, preview: tool.preview, hover: tool.hoverCell, group: tool.group?.id ?? null } : null; },
     tool: (id, extra) => startTool(allTools().find((t) => t.id === id), selectedOwn(), extra),
     hover: (x, y) => { if (tool?.pick) { tool.hoverCell = cellAt(map, x, y); tool.preview = tool.pick.preview(tool.hoverCell); refresh(); } },
@@ -1316,6 +1340,11 @@ export async function mount(root, params) {
     get plannerWindow() { return plannerWindow; },
   };
   window.__gefecht = api;
+  // Grundausbildung: Zettel mit Schritten fuer Anfaenger (js/ui/drill.js, Schritte in js/config/drill.js)
+  if (params.has('ausbildung') && !params.has('demo')) {
+    const at = Number(params.get('ausbildung'));
+    api.drill = attachDrill({ ui, root, api, startAt: Number.isInteger(at) && at > 1 ? at - 1 : null });
+  }
   const demo = params.get('demo');
   if (demo) {
     const own = groupsOf(state, side);
@@ -1390,6 +1419,14 @@ export async function mount(root, params) {
       const d = decide(lv, { map, seed, ...aiCfg, posture: params.get('lage') || undefined });
       const note = noteFromDecision(d, lv, { seed, difficulty: d.difficulty });
       showNote({ ...note, found: 'von einem Beobachter aus dem Niemandsland geholt' });
+    }
+    else if (demo === 'notizen') {
+      // Bleistiftnotizen aus dem Protokoll: eine erfundene Runde mit typischen Fehlern
+      archive = { ...archive, rounds: [...archive.rounds, { turn: 0, log: [
+        { type: 'losses', side, cause: 'enfilade', at: { x: own[0].pos.x, y: own[0].pos.y } },
+        { type: 'assault', side, at: { x: 40, y: 20 }, wire: { x: 42, y: 21 } },
+        { type: 'flood', side, at: { x: own[own.length - 1].pos.x, y: own[own.length - 1].pos.y + 2 } },
+      ] }] };
     }
     else if (demo === 'sichtlinie') { api.select(own[0].id); hoverSight = sightLabel(sightLine(map, own[0], { x: 41, y: 12 }, darknessOf(state))); }
     else if (demo === 'lorenplan' || demo === 'versorgung') {

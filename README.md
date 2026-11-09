@@ -6,10 +6,13 @@ Taktisches Grabenkriegsspiel in 2D für den Browser. Beide Seiten planen gleichz
 
 Läuft ohne Installation auf Desktop, Tablet und Handy (ab 390 x 844, ganz per Touch), lässt sich als App installieren und funktioniert danach auch offline.
 
+**Neu hier?** Im Hauptmenü oben die **Grundausbildung** wählen (zehn Minuten, Schritt für Schritt im Spiel). Die Anleitung mit Bildern steht in [`docs/tutorial.md`](docs/tutorial.md), alle Begriffe im **Handbuch** im Spiel.
+
 ## Spielmodi
 
 | Modus | Inhalt |
 |---|---|
+| Grundausbildung | Erste Partie an der Asse mit einem Zettel, der jeden Schritt erklärt und abhakt |
 | Kampagne | Feldzug an der Asse in vier Akten mit je sechs Missionen, Stabsbefehlen, Ansehen beim Stab und Vertrauen der Truppe, vier Enden |
 | Gefecht frei | Asse-Nord, drei Spiegelkarten oder Zufallskarte; Dauer, Fraktion und Schwierigkeit wählbar |
 | Tageslage | Für alle dieselbe Woche an einem Tag, mit Wachbuch |
@@ -67,6 +70,7 @@ node tools/shot.mjs --check         # Konsolenfehler und fehlende Dateien prüfe
 node tools/precache.mjs             # Offline-Dateiliste in sw.js neu schreiben
 node tools/playthrough.mjs          # Hauptmodi im Browser durchspielen
 node tools/balance.mjs --runs 150   # Balancing KI gegen KI
+node tools/tutorial-shots.mjs       # Bilder der Anleitung neu erzeugen (docs/bilder/tutorial/)
 ```
 
 ## Aufbau
@@ -83,6 +87,7 @@ node tools/balance.mjs --runs 150   # Balancing KI gegen KI
 
 ## Dokumentation
 
+- Anleitung für Einsteiger mit Bildern: `docs/tutorial.md`
 - Spielplan: `docs/plan.md`
 - Stand und bekannte Macken: `docs/status.md`
 - Änderungen je Version: `CHANGELOG.md`
