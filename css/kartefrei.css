@@ -1,0 +1,82 @@
+/* Aufgeraeumte Karte und "Karte frei" (js/ui/tidy.js). Farben nur ueber CSS-Variablen.
+   .tidy: Tablet und auf Wunsch (Dienstbuch) - Kopfleiste statt Kaertchen, Seitenleiste zum Aufklappen.
+   .bare: alle Kaertchen werden beiseitegeschoben, nur "Lage zeigen" bleibt. */
+
+/* ---------- Hinweis wegschieben (ueberall) ---------- */
+.gefecht .hint{padding-right:40px;cursor:pointer}
+.gefecht .hint-x{position:absolute;right:4px;top:4px;width:32px;height:32px;padding:0;background:none;border:0;font:20px/1 var(--font-ui);color:var(--ink2)}
+.gefecht .hint-x:hover{color:var(--ink)}
+.gefecht .strip-warn{display:none}
+
+/* ---------- Aufgeraeumt ---------- */
+.gefecht.tidy .hud-strip{position:absolute;left:12px;top:calc(12px + env(safe-area-inset-top));display:flex;align-items:center;gap:10px;
+  min-height:48px;max-width:calc(100% - 170px);padding:6px 12px;font:13.5px/1.25 var(--font-ui);text-align:left;color:var(--ink)}
+.gefecht.tidy .strip-vals{display:block}
+.gefecht.tidy .strip-vals b{font-family:var(--font-num)}
+.gefecht.tidy .strip-round{flex:none;font:13px var(--font-num);color:var(--ink2);border-left:var(--border);padding-left:10px}
+.gefecht.tidy .strip-warn:not([hidden]){display:inline-block;flex:none;padding:2px 7px;border:1.5px solid var(--danger);border-radius:var(--radius);
+  font:700 12px var(--font-num);color:var(--danger);white-space:nowrap}
+.gefecht.tidy .hud-strip[aria-expanded="true"]{border-color:var(--ink)}
+
+/* Zugeklappt: Kaertchen der Seitenleiste ruhen; nur ein Rundenkaertchen mit Knopf (Angriff abbrechen) bleibt auf der Karte */
+.gefecht.tidy:not(.sheet-open) .hud-sheet > *{display:none}
+.gefecht.tidy:not(.sheet-open) .hud-sheet > .round:has(.round-act:not([hidden])){display:block;top:72px;left:12px;right:auto;max-width:min(380px,calc(100% - 170px))}
+/* Aufgeklappt: Seitenleiste links wie auf dem Handy, nur breiter */
+.gefecht.tidy.sheet-open .hud-sheet{display:flex;position:absolute;left:12px;top:calc(70px + env(safe-area-inset-top));bottom:calc(96px + env(safe-area-inset-bottom));
+  width:290px;overflow:auto;flex-direction:column;gap:8px;padding-bottom:4px;z-index:4;pointer-events:auto;overscroll-behavior:contain}
+.gefecht.tidy.sheet-open .hud-sheet > *{position:static !important;width:auto !important;max-width:none !important;max-height:none !important;min-height:0 !important;flex:none}
+.gefecht.tidy .res-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.gefecht.tidy .res{min-width:0}
+.gefecht.tidy .hud-sheet > .overlays,.gefecht.tidy .hud-sheet > .lr-card,.gefecht.tidy .hud-sheet > .snd-card{display:none !important}
+.gefecht.tidy.sheet-open .hint,.gefecht.tidy.sheet-open .shield{display:none}
+
+/* Hinweis schmal unter der Kopfleiste */
+.gefecht.tidy .hint{top:calc(70px + env(safe-area-inset-top));width:min(340px,calc(100% - 170px));font-size:13px;padding:7px 40px 8px 12px}
+.gefecht.tidy .hint-title{font-size:14px;margin-bottom:1px}
+/* Rundenkaertchen mit "Angriff abbrechen" sichtbar: Hinweis darunter, nicht darueber */
+.gefecht.tidy:not(.sheet-open):has(.round-act:not([hidden])) .hint{top:calc(160px + env(safe-area-inset-top))}
+/* Handy quer und flache Fenster: "Karte frei" in die Seitenleiste, die rechte Spalte reicht sonst bis zur Werkzeugreihe */
+@media (max-height:560px){
+  .gefecht.tidy .hud-right .bare-btn{display:none}
+  .gefecht.tidy.sheet-open .hud-sheet > .bare-card{display:block !important;padding:6px}
+  .gefecht.tidy .bare-btn2{width:100%;justify-content:center;min-height:44px;font-weight:700}
+}
+
+/* Rechte Leiste: Knoepfe fuer den Finger, etwas schlanker */
+.gefecht.tidy .hud-right{gap:6px}
+.gefecht.tidy .hud-right .btn{min-height:44px;min-width:104px;padding:6px 12px}
+
+/* ---------- Karte frei ---------- */
+.gefecht .bare-btn{justify-content:center;font-weight:700}
+.gefecht .bare-card{display:none}
+.gefecht .bare-exit,.gefecht .bare-note{display:none}
+.gefecht .hud-strip,.gefecht .res-row,.gefecht .axes,.gefecht .round,.gefecht .check,.gefecht .hint,.gefecht .hud-right,.gefecht .bottom{
+  transition:transform .38s cubic-bezier(.3,.7,.35,1),opacity .28s ease-out,visibility 0s linear 0s}
+.gefecht.bare :is(.hud-strip,.res-row,.axes,.check,.hint){transform:translateX(calc(-100% - 48px)) rotate(-5deg)}
+.gefecht.bare .round{transform:translateY(calc(-100% - 48px)) rotate(2deg)}
+.gefecht.bare .hud-right{transform:translateX(calc(100% + 48px)) rotate(4deg)}
+.gefecht.bare .bottom{transform:translateY(calc(100% + 48px)) rotate(-1.5deg)}
+.gefecht.bare :is(.hud-strip,.res-row,.axes,.round,.check,.hint,.hud-right,.bottom){opacity:0;visibility:hidden;pointer-events:none;
+  transition:transform .38s cubic-bezier(.5,0,.75,.4),opacity .3s ease-in,visibility 0s linear .38s}
+/* Offene Kaertchen (Telegramm, Lehrling, Befehlsliste, Schild ...) ruhen, Dialoge bleiben */
+.gefecht.bare .g-ui > :not(.hud,.bottom,.modal-back,.rm-back,.fa-wait-back,.bare-exit,.bare-note){visibility:hidden;opacity:0;pointer-events:none}
+.gefecht.bare .hud-sheet > :not(.res-row,.axes,.round,.check){visibility:hidden;opacity:0;pointer-events:none}
+.gefecht.bare .bare-exit{display:flex;position:absolute;right:12px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:6;align-items:center;
+  min-height:52px;padding:0 20px;background:var(--ink);color:var(--card);border:0;font:700 15px var(--font-ui);box-shadow:var(--shadow);
+  animation:bare-in .3s ease-out .2s both}
+/* Bleistiftvermerk: wann die Kaertchen beiseitegelegt wurden */
+.gefecht.bare .bare-note{display:block;position:absolute;left:16px;top:calc(10px + env(safe-area-inset-top));max-width:calc(100% - 32px);
+  font:700 22px/1.1 var(--font-hand);color:var(--ink);transform:rotate(-1.5deg);transform-origin:left;pointer-events:none;
+  animation:bare-note .4s ease-out .3s both}
+@keyframes bare-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes bare-note{from{opacity:0;transform:translateX(-8px) rotate(-1.5deg)}to{opacity:1;transform:rotate(-1.5deg)}}
+@media (prefers-reduced-motion:reduce){
+  .gefecht :is(.hud-strip,.res-row,.axes,.round,.check,.hint,.hud-right,.bottom){transition:none !important}
+  .gefecht.bare .bare-exit,.gefecht.bare .bare-note{animation:none}
+}
+@media (max-width:699px){
+  .gefecht .hud-right .bare-btn{display:none}
+  .gefecht .bare-card{display:block;padding:6px}
+  .gefecht .bare-btn2{width:100%;justify-content:center;min-height:44px;font-weight:700}
+  .gefecht.bare .bare-note{font-size:19px}
+}

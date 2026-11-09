@@ -25,6 +25,7 @@ const LABELS = {
   signs: ['Signaturen', { false: 'nur Farbe', true: 'Farbe und Form' }, 'Gegner mit Doppelrahmen, Warnzeilen mit Zeichen. Hilft bei Farbsehschwäche.'],
   contrast: ['Kontrast', { false: 'normal', true: 'hoch' }, 'Kräftigere Linien und Hilfstexte, auch in der Dämmerung.'],
   tap: ['Ziel antippen', { confirm: 'vormerken, dann setzen', direct: 'sofort setzen' }, 'Nur mit dem Finger: Das erste Antippen zeichnet das Ziel mit Bleistift vor und zeigt Weg und Kosten, das zweite setzt den Befehl.'],
+  hud: ['Kärtchen im Gefecht', { auto: 'nach Gerät', tidy: 'aufgeräumt', full: 'alle offen' }, 'Aufgeräumt: Vorräte, Runde und Prüfliste stecken in einer Kopfleiste, die Karte bleibt frei. Nach Gerät heißt aufgeräumt auf Tablets.'],
 };
 
 // Feste Tasten (Plan 7.6); die Werkzeuge melden ihre Tasten selbst im Register an
@@ -37,6 +38,7 @@ const FIXED_KEYS = [
     ['P', 'Protokoll der Mission'],
     ['T', 'Taktik-Lehrling'],
     ['O', 'dieses Dienstbuch'],
+    ['^', 'Karte frei (Kärtchen beiseiteschieben)'],
     ['Strg + Z', 'letzten Befehl zurücknehmen'],
     ['Pfeile', 'Karte schieben; bei der Zielwahl Enter für das Feld in der Mitte'],
     ['Esc', 'schließen, abbrechen, Auswahl aufheben'],
