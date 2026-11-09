@@ -12,7 +12,8 @@ const validators = new Map();
 
 /**
  * Zusaetzliche Pruefung fuer eine Befehlsart anmelden (z. B. P04: Graben nur auf grabbarem Boden).
- * fn(order, group, state, env) -> null wenn gueltig, sonst deutscher Grund als Text.
+ * fn(order, group, state, env, side) -> null wenn gueltig, sonst deutscher Grund als Text.
+ * Bei Seitenbefehlen (scope 'side') ist group null.
  */
 export function registerOrderValidator(type, fn) {
   if (!Object.hasOwn(ORDER_TYPES, type)) throw new Error('Unbekannte Befehlsart: ' + type);
@@ -40,6 +41,7 @@ export function sortOrders(orders) {
  */
 export function validateOrder(order, state, side, env = {}) {
   if (!order || typeof order !== 'object') return 'Befehl ist kein Objekt';
+  if (isSideOrder(order)) return validateSideOrder(order, state, side, env);
   if (typeof order.group !== 'string') return 'Befehl ohne Gruppe';
   const g = getGroup(state, order.group);
   if (!g) return `Gruppe ${order.group} gibt es nicht`;
@@ -62,10 +64,28 @@ export function validateOrder(order, state, side, env = {}) {
   for (const fn of validators.get(order.type) ?? []) {
     let why;
     try {
-      why = fn(order, g, state, env);
+      why = fn(order, g, state, env, side);
     } catch (err) {
       why = 'Prüfung fehlgeschlagen: ' + err.message;
     }
+    if (why) return why;
+  }
+  return null;
+}
+
+/** Befehl der ganzen Seite (ohne Gruppe), z. B. Lorenplan */
+export function isSideOrder(order) {
+  return !!order && Object.hasOwn(ORDER_TYPES, order.type) && ORDER_TYPES[order.type].scope === 'side';
+}
+
+function validateSideOrder(order, state, side, env) {
+  const t = ORDER_TYPES[order.type];
+  if (t.kind !== 'both' && t.kind !== state.turnKind) {
+    return state.turnKind === 'battle' ? `${t.label} geht nur in einer Stellungsrunde` : `${t.label} geht nur in einer Gefechtsrunde`;
+  }
+  for (const fn of validators.get(order.type) ?? []) {
+    let why;
+    try { why = fn(order, null, state, env, side); } catch (err) { why = 'Prüfung fehlgeschlagen: ' + err.message; }
     if (why) return why;
   }
   return null;
@@ -77,7 +97,8 @@ export function validateOrder(order, state, side, env = {}) {
  * - doppelte Befehle fuer dieselbe Gruppe: der erste gueltige gilt, weitere werden verworfen
  * - einsatzfaehige Gruppen ohne Befehl bekommen Halten (implicit: true)
  * - Ergebnis nach Gruppen-ID sortiert
- * Liefert { orders, events }.
+ * - Seitenbefehle (scope 'side') stehen getrennt in plans[type]; der erste gueltige je Art gilt
+ * Liefert { orders, events, plans }.
  */
 export function normalizeOrders(state, side, orders, env = {}) {
   const list = Array.isArray(orders) ? orders : [];
@@ -99,7 +120,14 @@ export function normalizeOrders(state, side, orders, env = {}) {
     .sort((p, q) => compareId(String(p.o?.group ?? ''), String(q.o?.group ?? '')) || p.i - q.i)
     .map((e) => e.o);
 
+  const plans = {};
   for (const order of sorted) {
+    if (isSideOrder(order)) {
+      const why = plans[order.type] ? 'es gibt schon einen ' + ORDER_TYPES[order.type].label : validateOrder(order, state, side, env);
+      if (why) reject(order, why, null);
+      else plans[order.type] = structuredClone(order);
+      continue;
+    }
     const why = validateOrder(order, state, side, env);
     const g = order && typeof order.group === 'string' ? getGroup(state, order.group) : null;
     const own = g && g.side === side && g.status !== 'lost';
@@ -118,5 +146,5 @@ export function normalizeOrders(state, side, orders, env = {}) {
   for (const g of groupsOf(state, side)) {
     if (!byGroup.has(g.id)) byGroup.set(g.id, holdOrder(g.id, true));
   }
-  return { orders: sortOrders([...byGroup.values()]), events };
+  return { orders: sortOrders([...byGroup.values()]), events, plans };
 }
