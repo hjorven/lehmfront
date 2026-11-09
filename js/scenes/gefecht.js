@@ -6,6 +6,7 @@ import { loadMap, cellAt, cellLabel } from '../map.js';
 import { createInitialState, groupsOf, getGroup, otherSide } from '../state.js';
 import { resolveTurn } from '../resolve.js';
 import { viewFor } from '../view.js';
+import { sightLine, coverAt, PINNED, darknessOf } from '../sight.js';
 import { faction } from '../config/factions.js';
 import { themeAt, applyTheme, currentTheme, onThemeChange, animateDarkness } from '../theme.js';
 import {
@@ -71,6 +72,9 @@ export async function mount(root, params) {
   let suppressTap = false;
   let modalOpen = false;
   const forcedDark = params.has('night') ? Math.max(0, Math.min(1, num(params.get('night'), 0))) : null;
+  // Erzwungene Nacht auch fuer die Regeln (Sichtweite, Trefferchance): Uhr auf 22 Uhr stellen
+  if (forcedDark !== null && forcedDark >= 0.5 && !state.night) { state.clock = { ...state.clock, hour: 22, minute: 0 }; state.night = true; }
+  let hoverSight = null;       // Sichtlinie der gewaehlten Gruppe zum Feld unter der Maus (P05)
 
   root.className = 'gefecht';
   root.innerHTML = `
@@ -109,7 +113,7 @@ export async function mount(root, params) {
   const ordersNow = () => listOrders(book, side);
   const groupLabel = (g) => groupName(state, g);
   function shownGroups() {
-    const v = viewFor(state, [], side);
+    const v = viewFor(state, [], side, env);
     return { groups: v.groups.map((g) => ({ ...g, mark: groupMark(state, getGroup(state, g.id) ?? g) })), ghosts: v.ghosts };
   }
   const reachOf = (g, o) => (o?.path?.length ? pathRounds(map, state, g, o.path).reach : 0);
@@ -141,7 +145,8 @@ export async function mount(root, params) {
     drawBattle(dctx, cam, dpr, currentTheme(), {
       state, map, side, groups, ghosts, orders, reach, selectedId, planning: !modalOpen, anim,
       hover: tool?.pick ? tool.hoverCell : null,
-      preview: prev ? { group: tool.group.id, path: prev.path, reach: prev.reach, cell: tool.hoverCell, ok: !!prev.path } : null,
+      preview: prev ? { ...prev, group: tool.group.id, cell: tool.hoverCell, ok: prev.ok ?? !!prev.path } : null,
+      sightLine: !tool && hoverSight ? hoverSight : null,
       overlays: overlaySlots().filter((o) => overlaysOn.has(o.slot) && o.draw),
     });
     placeShield();
@@ -257,7 +262,7 @@ export async function mount(root, params) {
     if (!g || !visible || g.status === 'lost' || radial.open) { shield.hide(); return; }
     if (g.side !== side) {
       shield.show(`<header><b>Feind</b><span>${esc(typeName(g))}</span></header>
-        <div class="rows"><div><span>Feld</span><b>${cellLabel(g.pos.x, g.pos.y)}</b></div></div>
+        <div class="rows"><div><span>Feld</span><b>${cellLabel(g.pos.x, g.pos.y)}</b></div><div><span>Deckung</span><b>${esc(coverAt(state, map, g.pos, g.side).label)}</b></div></div>
         <footer><span>Gesichtet</span><b>diese Runde</b></footer>`, shieldAnchor(g));
       return;
     }
@@ -270,9 +275,10 @@ export async function mount(root, params) {
         <div><span>Moral</span><b>${g.morale}</b></div>
         <div><span>Erschöpfung</span><b>${fatigueWord(g.fatigue)}</b></div>
         <div><span>Erfahrung</span><b>${g.experience} / 4</b></div>
+        ${g.suppressed >= 0.3 ? `<div class="warn"><span>Unter Feuer</span><b>${g.suppressed >= PINNED ? 'niedergehalten' : 'geduckt'}</b></div>` : ''}
       </div>
       <footer><span>Befehl</span><b>${esc(orderText(g, o))}</b></footer>
-      ${prev?.text ? `<div class="preview${prev.path ? '' : ' bad'}">${esc(prev.text)}</div>` : ''}`, shieldAnchor(g));
+      ${prev?.text ? `<div class="preview${(prev.ok ?? !!prev.path) ? '' : ' bad'}">${esc(prev.text)}</div>` : ''}`, shieldAnchor(g));
   }
   function placeShield() {
     const g = selectedId ? getGroup(state, selectedId) : null;
@@ -280,8 +286,14 @@ export async function mount(root, params) {
   }
 
   // ---------- Auswahl und Werkzeuge ----------
+  function sightLabel(sl) {
+    const label = !sl.visible ? (sl.blockedAt ? 'Sicht verdeckt' : `zu weit (Sicht ${sl.range})`)
+      : sl.d > sl.hidden ? `${plural(sl.d, 'Feld', 'Felder')} · frei, Deckung erst ab ${sl.hidden}` : `${plural(sl.d, 'Feld', 'Felder')} · frei`;
+    return { ...sl, blockedAt: sl.blockedAt, label };
+  }
   function select(id, { center = false } = {}) {
     if (tool) cancelTool(false);
+    hoverSight = null;
     radial.hide();
     selectedId = id;
     const g = id ? getGroup(state, id) : null;
@@ -409,6 +421,7 @@ export async function mount(root, params) {
     book = seal(book, side);
     playSfx('stamp');
     selectedId = null;
+    hoverSight = null;
     closeList();
     report.hide();
     overlaysOn = new Set();
@@ -437,7 +450,7 @@ export async function mount(root, params) {
   let lastTurn = 0;
   function showReport() {
     reportDue.delete(side);
-    const v = viewFor(state, lastLog, side);
+    const v = viewFor(state, lastLog, side, env);
     const lines = v.log.filter((e) => e.phase !== 'orders' || e.side === side).map((e) => ({
       text: e.reason, at: e.at, group: e.side === side ? e.group : null,
       tone: e.type === 'order_invalid' || e.blocked ? 'warn' : e.type === 'hold' ? 'quiet' : '',
@@ -448,10 +461,11 @@ export async function mount(root, params) {
 
   function resolveNow() {
     const ordersA = listOrders(book, 'a');
-    const ordersB = humans.includes('b') ? listOrders(book, 'b') : planOrders(viewFor(state, [], 'b'), { map, seed });
+    const ordersB = humans.includes('b') ? listOrders(book, 'b') : planOrders(viewFor(state, [], 'b', env), { map, seed });
     const r = resolveTurn(state, ordersA, ordersB, seed, state.turn, env);
     const before = state;
     state = r.state;
+    hoverSight = null;
     lastLog = r.log;
     // Unvollendete Wege laufen als Befehl weiter, solange die Rundenart passt
     const carry = { a: [], b: [] };
@@ -532,7 +546,14 @@ export async function mount(root, params) {
     keyTarget,
     onChange: onCamera,
     onHover: (p) => {
-      if (!tool?.pick) return;
+      if (!tool?.pick) {
+        const g = selectedOwn();
+        const cell = p && g && !modalOpen ? cellFromScreen(p).cell : null;
+        const next = cell && (cell.x !== g.pos.x || cell.y !== g.pos.y) ? sightLabel(sightLine(map, g, cell, darknessOf(state))) : null;
+        const k = (s) => (s ? `${s.to.x},${s.to.y},${s.from.x},${s.from.y}` : '');
+        if (k(next) !== k(hoverSight)) { hoverSight = next; drawDyn(); }
+        return;
+      }
       const cell = p ? cellFromScreen(p).cell : null;
       if (cell === tool.hoverCell) return;
       tool.hoverCell = cell;
@@ -738,6 +759,20 @@ export async function mount(root, params) {
       placeOrder({ group: own[1].id, type: 'redeploy', path: pathTo(own[1], 25, 21) });
       anim = { group: own[1].id, progress: 0.55, frozen: true };
     } else if (demo === 'overlays') { api.overlay(3); api.overlay(4); }
+    else if (demo === 'feuer' || demo === 'sektor' || demo === 'feuerrunde') {
+      // P05: Gefechtsrunde, die 1. Gruppe ist ins Niemandsland vorgegangen
+      state.turnKind = 'battle'; state.battle = { round: 1 };
+      own[0].pos = { x: 40, y: 10 };
+      if (demo === 'feuer') { api.select(own[0].id); api.tool('fire'); api.hover(45, 9); }
+      else if (demo === 'sektor') { api.select(own[1].id); api.tool('fire'); api.hover(41, 14); }
+      else {
+        placeOrder({ group: own[0].id, type: 'fire', target: { x: 45, y: 9 } });
+        placeOrder({ group: own[1].id, type: 'sector', target: { x: 42, y: 14 } });
+        anim = null;
+        commitSide();
+      }
+    } else if (demo === 'bedrohung') { api.overlay(2); }
+    else if (demo === 'sichtlinie') { api.select(own[0].id); hoverSight = sightLabel(sightLine(map, own[0], { x: 41, y: 12 }, darknessOf(state))); }
     refresh();
     drawDynNow();
   }

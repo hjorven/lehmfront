@@ -14,13 +14,16 @@ import { registerOrderValidator } from '../orders.js';
 import { cellAt, enterCost, cellLabel } from '../map.js';
 import { unitType } from '../config/units.js';
 import { surname } from './hold.js';
+import { PINNED } from '../sight.js';
 
 export const BATTLE_FACTOR = 10;
 export const POSITION_FACTOR = 40;
 
 /** Bewegungsbudget einer Gruppe in Zehnteln */
 export function moveBudget(group, kind) {
-  return unitType(group.type).speed * (kind === 'battle' ? BATTLE_FACTOR : POSITION_FACTOR);
+  const full = unitType(group.type).speed * (kind === 'battle' ? BATTLE_FACTOR : POSITION_FACTOR);
+  // Niedergehalten (P05) im Gefecht: nur noch halb so weit, die Gruppe kriecht
+  return kind === 'battle' && (group.suppressed ?? 0) >= PINNED ? Math.floor(full / 2) : full;
 }
 
 /** Kosten eines Schritts von a nach b (Zehntel), diagonal 14/10 */
