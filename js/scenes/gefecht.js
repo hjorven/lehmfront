@@ -2,7 +2,9 @@
 // Gefecht laden, Gruppen waehlen, Befehle geben (Werkzeugreihe, radiales Menue, Tastatur), Runde ausfuehren.
 // Parameter: scenario=asse-frei, mode=frei|hotseat, seed=<Zahl>, night=0..1 (erzwingt Dunkelheit),
 //   kind=battle (Gefechtsrunde testen), x, y, zoom (Kamera), demo=<Zustand fuer Screenshots>.
-import { loadMap, cellAt, cellLabel } from '../map.js';
+import { loadMap, cellAt, cellLabel, applyCellState } from '../map.js';
+import { ORDER_TYPES } from '../config/orders.js';
+import { captureTrench } from '../trench.js';
 import { createInitialState, groupsOf, getGroup, otherSide } from '../state.js';
 import { resolveTurn } from '../resolve.js';
 import { viewFor } from '../view.js';
@@ -68,6 +70,11 @@ export async function mount(root, params) {
   if (params.get('kind') === 'battle') { state.turnKind = 'battle'; state.battle = { round: 1 }; }
   const humans = mode === 'hotseat' ? ['a', 'b'] : ['a'];
   const env = { map };
+  // Karte mit Graeben, Kratern usw. aus dem Spielzustand (Anzeige und Werkzeuge); env.map bleibt die Grundkarte
+  // Nur Felder, die die planende Seite kennt (Nebel des Krieges fuer Graeben, Aufwurf usw.)
+  let seenCells = viewFor(state, [], 'a', env).cells; // Seite a plant zuerst
+  let liveMap = applyCellState(map, seenCells);
+  const updateLiveMap = () => { seenCells = viewFor(state, [], side, env).cells; liveMap = applyCellState(map, seenCells); layer.setMap(liveMap); };
 
   // Planungszustand
   let side = 'a';
@@ -121,7 +128,7 @@ export async function mount(root, params) {
     centerOn(cam, num(params.get('x'), cam.x), num(params.get('y'), cam.y), num(params.get('zoom'), cam.zoom));
   }
 
-  const layer = createMapLayer(staticCv, map, { getCamera: () => cam, getTheme: currentTheme });
+  const layer = createMapLayer(staticCv, liveMap, { getCamera: () => cam, getTheme: currentTheme });
   const dctx = dynCv.getContext('2d');
   let dpr = 1;
 
@@ -135,6 +142,8 @@ export async function mount(root, params) {
   const reachOf = (g, o) => (o?.path?.length ? pathRounds(map, state, g, o.path).reach : 0);
   function orderText(g, o) {
     if (!o) return 'Halten (Standard)';
+    const desc = allTools().find((t) => t.describe && t.orderTypes?.includes(o.type));
+    if (desc) return desc.describe(o, g, state, liveMap) + (o.carried ? ' · läuft weiter' : '');
     if (o.type === 'hold') return 'Halten';
     const dest = o.path?.length ? o.path[o.path.length - 1] : o.target;
     let t = orderLabel(o.type) + (dest ? ` nach ${cellLabel(dest.x, dest.y)}` : '');
@@ -161,7 +170,7 @@ export async function mount(root, params) {
     }
     const prev = tool?.preview;
     drawBattle(dctx, cam, dpr, currentTheme(), {
-      state, map, side, groups, ghosts, orders, reach, selectedId, planning: !modalOpen, anim,
+      state, map: liveMap, cells: seenCells, side, groups, ghosts, orders, reach, selectedId, planning: !modalOpen, anim,
       hover: tool?.pick ? tool.hoverCell : null,
       preview: prev ? { ...prev, group: tool.group.id, cell: tool.hoverCell, ok: prev.ok ?? !!prev.path } : null,
       sightLine: !tool && hoverSight ? hoverSight : null,
@@ -326,7 +335,7 @@ export async function mount(root, params) {
   function updateShield() {
     const g = selectedId ? getGroup(state, selectedId) : null;
     const visible = g && shownGroups().groups.some((x) => x.id === g.id);
-    if (!g || !visible || g.status === 'lost' || radial.open || filmFrame) { shield.hide(); return; }
+    if (!g || !visible || g.status === 'lost' || radial.open || filmFrame || tool?.cleanup) { shield.hide(); return; }
     if (g.side !== side) {
       shield.show(`<header><b>Feind</b><span>${esc(typeName(g))}</span></header>
         <div class="rows"><div><span>Feld</span><b>${cellLabel(g.pos.x, g.pos.y)}</b></div><div><span>Deckung</span><b>${esc(coverAt(state, map, g.pos, g.side).label)}</b></div></div>
@@ -384,7 +393,7 @@ export async function mount(root, params) {
     tool = { def, group: g, pick: null, preview: null, hoverCell: null, pickHint: '' };
     const t = tool;
     def.begin({
-      group: g, state, map, side,
+      group: g, state, map: liveMap, side, cam,
       setOrder: (o) => placeOrder(o),
       pickCell: (req) => { if (tool !== t) return; t.pick = req; t.pickHint = req.hint; refresh(); },
       hint: (text) => flash(text, 'warn'),
@@ -394,12 +403,18 @@ export async function mount(root, params) {
       setSidePlan: (o) => { sidePlans[side] = { ...sidePlans[side], [o.type]: o }; helpShown = true; playSfx('lore'); refresh(); },
       setModal: (on) => { modalOpen = on; if (!on) { plannerWindow = null; dynCv.focus({ preventScroll: true }); } refresh(); },
       onWindow: (w) => { plannerWindow = w; },
+      // Fuer Zeichenwerkzeuge (P04): Aufraeumen beim Abbrechen, Neuzeichnen, Demo-Zugriff
+      onCancel: (fn) => { t.cleanup = fn; },
+      redraw: (camera = false) => { if (camera) onCamera(); else drawDyn(); },
+      expose: (a) => { t.api = a; },
     });
     refresh();
   }
 
   function cancelTool(doRefresh = true) {
+    const t = tool;
     tool = null;
+    if (t?.cleanup) try { t.cleanup(); } catch (err) { console.error(err); }
     if (doRefresh) refresh();
   }
 
@@ -508,7 +523,7 @@ export async function mount(root, params) {
         text: `Die Befehle von ${faction(state.sides[side].faction).name} sind verschlossen. Gib das Gerät an ${faction(state.sides[waiting].faction).name} weiter.`,
         button: `Weiter als ${faction(state.sides[waiting].faction).short}`,
         onGo: () => {
-          modalOpen = false; side = waiting; homeView(); onCamera();
+          modalOpen = false; side = waiting; updateLiveMap(); homeView(); onCamera();
           if (reportDue.has(side)) showReport();
           refresh(); dynCv.focus({ preventScroll: true });
         },
@@ -604,6 +619,13 @@ export async function mount(root, params) {
     // Unvollendete Wege laufen als Befehl weiter, solange die Rundenart passt
     const carry = { a: [], b: [] };
     for (const e of r.log) {
+      // Mechaniken mit eigenem Weitertragen (Graben, Umbauen) melden den Restbefehl als carry
+      if (e.carry && e.carry.group === e.group) {
+        const g = getGroup(state, e.group);
+        const kind = ORDER_TYPES[e.carry.type]?.kind;
+        if (g && g.status !== 'lost' && (kind === 'both' || kind === state.turnKind)) carry[g.side].push({ ...e.carry, carried: true });
+        continue;
+      }
       if ((e.type === 'move' || e.type === 'redeploy') && e.rest?.length && !e.blocked) {
         const g = getGroup(state, e.group);
         const type = state.turnKind === 'battle' ? 'move' : 'redeploy';
@@ -613,6 +635,7 @@ export async function mount(root, params) {
     book = nextRound(book, carry);
     sidePlans = { a: {}, b: {} }; // der Lorenplan steht danach im Zustand und gilt weiter
     side = humans[0];
+    updateLiveMap();
     playSfx('clock-lock');
     // Der Tag-Nacht-Uebergang laeuft in der letzten Sekunde des Films (Plan 7.7)
     const target = forcedDark ?? darknessAt(state.clock, state.turnKind, state.night);
@@ -936,6 +959,36 @@ export async function mount(root, params) {
       if (demo === 'lorenplan') api.tool('supply');
       else { api.overlay(1); centerOn(cam, 20, 15, Math.max(cam.zoom, narrow() ? 20 : 26)); onCamera(); }
     }
+    else if (demo === 'graben' || demo === 'traversen' || demo === 'grabenplan') {
+      // P04: Pioniere ziehen einen geraden Graben zwischen den Linien, Warnung Laengsfeuer
+      const pi = own[2];
+      api.select(pi.id);
+      centerOn(cam, narrow() ? 29.5 : 30, narrow() ? 26 : 28.5, Math.max(cam.zoom, narrow() ? 26 : 30));
+      api.tool('dig');
+      tool?.api?.draw([{ x: 30.5, y: 24.5 }, { x: 30.5, y: 33.5 }]);
+      if (demo !== 'graben') tool?.api?.act('traverse');
+      if (demo === 'grabenplan') {
+        tool?.api?.act('go');
+        anim = null;
+        api.order({ group: own[0].id, type: 'redeploy', path: pathTo(own[0], 24, 9) });
+        anim = null;
+        commitSide();
+        api.select(null);
+        api.finishAnim();
+      }
+    } else if (demo === 'umbauen') {
+      // P04: eroberter Feindgraben, halbe Deckung, Umbauen zeichnen
+      const g = own[0];
+      g.pos = { x: 44, y: 7 };
+      for (const e of groupsOf(state, otherSide(side))) if (e.pos.x === 45 && e.pos.y <= 12) e.pos = { x: 48, y: e.pos.y };
+      for (let y = 4; y <= 12; y++) captureTrench(state, map, 45, y, side);
+      updateLiveMap();
+      api.select(g.id);
+      centerOn(cam, 45, narrow() ? 5 : 8.5, Math.max(cam.zoom, narrow() ? 26 : 30));
+      api.tool('rebuild');
+      tool?.api?.draw([{ x: 45.5, y: 5.5 }, { x: 45.5, y: 12.5 }]);
+    }
+    onCamera();
     refresh();
     drawDynNow();
   }

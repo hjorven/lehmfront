@@ -108,7 +108,7 @@ export function loadMap(json) {
     const c = at(t.x, t.y, 'Graben');
     if (!TRENCH_KINDS.includes(t.kind)) fail(`Grabenart "${t.kind}" bei ${t.x}/${t.y}`);
     if (!DIR[t.facing]) fail(`Feuerrichtung "${t.facing}" bei ${t.x}/${t.y}`);
-    if (!(t.level >= 1 && t.level <= 3)) fail(`Grabenstufe "${t.level}" bei ${t.x}/${t.y}`);
+    if (!(t.level >= 1 && t.level <= 4)) fail(`Grabenstufe "${t.level}" bei ${t.x}/${t.y}`);
     if (t.side !== 'own' && t.side !== 'enemy') fail(`Grabenseite "${t.side}" bei ${t.x}/${t.y}`);
     c.trench = { side: t.side, kind: t.kind, level: t.level, facing: t.facing };
   }
@@ -386,4 +386,22 @@ export function cellChains(map, isMember, styleOf = () => '') {
 export function heightAt(map, x, y) {
   const c = cellAt(map, x, y);
   return c ? c.height : 0;
+}
+
+/**
+ * Karte mit dem Feldzustand aus dem Spiel (state.cells) ueberlagern, ohne die Karte zu veraendern.
+ * Felder aus state.cells ersetzen gleichnamige Felder der Kartenzelle (trench, crater, wire ...).
+ * Ohne Aenderungen kommt dieselbe Karte zurueck. Fuer Anzeige, Werkzeuge und Regeln, die Graeben sehen muessen.
+ */
+export function applyCellState(map, cells) {
+  const keys = Object.keys(cells ?? {});
+  if (!keys.length) return map;
+  const out = { ...map, cells: map.cells.slice() };
+  for (const k of keys) {
+    const [x, y] = k.split(',').map(Number);
+    if (!inBounds(map, x, y)) continue;
+    const i = y * map.width + x;
+    out.cells[i] = { ...map.cells[i], ...cells[k] };
+  }
+  return out;
 }

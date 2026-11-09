@@ -8,6 +8,7 @@ import { FONTS } from './map-layer.js';
 import { drawCone, drawSightLine, drawFireOrder, drawGhost, drawSuppression } from './fire-layer.js';
 import { sectorOf, PINNED } from '../sight.js';
 import { unitType } from '../config/units.js';
+import { allDecors, orderPainter } from './decor.js';
 
 /** Groesse des Gruppensymbols in Feldern: mindestens 26 x 17 Bildschirmpixel */
 export function unitBox(cam) {
@@ -247,6 +248,9 @@ export function drawBattle(ctx, cam, dpr, th, d) {
   applyCameraTransform(ctx, cam, dpr);
   const px = 1 / cam.zoom;
 
+  for (const dec of allDecors()) {
+    try { dec.draw(ctx, { ...d, cam, theme: th, px }); } catch (err) { console.error(err); }
+  }
   for (const o of d.overlays ?? []) {
     try { o.draw(ctx, { cam, theme: th, map: d.map, state: d.state, side: d.side, px }); } catch (err) { console.error(err); }
   }
@@ -284,6 +288,12 @@ export function drawBattle(ctx, cam, dpr, th, d) {
     if (!o?.path?.length) continue;
     if (d.preview && d.preview.group === g.id) continue;
     const progress = d.anim && d.anim.group === g.id ? d.anim.progress : 1;
+    const paint = orderPainter(o.type);
+    if (paint) {
+      let done = false;
+      try { done = paint(ctx, { group: g, order: o, th, px, progress, d }); } catch (err) { console.error(err); }
+      if (done) continue;
+    }
     drawPathOrder(ctx, g.pos, o.path, {
       reach: d.reach?.get(g.id) ?? o.path.length, progress, color: th.pencil, th, px, seed: hashSeed(g.id, o.path.length),
     });
