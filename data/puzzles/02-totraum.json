@@ -1,0 +1,191 @@
+{
+ "id": "totraum",
+ "num": 2,
+ "title": "Totraum",
+ "lesson": "Totraum",
+ "kind": "battle",
+ "brief": "Vor der feindlichen Stellung liegt eine Hochfläche, flach wie ein Tisch. Die Pioniere sollen ungesehen bis {ziel} kommen, um dort in der Nacht eine Sappe anzusetzen. Wer gesehen wird, verrät den ganzen Plan.",
+ "hints": [
+  "Höhenlinien lügen nicht: Wo das Gelände abfällt, endet die Sicht von oben.",
+  "Die Mulde zieht sich von deinem Graben fast bis vor den Draht. Wer in ihr bleibt, ist im toten Winkel.",
+  "Nicht abkürzen. Jeder Schritt auf die Hochfläche ist ein Schritt ins Blickfeld."
+ ],
+ "solutionText": "Die Pioniere gehen die Mulde entlang: erst nach Osten, dann schräg nach Nordosten und zuletzt nach Norden bis 11/4. Keiner drüben sieht sie.",
+ "wonText": "Die Pioniere liegen vor dem Draht, und drüben hat niemand etwas bemerkt.",
+ "goal": {
+  "type": "reach",
+  "cells": [
+   [
+    10,
+    3
+   ]
+  ],
+  "unseen": true
+ },
+ "limit": 6,
+ "par": {
+  "rounds": 5,
+  "losses": 0
+ },
+ "width": 18,
+ "height": 12,
+ "zoneCols": [
+  5,
+  12
+ ],
+ "heights": [
+  "222222222222222222",
+  "222222222222222222",
+  "222222222222222222",
+  "222222222202222222",
+  "222222222202222222",
+  "222222222202222222",
+  "222222222022222222",
+  "222222220022222222",
+  "222222200222222222",
+  "000000002222222222",
+  "222220022222222222",
+  "222222222222222222"
+ ],
+ "plan": [
+  "..................",
+  ".............#....",
+  "..=..........#....",
+  "..=..........#....",
+  "..=..........#....",
+  "..=..........#....",
+  "..=..........#....",
+  "..=..........#....",
+  "..=..........#....",
+  "..=..........#....",
+  "..=..........#....",
+  ".................."
+ ],
+ "groups": {
+  "a": [
+   {
+    "type": "pioneers",
+    "at": [
+     2,
+     9
+    ],
+    "strength": 8,
+    "morale": 70
+   }
+  ],
+  "b": [
+   {
+    "type": "mg",
+    "at": [
+     13,
+     6
+    ],
+    "strength": 7,
+    "morale": 70
+   },
+   {
+    "type": "rifles",
+    "at": [
+     13,
+     2
+    ],
+    "strength": 10,
+    "morale": 70
+   }
+  ]
+ },
+ "solution": {
+  "1": [
+   {
+    "group": "a01",
+    "type": "move",
+    "path": [
+     [
+      3,
+      9
+     ],
+     [
+      4,
+      9
+     ],
+     [
+      5,
+      9
+     ],
+     [
+      6,
+      9
+     ],
+     [
+      7,
+      8
+     ],
+     [
+      8,
+      7
+     ],
+     [
+      9,
+      6
+     ],
+     [
+      10,
+      5
+     ],
+     [
+      10,
+      4
+     ],
+     [
+      10,
+      3
+     ]
+    ]
+   }
+  ]
+ },
+ "tests": {
+  "geradeaus": {
+   "1": [
+    {
+     "group": "a01",
+     "type": "move",
+     "path": [
+      [
+       3,
+       8
+      ],
+      [
+       4,
+       7
+      ],
+      [
+       5,
+       6
+      ],
+      [
+       6,
+       5
+      ],
+      [
+       7,
+       4
+      ],
+      [
+       8,
+       3
+      ],
+      [
+       9,
+       3
+      ],
+      [
+       10,
+       3
+      ]
+     ]
+    }
+   ]
+  }
+ }
+}

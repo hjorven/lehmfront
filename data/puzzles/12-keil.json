@@ -1,0 +1,373 @@
+{
+ "id": "keil",
+ "num": 12,
+ "title": "Der Keil",
+ "lesson": "Alles zusammen",
+ "kind": "battle",
+ "brief": "Der letzte Graben vor dem Dorf, betoniert, mit Draht davor und einem MG-Nest im Norden. Hinten wartet eine Reserve. Der Stab will {ziel}, und er will es ohne große Verluste.",
+ "hints": [
+  "Das Nest sieht nach Westen. Wer von Norden kommt, ist neben ihm.",
+  "Nicht jede Gasse lohnt sich. Wer vor dem Draht steht, steht im Feuer.",
+  "Erst wenn das MG den Graben niederhält, laufen die Schützen."
+ ],
+ "solutionText": "Das MG geht auf 14/2 und bestreicht den Graben der Länge nach. Die Pioniere bleiben liegen. In der dritten Runde stürmen die Schützen am Wäldchen vorbei auf 15/9, der Draht hält sie nur kurz auf.",
+ "wonText": "Der Keil sitzt. Hinter dem Graben liegt das Dorf, und zum ersten Mal seit Wochen ist es still.",
+ "goal": {
+  "type": "take",
+  "cells": [
+   [
+    14,
+    8
+   ]
+  ]
+ },
+ "limit": 8,
+ "maxLosses": 6,
+ "par": {
+  "rounds": 7,
+  "losses": 4
+ },
+ "width": 20,
+ "height": 14,
+ "zoneCols": [
+  7,
+  13
+ ],
+ "trenchLevel": 4,
+ "terrain": [
+  "....................",
+  "....................",
+  "....................",
+  "....................",
+  "....................",
+  "....................",
+  "..........w.........",
+  "..........w.........",
+  "..........w.........",
+  "....................",
+  "....................",
+  "....................",
+  "....................",
+  "...................."
+ ],
+ "plan": [
+  "....................",
+  "............o.......",
+  "....=.......X.#.....",
+  "....=.......X.#.....",
+  "....=.......X.#.....",
+  "....=.......X.#.....",
+  "....=.......X.#.....",
+  "....=...o...X.#.....",
+  "....=.......X.#.....",
+  "....=.......X.#.....",
+  "....=......oX.#.....",
+  "....=.......X.#.....",
+  "....................",
+  "...................."
+ ],
+ "groups": {
+  "a": [
+   {
+    "type": "mg",
+    "at": [
+     12,
+     1
+    ],
+    "strength": 7,
+    "morale": 72
+   },
+   {
+    "type": "pioneers",
+    "at": [
+     11,
+     10
+    ],
+    "strength": 9,
+    "morale": 70
+   },
+   {
+    "type": "rifles",
+    "at": [
+     8,
+     7
+    ],
+    "strength": 12,
+    "morale": 72,
+    "experience": 2
+   }
+  ],
+  "b": [
+   {
+    "type": "rifles",
+    "at": [
+     14,
+     8
+    ],
+    "strength": 12,
+    "morale": 74,
+    "experience": 2
+   },
+   {
+    "type": "mg",
+    "at": [
+     14,
+     5
+    ],
+    "strength": 7,
+    "morale": 72
+   },
+   {
+    "type": "rifles",
+    "at": [
+     18,
+     8
+    ],
+    "strength": 10,
+    "morale": 70
+   }
+  ]
+ },
+ "script": {
+  "5": [
+   {
+    "group": "b03",
+    "type": "move",
+    "path": [
+     [
+      17,
+      8
+     ],
+     [
+      16,
+      8
+     ],
+     [
+      15,
+      8
+     ]
+    ]
+   }
+  ]
+ },
+ "solution": {
+  "1": [
+   {
+    "group": "a01",
+    "type": "move",
+    "path": [
+     [
+      13,
+      1
+     ]
+    ]
+   }
+  ],
+  "2": [
+   {
+    "group": "a01",
+    "type": "sector",
+    "target": [
+     14,
+     6
+    ]
+   }
+  ],
+  "3": [
+   {
+    "group": "a03",
+    "type": "assault",
+    "path": [
+     [
+      9,
+      8
+     ],
+     [
+      10,
+      9
+     ],
+     [
+      11,
+      9
+     ],
+     [
+      12,
+      9
+     ],
+     [
+      13,
+      8
+     ],
+     [
+      14,
+      8
+     ]
+    ]
+   }
+  ]
+ },
+ "tests": {
+  "frontal": {
+   "1": [
+    {
+     "group": "a01",
+     "type": "sector",
+     "target": [
+      14,
+      6
+     ]
+    },
+    {
+     "group": "a03",
+     "type": "assault",
+     "path": [
+      [
+       9,
+       8
+      ],
+      [
+       10,
+       9
+      ],
+      [
+       11,
+       9
+      ],
+      [
+       12,
+       9
+      ],
+      [
+       13,
+       8
+      ],
+      [
+       14,
+       8
+      ]
+     ]
+    }
+   ]
+  },
+  "zu-frueh": {
+   "1": [
+    {
+     "group": "a01",
+     "type": "move",
+     "path": [
+      [
+       13,
+       1
+      ]
+     ]
+    },
+    {
+     "group": "a03",
+     "type": "assault",
+     "path": [
+      [
+       9,
+       8
+      ],
+      [
+       10,
+       9
+      ],
+      [
+       11,
+       9
+      ],
+      [
+       12,
+       9
+      ],
+      [
+       13,
+       8
+      ],
+      [
+       14,
+       8
+      ]
+     ]
+    }
+   ],
+   "2": [
+    {
+     "group": "a01",
+     "type": "sector",
+     "target": [
+      14,
+      6
+     ]
+    }
+   ]
+  },
+  "pioniere-vorn": {
+   "1": [
+    {
+     "group": "a01",
+     "type": "move",
+     "path": [
+      [
+       13,
+       1
+      ]
+     ]
+    },
+    {
+     "group": "a02",
+     "type": "move",
+     "path": [
+      [
+       12,
+       9
+      ]
+     ]
+    }
+   ],
+   "2": [
+    {
+     "group": "a01",
+     "type": "sector",
+     "target": [
+      14,
+      6
+     ]
+    }
+   ],
+   "3": [
+    {
+     "group": "a03",
+     "type": "assault",
+     "path": [
+      [
+       9,
+       8
+      ],
+      [
+       10,
+       9
+      ],
+      [
+       11,
+       9
+      ],
+      [
+       12,
+       9
+      ],
+      [
+       13,
+       8
+      ],
+      [
+       14,
+       8
+      ]
+     ]
+    }
+   ]
+  }
+ }
+}

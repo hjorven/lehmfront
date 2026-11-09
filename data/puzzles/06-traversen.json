@@ -1,0 +1,188 @@
+{
+ "id": "traversen",
+ "num": 6,
+ "title": "Traversen",
+ "lesson": "Traversen",
+ "kind": "position",
+ "brief": "Die Lücke zwischen den beiden Grabenstücken muss geschlossen werden, noch in dieser Stellungsrunde. Drüben steht ein MG, das jeden geraden Graben der Länge nach bestreicht.",
+ "hints": [
+  "Mehr als drei Felder gerade, und ein MG am Ende sieht die ganze Reihe.",
+  "Das Grabwerkzeug kann Traversen einfügen. Es kostet ein paar Felder mehr.",
+  "Fels gräbt sich schlecht. Der Zickzack darf ihm ausweichen."
+ ],
+ "solutionText": "Die Pioniere graben von 4/3 im Zickzack: drei Felder nach Süden, ein Versatz nach Osten, drei Felder, zurück nach Westen, drei Felder bis 5/11.",
+ "wonText": "Der Graben steht, und kein Stück ist länger als drei Felder.",
+ "goal": {
+  "type": "dig",
+  "from": [
+   3,
+   1
+  ],
+  "to": [
+   4,
+   10
+  ],
+  "maxRun": 3
+ },
+ "limit": 1,
+ "par": {
+  "rounds": 1,
+  "losses": 0
+ },
+ "startHour": 8,
+ "width": 16,
+ "height": 12,
+ "zoneCols": [
+  7,
+  11
+ ],
+ "terrain": [
+  "................",
+  "................",
+  "................",
+  "................",
+  "................",
+  "fff.............",
+  "fff.............",
+  "................",
+  "................",
+  "................",
+  "................",
+  "................"
+ ],
+ "plan": [
+  "................",
+  "...=........#...",
+  "............#...",
+  "............#...",
+  "............#...",
+  "............#...",
+  "............#...",
+  "............#...",
+  "............#...",
+  "............#...",
+  "....=.......#...",
+  "................"
+ ],
+ "groups": {
+  "a": [
+   {
+    "type": "pioneers",
+    "at": [
+     3,
+     1
+    ],
+    "strength": 9,
+    "morale": 70
+   }
+  ],
+  "b": [
+   {
+    "type": "mg",
+    "at": [
+     12,
+     3
+    ],
+    "strength": 7
+   }
+  ]
+ },
+ "solution": {
+  "1": [
+   {
+    "group": "a01",
+    "type": "dig",
+    "path": [
+     [
+      3,
+      2
+     ],
+     [
+      3,
+      3
+     ],
+     [
+      4,
+      4
+     ],
+     [
+      4,
+      5
+     ],
+     [
+      4,
+      6
+     ],
+     [
+      3,
+      7
+     ],
+     [
+      3,
+      8
+     ],
+     [
+      3,
+      9
+     ],
+     [
+      4,
+      10
+     ]
+    ],
+    "level": 2,
+    "kind": "fire"
+   }
+  ]
+ },
+ "tests": {
+  "gerade": {
+   "1": [
+    {
+     "group": "a01",
+     "type": "dig",
+     "path": [
+      [
+       3,
+       2
+      ],
+      [
+       3,
+       3
+      ],
+      [
+       3,
+       4
+      ],
+      [
+       3,
+       5
+      ],
+      [
+       3,
+       6
+      ],
+      [
+       3,
+       7
+      ],
+      [
+       3,
+       8
+      ],
+      [
+       3,
+       9
+      ],
+      [
+       4,
+       10
+      ]
+     ],
+     "level": 2,
+     "kind": "fire"
+    }
+   ]
+  }
+ }
+}

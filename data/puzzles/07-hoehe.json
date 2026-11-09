@@ -1,0 +1,234 @@
+{
+ "id": "hoehe",
+ "num": 7,
+ "title": "Über den Wald",
+ "lesson": "Höhe",
+ "kind": "battle",
+ "brief": "Ein feindliches MG-Nest liegt hinter einem Waldstreifen bei {ziel}. Von deinem Graben aus sieht man nur Bäume. Die Höhe im Norden ist kahl.",
+ "hints": [
+  "Wald verdeckt, was hinter ihm liegt. Aber nicht für den, der höher steht.",
+  "Ein MG auf der Kuppe sieht über die Wipfel hinweg. Der Feuersektor muss es wissen.",
+  "Erst niederhalten, dann stürmen. Der Weg durch den Wald ist kurz."
+ ],
+ "solutionText": "Das MG steigt auf die Kuppe bei 5/2 und richtet den Sektor auf das Nest. Die Schützen stürmen ab der vierten Runde durch den Wald.",
+ "wonText": "Von oben war das Nest nur noch ein Strich auf der Karte.",
+ "goal": {
+  "type": "take",
+  "cells": [
+   [
+    12,
+    6
+   ]
+  ]
+ },
+ "limit": 7,
+ "par": {
+  "rounds": 6,
+  "losses": 3
+ },
+ "width": 18,
+ "height": 12,
+ "zoneCols": [
+  7,
+  12
+ ],
+ "terrain": [
+  "..................",
+  "..................",
+  ".........w........",
+  ".........w........",
+  ".........w........",
+  ".........w........",
+  ".........w........",
+  ".........w........",
+  ".........w........",
+  ".........w........",
+  ".........w........",
+  ".................."
+ ],
+ "heights": [
+  "002332000000000000",
+  "002332000000000000",
+  "002222000000000000",
+  "000000000000000000",
+  "000000000000000000",
+  "000000000000000000",
+  "000000000000000000",
+  "000000000000000000",
+  "000000000000000000",
+  "000000000000000000",
+  "000000000000000000",
+  "000000000000000000"
+ ],
+ "plan": [
+  "..................",
+  "....o.............",
+  "....=.......#.....",
+  "....=.......#.....",
+  "....=.......#.....",
+  "....=.......#.....",
+  "....=.......#.....",
+  "....=.......#.....",
+  "....=.......#.....",
+  "....=.......#.....",
+  "....=.......#.....",
+  ".................."
+ ],
+ "groups": {
+  "a": [
+   {
+    "type": "mg",
+    "at": [
+     4,
+     4
+    ],
+    "strength": 7,
+    "morale": 70
+   },
+   {
+    "type": "rifles",
+    "at": [
+     4,
+     8
+    ],
+    "strength": 10,
+    "morale": 70
+   }
+  ],
+  "b": [
+   {
+    "type": "mg",
+    "at": [
+     12,
+     6
+    ],
+    "strength": 7,
+    "morale": 70
+   }
+  ]
+ },
+ "solution": {
+  "1": [
+   {
+    "group": "a01",
+    "type": "move",
+    "path": [
+     [
+      4,
+      3
+     ],
+     [
+      4,
+      2
+     ],
+     [
+      4,
+      1
+     ]
+    ]
+   }
+  ],
+  "3": [
+   {
+    "group": "a01",
+    "type": "sector",
+    "target": [
+     12,
+     6
+    ]
+   }
+  ],
+  "4": [
+   {
+    "group": "a02",
+    "type": "assault",
+    "path": [
+     [
+      5,
+      8
+     ],
+     [
+      6,
+      7
+     ],
+     [
+      7,
+      7
+     ],
+     [
+      8,
+      7
+     ],
+     [
+      9,
+      7
+     ],
+     [
+      10,
+      6
+     ],
+     [
+      11,
+      6
+     ],
+     [
+      12,
+      6
+     ]
+    ]
+   }
+  ]
+ },
+ "tests": {
+  "bleiben": {
+   "1": [
+    {
+     "group": "a01",
+     "type": "sector",
+     "target": [
+      12,
+      6
+     ]
+    },
+    {
+     "group": "a02",
+     "type": "assault",
+     "path": [
+      [
+       5,
+       8
+      ],
+      [
+       6,
+       7
+      ],
+      [
+       7,
+       7
+      ],
+      [
+       8,
+       7
+      ],
+      [
+       9,
+       7
+      ],
+      [
+       10,
+       6
+      ],
+      [
+       11,
+       6
+      ],
+      [
+       12,
+       6
+      ]
+     ]
+    }
+   ]
+  }
+ }
+}

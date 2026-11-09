@@ -2,7 +2,7 @@
 // Befehle aufbereiten, Phasen aus dem Register der Reihe nach ausfuehren, Protokoll sammeln.
 // Die Mechaniken liegen in js/phases/*.js und melden sich in js/phases/registry.js an.
 // Rein: kein DOM, kein Date, kein Math.random. Zufall nur ueber js/rng.js.
-import { rngForTurn } from './rng.js';
+import { rngForTurn, createSteadyRng } from './rng.js';
 import { makeEvent } from './events.js';
 import { normalizeOrders } from './orders.js';
 import { groupsOf, getGroup, compareId } from './state.js';
@@ -66,7 +66,8 @@ export function resolveTurn(state, ordersA, ordersB, seed, turn, env = {}) {
       plans,
       allOrders: all,
       log,
-      rng: rngForPhase(seed, turn, phase.id),
+      // P25: Puzzle-Lagen (state.steady) wuerfeln nicht, jede Phase bekommt die ruhige Folge von vorn
+      rng: draft.steady ? createSteadyRng() : rngForPhase(seed, turn, phase.id),
       phase: phase.id,
       orderFor: (groupId) => byGroup.get(groupId) ?? null,
       ordersOfType: (type) => all.filter((o) => o.type === type),

@@ -1,0 +1,90 @@
+/* P25: Puzzle-Lagen (Uebungsblatt, Ergebnis), Koop-Uebergabe, Lehrgangsmappe, Werkstatt (Editor und Sandbox).
+   Farben nur ueber Token. Stil 03 fuer Gedrucktes, Bleistift in Caveat. */
+
+/* ---------- Uebungsblatt und Ergebnis im Gefecht ---------- */
+.lage-sheet{max-width:560px}
+.lage-goal{display:flex;flex-direction:column;gap:2px;margin:0 0 6px;font:600 15px/1.35 var(--font-ui)}
+.lage-goal span,.lage-solution span{font:12px var(--font-num);color:var(--ink2);text-transform:uppercase;letter-spacing:.06em;font-weight:400}
+.lage-rules{margin:0 0 10px;font:13px var(--font-num);color:var(--ink2)}
+.lage-fine{margin:0 0 10px;font-size:13px;color:var(--ink2);border-left:3px solid var(--line);padding-left:10px}
+.lage-hints ol{margin:4px 0 10px;padding-left:22px;font:700 19px/1.2 var(--font-hand);color:var(--ink2)}
+.lage-hints li{transform:rotate(var(--r,0deg));margin:4px 0}
+.lage-hints .btn{min-height:44px;font:700 17px var(--font-hand);margin-bottom:8px}
+.lage-note{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:baseline}
+.lage-grade{border-bottom:2px solid var(--danger);color:var(--danger)}
+.lage-solution{display:flex;flex-direction:column;gap:2px;margin:0 0 10px;font:700 19px/1.25 var(--font-hand);color:var(--ink2)}
+.gefecht .lage-card{display:none}
+@media (max-width:699px){
+  .gefecht .lage-btn{display:none !important}
+  .gefecht .lage-card{display:flex;width:100%;min-height:48px;justify-content:space-between;font-weight:700}
+  .lage-sheet{padding:16px 16px 12px}
+  .lage-sheet .rm-foot .btn{flex:1 1 auto;justify-content:center}
+}
+
+/* ---------- Koop: Weitergabe mit Zettel ---------- */
+.koop-note{display:flex;flex-direction:column;gap:4px;margin:0 0 10px;font:13px var(--font-num);color:var(--ink2)}
+.koop-note textarea{font:700 20px/1.2 var(--font-hand);color:var(--ink);background:var(--paper);border:var(--border);border-radius:var(--radius);padding:6px 8px;resize:vertical;min-height:64px}
+.koop-hand .btn{min-height:44px}
+
+/* ---------- Lehrgangsmappe (Szene puzzle) ---------- */
+.lg{position:fixed;inset:0;overflow:auto;background:var(--paper);color:var(--ink);padding:24px 16px 48px}
+.lg-in{max-width:1080px;margin:0 auto}
+.lg-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 16px;border-bottom:2px solid var(--ink);padding-bottom:10px;margin-bottom:16px}
+.lg-head h1{font:400 clamp(28px,5vw,40px)/1.05 var(--font-head);margin:0;flex:1 1 auto}
+.lg-head p{margin:0;font:13px var(--font-num);color:var(--ink2)}
+.lg-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px}
+.lg-card{position:relative;display:flex;flex-direction:column;gap:6px;padding:12px 14px 14px;text-decoration:none;color:var(--ink);transform:rotate(var(--r,0deg));transition:transform var(--dur-quick,.12s) var(--ease-paper,ease)}
+.lg-card:hover,.lg-card:focus-visible{transform:rotate(0deg) translateY(-2px);border-color:var(--ink)}
+.lg-card:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.lg-card canvas{width:100%;aspect-ratio:3/2;border:var(--border);background:var(--paper);display:block}
+.lg-num{font:12px var(--font-num);color:var(--ink2);text-transform:uppercase;letter-spacing:.06em}
+.lg-card b{font:400 19px/1.15 var(--font-head)}
+.lg-card small{font:13px var(--font-ui);color:var(--ink2)}
+.lg-stamp{position:absolute;right:10px;top:36px;padding:2px 8px;border:3px solid var(--own);color:var(--own);font:400 15px var(--font-head);text-transform:uppercase;transform:rotate(-8deg);background:var(--card);opacity:.92}
+.lg-grade{font:700 20px var(--font-hand);color:var(--danger)}
+.lg-foot{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
+.lg-foot .btn{min-height:44px}
+
+/* ---------- Werkstatt: Missionseditor und Stellungsbau-Sandbox ---------- */
+.ws{position:fixed;inset:0;display:grid;grid-template-columns:minmax(0,1fr) 340px;background:var(--paper);color:var(--ink)}
+.ws-map{position:relative;overflow:hidden;touch-action:none}
+.ws-map canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.ws-side{display:flex;flex-direction:column;gap:10px;padding:12px;border-left:var(--border);background:var(--card);overflow:auto}
+.ws-side h1{font:400 24px/1.1 var(--font-head);margin:0}
+.ws-side h2{font:12px var(--font-num);text-transform:uppercase;letter-spacing:.06em;color:var(--ink2);margin:6px 0 2px;font-weight:400}
+.ws-tabs{display:flex;gap:6px}
+.ws-tabs .btn{flex:1 1 0;justify-content:center;min-height:44px}
+.ws-tabs .btn[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 -3px 0 var(--accent)}
+.ws-tools{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.ws-tools .btn{flex-direction:column;align-items:flex-start;gap:2px;padding:8px;min-height:52px;font-size:13.5px;font-weight:600}
+.ws-tools .btn small{font-weight:400}
+.ws-tools .btn[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.ws-row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.ws-row .btn{min-height:44px}
+.ws-row label{display:flex;flex-direction:column;gap:2px;font:12px var(--font-num);color:var(--ink2);flex:1 1 120px}
+.ws-row input,.ws-row select,.ws-row textarea{font:14px var(--font-ui);color:var(--ink);background:var(--paper);border:var(--border);border-radius:var(--radius);padding:8px;min-height:40px}
+.ws-row textarea{min-height:64px;resize:vertical}
+.ws-status{font:13px var(--font-num);color:var(--ink2);margin:0}
+.ws-status.bad,.ws-status .bad{color:var(--danger)}
+.ws-check-row{display:flex;gap:8px;align-items:center;min-height:44px;font:14px var(--font-ui)}
+.ws-check-row input{width:20px;height:20px}
+.ws-out{margin-top:auto;padding-top:8px;border-top:var(--border)}
+.ws-list small{font:12px var(--font-num);color:var(--ink2)}
+.ws-analysis{font:13.5px/1.4 var(--font-ui);margin:0;padding:8px 10px;border:var(--border);border-radius:var(--radius);background:var(--paper)}
+.ws-analysis b{font-family:var(--font-num)}
+.ws-analysis .note{display:block;font:700 18px/1.15 var(--font-hand);color:var(--danger);margin-top:4px}
+.ws-hint{position:absolute;left:12px;bottom:12px;margin:0;max-width:min(420px,calc(100% - 200px));padding:8px 12px;font:13px var(--font-ui);pointer-events:none}
+.ws-zoom{position:absolute;right:12px;bottom:12px;display:flex;gap:6px}
+.ws-zoom .btn{min-width:44px;min-height:44px;justify-content:center;font-weight:700}
+.ws-code{font:12px var(--font-num);word-break:break-all;max-height:6em;overflow:auto;background:var(--paper);border:var(--border);padding:6px;border-radius:var(--radius);margin:0}
+.ws-list{display:flex;flex-direction:column;gap:6px;margin:0;padding:0;list-style:none}
+.ws-list li{display:flex;gap:6px;align-items:center}
+.ws-list li .btn{min-height:40px}
+.ws-list li .grow{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:799px){
+  .ws{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) auto}
+  .ws-side{border-left:0;border-top:var(--border);max-height:48vh;padding:10px 12px calc(10px + env(safe-area-inset-bottom))}
+  .ws-tools .btn{font-size:13px;padding:6px 8px}
+  .ws-hint{bottom:8px;left:8px;font-size:12px;padding:6px 8px;max-width:calc(100% - 196px)}
+  .ws-zoom{right:8px;bottom:8px}
+}

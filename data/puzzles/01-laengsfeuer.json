@@ -1,0 +1,226 @@
+{
+ "id": "laengsfeuer",
+ "num": 1,
+ "title": "Längsfeuer",
+ "lesson": "Längsfeuer",
+ "kind": "battle",
+ "brief": "Drüben liegt ein betonierter Graben, schnurgerade, ohne eine einzige Traverse. Von vorn beißt sich jedes MG daran die Zähne aus. Der Stab will das Stück bei {ziel} bis zur vollen Stunde.",
+ "hints": [
+  "Ein gerader Graben ist von vorn stark und von der Seite nackt.",
+  "Der Trichter nördlich der Linie liegt genau in der Verlängerung des Grabens. Von dort sieht man bis ans andere Ende.",
+  "Erst wenn drüben niemand mehr an der Brustwehr steht, lohnt der Sturm. Ein MG schießt nur in seinen Sektor."
+ ],
+ "solutionText": "MG in den Trichter bei 12/2, Feuersektor den Graben hinunter. Das Längsfeuer hält beide Gruppen nieder. In der vierten Runde stürmen die Schützen südlich am Wäldchen vorbei.",
+ "wonText": "Der Graben ist genommen. Längsfeuer hat ihn geräumt, bevor der erste Mann hinüberlief.",
+ "goal": {
+  "type": "take",
+  "cells": [
+   [
+    12,
+    7
+   ]
+  ]
+ },
+ "limit": 6,
+ "par": {
+  "rounds": 5,
+  "losses": 3
+ },
+ "width": 18,
+ "height": 12,
+ "zoneCols": [
+  6,
+  11
+ ],
+ "trenchLevel": 4,
+ "terrain": [
+  "..................",
+  "..................",
+  "..................",
+  "..................",
+  "..................",
+  "..........w.......",
+  "..........w.......",
+  "..........w.......",
+  "..................",
+  "..................",
+  "..................",
+  ".................."
+ ],
+ "plan": [
+  "..................",
+  "...........o......",
+  "...=......o.#.....",
+  "...=........#.....",
+  "...=........#.....",
+  "...=........#.....",
+  "...=........#.....",
+  "...=........#.....",
+  "...=........#.....",
+  "...=........#.....",
+  "..................",
+  ".................."
+ ],
+ "groups": {
+  "a": [
+   {
+    "type": "mg",
+    "at": [
+     10,
+     2
+    ],
+    "strength": 7,
+    "morale": 72
+   },
+   {
+    "type": "rifles",
+    "at": [
+     8,
+     6
+    ],
+    "strength": 10,
+    "morale": 70
+   }
+  ],
+  "b": [
+   {
+    "type": "rifles",
+    "at": [
+     12,
+     7
+    ],
+    "strength": 11,
+    "morale": 72
+   },
+   {
+    "type": "mg",
+    "at": [
+     12,
+     4
+    ],
+    "strength": 7,
+    "morale": 72
+   }
+  ]
+ },
+ "solution": {
+  "1": [
+   {
+    "group": "a01",
+    "type": "move",
+    "path": [
+     [
+      11,
+      1
+     ]
+    ]
+   }
+  ],
+  "2": [
+   {
+    "group": "a01",
+    "type": "sector",
+    "target": [
+     12,
+     5
+    ]
+   }
+  ],
+  "3": [
+   {
+    "group": "a02",
+    "type": "assault",
+    "path": [
+     [
+      9,
+      7
+     ],
+     [
+      10,
+      8
+     ],
+     [
+      11,
+      8
+     ],
+     [
+      12,
+      7
+     ]
+    ]
+   }
+  ]
+ },
+ "tests": {
+  "frontal": {
+   "1": [
+    {
+     "group": "a01",
+     "type": "sector",
+     "target": [
+      12,
+      6
+     ]
+    },
+    {
+     "group": "a02",
+     "type": "assault",
+     "path": [
+      [
+       9,
+       7
+      ],
+      [
+       10,
+       8
+      ],
+      [
+       11,
+       8
+      ],
+      [
+       12,
+       7
+      ]
+     ]
+    }
+   ]
+  },
+  "frontal-spaet": {
+   "1": [
+    {
+     "group": "a01",
+     "type": "sector",
+     "target": [
+      12,
+      6
+     ]
+    }
+   ],
+   "3": [
+    {
+     "group": "a02",
+     "type": "assault",
+     "path": [
+      [
+       9,
+       7
+      ],
+      [
+       10,
+       8
+      ],
+      [
+       11,
+       8
+      ],
+      [
+       12,
+       7
+      ]
+     ]
+    }
+   ]
+  }
+ }
+}

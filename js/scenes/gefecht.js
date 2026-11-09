@@ -71,6 +71,8 @@ import { prepareMission, missionAi, withMissionOrders } from '../missions/script
 import { attachMissionUi } from '../ui/mission.js';
 import { carryOrders, recordFrom } from '../online/replay.js';
 import { setupOnline, attachMatch, brokenText, blockMatch, telegramLines } from '../online/session.js';
+import { attachLageRules } from '../ui/lage-rules.js';
+import { createKoop } from '../ui/koop.js';
 
 const num = (v, d) => (v === null || v === '' || !Number.isFinite(Number(v)) ? d : Number(v));
 const LONG_PRESS_MS = 430;
@@ -104,6 +106,8 @@ export async function mount(root, params) {
   // P22: oder eine Woche im Frontabschnitt (Zustand aus dem Speicher des Laufs)
   const campaignRun = campaignMission(params) ?? endlessWeek(params, map);
   if (campaignRun) state = campaignRun.prepare(state, map);
+  // P25: Puzzle-Lage oder eigene Lage legt ihren Startzustand fest (Gefechtsrunde, eroberte Graeben)
+  if (battle.prepare) state = battle.prepare(state);
   if (!fixed && params.get('kind') === 'battle') { state.turnKind = 'battle'; state.battle = { round: 1 }; }
   if (!fixed) applyWeatherParams(state, map, params);
   // P18: Spielstand aus ?slot= ersetzt den Startzustand; Archiv und KI-Gedaechtnis folgen weiter unten
@@ -116,6 +120,9 @@ export async function mount(root, params) {
   if (online?.state) state = online.state;
   if (resumed) state = resumed.state;
   const humans = online?.side ? [online.side] : mode === 'hotseat' ? ['a', 'b'] : ['a'];
+  // P25: Koop, zwei Kommandos teilen Seite a (js/ui/koop.js)
+  const koop = modeInfo?.kind === 'koop' && !online ? createKoop(state, map) : null;
+  let lageOverlays = () => []; // P25: Ziel und Plan des Gegners, gesetzt, sobald die Wertung steht
   const env = { map };
   // KI-Kommandant (P13): Doktrin und Schwierigkeit aus dem Szenario (sides.b.ai), per URL &doktrin= &ki=.
   // Mit Marschbefehl (karte=) steckt die Wahl schon im Szenario; die Tageslage nimmt gar keine URL-Eingriffe an.
@@ -241,7 +248,8 @@ export async function mount(root, params) {
       preview: prev ? { ...prev, group: tool.group.id, cell: tool.hoverCell, ok: prev.ok ?? !!prev.path } : null,
       sightLine: !tool && hoverSight ? hoverSight : null,
       overlays: [artilleryOverlay(state), ...(decor ? [{ draw: decor }] : []), ...activeOverlays(),
-        ...(noteMark ? [laskNoteOverlay(noteMark)] : []), ...lehrling.overlays(), ...(missionUi?.overlays(state) ?? []), ...(campaignRun?.overlays?.() ?? [])],
+        ...(noteMark ? [laskNoteOverlay(noteMark)] : []), ...lehrling.overlays(), ...(missionUi?.overlays(state) ?? []), ...(campaignRun?.overlays?.() ?? []),
+        ...lageOverlays(), ...(koop ? [koop.overlay(() => state.groups)] : [])],
       plans: sidePlans[side],
       time: performance.now(),
     });
@@ -316,8 +324,9 @@ export async function mount(root, params) {
       onBlock: () => { cancelTool(false); radial.hide(); modalOpen = true; refresh(); },
       onUnblock: () => { modalOpen = false; refresh(); dynCv.focus({ preventScroll: true }); },
     }) : null;
-  const rules = attachModeRules({
-    ui, info: modeInfo, map, start: startState, scenario, humans, aiCfg,
+  // P25: Puzzle-Lagen und eigene Lagen mit Ziel bringen ihre eigene Wertung mit (js/ui/lage-rules.js)
+  const rules = (battle.lage ? attachLageRules : attachModeRules)({
+    ui, info: modeInfo, map, start: startState, scenario, humans, aiCfg, lage: battle.lage, kind: battle.lageKind, resumed: !!resumed,
     // P20: Befehlsprotokoll fuer Wiedergabe-Link und Nachrechnen der Tageslage (nicht fuer Kampagne und Online)
     // Mit erzwungener Nacht (night=, nur Ansicht) liesse sich die Partie nicht genau nachrechnen
     record: () => (campaignRun || online?.kind === 'match' || params.has('night') ? null
@@ -326,10 +335,12 @@ export async function mount(root, params) {
     onClose: () => { modalOpen = false; refresh(); dynCv.focus({ preventScroll: true }); },
   });
   if (resumed) rules.restore(resumed.rules, state);
+  if (resumed && koop) koop.restore(resumed.rules?.koop);
+  if (rules.overlays) lageOverlays = () => rules.overlays(state);
   // P18: Dienstbuch (Einstellungen, Spielstaende, Klang, Tasten) und laufende Akte nach jeder Runde
   const gameMenu = attachGameMenu({
     ui, params,
-    snapshot: () => ({ state, map: liveMap, archive, aiMemory, lastLog, rules: rules.snapshot(), side, book }),
+    snapshot: () => ({ state, map: liveMap, archive, aiMemory, lastLog, rules: { ...rules.snapshot(), ...(koop ? { koop: koop.snapshot() } : {}) }, side, book }),
     busy: () => (online?.kind === 'match' ? 'Online-Gefechte liegen beim Stab, nicht in der Kartentasche.'
       : online?.kind === 'replay' ? 'Eine Wiedergabe steckt im Link, nicht in der Kartentasche.'
       : filmFrame || book.a?.sealed || book.b?.sealed ? 'Während der Ausführung oder Übergabe kann nicht abgelegt werden.' : rules.ended ? 'Die Partie ist beendet.' : null),
@@ -428,7 +439,7 @@ export async function mount(root, params) {
 
   function selectedOwn() {
     const g = selectedId ? getGroup(state, selectedId) : null;
-    return g && g.side === side && g.status !== 'lost' ? g : null;
+    return g && g.side === side && g.status !== 'lost' && (!koop || koop.owns(g)) ? g : null;
   }
 
   function flash(text, tone = '') {
@@ -461,7 +472,7 @@ export async function mount(root, params) {
     return {
       side,
       supplies: { ...s.supplies, carts: currentWagons(map, state, side, sidePlans[side]).length, cartsTotal: capacityOf(state, side) }, morale, reputation: s.reputation, trust: s.trust,
-      roundTitle: roundTitle(state) + (mode === 'hotseat' ? ` · ${faction(s.faction).short}` : '') + rules.suffix(state) + (campaignRun?.suffix?.(state) ?? ''),
+      roundTitle: roundTitle(state) + (mode === 'hotseat' ? ` · ${faction(s.faction).short}` : koop ? ` · ${koop.title()}` : '') + rules.suffix(state) + (campaignRun?.suffix?.(state) ?? ''),
       roundSub: battleNow
         ? `Minute ${clk.minutes} von ${BATTLE_ROUNDS * BATTLE_MINUTES} · ${clockText(state.clock)} Uhr · ${attacking ? 'Sturm läuft' : 'Der Gegner greift an'}`
         : `${daytime} · ${clockText(state.clock)} Uhr · ${weatherName(state.weather)} · Abschnitt ${sector}`,
@@ -470,7 +481,7 @@ export async function mount(root, params) {
       roundAction: battleNow && attacking && !state.battle?.outcome?.[side] && !book[side]?.sealed && assaultersOf(side).length ? 'Angriff abbrechen' : null,
       orderCount: orders.length,
       overlays: overlaySlots().map((o) => ({ slot: o.slot, label: o.label, empty: !!o.empty, active: overlaysOn.has(o.slot) })),
-      checklist: checklist({ state, side, orders, map, plans: sidePlans[side] }),
+      checklist: checklist({ state, side, orders, map, plans: sidePlans[side], only: koop ? koop.owns : null }),
       hint: currentHint(),
     };
   }
@@ -514,7 +525,7 @@ export async function mount(root, params) {
       active: tool?.def.id ?? null,
       canUndo: canUndo(book, side),
       count: ordersNow().length,
-      label: mode === 'hotseat' && side === 'a' && !book.b?.sealed ? 'Befehle versiegeln' : 'Runde ausführen',
+      label: mode === 'hotseat' && side === 'a' && !book.b?.sealed ? 'Befehle versiegeln' : koop ? koop.button() : 'Runde ausführen',
     });
     if (orderList.open) updateList();
     lehrling.sync();
@@ -690,7 +701,7 @@ export async function mount(root, params) {
   }
 
   function nextIdle() {
-    const idle = groupsOf(state, side).filter((g) => !orderOf(book, side, g.id) && g.status !== 'rest');
+    const idle = groupsOf(state, side).filter((g) => !orderOf(book, side, g.id) && g.status !== 'rest' && (!koop || koop.owns(g)));
     if (!idle.length) { flash('Alle Gruppen haben einen Befehl. Enter führt die Runde aus.'); return; }
     const i = idle.findIndex((g) => g.id === selectedId);
     select(idle[(i + 1) % idle.length].id, { center: true });
@@ -728,19 +739,29 @@ export async function mount(root, params) {
     cancelTool(false);
     radial.hide();
     const orders = ordersNow();
-    const s = summarize({ state, side, orders, map, plans: sidePlans[side] });
+    const s = summarize({ state, side, orders, map, plans: sidePlans[side], only: koop ? koop.owns : null });
     modalOpen = true;
     refresh();
     showSummary(ui, s, {
       title: `${roundTitle(state)} · Zusammenfassung`,
-      sub: mode === 'hotseat' ? faction(state.sides[side].faction).name : 'Was du gleich abschickst',
-      preset,
+      sub: mode === 'hotseat' ? faction(state.sides[side].faction).name : koop ? `${koop.title()}: was du einzeichnest` : 'Was du gleich abschickst',
+      preset, action: koop ? koop.button() : undefined,
       onCancel: () => { modalOpen = false; refresh(); dynCv.focus({ preventScroll: true }); },
       onCommit: () => { modalOpen = false; commitSide(); },
     });
   }
 
   function commitSide() {
+    // P25 Koop: Nord gibt an Sued weiter (mit Zettel), erst Sued fuehrt die Runde aus
+    if (koop && !koop.last()) {
+      selectedId = null; closeList(); modalOpen = true; refresh();
+      koop.handover(ui, state.turn, (went) => {
+        modalOpen = false;
+        if (went) { homeView(); onCamera(); const n = koop.takeNote(); if (n) flash(`Zettel von Nord: ${n}`); }
+        refresh(); dynCv.focus({ preventScroll: true });
+      });
+      return;
+    }
     // Sturm: nach dem Halten des Rings geht die Pfeife
     const storm = listOrders(book, side).some((o) => HOLD_TYPES.has(o.type));
     book = seal(book, side);
@@ -867,7 +888,12 @@ export async function mount(root, params) {
     const ordersA = withPlans('a', listOrders(book, 'a'));
     let ordersB;
     if (humans.includes('b')) ordersB = withPlans('b', listOrders(book, 'b'));
-    else {
+    else if (battle.ordersB) {
+      // P25: Drehbuch der Puzzle-Lage oder eine Gegenseite, die nur haelt; Restbefehle (Sturm) laufen weiter
+      const fresh = battle.ordersB(state);
+      const have = new Set(fresh.map((o) => o.group));
+      ordersB = [...fresh, ...listOrders(book, 'b').filter((o) => o.carried && !have.has(o.group))];
+    } else {
       const d = aiNext?.turn === state.turn ? aiNext.decision : decide(viewFor(state, lastLog, 'b', env), { map, seed, ...aiCfg, ...missionAi(state), memory: aiMemory });
       aiMemory = d.memory;
       const fresh = new Set(d.orders.map((o) => o.group).filter(Boolean));
@@ -884,7 +910,7 @@ export async function mount(root, params) {
     lastRound = { input, result: r };
     // P13: Lasks naechsten Zug schon jetzt rechnen; manchmal faellt dabei eine Notiz in die eigenen Haende
     aiNext = null;
-    if (!humans.includes('b') && !state.result) {
+    if (!humans.includes('b') && !battle.ordersB && !state.result) {
       const lv = viewFor(state, lastLog, 'b', env);
       const d = decide(lv, { map, seed, ...aiCfg, ...missionAi(state), memory: aiMemory });
       aiNext = { turn: state.turn, decision: d };
@@ -899,6 +925,7 @@ export async function mount(root, params) {
     gameMenu.autosave(); // nach dem Weitertragen, damit laufende Wege und Graben mit in die Akte kommen
     sidePlans = { a: {}, b: {} }; // der Lorenplan steht danach im Zustand und gilt weiter
     side = humans[0];
+    koop?.reset();
     updateLiveMap();
     playSfx('clock-lock');
     // Der Tag-Nacht-Uebergang laeuft in der letzten Sekunde des Films (Plan 7.7)
@@ -922,7 +949,7 @@ export async function mount(root, params) {
 
   // ---------- Radiales Menue ----------
   function openRadial(g, clientX, clientY) {
-    if (!g || g.side !== side || modalOpen || book[side]?.sealed || root.classList.contains('fp-open')) return false;
+    if (!g || g.side !== side || modalOpen || book[side]?.sealed || root.classList.contains('fp-open') || (koop && !koop.owns(g))) return false;
     cancelTool(false);
     selectedId = g.id;
     const r = root.getBoundingClientRect();
@@ -1000,7 +1027,10 @@ export async function mount(root, params) {
         return;
       }
       const g = groupAtScreen(p);
-      if (g) select(g.id);
+      if (g) {
+        select(g.id);
+        if (koop && g.side === side && !koop.owns(g)) flash(`Gehört zu ${koop.ownerName(g)}. Pfeile sehen, aber nicht ändern.`);
+      }
       else if (selectedId) select(null);
       else if (cell && !closedSomething && state.turnKind === 'position' && !book[side]?.sealed) {
         // P11: Antippen eines Gebaeudes oder vorgemerkten Baus der eigenen Etappe (ohne gewaehlte Gruppe)

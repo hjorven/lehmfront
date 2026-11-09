@@ -1,0 +1,194 @@
+{
+ "id": "gegenstoss",
+ "num": 5,
+ "title": "Gegenstoß",
+ "lesson": "Gegenstoß",
+ "kind": "battle",
+ "brief": "Der Gegner ist bei {ziel} in deinen Graben eingebrochen. Der Auftritt zeigt noch in die falsche Richtung, die Eindringlinge haben kaum Deckung. Drüben setzt sich schon Verstärkung in Bewegung.",
+ "hints": [
+  "Ein eroberter Graben schützt schlecht, solange er nicht umgebaut ist. Das gilt jetzt für den Gegner.",
+  "Eine Gruppe allein hat kaum mehr als die halbe Aussicht. Zwei Gruppen gegen ein Feld zählen zusammen.",
+  "Wer ausweicht, ist noch nicht fort. Kein Feind darf neben dem Feld bleiben."
+ ],
+ "solutionText": "Beide Gruppen stürmen in der ersten Runde auf 9/7. Der Rest der Eindringlinge weicht nach 8/6 aus; dort stellt ihn die zweite Gruppe in der zweiten Runde.",
+ "wonText": "Der Graben ist zurück. Der Stab nennt es einen sauberen Gegenstoß.",
+ "goal": {
+  "type": "take",
+  "cells": [
+   [
+    8,
+    6
+   ]
+  ]
+ },
+ "limit": 4,
+ "par": {
+  "rounds": 2,
+  "losses": 3
+ },
+ "width": 18,
+ "height": 12,
+ "zoneCols": [
+  10,
+  13
+ ],
+ "trenchLevel": 3,
+ "plan": [
+  "..................",
+  "........=......#..",
+  "........=......#..",
+  "........=..o...#..",
+  "........=......#..",
+  "........=......#..",
+  "........=......#..",
+  "........=......#..",
+  "........=...o..#..",
+  "........=......#..",
+  "........=......#..",
+  ".................."
+ ],
+ "cells": [
+  {
+   "at": [
+    8,
+    6
+   ],
+   "trench": {
+    "side": "enemy",
+    "kind": "fire",
+    "level": 3,
+    "facing": "E",
+    "captured": true
+   }
+  }
+ ],
+ "groups": {
+  "a": [
+   {
+    "type": "rifles",
+    "at": [
+     8,
+     5
+    ],
+    "strength": 9,
+    "morale": 66
+   },
+   {
+    "type": "rifles",
+    "at": [
+     8,
+     7
+    ],
+    "strength": 8,
+    "morale": 64
+   }
+  ],
+  "b": [
+   {
+    "type": "rifles",
+    "at": [
+     8,
+     6
+    ],
+    "strength": 10,
+    "morale": 72
+   },
+   {
+    "type": "rifles",
+    "at": [
+     15,
+     6
+    ],
+    "strength": 11,
+    "morale": 72
+   }
+  ]
+ },
+ "script": {
+  "1": [
+   {
+    "group": "b02",
+    "type": "move",
+    "path": [
+     [
+      14,
+      6
+     ],
+     [
+      13,
+      6
+     ],
+     [
+      12,
+      6
+     ],
+     [
+      11,
+      6
+     ],
+     [
+      10,
+      6
+     ]
+    ]
+   }
+  ]
+ },
+ "solution": {
+  "1": [
+   {
+    "group": "a01",
+    "type": "assault",
+    "path": [
+     [
+      8,
+      6
+     ]
+    ]
+   },
+   {
+    "group": "a02",
+    "type": "assault",
+    "path": [
+     [
+      8,
+      6
+     ]
+    ]
+   }
+  ],
+  "2": [
+   {
+    "group": "a02",
+    "type": "assault",
+    "path": [
+     [
+      7,
+      6
+     ],
+     [
+      7,
+      5
+     ]
+    ]
+   }
+  ]
+ },
+ "tests": {
+  "einer": {
+   "1": [
+    {
+     "group": "a01",
+     "type": "assault",
+     "path": [
+      [
+       8,
+       6
+      ]
+     ]
+    }
+   ]
+  },
+  "nichts": {}
+ }
+}

@@ -25,7 +25,8 @@ export function seesPoint(state, side, p, env = {}) {
 }
 
 const DEFAULT_RULES = {
-  groupVisible: (state, side, group, ctx) => ctx.visible.has(group.id),
+  // P25: Puzzle-Lagen (state.reveal) zeigen alle Gruppen, volle Information
+  groupVisible: (state, side, group, ctx) => !!state.reveal || ctx.visible.has(group.id),
   cellVisible: () => true,
   // Ereignisse mit side: nur diese Seite. Ausnahme: public: true und der Ort ist fuer die andere Seite sichtbar
   // (z. B. Einschlag, Sturm). Befehle, Namen und Halten bleiben so beim Gegner verborgen.
