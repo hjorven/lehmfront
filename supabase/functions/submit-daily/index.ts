@@ -1,7 +1,7 @@
 // Edge Function submit-daily (P20, Plan 11.1): rechnet die Tageslage aus dem Befehlsprotokoll nach und traegt
 // das Ergebnis in die Bestenliste ein. Clients schreiben nie selbst in daily_results.
 import { serve, admin, json, fail } from '../_lib/http.ts';
-import { replayDaily } from '../_shared/js/online/replay.js';
+import { replayDaily } from '../_lib/logic.ts';
 
 /** JJJJMMTT eines Zeitpunkts in UTC */
 function keyOf(ms: number): number {

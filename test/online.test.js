@@ -21,7 +21,7 @@ import {
   startMatch, resolveMatch, stateFromView, matchRecord, matchQuery, parseMapId, normalizeCode, turnState,
   MATCH_LIMIT, matchBattle, initSeedFor,
 } from '../js/online/match.js';
-import { closure } from '../tools/sync-functions.mjs';
+import { closure, pinnedCommit, repin } from '../tools/sync-functions.mjs';
 
 const read = (p) => readFileSync(new URL('../' + p, import.meta.url), 'utf8');
 
@@ -223,4 +223,25 @@ test('Zweikampf: die Sicht beim Start verraet nichts ueber den geheimen Seed', (
   const one = startMatch('velde', 12345, i).views;
   const two = startMatch('velde', 987654321, i).views;
   assert.deepEqual(one, two);
+});
+
+test('Edge Functions: logic.ts auf genau einen Commit gepinnt, exportiert nur Vorhandenes', async () => {
+  const src = read('supabase/functions/_lib/logic.ts');
+  const sha = pinnedCommit(src);
+  assert.match(sha, /^[0-9a-f]{40}$/);
+  const match = await import('../js/online/match.js');
+  const replay = await import('../js/online/replay.js');
+  for (const m of src.matchAll(/export\s*\{([^}]*)\}\s*from\s*'[^']*\/js\/online\/(\w+)\.js'/g)) {
+    const mod = m[2] === 'match' ? match : replay;
+    for (const name of m[1].split(',').map((x) => x.trim()).filter(Boolean)) {
+      assert.equal(typeof mod[name], 'function', `${name} fehlt in ${m[2]}.js`);
+    }
+  }
+  const other = 'a'.repeat(40);
+  assert.equal(pinnedCommit(repin(src, other)), other);
+  assert.throws(() => repin(src, 'main'));
+  for (const fn of ['join', 'resolve', 'submit-daily']) {
+    const idx = read(`supabase/functions/${fn}/index.ts`);
+    assert.ok(!idx.includes('_shared'), `${fn} importiert noch die alte Kopie`);
+  }
 });

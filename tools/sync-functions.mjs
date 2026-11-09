@@ -1,19 +1,22 @@
 #!/usr/bin/env node
-// Kopiert die reine Spiellogik, die die Edge Functions brauchen, nach supabase/functions/_shared/ (P20, Plan 11.3).
-// Der Deploy buendelt nur, was unter supabase/functions/ liegt; die Kopie wird nicht eingecheckt (.gitignore).
+// Spiellogik fuer die Edge Functions (P20, Plan 11.3). Die Functions importieren die reinen Module des Spiels
+// ueber supabase/functions/_lib/logic.ts von jsDelivr, fest auf einen Commit gepinnt; Supabase buendelt sie
+// beim Deploy. So bleibt die Logik eine einzige Quelle, und der Server rechnet genau den gepinnten Stand.
 //
-//   node tools/sync-functions.mjs              # Kopie schreiben
-//   node tools/sync-functions.mjs --list       # nur die Dateiliste ausgeben
-//   node tools/sync-functions.mjs --mcp join   # Dateien einer Function als JSON fuer den Supabase-MCP (deploy_edge_function)
+//   node tools/sync-functions.mjs --list               # Dateien, die die Functions brauchen (nur relative Importe)
+//   node tools/sync-functions.mjs --pin <commit>       # logic.ts auf einen Commit von main umstellen
+//   node tools/sync-functions.mjs --mcp join           # Dateien einer Function als JSON fuer den Supabase-MCP
 //
-// Danach mit der CLI:  supabase functions deploy join resolve submit-daily --project-ref <ref>
-import { readFileSync, writeFileSync, mkdirSync, rmSync, existsSync } from 'node:fs';
+// Der Commit muss auf GitHub liegen (jsDelivr laedt von dort). Danach alle drei Functions neu deployen:
+//   supabase functions deploy join resolve submit-daily --project-ref trxetnkronmurxqcrhit --no-verify-jwt
+import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const ENTRIES = ['js/online/replay.js', 'js/online/match.js'];
-const OUT = join(ROOT, 'supabase/functions/_shared');
+const LOGIC = join(ROOT, 'supabase/functions/_lib/logic.ts');
+const CDN = 'https://cdn.jsdelivr.net/gh/hjorven/lehmfront@';
 const IMPORT_RE = /(?:^|\n)\s*(?:import|export)\s[^'"]*?from\s+['"]([^'"]+)['"]|(?:^|\n)\s*import\s+['"]([^'"]+)['"]/g;
 
 /** Alle Dateien, die von den Einstiegen aus importiert werden (relativ zur Wurzel, sortiert) */
@@ -38,9 +41,23 @@ export function closure(entries = ENTRIES) {
 function functionFiles(name) {
   const fnDir = join(ROOT, 'supabase/functions');
   const files = [{ name: 'index.ts', content: readFileSync(join(fnDir, name, 'index.ts'), 'utf8') }];
-  files.push({ name: '../_lib/http.ts', content: readFileSync(join(fnDir, '_lib/http.ts'), 'utf8') });
-  for (const f of closure()) files.push({ name: '../_shared/' + f, content: readFileSync(join(ROOT, f), 'utf8') });
+  for (const f of ['http.ts', 'logic.ts']) {
+    files.push({ name: '../_lib/' + f, content: readFileSync(join(fnDir, '_lib', f), 'utf8') });
+  }
   return files;
+}
+
+/** Gepinnter Commit aus logic.ts */
+export function pinnedCommit(src = readFileSync(LOGIC, 'utf8')) {
+  const pins = new Set([...src.matchAll(/lehmfront@([0-9a-f]{40})\//g)].map((m) => m[1]));
+  if (pins.size !== 1) throw new Error('logic.ts: genau ein gepinnter Commit erwartet');
+  return [...pins][0];
+}
+
+/** logic.ts auf einen anderen Commit umschreiben */
+export function repin(src, sha) {
+  if (!/^[0-9a-f]{40}$/.test(sha)) throw new Error('Commit als volle 40-stellige SHA angeben');
+  return src.split(pinnedCommit(src)).join(sha);
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
@@ -54,14 +71,11 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
       process.exit(1);
     }
     console.log(JSON.stringify(functionFiles(name)));
+  } else if (args.includes('--pin')) {
+    const sha = args[args.indexOf('--pin') + 1] ?? '';
+    writeFileSync(LOGIC, repin(readFileSync(LOGIC, 'utf8'), sha));
+    console.log(`logic.ts gepinnt auf ${sha} (${CDN}${sha}/). Jetzt die Functions neu deployen.`);
   } else {
-    rmSync(OUT, { recursive: true, force: true });
-    const files = closure();
-    for (const f of files) {
-      const to = join(OUT, f);
-      mkdirSync(dirname(to), { recursive: true });
-      writeFileSync(to, readFileSync(join(ROOT, f)));
-    }
-    console.log(`supabase/functions/_shared: ${files.length} Dateien kopiert`);
+    console.log(`Gepinnter Stand: ${pinnedCommit()}`);
   }
 }

@@ -1,6 +1,5 @@
 // Gemeinsames fuer die Edge Functions von Lehmfront (P20): CORS, Antworten, Anmeldung pruefen.
-// Die Spiellogik liegt als Kopie unter ../_shared/ (node tools/sync-functions.mjs), weil der Deploy nur
-// buendelt, was unter supabase/functions/ liegt.
+// Die Spiellogik kommt aus ./logic.ts (reine Module des Spiels, auf einen Commit gepinnt).
 import { createClient, type SupabaseClient } from 'npm:@supabase/supabase-js@2.118.0';
 
 export const CORS = {

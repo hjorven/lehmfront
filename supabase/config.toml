@@ -1,4 +1,5 @@
-# Lehmfront (P20). Fuer die Supabase-CLI; das Projekt selbst wird im Dashboard angelegt (siehe docs/online.md).
+# Lehmfront (P20). Fuer die Supabase-CLI; Projekt-Ref trxetnkronmurxqcrhit (siehe docs/online.md).
+# verify_jwt aus: die Functions pruefen die Anmeldung selbst (auth.getUser), das Projekt nutzt ES256-Tokens.
 project_id = "lehmfront"
 
 [auth]
@@ -8,10 +9,10 @@ site_url = "https://hjorven.github.io/lehmfront/"
 additional_redirect_urls = ["https://hjorven.github.io/lehmfront/?scene=fernamt", "http://localhost:8080/", "http://localhost:8080/?scene=fernamt"]
 
 [functions.join]
-verify_jwt = true
+verify_jwt = false
 
 [functions.resolve]
-verify_jwt = true
+verify_jwt = false
 
 [functions.submit-daily]
-verify_jwt = true
+verify_jwt = false
