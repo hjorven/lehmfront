@@ -25,6 +25,7 @@ import { unitType } from '../config/units.js';
 import { surname } from './hold.js';
 import { PINNED } from '../sight.js';
 import { captureTrench } from '../trench.js';
+import { hasReport } from '../config/reports.js';
 
 export const BATTLE_FACTOR = 10;
 export const POSITION_FACTOR = 40;
@@ -233,7 +234,8 @@ function runMove(ctx) {
       const c = map ? liveCell(map, state, p.x, p.y) : null;
       if (ctx.kind === 'battle' && enemyWire(c, m.g.side)) {
         // Im feindlichen Draht: haengt fest; Pioniere schneiden eine Gasse
-        if (WIRE_CUTTERS.has(m.g.type)) {
+        // Erfahrungsbericht Drahtscheren (P14): dann schneiden auch Schuetzen
+        if (WIRE_CUTTERS.has(m.g.type) || (m.g.type === 'rifles' && hasReport(state, m.g.side, 'drahtscheren'))) {
           state.cells[p.x + ',' + p.y] = { ...(state.cells[p.x + ',' + p.y] ?? {}), wire: null, wireCut: ctx.turn };
           m.cut = { ...p };
         } else {

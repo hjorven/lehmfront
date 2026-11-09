@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 
 const root = new URL('../js/', import.meta.url);
-const files = ['rules.js', 'resolve.js', 'state.js', 'orders.js', 'view.js', 'events.js', 'map.js', 'supply.js', 'artillery.js', 'etappe.js', 'sight.js', 'weather.js', 'ui/daytime.js', 'film.js', 'archive.js', 'trench.js', 'morale.js', 'audio/cues.js', 'letters.js', 'ai.js', 'ai/match.js', 'ai/notes.js', 'config/doctrines.js', 'mapgen.js', 'placenames.js', 'modes/skirmish.js', 'config/battlemaps.js']
+const files = ['rules.js', 'resolve.js', 'state.js', 'orders.js', 'view.js', 'events.js', 'map.js', 'supply.js', 'artillery.js', 'etappe.js', 'sight.js', 'weather.js', 'ui/daytime.js', 'film.js', 'archive.js', 'trench.js', 'morale.js', 'audio/cues.js', 'letters.js', 'ai.js', 'ai/match.js', 'ai/notes.js', 'config/doctrines.js', 'mapgen.js', 'placenames.js', 'modes/skirmish.js', 'config/battlemaps.js', 'campaign.js', 'config/reports.js']
   .filter((f) => existsSync(new URL(f, root)))
   .concat(readdirSync(new URL('phases/', root)).filter((f) => f.endsWith('.js')).map((f) => 'phases/' + f))
   .concat(readdirSync(new URL('narrative/', root)).filter((f) => f.endsWith('.js')).map((f) => 'narrative/' + f));

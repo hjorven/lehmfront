@@ -17,6 +17,7 @@ import { trenchAt } from '../sight.js';
 import { captureTrench } from '../trench.js';
 import { surname } from './hold.js';
 import { liveCell, mapSideOf } from './move.js';
+import { hasReport, REPORT_EFFECTS } from '../config/reports.js';
 
 export const ASSAULT_DASH = 1.25;
 export const TRENCH_HOLD = 1.4;
@@ -51,9 +52,11 @@ export function defenseFactor(state, map, def) {
 
 /** Chance des Angreifers (0,05 bis 0,95). attackers: [{ g, assault }] */
 export function meleeOdds(state, map, attackers, def) {
-  const A = attackers.reduce((s, a) => s + meleePower(a.g) * (a.assault ? ASSAULT_DASH : 1), 0);
+  // Erfahrungsbericht Grabenkeulen (P14): Kampfkraft im Nahkampf
+  const club = (g) => (hasReport(state, g.side, 'grabenkeulen') ? REPORT_EFFECTS.grabenkeulen.meleePct / 100 : 1);
+  const A = attackers.reduce((s, a) => s + meleePower(a.g) * club(a.g) * (a.assault ? ASSAULT_DASH : 1), 0);
   const d = defenseFactor(state, map, def);
-  const D = meleePower(def) * d.factor;
+  const D = meleePower(def) * club(def) * d.factor;
   const p = A + D > 0 ? A / (A + D) : 0.5;
   return { p: Math.max(0.05, Math.min(0.95, p)), A, D, why: d.why };
 }

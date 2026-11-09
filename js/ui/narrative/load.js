@@ -6,7 +6,7 @@ import { loadPaperStyles } from '../paper/index.js';
 export const TEXT_FILES = [
   'texts/akt1.json', 'texts/akt2.json', 'texts/akt3.json', 'texts/akt4.json',
   'texts/berichte.json', 'texts/enden.json', 'texts/endlos.json', 'texts/erfolge.json',
-  'texts/fundstuecke.json', 'texts/tutorial.json', 'texts/zeitungen.json',
+  'texts/fundstuecke.json', 'texts/stab.json', 'texts/tutorial.json', 'texts/zeitungen.json',
   'letters/briefe-akt1-2.json', 'letters/briefe-akt3-4.json', 'letters/templates.json',
 ];
 

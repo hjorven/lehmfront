@@ -15,6 +15,7 @@ import {
   BATTERY_TYPES, PLAN_KINDS, LINK_DELAY, LINE_REACH, LINE_CUT, FLASH_SPOT, SILENCED_ROUNDS, CRATER_BIG, SHELLS_PER_AMMO,
 } from './config/artillery.js';
 import { faction } from './config/factions.js';
+import { hasReport, reportOpen } from './config/reports.js';
 import { unitType } from './config/units.js';
 import { DIR, DIRS, lineCells, distance, cellAt, cellLabel, enterCost } from './map.js';
 import { coverValue } from './rules.js';
@@ -267,6 +268,7 @@ export function ammoAfter(plans, art, factionId) {
 export function validatePlan(plan, state, side, map) {
   const k = PLAN_KINDS[plan?.kind];
   if (!k) return 'unbekannte Feuerplan-Art';
+  if (plan.kind === 'creep' && !reportOpen(state, side, 'feuerwalze')) return 'Feuerwalze erst nach dem Erfahrungsbericht (drei Vorbereitungsfeuer)';
   const art = artilleryOf(state, side);
   if (!Array.isArray(plan.batteries) || !plan.batteries.length) return `${k.label} ohne Batterie`;
   for (const id of plan.batteries) {
@@ -543,6 +545,8 @@ export function applyImpacts(state, map, rng, impacts, { firing, emit, turn, wha
       }
     }
     losses = Math.min(g.strength, losses);
+    // Erfahrungsbericht Stahlhelme (P14): jeder vierte Splittertreffer geht am Helm vorbei
+    if (losses > 1 && hasReport(state, g.side, 'stahlhelme')) losses -= Math.floor((losses + 1) / 4);
     const before = g.suppressed;
     const supp = (acc.direct * suppression) / 100 + (acc.near * suppression) / 400;
     g.suppressed = r2(Math.min(1, g.suppressed + (g.inDugout ? supp / 2 : supp)));

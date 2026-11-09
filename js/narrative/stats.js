@@ -22,8 +22,10 @@ registerStat('verwundete_liegen', ({ rounds, side }) => {
   return last + waiting.reduce((n, e) => n + (e.died ?? 0), 0);
 });
 registerStat('gefangene', ({ rounds, side }) => sum(rounds, side, 'prisoners', 'count'));
-registerStat('felder_gewonnen', ({ rounds, side }) => count(rounds, side, 'trench_taken'));
-registerStat('felder_verloren', ({ rounds, side }) => count(rounds, side, 'trench_lost'));
+registerStat('felder_gewonnen', ({ rounds, side }) => count(rounds, side, 'trench_taken') + count(rounds, side, 'breach'));
+// Einbrueche des Gegners (breach, P06) sind verlorene eigene Grabenfelder
+registerStat('felder_verloren', ({ rounds, side }) => count(rounds, side, 'trench_lost')
+  + rounds.reduce((n, r) => n + (r.log ?? []).filter((e) => e.type === 'breach' && e.side && e.side !== side).length, 0));
 // Stellungsrunden; Gefechtsrunden (kind 'battle') liegen dazwischen und zaehlen nicht
 registerStat('runden', ({ rounds }) => rounds.filter((r) => r.kind !== 'battle').length);
 registerStat('depot_leer', ({ rounds, side }) => count(rounds, side, 'depot_empty'));

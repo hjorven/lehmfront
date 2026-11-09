@@ -13,6 +13,7 @@ import { cellKey, getCell, patchCell, otherSide } from '../state.js';
 import { darknessAt } from '../ui/daytime.js';
 import { surname } from './hold.js';
 import { addStepCostRule } from './move.js';
+import { reportOpen } from '../config/reports.js';
 import {
   rollWeather, stepWet, waterGain, waterLoss, mudAt, mudMoveCost, trenchOf, isSink, flareAt, flareProblem,
   MAX_WATER, MUD_MORALE, WATER_MORALE, FLARE_RADIUS, FLARE_HEAR, FLARE_DARKNESS, WEATHER_NAMES, MUD_IN, WATER_IN,
@@ -146,6 +147,7 @@ export function drainCells(state, map, target) {
 
 registerOrderValidator('drain', (order, group, state, env) => {
   const t = order.target;
+  if (!reportOpen(state, group.side, 'lattenroste')) return 'Entwässern erst nach dem Erfahrungsbericht Lattenroste';
   if (!trenchOf(state, env.map, t.x, t.y)) return 'Entwässern geht nur in einem Graben';
   if (distance(group.pos, t) > 1) return 'Die Gruppe muss im Graben oder daneben stehen';
   if (getCell(state, t.x, t.y)?.drain) return 'Dieser Abschnitt ist schon entwässert';
