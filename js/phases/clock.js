@@ -21,7 +21,8 @@ registerPhase({
     const wasNight = s.night;
     s.clock = advanceClock(s.clock, ctx.kind === 'battle' ? BATTLE_MINUTES : POSITION_HOURS * 60);
     if (ctx.kind === 'battle' && s.battle) s.battle.round = (s.battle.round ?? 0) + 1;
-    s.night = isNightHour(s.clock.hour);
+    // Gefechtsrunden erben die Tageszeit ihrer Stellungsrunde (Plan 7.7): nur Stellungsrunden wechseln Tag und Nacht
+    if (ctx.kind !== 'battle') s.night = isNightHour(s.clock.hour);
     if (s.night !== wasNight) {
       const hh = String(s.clock.hour).padStart(2, '0') + ':' + String(s.clock.minute).padStart(2, '0');
       ctx.emit(s.night ? 'nightfall' : 'daybreak', {

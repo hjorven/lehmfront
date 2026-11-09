@@ -20,7 +20,7 @@ import { resolveFire, hitChance, coverValue, visibilityFromDarkness } from '../r
 import { cellLabel, distance, lineOfSight } from '../map.js';
 import { otherSide } from '../state.js';
 import {
-  darknessOf, coverAt, trenchAt, spot, visibleEnemies, sectorOf, inCone, directionOf, PINNED,
+  darknessOf, darknessAtCell, coverAt, trenchAt, spot, visibleEnemies, sectorOf, inCone, directionOf, PINNED,
 } from '../sight.js';
 import { surname } from './hold.js';
 
@@ -103,8 +103,9 @@ export function fireOdds(state, map, shooter, targetPos, targetSide, { darkness 
     los = lineOfSight(map, shooter.pos, targetPos, { eye: 1, target: 1 });
     if (!los.visible) return { ...base, ok: false, why: `kein freies Schussfeld (Sicht endet bei ${cellLabel(los.blockedAt.x, los.blockedAt.y)})`, p: 0, expected: 0, los };
   }
+  // Im Licht einer Leuchtkugel (P10) zielt es sich wie am Tag
   const p = hitChance({
-    distance: d, range: t.range, cover, visibility: visibilityFromDarkness(darkness),
+    distance: d, range: t.range, cover, visibility: visibilityFromDarkness(darknessAtCell(state, targetPos, darkness)),
     experience: shooter.experience, suppressed: shooter.suppressed, enfilade, reversed: cov.reversed,
   });
   return { ...base, ok: true, why: '', p, expected: base.shots * p, los };
@@ -230,7 +231,7 @@ function runFire(ctx) {
     const r = resolveFire(ctx.rng,
       { shots: odds.shots, range: t.range, experience: shooter.experience, suppressed: shooter.suppressed, suppressionPerShot: t.suppressionPerShot },
       { cover: odds.cover, suppressed: 0, reversed: odds.reversed, inDugout: target.inDugout },
-      { distance: odds.distance, visibility: visibilityFromDarkness(darkness) * (odds.blind ? BLIND : 1), enfilade: odds.enfilade });
+      { distance: odds.distance, visibility: visibilityFromDarkness(darknessAtCell(ctx.state, target.pos, darkness)) * (odds.blind ? BLIND : 1), enfilade: odds.enfilade });
     shooter.fired = true;
     if (!hitsOn.has(target.id)) hitsOn.set(target.id, { hits: 0, supp: 0, from: [] });
     const acc = hitsOn.get(target.id);

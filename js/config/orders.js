@@ -21,6 +21,8 @@ export const ORDER_TYPES = {
   observe:     { id: 'observe',     label: 'Beobachten',      kind: 'position', target: 'cell' },
   redeploy:    { id: 'redeploy',    label: 'Verlegen',        kind: 'position', target: 'path' },
   sector:      { id: 'sector',      label: 'Feuersektor',     kind: 'both',     target: 'cell' },
+  drain:       { id: 'drain',       label: 'Entwässern',      kind: 'position', target: 'cell' },
+  flare:       { id: 'flare',       label: 'Leuchtkugel',     kind: 'both',     target: 'cell', night: true },
 
   move:        { id: 'move',        label: 'Bewegen',         kind: 'battle',   target: 'path' },
   fire:        { id: 'fire',        label: 'Feuern',          kind: 'battle',   target: 'cell' },

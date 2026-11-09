@@ -2,7 +2,7 @@
 // Vorschau: Weg per A*, der in dieser Runde erreichbare Teil durchgezogen, der Rest gestrichelt.
 import { registerTool } from '../tools.js';
 import { findPath, enterCost, cellAt, cellLabel, TERRAIN } from '../../map.js';
-import { moveBudget, stepCost, redeployAllowed } from '../../phases/move.js';
+import { moveBudget, stepCost, extraCost, redeployAllowed } from '../../phases/move.js';
 import { groupName, plural } from '../labels.js';
 
 export function moveTypeFor(state) {
@@ -19,7 +19,8 @@ export function planMove(map, state, group, goal) {
   const cost = (c) => {
     if (blocked.has(c.x + ',' + c.y)) return Infinity;
     if (type === 'redeploy' && !redeployAllowed(c, group.side)) return Infinity;
-    return enterCost(c);
+    const base = enterCost(c);
+    return Number.isFinite(base) ? base + extraCost(state, map, c) : base;
   };
   if (goal.x === group.pos.x && goal.y === group.pos.y) return null;
   const r = findPath(map, group.pos, goal, { cost });
@@ -33,7 +34,7 @@ export function pathRounds(map, state, group, path) {
   const budget = moveBudget(group, state.turnKind);
   let rounds = 1, left = budget, reach = -1, prev = group.pos, steps = 0;
   for (let i = 0; i < path.length; i++) {
-    const c = stepCost(map, prev, path[i]);
+    const c = stepCost(map, prev, path[i], state);
     if (c > left && steps > 0) { rounds++; left = budget; steps = 0; if (reach < 0) reach = i; }
     left -= c;
     steps++;
