@@ -10,10 +10,14 @@ export function createToolbar(root, { onTool, onUndo, onExec }) {
   el.innerHTML = `<div class="tb-wrap"><div class="toolbar" role="toolbar" aria-label="Befehle"></div>
     <button class="tb-more prev" type="button" tabindex="-1" aria-label="Weitere Werkzeuge links" hidden>‹</button>
     <button class="tb-more next" type="button" tabindex="-1" aria-label="Weitere Werkzeuge rechts" hidden>› <small></small></button></div>
+    <button type="button" class="tool undo" data-undo aria-keyshortcuts="Control+Z" title="Letzten Befehl zurücknehmen (Strg+Z)">${icon(UNDO_ICON)}<span class="lbl">Zurück</span><kbd>Strg+Z</kbd></button>
     <button class="exec" type="button" aria-keyshortcuts="Enter"><span class="exec-label">Runde ausführen</span> <b class="n"></b></button>`;
   root.append(el);
   const bar = el.querySelector('.toolbar');
   const exec = el.querySelector('.exec');
+  const undo = el.querySelector('.undo');
+  // P21: "Zurück" steht fest neben der Reihe, damit es nie hinter der Lasche verschwindet
+  undo.addEventListener('click', () => { if (undo.getAttribute('aria-disabled') !== 'true') onUndo(); });
   const prev = el.querySelector('.tb-more.prev'), next = el.querySelector('.tb-more.next');
   // P21: Mit Akt 2 sind es bis zu 16 Werkzeuge. Passt die Reihe nicht, zeigen Laschen an den Enden, dass es weitergeht
   // (Zahl der verdeckten Werkzeuge rechts), und blaettern beim Antippen um eine Handbreit.
@@ -33,6 +37,9 @@ export function createToolbar(root, { onTool, onUndo, onExec }) {
   next.addEventListener('click', () => page(1));
   bar.addEventListener('scroll', edges, { passive: true });
   if (typeof ResizeObserver === 'function') new ResizeObserver(edges).observe(bar);
+  let lastActive = null, lastModel = null;
+  // Handy gedreht oder Fenster schmaler: Reihenfolge (moegliche Befehle vorn) neu setzen
+  narrowMq?.addEventListener?.('change', () => { if (lastModel) api.update(lastModel); });
   exec.addEventListener('click', () => onExec());
   bar.addEventListener('click', (e) => {
     const b = e.target.closest('button');
@@ -41,10 +48,9 @@ export function createToolbar(root, { onTool, onUndo, onExec }) {
       return;
     }
     if (b.dataset.tool) onTool(b.dataset.tool, false);
-    else if (b.dataset.undo !== undefined) onUndo();
   });
 
-  return {
+  const api = {
     el,
     /** m = { tools: [{ tool, ok, why }], active, canUndo, count, label } */
     update(m) {
@@ -55,15 +61,18 @@ export function createToolbar(root, { onTool, onUndo, onExec }) {
           data-tool="${esc(tool.id)}" aria-keyshortcuts="${esc(tool.key.toUpperCase())}" aria-pressed="${m.active === tool.id}"
           aria-disabled="${!ok}" title="${esc(ok ? tool.label + ' (' + tool.key.toUpperCase() + ')' : why)}">
           ${icon(tool.icon)}<span class="lbl">${esc(tool.label)}</span><kbd>${esc(tool.key.toUpperCase())}</kbd></button>`).join('')
-        + `<button type="button" class="tool undo" data-undo aria-keyshortcuts="Control+Z" aria-disabled="${!m.canUndo}"
-          title="Letzten Befehl zurücknehmen (Strg+Z)">${icon(UNDO_ICON)}<span class="lbl">Zurück</span><kbd>Strg+Z</kbd></button>`;
+;
+      undo.setAttribute('aria-disabled', String(!m.canUndo));
       exec.querySelector('.n').textContent = m.count;
       exec.querySelector('.exec-label').textContent = m.label;
       exec.setAttribute('aria-label', `${m.label}, ${m.count} Befehle`);
-      // Aktives Werkzeug (auch per Taste oder Kreis gewaehlt) in die sichtbare Reihe holen
-      bar.querySelector('.tool.active')?.scrollIntoView?.({ block: 'nearest', inline: 'nearest' });
+      // Aktives Werkzeug (auch per Taste oder Kreis gewaehlt) in die sichtbare Reihe holen, nur wenn es wechselt
+      if (m.active && m.active !== lastActive) bar.querySelector('.tool.active')?.scrollIntoView?.({ block: 'nearest', inline: 'nearest' });
+      lastActive = m.active ?? null;
+      lastModel = m;
       edges();
     },
     focusTool(id) { bar.querySelector(`[data-tool="${id}"]`)?.focus(); },
   };
+  return api;
 }

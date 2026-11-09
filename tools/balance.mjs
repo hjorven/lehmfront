@@ -15,6 +15,7 @@ const runs = Number(args.runs ?? 20) | 0;
 const turns = Number(args.turns ?? 24) | 0;
 const first = Number(args.seed ?? 1) >>> 0;
 const same = typeof args.same === 'string' ? args.same : null;
+if (same && !['kaldern', 'morrow'].includes(same)) { console.error('Fehler: --same kaldern oder --same morrow'); process.exit(1); }
 
 const tally = { kaldern: 0, morrow: 0, west: 0, east: 0, draw: 0, games: 0 };
 const losses = { kaldern: 0, morrow: 0 };

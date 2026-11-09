@@ -18,7 +18,7 @@ export async function mount(root) {
   const [list] = await Promise.all([
     Promise.all(PUZZLES.map((f) => fetch(`data/puzzles/${f}.json`).then((r) => r.json()))),
     ensureCss('css/werkstatt.css'),
-    Promise.all(['16px "Special Elite"', '16px "IBM Plex Mono"', '700 16px "Caveat"', '16px "IBM Plex Sans"'].map((f) => document.fonts.load(f))).catch(() => {}),
+    Promise.all(['16px "Special Elite"', '16px "IBM Plex Mono"', '16px "Caveat"', '700 16px "Caveat"', '16px "IBM Plex Sans"'].map((f) => document.fonts.load(f))).catch(() => {}),
   ]);
   const prog = readProgress();
   const solved = list.filter((p) => prog[p.id]?.solved).length;

@@ -133,19 +133,23 @@ export function contrast(a, b) {
 }
 
 /**
- * Hoher Kontrast fuer die gezeichnete Karte (P21): Signaturfarben ruecken vom Papier weg (auf hellem Papier dunkler,
- * auf dunklem heller, jede Farbe in ihre eigene Richtung), Falten und Flecken werden blasser. Papier, Kaertchen und Tisch bleiben, die Kaertchen regelt
- * css/einstellungen.css. Die Farben von Eigen und Feind behalten ihren Ton.
+ * Hoher Kontrast (P21): Signaturfarben ruecken vom Papier weg, bei Tag dunkler, bei Nacht heller. Die Richtung haengt
+ * an der Tageszeit: spaet springende Farben (LATE_KEYS) drehen genau bei ihrem eigenen Sprung, die uebrigen bei
+ * darkness 0,5. So entstehen in der Daemmerung keine zusaetzlichen Farbspruenge. Linien und Schrift kraeftig, Flaechen (Raster, Wasser, Wald, Krater,
+ * Kreide) nur leicht, damit das Raster ein Raster bleibt. Falten und Flecken werden blasser. Papier, Kaertchengrund
+ * und Tisch bleiben; ueber die CSS-Variablen werden auch Tinte und Signalfarben der Kaertchen kraeftiger.
  */
 const KEEP = new Set(['paper', 'card', 'track', 'desk', 'shade', 'stain', 'fold', 'fog', 'flareLight', 'wetPaper']);
+const AREAS = new Set(['faint', 'water', 'forest', 'crater', 'chalk']);
 export function boostContrast(theme) {
   const out = { ...theme };
-  const lum = (h) => { const r = hexToRgb(h); return 0.2126 * r[0] + 0.7152 * r[1] + 0.0722 * r[2]; };
-  const p = lum(theme.paper);
+  const t = theme.darkness ?? 0;
   for (const [k, v] of Object.entries(theme)) {
     if (KEEP.has(k) || typeof v !== 'string' || v[0] !== '#') continue;
-    // Jede Farbe weiter in die Richtung, in der sie schon vom Papier abweicht
-    out[k] = lum(v) <= p ? mix(v, '#000000', 0.32) : mix(v, '#ffffff', 0.28);
+    // Spaet springende Farben wechseln die Richtung genau mit ihrem eigenen Sprung, die anderen bei 0,5
+    const night = LATE_KEYS.includes(k) ? lateFactor(t, k) === 1 : t > 0.5;
+    const f = AREAS.has(k) ? 0.12 : night ? 0.28 : 0.32;
+    out[k] = night ? mix(v, '#ffffff', f) : mix(v, '#000000', f);
   }
   if (typeof theme.foldAlpha === 'number') out.foldAlpha = theme.foldAlpha * 0.6;
   if (typeof theme.stainAlpha === 'number') out.stainAlpha = theme.stainAlpha * 0.6;
@@ -156,6 +160,11 @@ export function boostContrast(theme) {
 let base = themeAt(0);
 let current = base;
 const listeners = new Set();
+
+/** Thema ohne Kontrastverstaerkung (fuer Szenen, die es spaeter wiederherstellen, z. B. die Blaupause) */
+export function baseTheme() {
+  return base;
+}
 
 export function currentTheme() {
   return current;

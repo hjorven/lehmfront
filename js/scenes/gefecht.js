@@ -10,7 +10,7 @@ import { resolveTurn } from '../resolve.js';
 import { viewFor } from '../view.js';
 import { sightLine, coverAt, PINNED, darknessOf } from '../sight.js';
 import { faction } from '../config/factions.js';
-import { themeAt, applyTheme, currentTheme, onThemeChange, blueprintTheme } from '../theme.js';
+import { themeAt, applyTheme, currentTheme, baseTheme, onThemeChange, blueprintTheme } from '../theme.js';
 import {
   createCamera, resizeCamera, attachCameraControls, screenToWorld, worldToScreen, centerOn, fitZoom,
 } from '../render/camera.js';
@@ -88,7 +88,7 @@ export async function mount(root, params) {
     ensureCss('css/feuerplan.css'), // P09: Editor und Zittern der Karte bei Einschlaegen
     ensureCss('css/uhr.css'),
     ensureCss('css/motion.css'),
-    Promise.all(['16px "Special Elite"', '16px "IBM Plex Mono"', '700 16px "IBM Plex Mono"', '700 16px "Caveat"', '16px "IBM Plex Sans"', '700 16px "IBM Plex Sans"']
+    Promise.all(['16px "Special Elite"', '16px "IBM Plex Mono"', '700 16px "IBM Plex Mono"', '16px "Caveat"', '700 16px "Caveat"', '16px "IBM Plex Sans"', '700 16px "IBM Plex Sans"']
       .map((f) => document.fonts.load(f))).catch(() => {}),
   ]);
   const { scenario, mapJson, scenId, mode: modeInfo } = battle;
@@ -653,7 +653,7 @@ export async function mount(root, params) {
       onEnd: (fn) => { t.onEnd = fn; },
       marks: () => Object.fromEntries(groupsOf(state, side).map((x) => [x.id, groupMark(state, x)])),
       blueprint: (on, base) => {
-        if (on) { const b = currentTheme(); applyTheme(blueprintTheme(b)); playSfx('paper', { intensity: 0.6 }); return b; }
+        if (on) { const b = baseTheme(); applyTheme(blueprintTheme(b)); playSfx('paper', { intensity: 0.6 }); return b; }
         applyTheme(base && !base.blueprint ? base : themeAt(darkness));
         return null;
       },

@@ -116,7 +116,6 @@ function menuSound() {
   btn.addEventListener('click', () => { if (audio.init().ready) audio.setMuted(!audio.isMuted()); });
 }
 
-// Tageslage im Menue: heutiges Datum und der beste Eintrag im Wachbuch dieses Geraets
 // Ueberraschung P21: Wie auf einer echten Generalstabskarte steht unten ein Druckvermerk. "Berichtigt bis" ist der
 // letzte Tag, an dem auf diesem Geraet gespielt wurde; wer lange fort war, sieht, wie alt sein Blatt geworden ist.
 function markFieldDay() {
@@ -139,6 +138,7 @@ function showImprint() {
   el.classList.toggle('stale', days >= 14);
 }
 
+// Tageslage im Menue: heutiges Datum und der beste Eintrag im Wachbuch dieses Geraets
 function menuToday() {
   const a = document.getElementById('menu-tageslage');
   if (!a) return;

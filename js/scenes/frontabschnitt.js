@@ -94,7 +94,7 @@ export async function mount(root, params) {
   await Promise.all([
     ensureCss('css/modi.css'),
     ensureCss('css/frontabschnitt.css'),
-    Promise.all(['16px "Special Elite"', '16px "IBM Plex Mono"', '700 16px "Caveat"', '16px "IBM Plex Sans"', '700 16px "IBM Plex Sans"']
+    Promise.all(['16px "Special Elite"', '16px "IBM Plex Mono"', '16px "Caveat"', '700 16px "Caveat"', '16px "IBM Plex Sans"', '700 16px "IBM Plex Sans"']
       .map((f) => document.fonts.load(f))).catch(() => {}),
   ]);
   const dark = matchMedia('(prefers-color-scheme: dark)').matches;

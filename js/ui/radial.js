@@ -5,9 +5,18 @@ import { esc, icon } from './dom.js';
 export const RADIUS = 74;
 export const ITEM = 66;
 
-/** Positionen der Eintraege: oben beginnend im Uhrzeigersinn, Mittelpunkt bleibt im Bild */
-export function radialLayout(n, cx, cy, vw, vh, r = RADIUS, item = ITEM) {
-  const pad = r + item / 2 + 6;
+/** Knopfgroesse fuer n Eintraege (P21: in Akt 2 sind es bis zu 16; ab 9 werden die Knoepfe kleiner) */
+export function radialItem(n) {
+  return n > 8 ? 56 : ITEM;
+}
+
+/**
+ * Positionen der Eintraege: oben beginnend im Uhrzeigersinn, Mittelpunkt bleibt im Bild. Der Radius waechst mit der
+ * Zahl der Eintraege, damit sich die Knoepfe nicht ueberdecken (Bogenabstand mindestens Knopf plus 4 px).
+ */
+export function radialLayout(n, cx, cy, vw, vh, r = null, item = radialItem(n)) {
+  if (r === null) r = Math.max(RADIUS, Math.ceil((n * (item + 4)) / (2 * Math.PI)));
+  const pad = Math.min(r + item / 2 + 6, Math.min(vw, vh) / 2);
   const x = Math.max(pad, Math.min(vw - pad, cx));
   const y = Math.max(pad, Math.min(vh - pad, cy));
   const out = [];
@@ -17,7 +26,7 @@ export function radialLayout(n, cx, cy, vw, vh, r = RADIUS, item = ITEM) {
     const a = start + i * step;
     out.push({ x: Math.round(Math.cos(a) * r), y: Math.round(Math.sin(a) * r) });
   }
-  return { x, y, items: out };
+  return { x, y, r, item, items: out };
 }
 
 export function createRadial(root, { onPick, onClose }) {
@@ -46,8 +55,12 @@ export function createRadial(root, { onPick, onClose }) {
     get open() { return !el.hidden; },
     /** list: [{ id, label, icon, ok, why }] */
     show(list, cx, cy, center) {
+      // Viele Eintraege: nur die gerade moeglichen Befehle zeigen (die gesperrten stehen in der Werkzeugreihe mit Grund)
+      if (list.length > 10) list = list.filter((it) => it.ok || it.id === '__clear');
       items = list;
       const L = radialLayout(list.length, cx, cy, root.clientWidth, root.clientHeight);
+      el.style.setProperty('--ri', L.item + 'px');
+      el.classList.toggle('small', L.item < ITEM);
       el.style.left = L.x + 'px';
       el.style.top = L.y + 'px';
       el.setAttribute('aria-label', 'Befehle für ' + center);

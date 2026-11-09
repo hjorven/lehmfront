@@ -278,6 +278,13 @@ test('Optik: Pfeil abschneiden, radiales Menue bleibt im Bild', async () => {
   assert.equal(L.items.length, 3);
   assert.equal(L.items[0].x, 0);
   assert.equal(L.items[0].y, -74);
+  // P21: 14 Eintraege ueberdecken sich nicht und bleiben auf dem Handy im Bild
+  const M = radialLayout(14, 195, 400, 390, 844);
+  for (let i = 0; i < 14; i++) {
+    const a = M.items[i], b = M.items[(i + 1) % 14];
+    assert.ok(Math.hypot(a.x - b.x, a.y - b.y) >= M.item, 'Abstand ' + i);
+    assert.ok(M.x + a.x - M.item / 2 >= 0 && M.x + a.x + M.item / 2 <= 390, 'im Bild ' + i);
+  }
 });
 
 test('Kolonne: Gruppe hinter einer abziehenden Gruppe kommt nach, unabhaengig von der ID', () => {

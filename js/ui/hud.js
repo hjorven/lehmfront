@@ -110,7 +110,7 @@ export function createHud(root, { onToggleList, onToggleOverlay, onCheck, onTogg
       $('.round-title').textContent = m.roundTitle;
       $('.round-sub').textContent = m.roundSub;
       const sm = (k) => (marks[k] ? marks[k].replace('<s class="was"', `<s class="was" data-k="${k}"`) : '');
-      $('.strip-vals').innerHTML = `Loren <b>${esc(s.carts ?? 0)}/${esc(s.cartsTotal ?? s.carts ?? 0)}</b> · Mun ${sm('ammo')}<b>${esc(s.ammo ?? 0)}</b> · Mat ${sm('material')}<b>${esc(s.material ?? 0)}</b> · Moral ${sm('morale')}<b>${esc(m.morale)}</b>`;
+      $('.strip-vals').innerHTML = `<span class="nw">Loren <b>${esc(s.carts ?? 0)}/${esc(s.cartsTotal ?? s.carts ?? 0)}</b></span> · <span class="nw">Mun ${sm('ammo')}<b>${esc(s.ammo ?? 0)}</b></span> · <span class="nw">Mat ${sm('material')}<b>${esc(s.material ?? 0)}</b></span> · <span class="nw">Moral ${sm('morale')}<b>${esc(m.morale)}</b></span>`;
       $('.strip-round').textContent = m.stripRound;
       // Uhr (P06): nur neu setzen, wenn sie sich aendert, sonst startet das Einrasten bei jedem Neuzeichnen neu
       if (m.clock && m.clock.big !== lastClock) {

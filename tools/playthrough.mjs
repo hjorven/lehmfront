@@ -6,7 +6,8 @@
 //   node tools/playthrough.mjs --handy --throttle 4  Handy 390 x 844, CPU 4x gedrosselt (Leistung)
 //   node tools/playthrough.mjs --only hotseat --rounds 6 --shots
 //
-// Erwartet einen laufenden Server (npm run serve) oder startet selbst einen auf Port 8093.
+// Startet einen eigenen Server (Port 8093, mit --port aenderbar). Die Bildzeit misst ein volles Neuzeichnen je Bild
+// (Kamera verschoben plus resize), also eher den schlechtesten Fall beim Ziehen der Karte.
 import { createRequire } from 'node:module';
 import { spawn } from 'node:child_process';
 import { mkdirSync } from 'node:fs';
