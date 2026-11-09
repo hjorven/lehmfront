@@ -25,6 +25,8 @@ import '../ui/tools/index.js';
 import { overlaySlots } from '../ui/overlays.js';
 import '../ui/overlays/index.js';
 import { planMove, pathRounds } from '../ui/tools/move.js';
+import { currentWagons } from '../ui/tools/supply.js';
+import { capacityOf, addWounded } from '../supply.js';
 import {
   groupName, groupMark, typeName, leaderShort, fatigueWord, weatherName, clockText, roundTitle, orderLabel, plural,
 } from '../ui/labels.js';
@@ -70,6 +72,8 @@ export async function mount(root, params) {
   // Planungszustand
   let side = 'a';
   let book = createOrderBook();
+  let sidePlans = { a: {}, b: {} };  // Seitenbefehle dieser Runde nach Art (Lorenplan), nicht im Befehlsbuch
+  let plannerWindow = null;
   let selectedId = null;
   let tool = null;              // { def, group, pick, preview, hoverCell }
   let anim = null;              // { group, progress }
@@ -160,9 +164,17 @@ export async function mount(root, params) {
       hover: tool?.pick ? tool.hoverCell : null,
       preview: prev ? { ...prev, group: tool.group.id, cell: tool.hoverCell, ok: prev.ok ?? !!prev.path } : null,
       sightLine: !tool && hoverSight ? hoverSight : null,
-      overlays: overlaySlots().filter((o) => overlaysOn.has(o.slot) && o.draw),
+      overlays: activeOverlays(),
+      plans: sidePlans[side],
+      time: performance.now(),
     });
     placeShield();
+    // Bewegte Overlays (Loren im Versorgungs-Overlay) zeichnen weiter, solange sie an sind
+    if (!reducedMotion() && !params.has('demo') && activeOverlays().some((o) => o.animated)) drawDyn();
+  }
+
+  function activeOverlays() {
+    return overlaySlots().filter((o) => overlaysOn.has(o.slot) && o.draw);
   }
 
   // Phasenfilm: Zwischenstand aus dem Film, Spuren als Overlay unter den Gruppen
@@ -264,13 +276,13 @@ export async function mount(root, params) {
     const sector = map.sheet?.title?.replace(/^Lagekarte\s*/i, '') || map.name;
     const orders = ordersNow();
     return {
-      supplies: s.supplies, morale, reputation: s.reputation, trust: s.trust,
+      supplies: { ...s.supplies, carts: currentWagons(map, state, side, sidePlans[side]).length, cartsTotal: capacityOf(state, side) }, morale, reputation: s.reputation, trust: s.trust,
       roundTitle: roundTitle(state) + (mode === 'hotseat' ? ` · ${faction(s.faction).short}` : ''),
       roundSub: `${daytime} · ${clockText(state.clock)} Uhr · ${weatherName(state.weather)} · Abschnitt ${sector}`,
       stripRound: `R${state.turn} · ${daytime}`,
       orderCount: orders.length,
       overlays: overlaySlots().map((o) => ({ slot: o.slot, label: o.label, empty: !!o.empty, active: overlaysOn.has(o.slot) })),
-      checklist: checklist({ state, side, orders, map }),
+      checklist: checklist({ state, side, orders, map, plans: sidePlans[side] }),
       hint: currentHint(),
     };
   }
@@ -358,13 +370,13 @@ export async function mount(root, params) {
 
   function startTool(def, g) {
     if (!def) return;
-    if (book[side]?.sealed) return;
+    if (book[side]?.sealed || modalOpen) return;
     const u = usable(def, g, state, env);
     if (!u.ok) { flash(u.why, 'warn'); return; }
     cancelTool(false);
     radial.hide();
     helpShown = true;
-    selectedId = g.id;
+    if (g) selectedId = g.id;
     tool = { def, group: g, pick: null, preview: null, hoverCell: null, pickHint: '' };
     const t = tool;
     def.begin({
@@ -373,6 +385,11 @@ export async function mount(root, params) {
       pickCell: (req) => { if (tool !== t) return; t.pick = req; t.pickHint = req.hint; refresh(); },
       hint: (text) => flash(text, 'warn'),
       cancel: () => { if (tool === t) cancelTool(); },
+      ui,
+      plans: () => sidePlans[side],
+      setSidePlan: (o) => { sidePlans[side] = { ...sidePlans[side], [o.type]: o }; helpShown = true; playSfx('lore'); refresh(); },
+      setModal: (on) => { modalOpen = on; if (!on) { plannerWindow = null; dynCv.focus({ preventScroll: true }); } refresh(); },
+      onWindow: (w) => { plannerWindow = w; },
     });
     refresh();
   }
@@ -457,7 +474,7 @@ export async function mount(root, params) {
     cancelTool(false);
     radial.hide();
     const orders = ordersNow();
-    const s = summarize({ state, side, orders, map });
+    const s = summarize({ state, side, orders, map, plans: sidePlans[side] });
     modalOpen = true;
     refresh();
     showSummary(ui, s, {
@@ -569,8 +586,9 @@ export async function mount(root, params) {
   }
 
   function resolveNow() {
-    const ordersA = listOrders(book, 'a');
-    const ordersB = humans.includes('b') ? listOrders(book, 'b') : planOrders(viewFor(state, [], 'b', env), { map, seed });
+    const withPlans = (s, list) => [...list, ...Object.keys(sidePlans[s]).sort().map((k) => sidePlans[s][k])];
+    const ordersA = withPlans('a', listOrders(book, 'a'));
+    const ordersB = humans.includes('b') ? withPlans('b', listOrders(book, 'b')) : planOrders(viewFor(state, [], 'b', env), { map, seed });
     const input = { state, ordersA, ordersB, seed, turn: state.turn, env };
     const r = resolveTurn(state, ordersA, ordersB, seed, state.turn, env);
     const before = state;
@@ -589,6 +607,7 @@ export async function mount(root, params) {
       }
     }
     book = nextRound(book, carry);
+    sidePlans = { a: {}, b: {} }; // der Lorenplan steht danach im Zustand und gilt weiter
     side = humans[0];
     playSfx('clock-lock');
     // Der Tag-Nacht-Uebergang laeuft in der letzten Sekunde des Films (Plan 7.7)
@@ -790,7 +809,7 @@ export async function mount(root, params) {
       if (!def) return;
       e.preventDefault();
       const g = selectedOwn();
-      if (!g) { flash(`${def.label}: erst eine Gruppe wählen (Leertaste).`, 'warn'); return; }
+      if (!g && def.needsGroup !== false) { flash(`${def.label}: erst eine Gruppe wählen (Leertaste).`, 'warn'); return; }
       startTool(def, g);
     }
   });
@@ -841,6 +860,8 @@ export async function mount(root, params) {
     get player() { return player; },
     archive: () => openArchive(),
     finishAnim: () => { anim = null; drawDynNow(); },
+    get plans() { return sidePlans; },
+    get plannerWindow() { return plannerWindow; },
   };
   window.__gefecht = api;
   const demo = params.get('demo');
@@ -902,6 +923,15 @@ export async function mount(root, params) {
       }
     } else if (demo === 'bedrohung') { api.overlay(2); }
     else if (demo === 'sichtlinie') { api.select(own[0].id); hoverSight = sightLabel(sightLine(map, own[0], { x: 41, y: 12 }, darknessOf(state))); }
+    else if (demo === 'lorenplan' || demo === 'versorgung') {
+      // Lage fuer Screenshots: Verwundete in B und C, Abschnitt A durch verschuettete Graeben abgeschnitten
+      state = structuredClone(state);
+      addWounded(state, map, 'a', own[1].pos, 3, own[1].id);
+      addWounded(state, map, 'a', own[2].pos, 1, own[2].id);
+      for (const k of ['27,12', '27,13', '28,13', '26,12', '32,13', '33,14', '32,14', '33,13']) state.cells[k] = { ...(state.cells[k] ?? {}), trenchBlocked: true };
+      if (demo === 'lorenplan') api.tool('supply');
+      else { api.overlay(1); centerOn(cam, 20, 15, Math.max(cam.zoom, narrow() ? 20 : 26)); onCamera(); }
+    }
     refresh();
     drawDynNow();
   }

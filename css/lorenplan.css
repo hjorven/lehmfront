@@ -1,0 +1,94 @@
+/* Lorenplan als Zug (Plan 7.4, Bild feature-04). Farben nur aus den Theme-Variablen. */
+.lorenplan{width:min(980px,100%);display:flex;flex-direction:column;max-height:100%;overflow:hidden}
+.lp-head{display:flex;align-items:baseline;gap:12px;padding:12px 16px 8px;border-bottom:var(--border)}
+.lp-head b{font:400 22px/1.1 var(--font-head)}
+.lp-sub{color:var(--ink2);font-size:13px;margin-right:auto}
+.lorenplan .x{flex:none;width:40px;height:40px;margin:-8px -8px -8px 0;font-size:24px}
+
+.lp-scroll{overflow-x:auto;overflow-y:hidden;padding:10px 16px 0;scrollbar-width:thin;-webkit-overflow-scrolling:touch}
+.lp-yard{position:relative;min-width:max-content}
+.lp-stations{display:flex;justify-content:space-between;gap:12px;padding:0 4px 6px;font-size:13px;color:var(--ink2)}
+.lp-stations .cut{color:var(--danger);text-decoration:line-through}
+.lp-train{list-style:none;margin:0;padding:18px 4px 0;display:flex;align-items:flex-end;gap:10px}
+.lp-rail{height:14px;margin-top:-2px;border-top:3px solid var(--ink);
+  background:repeating-linear-gradient(90deg,var(--ink) 0 3px,transparent 3px 22px) top/100% 11px no-repeat}
+
+/* Lok und Wagen */
+.lp-train > li{position:relative;flex:none;width:104px;height:96px}
+.loco{display:flex;flex-direction:column;justify-content:flex-end;padding:0 8px 22px;background:var(--ink);color:var(--card);border-radius:4px 4px 2px 2px;font:700 14px/1.15 var(--font-num)}
+.loco b{font:700 15px var(--font-num)}
+.loco .stack{position:absolute;left:18px;top:-18px;width:20px;height:20px;background:var(--ink)}
+.wh{position:absolute;bottom:-9px;width:18px;height:18px;border-radius:50%;background:var(--card);border:3px solid var(--ink);left:14px;z-index:1}
+.wh + .wh{left:auto;right:14px}
+
+.wagon{background:var(--card);border:3px solid var(--ink);border-radius:3px}
+.wagon .w-body{position:absolute;inset:6px 6px 30px;display:grid;place-items:center;border:0;border-radius:2px;cursor:pointer;
+  font:700 17px var(--font-num);letter-spacing:.03em;color:var(--ink);background:var(--track)}
+.wagon .w-body:hover{outline:2px solid var(--ink2);outline-offset:-2px}
+.l-ammo .w-body{background:repeating-linear-gradient(135deg,var(--track) 0 9px,var(--card) 9px 18px)}
+.l-food .w-body{background:color-mix(in srgb,var(--accent) 42%,var(--ink2));color:var(--card)}
+.l-material .w-body{background:color-mix(in srgb,var(--ink2) 55%,var(--card))}
+.l-medic .w-body{background:var(--card);color:var(--danger);font-size:22px}
+.free{border-style:dashed;border-color:var(--line)}
+.free .w-body{background:none;color:var(--ink2);font:400 14px var(--font-ui)}
+.wagon.blocked{border-color:var(--danger)}
+.wagon.blocked .w-body{opacity:.55}
+.wagon.empty .w-body b{text-decoration:line-through}
+
+.w-to,.w-back{position:absolute;top:-17px;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font:700 14px var(--font-num);z-index:2}
+.w-to{right:-12px;background:var(--ink);color:var(--card);border:2px solid var(--card);cursor:pointer}
+.w-to:hover{background:var(--own)}
+.blocked .w-to{background:var(--danger)}
+.w-back{right:24px;width:auto;min-width:34px;padding:0 6px;border-radius:17px;background:var(--danger);color:var(--card);border:2px solid var(--card);font-size:13px}
+
+/* Kreideaufschrift auf der Bordwand */
+.chalk{position:absolute;left:6px;right:6px;bottom:7px;height:20px;display:block;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;
+  padding:0 4px;background:var(--ink);color:var(--card);border-radius:1px;font:700 16px/20px var(--font-hand);text-align:center;transform:rotate(-1.2deg)}
+.free .chalk{background:none;color:var(--ink2)}
+.chalk.strike{text-decoration:line-through;text-decoration-thickness:2px;color:color-mix(in srgb,var(--card) 70%,var(--danger))}
+.loco span{font:400 13px var(--font-num);opacity:.85}
+
+/* Abschnittskarten */
+.lp-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;padding:16px 16px 4px}
+.lp-card{padding:9px 12px 10px;font-size:14px;line-height:1.35;box-shadow:none}
+.lp-card p{margin:3px 0 0}
+.lp-ct{display:block;font:400 17px/1.2 var(--font-head)}
+.lp-card .red,.lp-card .bad{color:var(--danger)}
+.lp-card .cut{font-weight:700}
+.lp-card.is-cut{border-left:4px solid var(--danger);background:repeating-linear-gradient(135deg,var(--card) 0 8px,color-mix(in srgb,var(--danger) 9%,var(--card)) 8px 16px)}
+.lp-rounds{color:var(--ink2);font-size:13px}
+.lp-rounds b{font:700 13px var(--font-num);color:var(--ink)}
+.lp-rounds b.low{color:var(--danger)}
+.lp-card .quiet,.lp-rounds.quiet{color:var(--ink2)}
+.lp-card .num{font:700 18px var(--font-num)}
+.lp-note{margin:6px 16px 0;color:var(--ink2);font-size:13.5px}
+.lp-foot{display:flex;gap:10px;align-items:center;padding:12px 16px 14px}
+.lp-gap{flex:1}
+.lp-apply{background:var(--ink);color:var(--card);border-color:var(--ink);font-weight:700}
+.lp-foot .btn{min-height:44px}
+.lp-apply small{color:var(--track)}
+
+@media (max-width:699px){
+  .lorenplan-back{padding:0;align-items:end}
+  .lorenplan{width:100%;max-height:96%;border-radius:6px 6px 0 0}
+  .lp-head{padding:10px 12px 6px}
+  .lp-head b{font-size:19px}
+  .lp-sub{font-size:12px}
+  .lp-scroll{padding:6px 12px 0}
+  .lp-train{gap:8px;padding-top:20px}
+  .lp-train > li{width:84px;height:86px}
+  .loco{padding:0 6px 20px;font-size:12px}
+  .loco b{font-size:13px}
+  .wagon .w-body{font-size:15px;inset:5px 5px 28px}
+  .chalk{font-size:15px}
+  .lp-cards{grid-template-columns:1fr 1fr;gap:8px;padding:12px 12px 2px}
+  .lp-card{padding:7px 9px 8px;font-size:13px}
+  .lp-ct{font-size:15px}
+  .lp-note{margin:4px 12px 0;font-size:12.5px}
+  .lp-foot{padding:10px 12px 12px;gap:8px;flex-wrap:wrap}
+  .lp-foot .lp-gap{display:none}
+  .lp-foot .btn{flex:1 1 auto;justify-content:center}
+  .lp-foot small{display:none}
+  .lp-apply{flex-basis:100% !important;order:-1}
+}
+@media (prefers-reduced-motion:reduce){.wagon *{transition:none}}

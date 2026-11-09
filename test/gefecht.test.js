@@ -170,6 +170,11 @@ test('Werkzeug-Register: Bewegen und Halten, Tasten eindeutig', () => {
   const ids = allTools().map((t) => t.id);
   // Weitere Pakete melden eigene Werkzeuge an (P05 Feuern); Bewegen steht vor Halten
   assert.ok(ids.includes('move') && ids.includes('hold') && ids.indexOf('move') < ids.indexOf('hold'), ids.join());
+  assert.equal(new Set(allTools().map((t) => t.key)).size, ids.length);
+  // Lorenplan braucht keine Gruppe, aber eine Stellungsrunde
+  const st = fresh();
+  assert.equal(usable(toolByKey('l'), null, st).ok, true);
+  assert.equal(usable(toolByKey('l'), null, { ...st, turnKind: 'battle' }).why, 'Lorenplan nur in Stellungsrunden');
   assert.equal(toolByKey('B').id, 'move');
   assert.equal(toolByKey('h').id, 'hold');
   assert.throws(() => registerTool({ id: 'x', key: 'b', label: 'X', canUse: () => true, begin() {} }), /schon an move/);
@@ -248,7 +253,8 @@ test('Bezeichnungen', () => {
 test('Overlays: vier Plaetze, Sicht und Hoehe belegt', () => {
   const slots = overlaySlots();
   assert.deepEqual(slots.map((s) => s.slot), [1, 2, 3, 4]);
-  assert.equal(slots[0].empty, true);
+  assert.equal(slots[0].id, 'supply');
+  assert.equal(slots[0].animated, true);
   assert.equal(slots[2].id, 'sight');
   assert.equal(typeof slots[3].draw, 'function');
 });
