@@ -102,13 +102,14 @@ export function buildHuegel214() {
 
   const rails = new Map();
   const railLine = (pts) => { for (let i = 0; i < pts.length - 1; i++) for (const [x, y] of lineCells(pts[i][0], pts[i][1], pts[i + 1][0], pts[i + 1][1])) rails.set(key(x, y), [x, y]); };
-  railLine([[5, 20], [15, 20]]);
-  railLine([[15, 20], [18, 17], [20, 17]]);
-  railLine([[15, 20], [18, 23], [20, 23]]);
+  // Gleis zwei Felder unter Depot und Bahnhof (wie auf der Asse-Karte, passt zur Etappe)
+  railLine([[5, 18], [15, 18]]);
+  railLine([[15, 18], [17, 16], [20, 16]]);
+  railLine([[15, 18], [18, 21], [18, 24]]);
 
   const buildings = [
-    { id: 'depot', type: 'depot', x: 5, y: 17, w: 3, h: 2, letter: 'D', label: 'Depot' },
-    { id: 'bahnhof', type: 'bahnhof', x: 10, y: 17, w: 3, h: 2, letter: 'B', label: 'Feldbahnhof' },
+    { id: 'depot', type: 'depot', x: 5, y: 15, w: 3, h: 2, letter: 'D', label: 'Depot' },
+    { id: 'bahnhof', type: 'bahnhof', x: 10, y: 15, w: 3, h: 2, letter: 'B', label: 'Feldbahnhof' },
     { id: 'kueche', type: 'kueche', x: 5, y: 12, w: 2, h: 2, letter: 'K', label: 'Feldküche' },
     { id: 'ruhelager', type: 'ruhelager', x: 9, y: 12, w: 3, h: 2, letter: 'R', label: 'Ruhelager' },
     { id: 'lazarett', type: 'lazarett', x: 5, y: 24, w: 3, h: 2, letter: 'L', label: 'Lazarett' },
