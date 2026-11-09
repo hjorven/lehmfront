@@ -43,6 +43,7 @@ function anyBatteries(state) {
 
 registerTool({
   id: 'fireplan',
+  shown: (state) => state.turnKind !== 'battle', // P06: nur in der passenden Rundenart in der Werkzeugreihe
   key: 'a',
   label: 'Feuerplan',
   order: 70,
@@ -104,6 +105,7 @@ export function shiftPreview(map, state, group, cell) {
 
 registerTool({
   id: 'shift',
+  shown: (state) => state.turnKind === 'battle', // P06: nur in der passenden Rundenart in der Werkzeugreihe
   key: 'v',
   label: 'Verlegen',
   order: 72,
@@ -134,6 +136,7 @@ registerTool({
 
 registerTool({
   id: 'cease',
+  shown: (state) => state.turnKind === 'battle', // P06: nur in der passenden Rundenart in der Werkzeugreihe
   key: 'e',
   label: 'Einstellen',
   order: 74,

@@ -341,3 +341,71 @@ test('Rueckzug: nach dem Gefecht darf eine Gruppe aus dem Niemandsland zurueck v
   assert.equal(validateOrder({ group: 'a01', type: 'redeploy', path: line(8, 4, 2) }, s, 'a', { map }), null);
   assert.match(validateOrder({ group: 'a02', type: 'redeploy', path: line(5, 7, 3) }, s, 'a', { map }), /hinter der eigenen Linie/);
 });
+
+// ------------------------------------------------------------------ Funde aus dem Review
+
+test('Deckung: wer beim Herauskommen wieder Deckung befiehlt, bleibt unten', () => {
+  const map = makeMap({ trenches: ownTrench(3, [3]) });
+  let s = makeState(map, [{ type: 'rifles', pos: { x: 3, y: 3 } }], [{ type: 'rifles', pos: { x: 18, y: 0 } }]);
+  s = run(s, [{ group: 'a01', type: 'dugout' }], [], map).state;
+  s = run(s, [], [], map).state;
+  assert.equal(getGroup(s, 'a01').dugout, 'leaving');
+  const r = run(s, [{ group: 'a01', type: 'dugout' }], [], map);
+  assert.equal(getGroup(r.state, 'a01').inDugout, true);
+  assert.equal(getGroup(r.state, 'a01').dugout, 'in');
+});
+
+test('Zwei Sturmgruppen mit demselben Ziel: jede hat ihr eigenes', () => {
+  const map = makeMap({ trenches: enemyTrench(15, [1, 2, 3, 4, 5]) });
+  const s = makeState(map, [
+    { type: 'rifles', pos: { x: 5, y: 1 } }, { type: 'rifles', pos: { x: 5, y: 3 } }, { type: 'rifles', pos: { x: 5, y: 5 } },
+  ], [{ type: 'rifles', pos: { x: 18, y: 6 } }], { kind: 'position' });
+  const r = run(s, [
+    { group: 'a01', type: 'attack', path: line(6, 15, 1) },
+    { group: 'a02', type: 'attack', path: line(6, 15, 3) },
+    { group: 'a03', type: 'attack', path: [...line(6, 14, 5), { x: 15, y: 4 }, { x: 15, y: 3 }] },
+  ], [], map);
+  const objs = r.state.battle.objectives.a;
+  assert.equal(objs.length, 3);
+  assert.deepEqual(objs.find((o) => o.group === 'a03'), { x: 15, y: 3, group: 'a03' });
+  // a01 an seinem Ziel, a02 und a03 neben bzw. auf 15/3: genommen
+  const t = structuredClone(r.state);
+  getGroup(t, 'a01').pos = { x: 15, y: 1 };
+  getGroup(t, 'a02').pos = { x: 14, y: 3 };
+  getGroup(t, 'a03').pos = { x: 15, y: 3 };
+  assert.equal(objectiveTaken(t, 'a'), true);
+});
+
+test('Gegenstoss zaehlt nur, wenn der Sturm auf den verlorenen Graben zielt; kein Stabsbefehl, wenn das Gefecht endet', () => {
+  const map = makeMap({ trenches: enemyTrench(15, [1, 2, 3, 4, 5]) });
+  const s = makeState(map, [{ type: 'rifles', pos: { x: 14, y: 3 } }], [{ type: 'rifles', pos: { x: 15, y: 6 } }, { type: 'rifles', pos: { x: 18, y: 1 } }]);
+  s.battle = { round: 1, attackers: ['a'], assaulters: { a: ['a01'] }, objectives: { a: [{ x: 18, y: 3, group: 'a01' }] }, counter: {}, outcome: {} };
+  const r = run(s, [{ group: 'a01', type: 'assault', path: [{ x: 15, y: 3 }, { x: 16, y: 3 }] }], [], map);
+  const r2 = run(r.state, [{ group: 'a01', type: 'hold' }], [{ group: 'b02', type: 'assault', path: [{ x: 18, y: 0 }] }], map);
+  assert.ok(!r2.log.some((e) => e.type === 'counter_done'), 'Sturm woandershin ist kein Gegenstoss');
+  // Ziel direkt genommen: kein unerfuellbarer Stabsbefehl
+  const s3 = structuredClone(s);
+  s3.battle.objectives.a = [{ x: 15, y: 3, group: 'a01' }];
+  getGroup(s3, 'b01').pos = { x: 18, y: 6 };
+  const r3 = run(s3, [{ group: 'a01', type: 'assault', path: [{ x: 15, y: 3 }] }], [], map);
+  assert.equal(r3.state.battle, null);
+  assert.ok(!r3.log.some((e) => e.type === 'staff_order'));
+});
+
+test('Nahkampf nur, wo man auf den Feind traf; wer verteidigt hat, laeuft nicht als Angreifer weiter', () => {
+  const map = makeMap({ trenches: enemyTrench(15, [1, 2, 3, 4, 5]) });
+  // Sturm gegeneinander: beide treffen sich
+  const s = makeState(map, [{ type: 'rifles', pos: { x: 10, y: 3 } }], [{ type: 'rifles', pos: { x: 12, y: 3 } }]);
+  for (let seed = 1; seed < 15; seed++) {
+    s.seed = seed;
+    const r = run(s, [{ group: 'a01', type: 'assault', path: line(11, 15, 3) }], [{ group: 'b01', type: 'assault', path: line(11, 6, 3) }], map);
+    assert.equal(r.log.filter((e) => e.type === 'melee').length, 1);
+    assert.ok(!r.log.some((e) => e.type === 'melee_push' && /nicht mehr vor/.test(e.reason)));
+    // Weitergetragene Wege beginnen neben der Gruppe
+    for (const e of r.log.filter((x) => x.carry?.type === 'assault')) {
+      const g = getGroup(r.state, e.group);
+      const p = e.carry.path[0];
+      assert.ok(Math.max(Math.abs(p.x - g.pos.x), Math.abs(p.y - g.pos.y)) <= 1, `Weg von ${e.group} springt`);
+    }
+  }
+});

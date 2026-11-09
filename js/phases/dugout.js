@@ -3,7 +3,7 @@
 // Der Wettlauf zum Grabenrand:
 // - Gruppen in einem eigenen Graben ab Stufe 2 (Schuetzengraben, nicht erobert) haben einen Unterstand.
 // - Wer unter Beschuss steht (niedergehalten aus der Vorrunde oder in dieser Runde von Artillerie getroffen,
-//   g.shelled, setzt P09 vor dieser Phase), geht von selbst hinein, ausser er hat einen Befehl zu laufen oder zu
+//   g.shelled, setzt die Artillerie aus P09 vor dieser Phase), geht von selbst hinein, ausser er hat einen Befehl zu laufen oder zu
 //   feuern. Befehl "dugout" (Deckung) schickt ausdruecklich hinein.
 // - Im Unterstand: unerreichbar fuer Feuer, sieht und wird nur aus dem Nachbarfeld gesehen, feuert nicht,
 //   bewegt sich nicht (sight.js, rules.js, fire.js, move.js beachten inDugout).
@@ -54,9 +54,11 @@ function runDugout(ctx) {
     if (g.inDugout) {
       const stay = type === 'dugout' || (hot && !STAY_UP.has(type));
       if (g.dugout === 'leaving') {
-        if (stay && hot) {
+        if (stay) {
           g.dugout = 'in';
-          ev('dugout_back', `${name} muss zurück in den Unterstand: das Feuer liegt wieder auf dem Graben.`);
+          ev('dugout_back', hot
+            ? `${name} muss zurück in den Unterstand: das Feuer liegt wieder auf dem Graben.`
+            : `${name} bleibt auf Befehl im Unterstand.`);
         } else {
           g.inDugout = false;
           delete g.dugout;
@@ -82,8 +84,7 @@ function runDugout(ctx) {
         : `${name} flüchtet unter Beschuss in den Unterstand bei ${cellLabel(g.pos.x, g.pos.y)}.`);
     }
   }
-  // Artillerie-Merker gilt nur fuer diese Runde
-  for (const g of ctx.state.groups) delete g.shelled;
+  // g.shelled loescht die Phase 'shelled' aus js/phases/artillery.js nach der Bewegung
 }
 
 registerPhase({ id: 'dugout', kind: 'battle', order: ORDER.battle.dugout, run: runDugout });

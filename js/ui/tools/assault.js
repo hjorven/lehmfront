@@ -10,7 +10,7 @@ import { drawPathOrder } from '../../render/units-layer.js';
 import { findPath, enterCost, cellLabel, TERRAIN } from '../../map.js';
 import { unitType } from '../../config/units.js';
 import { roundsAlong, ASSAULT_TYPES, MAX_ASSAULT_CELLS, enemyWire, liveCell } from '../../phases/move.js';
-import { isAttacker, BATTLE_MINUTES } from '../../phases/battle.js';
+import { isAttacker, BATTLE_MINUTES, counterMinute } from '../../phases/battle.js';
 import { HOLD_TYPES, registerCheck } from '../summary.js';
 import { groupName, plural } from '../labels.js';
 import { registerCue } from '../../audio/cues.js';
@@ -35,7 +35,7 @@ export function assaultWord(state, side) {
 export function planAssault(map, state, group, goal) {
   if (goal.x === group.pos.x && goal.y === group.pos.y) return null;
   const own = new Set(state.groups.filter((g) => g.id !== group.id && g.status !== 'lost' && g.side === group.side).map((g) => g.pos.x + ',' + g.pos.y));
-  const cost = (c) => (own.has(c.x + ',' + c.y) ? Infinity : enterCost(c));
+  const cost = (c) => (own.has(c.x + ',' + c.y) ? Infinity : enterCost(liveCell(map, state, c.x, c.y)));
   const r = findPath(map, group.pos, goal, { cost });
   if (!r) return null;
   const path = r.path.slice(1);
@@ -108,6 +108,7 @@ registerTool({
 // Werkzeug Deckung (Taste N, Unterstand): in den Unterstand, Gefechtsrunde
 registerTool({
   id: 'dugout',
+  shown: (state) => state.turnKind === 'battle', // P06: nur in der passenden Rundenart in der Werkzeugreihe
   key: 'n',
   label: 'Deckung',
   order: 55,
@@ -121,7 +122,7 @@ registerTool({
     if (state.turnKind !== 'battle') return 'Deckung gibt es nur in Gefechtsrunden';
     if (group.inDugout) return true;
     const t = liveCell(env.map ?? null, state, group.pos.x, group.pos.y)?.trench;
-    if (!t || t.side !== (group.side === 'a' ? 'own' : 'enemy') || t.captured || t.level < 2) return 'Kein Unterstand hier (eigener Graben ab Stufe 2)';
+    if (!t || t.side !== (group.side === 'a' ? 'own' : 'enemy') || t.captured || (t.level ?? 0) < 2) return 'Kein Unterstand hier (eigener Graben ab Stufe 2)';
     return true;
   },
   begin(ctx) {
@@ -139,7 +140,7 @@ registerCheck('angriff', ({ state, side, orders }) => {
   }
   const c = state.battle?.counter?.[side];
   if (c && !c.done && !orders.some((o) => o.type === 'assault')) {
-    out.push({ tone: 'warn', summary: true, text: `Stabsbefehl: Gegenstoß auf ${cellLabel(c.at.x, c.at.y)} bis Minute ${c.due * BATTLE_MINUTES}`, at: c.at });
+    out.push({ tone: 'warn', summary: true, text: `Stabsbefehl: Gegenstoß auf ${cellLabel(c.at.x, c.at.y)} bis Minute ${counterMinute(c)}`, at: c.at });
   }
   return out;
 });
@@ -191,7 +192,7 @@ registerDecor({
     if (!state) return;
     ctx.save();
     // Ziele des eigenen Angriffs: Bleistiftkreis mit "Ziel"
-    const objs = state.battle?.objectives?.[side] ?? [];
+    const objs = (state.battle?.objectives?.[side] ?? []).filter((o, i, all) => all.findIndex((p) => p.x === o.x && p.y === o.y) === i);
     ctx.strokeStyle = th.danger;
     ctx.fillStyle = th.danger;
     ctx.lineWidth = 2 * px;
@@ -212,7 +213,7 @@ registerDecor({
       ctx.rect(c.at.x - 0.1, c.at.y - 0.1, 1.2, 1.2);
       ctx.stroke();
       ctx.setLineDash([]);
-      ctx.fillText(`Gegenstoß bis Min. ${c.due * BATTLE_MINUTES}`, c.at.x + 1.4, c.at.y + 1.1);
+      ctx.fillText(`Gegenstoß bis Min. ${counterMinute(c)}`, c.at.x + 1.4, c.at.y + 1.1);
     }
     // Eigene Gruppen im Unterstand: Dach ueber dem Symbol, beim Herauskommen gestrichelt
     ctx.strokeStyle = th.ink;

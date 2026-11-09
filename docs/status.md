@@ -75,6 +75,24 @@ Jeder Thread traegt hier nach dem Merge ein, was fertig ist und was offen bleibt
   - Demos: `?scene=gefecht&demo=etappe`, `demo=etappe-plan`, `demo=etappe-karte` (nach einer Runde), `demo=etappe-schaden` (Bahnhof zerschossen).
   - Überraschung: Am Tag steigt Rauch aus der Feldküche, im Modell und als Bleistiftfahne auf der Lagekarte. Steht die Küche näher als 28 Felder an einer feindlichen Gruppe, sieht der Gegner den Rauch: die Küche ist aufgeklärt, ein roter Kringel mit „Rauch gesehen!" erscheint. Nachts bleibt der Schornstein kalt.
 
+- P06 Gefechtsrunde:
+  - Rundenwechsel `js/phases/battle.js`: Befehl `attack` („Angriff ansetzen“, Stellungsrunde, mit Sturmweg) schaltet nach der Runde auf Gefechtsrunden; die 12 Stunden laufen noch ab, die Sturmgruppen bekommen ihren Weg als `assault` (carry). `state.battle = { round, startTurn, attackers, assaulters, objectives, counter, outcome }`. Phase `battle-end`: Ende bei Ziel genommen (jede Sturmgruppe am Ziel, kein Feind daneben), Angriff steckt (alle Sturmgruppen halten oder sind ausgefallen) oder nach 12 Gefechtsrunden; danach `state.lastBattle` und wieder Stellungsrunden.
+  - Gegenstoß: Nach einem Einbruch bekommt der Verteidiger einen Stabsbefehl (Frist drei Gefechtsrunden). Wer mit `assault` antritt, bekommt Ansehen +3, wer sich einigelt −5. Prüfpunkt und Kartenmarke „Gegenstoß bis Min. …“.
+  - `js/phases/dugout.js`: Unterstand in eigenen Gräben ab Stufe 2 (nicht erobert). Unter Beschuss (niedergehalten oder `g.shelled` von der Artillerie) geht die Gruppe von selbst hinein, Befehl „Deckung“ (K) ausdrücklich. Herauskommen dauert eine Gefechtsrunde (`dugout: 'leaving'`): Wettlauf zum Grabenrand.
+  - `js/phases/move.js`: Sturm, Begegnungen (`g.engage` für den Nahkampf), feindlicher Draht hält fest, Pioniere schneiden eine Gasse (`wire: null`), eigener Draht hat Gassen. Einbruch in leere Feindgräben mit `captureTrench`. Rückzug aus dem Niemandsland per Verlegen. `roundsAlong` für Vorschauen.
+  - `js/phases/melee.js`: Nahkampf Feld für Feld, Kampfkraft aus Stärke, Erfahrung, Unterdrückung, Sturm-Schwung, Graben (eigener x1,4, eroberter x1,15), Unterstand überrascht (x0,35). Sieger nimmt das Feld, Verlierer weicht im Graben aus oder gerät in Gefangenschaft (`group_captured`, nicht in der Gefallenenliste). Ereignisse `melee` (öffentlich, mit Aussicht in Prozent), `losses` (Sanitätskette), `breach`.
+  - `js/phases/wire.js`: Draht verlegen (Stellungsrunde), 3 Felder je Runde, Pioniere doppelt, nachts +50 Prozent, 1 Material je Feld, Rest läuft weiter.
+  - Uhr (`js/ui/clock.js`, `css/uhr.css`): Tag-Nacht-Scheibe im Rundenkärtchen (oben Mittag, Bogen = die kommenden 12 Stunden), beim Angriff Stoppuhr mit zwölf Fünf-Minuten-Feldern, „Minute 15 von 60“ und Knopf „Angriff abbrechen“. Auf dem Handy klein in der Leiste.
+  - Werkzeuge Sturm (S: in Stellungsrunden „Angriff ansetzen“, im Gefecht „Sturm“ bzw. „Gegenstoß“, Vorschau mit Draht, Einbruch, Dauer; Halten-Ring), Draht (D, Linie zeichnen wie beim Graben), Deckung (K).
+  - Demos: `?scene=gefecht&demo=sturmplan|draht|umschalten|gefechtsrunde|nahkampf|unterstand`.
+  - Überraschung: Beim Umschalten auf Gefechtsrunden dreht die Scheibe zurück und rastet hörbar als Stoppuhr ein, das Kartenpapier ruckt kurz, als hätte jemand an den Tisch gestoßen.
+
+### Für die nächsten Pakete (nach P06)
+
+- P09 Artillerie: `g.shelled = true` in der Artilleriephase (vor `dugout`, Gefecht Schritt 2) treibt Gruppen in den Unterstand und hält sie dort (ist angeschlossen: `applyImpacts` setzt ihn, die Phase `shelled` löscht ihn nach der Bewegung). Draht zerstören: `state.cells[k].wire = null`. Feuerpläne laufen jetzt, sobald ein Angriff angesetzt ist (`state.battle.round` 1 bis 12, `battleMinute(state)`). `stormGhosts` liest weiter `assault`-Befehle; Feldkosten mit Feldzustand über `stepCost(map, a, b, state)`.
+- P12 Moral: `melee`, `group_captured`, `counter_missed` und `battle_end` (mit `outcome`) sind Haken für Moral und Vertrauen. P13 KI: Befehle `attack`, `assault`, `dugout`, `wire`; `state.battle.counter[side]` ist der Stabsbefehl zum Gegenstoß.
+- Neue Befehlsart `attack` in `js/config/orders.js`; `HOLD_TYPES` enthält jetzt auch `attack`.
+
 ### Für die nächsten Pakete (nach P07)
 
 - Tag-Nacht-Optik (P10): `setTransitionHook(({ t, from, to }) => ...)` aus `js/ui/film.js`. Wird in der letzten Sekunde des Films mit t 0..1 gerufen (beim Zurückspulen auch rückwärts), `from`/`to` sind die Dunkelheit vor und nach der Runde. Standard ist `applyTheme(themeAt(...))`.
@@ -214,6 +232,9 @@ Jeder Thread traegt hier nach dem Merge ein, was fertig ist und was offen bleibt
 - P04: Die Gruppe rückt beim Graben zum zuletzt bearbeiteten Feld nach. Ist das Feld besetzt, bleibt sie stehen; ein weitergetragener Rest gilt, solange irgendein Feld davon höchstens drei Felder entfernt ist. Grabgeschwindigkeit und Materialkosten sind Startwerte für das Balancing (P21).
 - P04: Laufgräben warnen nicht vor Längsfeuer, `enfiladeOf` zählt sie im Gefecht aber mit. Schräg gezeichnete Linien zerfallen in kurze Stücke und lösen selten eine Warnung aus.
 - P04: Die Anzeige von Gräben und Aufwurf folgt `viewFor(...).cells`; solange `cellVisible` immer wahr ist, sieht man feindliche Gräben überall.
+- P06: Melder und andere schnelle Gruppen kommen durch eigenen Draht in einer Runde hindurch, Schützen (Tempo 3) brauchen wegen der Feldkosten (+30) ohnehin zwei Runden; der Unterschied eigener/feindlicher Draht zeigt sich also vor allem beim Festhängen. Werte für Balancing in P21.
+- P06: Der Nahkampf hat einen einzigen Wurf je Begegnung; Moral wird noch nicht verändert (P12). Die Dummy-KI (Seite b) hält nur, stößt also auch nicht gegen; P13 sollte den Stabsbefehl lesen.
+- P06: Beginnt ein Gefecht um 18 Uhr, läuft es in die Dämmerung (Karte wird dunkler). Gewollt, aber auffällig.
 
 - P09: Die gedruckte Leitungs-Unterbrechung auf der Asse-Karte (`map.cables`, Etikett „Leitung durchtrennt“) bleibt stehen, auch wenn die Leitung im Spiel geflickt ist; die Leitungen im Zustand sind maßgeblich.
 - P09: Brandlöcher am Blattrand und das Zittern der Karte leben nur in der Szene (nicht im Spielstand); nach Neuladen sind sie weg.
@@ -280,3 +301,6 @@ Stand 2026-11-08, von Jorven bestaetigt:
 - P09: Sperrfeuer ist „auf Abruf“: es schießt nur in Runden, in denen Feind bis 3 Felder an der Linie gesehen wird, und spart sonst Munition.
 - P09: Beide Seiten zielen erst und dann schlagen alle Granaten gemeinsam ein (auch Gegenbatteriefeuer), damit keine Seite zuerst trifft. Hat ein Beobachter das Feuer verlegt, streut es weniger (x 0,7), weil er die Lage der Einschläge sieht. Zerschossene Gleise und Leitungen werden in der nächsten Stellungsrunde von selbst geflickt.
 - P09: Das Asse-Szenario hat jetzt 5 statt 3 Kaldern-Gruppen (Beobachter und Melder), damit die Leitungsregeln spielbar sind.
+- P06: „Angriff ansetzen“ ist ein eigener Befehl der Stellungsrunde (`attack`) mit dem ganzen Sturmweg; die Gefechtsrunden beginnen nach Ablauf der zwölf Stunden. Wer ein Gefecht beginnt, plant also im großen Zeitmaßstab, wer es führt, im kleinen.
+- P06: Gefangenschaft statt Vernichtung: Wer im Unterstand überrascht oder eingeschlossen wird, ergibt sich; Gefangene stehen nicht in der Gefallenenliste.
+- P06: Draht kostet Material (1 je Feld) und geht nachts schneller; Pioniere schneiden im Sturm Gassen, die alle Folgenden nutzen.

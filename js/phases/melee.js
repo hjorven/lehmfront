@@ -40,12 +40,12 @@ export function defenseFactor(state, map, def) {
   const why = [];
   const t = trenchAt(state, map, def.pos.x, def.pos.y);
   if (t && t.side === mapSideOf(def.side)) {
-    if (t.captured) { f *= CAPTURED_HOLD; why.push('eroberter Graben, noch nicht umgebaut'); }
-    else { f *= TRENCH_HOLD; why.push('im eigenen Graben'); }
+    if (t.captured) { f *= CAPTURED_HOLD; why.push('Verteidiger im eroberten Graben, noch nicht umgebaut'); }
+    else { f *= TRENCH_HOLD; why.push('Verteidiger im eigenen Graben'); }
   }
-  if (def.inDugout && def.dugout === 'leaving') { f *= LEAVING_SURPRISE; why.push('kam gerade aus dem Unterstand'); }
-  else if (def.inDugout) { f *= DUGOUT_SURPRISE; why.push('im Unterstand überrascht'); }
-  if ((def.suppressed ?? 0) >= 0.75) why.push('niedergehalten');
+  if (def.inDugout && def.dugout === 'leaving') { f *= LEAVING_SURPRISE; why.push('Verteidiger kam gerade aus dem Unterstand'); }
+  else if (def.inDugout) { f *= DUGOUT_SURPRISE; why.push('Verteidiger im Unterstand überrascht'); }
+  if ((def.suppressed ?? 0) >= 0.75) why.push('Verteidiger niedergehalten');
   return { factor: f, why };
 }
 
@@ -91,7 +91,8 @@ function runMelee(ctx) {
   for (const g of groups) {
     if (!g.engage) continue;
     const t = ctx.group(g.engage.target);
-    if (!t || t.status === 'lost' || distance(g.pos, t.pos) > 1) continue;
+    // Nur, wenn der Feind noch auf dem Feld steht, an dem man auf ihn traf (er kann weitergezogen sein)
+    if (!t || t.status === 'lost' || t.pos.x !== g.engage.at.x || t.pos.y !== g.engage.at.y || distance(g.pos, t.pos) > 1) continue;
     if (!byTarget.has(t.id)) byTarget.set(t.id, []);
     byTarget.get(t.id).push(g);
   }
@@ -241,7 +242,7 @@ function runMelee(ctx) {
   }
   // Begegnung ohne Gegner (der Feind ist weg oder aufgerieben): Sturm laeuft weiter
   for (const g of groups) {
-    if (g.engage && !carried.has(g.id) && g.status !== 'lost') {
+    if (g.engage && !carried.has(g.id) && !fought.has(g.id) && g.status !== 'lost') {
       const o = ctx.orderFor(g.id);
       const rest = o?.path ? o.path.slice(g.engage.idx).map((p) => ({ x: p.x, y: p.y })) : [];
       if (rest.length && o.type === 'assault') {

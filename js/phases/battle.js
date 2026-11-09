@@ -35,6 +35,11 @@ export function battleMinute(state) {
   return state.battle ? Math.min(BATTLE_ROUNDS, state.battle.round) * BATTLE_MINUTES : 0;
 }
 
+/** Spielminute, bis zu der ein Stabsbefehl zum Gegenstoss erfuellt sein muss (hoechstens 60) */
+export function counterMinute(counter) {
+  return Math.min(BATTLE_ROUNDS, counter.due) * BATTLE_MINUTES;
+}
+
 export function isAttacker(state, side) {
   return !!state.battle?.attackers?.includes(side);
 }
@@ -51,13 +56,11 @@ function runAttack(ctx) {
     if (!list.length) continue;
     battle.attackers.push(side);
     battle.assaulters[side] = list.map((o) => o.group);
-    const seen = new Set();
-    battle.objectives[side] = [];
-    for (const o of list) {
+    // Ziel je Sturmgruppe (mehrere Gruppen duerfen dasselbe Feld haben)
+    battle.objectives[side] = list.map((o) => {
       const end = o.path[o.path.length - 1];
-      const k = end.x + ',' + end.y;
-      if (!seen.has(k)) { seen.add(k); battle.objectives[side].push({ x: end.x, y: end.y, group: o.group }); }
-    }
+      return { x: end.x, y: end.y, group: o.group };
+    });
     for (const o of list) {
       const g = ctx.group(o.group);
       const end = o.path[o.path.length - 1];
@@ -74,7 +77,8 @@ function runAttack(ctx) {
   state.battle = battle;
   for (const side of SIDES) {
     const attacking = battle.attackers.includes(side);
-    const obj = battle.objectives[side]?.[0] ?? battle.objectives[otherSide(side)]?.[0];
+    // Der Verteidiger erfaehrt nicht, wohin der Sturm geht: Meldung am eigenen Graben
+    const obj = battle.objectives[side]?.[0] ?? ctx.groups(side)[0]?.pos;
     ctx.emit('battle_start', {
       side, secret: true,
       reason: attacking
@@ -111,8 +115,20 @@ function runEnd(ctx) {
   b.counter ??= {};
   b.outcome ??= {};
 
-  // Stabsbefehl zum Gegenstoss nach einem Einbruch
-  for (const e of ctx.log) {
+  // Ende des Angriffs je Seite
+  for (const side of b.attackers) {
+    if (b.outcome[side]) continue;
+    if (objectiveTaken(state, side)) { b.outcome[side] = 'taken'; continue; }
+    const alive = (b.assaulters[side] ?? []).map((id) => ctx.group(id)).filter((g) => g && g.status !== 'lost');
+    const pressing = alive.filter((g) => PRESSING.has(ctx.orderFor(g.id)?.type));
+    if (!pressing.length) b.outcome[side] = alive.length ? 'stuck' : 'broken';
+  }
+  const allDone = b.attackers.length > 0 && b.attackers.every((s) => b.outcome[s]);
+  const timeUp = b.round >= BATTLE_ROUNDS;
+  const ending = allDone || timeUp;
+
+  // Stabsbefehl zum Gegenstoss nach einem Einbruch (nur, wenn das Gefecht weitergeht)
+  for (const e of ending ? [] : ctx.log) {
     if (e.type !== 'breach' || !e.side) continue;
     const def = otherSide(e.side);
     const pending = b.counter[def];
@@ -121,14 +137,18 @@ function runEnd(ctx) {
     b.counter[def] = { at: { ...e.at }, due: b.round + COUNTER_ROUNDS, issued: b.round };
     ctx.emit('staff_order', {
       side: def, secret: true, kind: 'counter', due: b.round + COUNTER_ROUNDS,
-      reason: `Stabsbefehl: Der Graben bei ${cellLabel(e.at.x, e.at.y)} ist im Gegenstoß zurückzunehmen, spätestens bis Minute ${Math.min(BATTLE_ROUNDS, b.round + COUNTER_ROUNDS) * BATTLE_MINUTES}. Der Stab erwartet keine Ausreden.`,
+      reason: `Stabsbefehl: Der Graben bei ${cellLabel(e.at.x, e.at.y)} ist im Gegenstoß zurückzunehmen, spätestens bis Minute ${counterMinute(b.counter[def])}. Der Stab erwartet keine Ausreden.`,
       at: { ...e.at },
     });
   }
   for (const side of SIDES) {
     const c = b.counter[side];
     if (!c || c.done || c.issued === b.round) continue;
-    const pushing = ctx.groups(side).find((g) => ctx.orderFor(g.id)?.type === 'assault');
+    // Gegenstoss: ein Sturm, der auf oder neben dem verlorenen Graben endet
+    const pushing = ctx.groups(side).find((g) => {
+      const o = ctx.orderFor(g.id);
+      return o?.type === 'assault' && o.path?.length && distance(o.path[o.path.length - 1], c.at) <= 1;
+    });
     const s = state.sides[side];
     if (pushing) {
       c.done = 'done';
@@ -149,17 +169,7 @@ function runEnd(ctx) {
     }
   }
 
-  // Ende des Angriffs je Seite
-  for (const side of b.attackers) {
-    if (b.outcome[side]) continue;
-    if (objectiveTaken(state, side)) { b.outcome[side] = 'taken'; continue; }
-    const alive = (b.assaulters[side] ?? []).map((id) => ctx.group(id)).filter((g) => g && g.status !== 'lost');
-    const pressing = alive.filter((g) => PRESSING.has(ctx.orderFor(g.id)?.type));
-    if (!pressing.length) b.outcome[side] = alive.length ? 'stuck' : 'broken';
-  }
-  const allDone = b.attackers.length > 0 && b.attackers.every((s) => b.outcome[s]);
-  const timeUp = b.round >= BATTLE_ROUNDS;
-  if (!allDone && !timeUp) return;
+  if (!ending) return;
 
   for (const side of b.attackers) if (!b.outcome[side]) b.outcome[side] = 'time';
   const minutes = b.round * BATTLE_MINUTES;

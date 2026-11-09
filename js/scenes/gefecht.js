@@ -354,7 +354,7 @@ export async function mount(root, params) {
         : `${daytime} · ${clockText(state.clock)} Uhr · ${weatherName(state.weather)} · Abschnitt ${sector}`,
       stripRound: battleNow ? `G${clk.round} · ${clk.minutes}/${BATTLE_ROUNDS * BATTLE_MINUTES} Min` : `R${state.turn} · ${daytime}`,
       clock: clockView(),
-      roundAction: battleNow && attacking && !book[side]?.sealed && assaultersOf(side).length ? 'Angriff abbrechen' : null,
+      roundAction: battleNow && attacking && !state.battle?.outcome?.[side] && !book[side]?.sealed && assaultersOf(side).length ? 'Angriff abbrechen' : null,
       orderCount: orders.length,
       overlays: overlaySlots().map((o) => ({ slot: o.slot, label: o.label, empty: !!o.empty, active: overlaysOn.has(o.slot) })),
       checklist: checklist({ state, side, orders, map, plans: sidePlans[side] }),
@@ -1186,11 +1186,9 @@ export async function mount(root, params) {
           commitSide();
           if (demo === 'nahkampf') { player.seek(1e9); player.next(); report.finishTyping(); }
           else { const fl = planFilm(lastRound.input, lastRound.result, side); const sec = fl.sections.find((x) => x.key === 'dugout') ?? fl.sections[0]; player.seek(sec.start + sec.dur * 0.6); }
-        } else {
-          api.select(a.id);
         }
       }
-      centerOn(cam, narrow() ? 44 : 41, narrow() ? 8 : 10, Math.max(cam.zoom, narrow() ? 22 : 22));
+      centerOn(cam, narrow() ? 44 : 41, 10, 22);
     }
     else if (demo === 'feuerplan' || demo === 'walze' || demo === 'verlegen' || demo === 'einschlag') {
       // P09: Walze vor Abschnitt A, Vorbereitungsfeuer auf den Graben vor Abschnitt B

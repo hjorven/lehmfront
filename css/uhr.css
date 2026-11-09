@@ -15,6 +15,7 @@
 .clock-svg .moon{fill:var(--card)}
 .clock-svg .seg{fill:var(--track)}
 .clock-svg .seg.on{fill:var(--accent)}
+.clock-svg .seg.now{fill:var(--track);stroke:var(--accent);stroke-width:2.5}
 .clock-svg .hand{stroke:currentColor;stroke-width:4;stroke-linecap:round}
 .clock-svg.battle .hand{stroke:var(--accent)}
 .clock-svg .pin{fill:currentColor}

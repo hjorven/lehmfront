@@ -23,7 +23,8 @@ function band(cx, cy, r0, r1, a0, a1) {
 export function clockModel(state) {
   if (state.turnKind === 'battle') {
     const round = Math.max(1, Math.min(BATTLE_ROUNDS, state.battle?.round ?? 1));
-    return { mode: 'battle', round, of: BATTLE_ROUNDS, minutes: round * BATTLE_MINUTES, hour: state.clock.hour, minute: state.clock.minute };
+    // minutes = gelaufene Zeit vor dieser Runde (passt zur Uhrzeit); das laufende Feld ist umrandet
+    return { mode: 'battle', round, of: BATTLE_ROUNDS, minutes: (round - 1) * BATTLE_MINUTES, hour: state.clock.hour, minute: state.clock.minute };
   }
   return { mode: 'day', hour: state.clock.hour, minute: state.clock.minute, night: !!state.night };
 }
@@ -39,7 +40,7 @@ export function clockSvg(m, { labels = false, title = '' } = {}) {
     // Zwoelf Felder zu fuenf Minuten, die gelaufenen in Akzentfarbe
     for (let i = 0; i < BATTLE_ROUNDS; i++) {
       const a0 = i * 30 + 2.5, a1 = (i + 1) * 30 - 2.5;
-      const on = i < m.round;
+      const on = i < m.round - 1;
       parts.push(`<path class="${on ? 'seg on' : 'seg'}${i === m.round - 1 ? ' now' : ''}" d="${band(c, c, 33, 45, a0, a1)}"/>`);
     }
     if (labels) {
@@ -48,7 +49,7 @@ export function clockSvg(m, { labels = false, title = '' } = {}) {
         parts.push(`<text class="num" x="${x}" y="${y}">${i * BATTLE_MINUTES}</text>`);
       }
     }
-    const [hx, hy] = at(c, c, labels ? 31 : 29, m.round * 30);
+    const [hx, hy] = at(c, c, labels ? 31 : 29, (m.round - 1) * 30);
     parts.push(`<line class="hand" x1="${c}" y1="${c}" x2="${hx}" y2="${hy}"/>`);
   } else {
     // 24 Stunden: oben 12 Uhr, unten 0 Uhr. Tag hell, Nacht dunkel, Bogen = die kommende Stellungsrunde

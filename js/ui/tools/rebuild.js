@@ -108,6 +108,7 @@ registerOrderPainter('rebuild', (ctx, { order, th, px, d }) => {
 
 registerTool({
   id: 'rebuild',
+  shown: (state) => state.turnKind !== 'battle', // P06: nur in der passenden Rundenart in der Werkzeugreihe
   key: 'u',
   label: 'Umbauen',
   order: 20,
