@@ -201,6 +201,9 @@ Jeder Thread traegt hier nach dem Merge ein, was fertig ist und was offen bleibt
 - P09: Die gedruckte Leitungs-Unterbrechung auf der Asse-Karte (`map.cables`, Etikett „Leitung durchtrennt“) bleibt stehen, auch wenn die Leitung im Spiel geflickt ist; die Leitungen im Zustand sind maßgeblich.
 - P09: Brandlöcher am Blattrand und das Zittern der Karte leben nur in der Szene (nicht im Spielstand); nach Neuladen sind sie weg.
 - P09: Mengen (Granaten, Trefferchance, Leitungsriss 40 Prozent, Schweigen 2 Runden) sind geschätzt, Balancing in P21.
+- P09: Der Unterstand schützt vor Granaten (`g.inDugout`), aber noch setzt keine Phase das Feld; das kommt mit dem Befehl `dugout` (P06/P12).
+- P09: Eine Batterie schießt je Runde nur einen Plan (kleinste Plan-ID zuerst). Der Editor warnt bei Überschneidung, die Kopfzeile „Munition danach“ rechnet aber beide Pläne voll.
+- P09: Krater machen über `mudAt` (P10) von selbst Schlamm; ein eigenes `mud` setzen die Einschläge nicht, sonst zählte es doppelt.
 
 ## Freigaben und Entscheidungen von Jorven
 
@@ -254,5 +257,5 @@ Stand 2026-11-08, von Jorven bestaetigt:
 - P04: Umbauen geht auch an eigenen, nie eroberten Gräben (Feuerrichtung drehen). Antippen eines eroberten Feldes nimmt den ganzen eroberten Abschnitt.
 - P09: Der Feuerplan-Editor färbt die ganze Karte in Blaupause (Thema `blueprintTheme` in `js/theme.js`), solange er offen ist; die Nacht bleibt dabei erhalten (dunkleres Blau).
 - P09: Sperrfeuer ist „auf Abruf“: es schießt nur in Runden, in denen Feind bis 3 Felder an der Linie gesehen wird, und spart sonst Munition.
-- P09: Hat ein Beobachter das Feuer verlegt, streut es weniger (x 0,7), weil er die Lage der Einschläge sieht. Zerschossene Gleise und Leitungen werden in der nächsten Stellungsrunde von selbst geflickt.
+- P09: Beide Seiten zielen erst und dann schlagen alle Granaten gemeinsam ein (auch Gegenbatteriefeuer), damit keine Seite zuerst trifft. Hat ein Beobachter das Feuer verlegt, streut es weniger (x 0,7), weil er die Lage der Einschläge sieht. Zerschossene Gleise und Leitungen werden in der nächsten Stellungsrunde von selbst geflickt.
 - P09: Das Asse-Szenario hat jetzt 5 statt 3 Kaldern-Gruppen (Beobachter und Melder), damit die Leitungsregeln spielbar sind.

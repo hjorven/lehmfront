@@ -190,6 +190,7 @@ export const BLUEPRINT = {
   faint: '#2c58a3', contour: '#5d80c2', forest: '#3866b0', forestLine: '#dce6f7', water: '#4473be', wire: '#dce6f7', crater: '#24498f',
   rail: '#eef3fb', marsh: '#a8c0e8', chalk: '#3c64ab', rock: '#cfdcf2', village: '#eef3fb',
   pencil: '#ffffff', stain: '#10306a', fold: '#2f5ca8', frame: '#dce6f7', desk: '#0b1d42', shade: '#000000',
+  mud: '#9fb6e0', fog: '#2f5597', flareLight: '#ffd45c', wetPaper: '#143470',
   jitter: 0, shadeAlpha: 0.3, foldAlpha: 0.25, stainAlpha: 0,
 };
 
