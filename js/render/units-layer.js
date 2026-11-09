@@ -5,6 +5,9 @@
 import { applyCameraTransform } from './camera.js';
 import { jitterPolyline, polyLength, hashSeed } from './geometry.js';
 import { FONTS } from './map-layer.js';
+import { drawCone, drawSightLine, drawFireOrder, drawGhost, drawSuppression } from './fire-layer.js';
+import { sectorOf, PINNED } from '../sight.js';
+import { unitType } from '../config/units.js';
 
 /** Groesse des Gruppensymbols in Feldern: mindestens 26 x 17 Bildschirmpixel */
 export function unitBox(cam) {
@@ -235,7 +238,8 @@ export function drawTargetCell(ctx, cell, color, px, ok = true) {
  * Ganze dynamische Ebene zeichnen.
  * d = { state, map, side, groups (sichtbar, mit mark), ghosts, orders: Map(groupId -> order), selectedId,
  *       planning (true: Fragezeichen fuer Gruppen ohne Befehl), reach: Map(groupId -> Felder diese Runde),
- *       anim: { group, progress }, preview: { group, path, reach, cell, ok }, overlays: [overlay], hover }
+ *       anim: { group, progress }, preview: { group, path, reach, cell, ok, sight?, fire?, cone? }, overlays: [overlay], hover,
+ *       sightLine?: { from, to, blockedAt, label } }
  */
 export function drawBattle(ctx, cam, dpr, th, d) {
   ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -245,6 +249,20 @@ export function drawBattle(ctx, cam, dpr, th, d) {
 
   for (const o of d.overlays ?? []) {
     try { o.draw(ctx, { cam, theme: th, map: d.map, state: d.state, side: d.side, px }); } catch (err) { console.error(err); }
+  }
+
+  // MG-Kegel (P05): eigene MGs immer, feindliche, sobald man sie feuern sah. Ein geplanter Sektor gilt schon.
+  for (const g of d.groups) {
+    if (g.status === 'lost' || g.type !== 'mg') continue;
+    const own = g.side === d.side;
+    if (!own && !g.sector) continue;
+    const o = own ? d.orders.get(g.id) : null;
+    const planned = d.preview?.cone && d.preview.group === g.id ? d.preview.cone.aim : o?.type === 'sector' ? o.target : null;
+    const sec = sectorOf(planned ? { ...g, sector: planned } : g);
+    if (!sec) continue;
+    drawCone(ctx, g.pos, sec.aim, sec.width, unitType(g.type).range, {
+      color: g.side === 'a' ? th.own : th.enemy, px, alpha: own ? (planned ? 0.95 : 0.6) : 0.8, dashed: !!planned,
+    });
   }
 
   if (d.hover) {
@@ -259,6 +277,10 @@ export function drawBattle(ctx, cam, dpr, th, d) {
   // Befehlspfeile unter den Symbolen
   for (const g of d.groups) {
     const o = d.orders.get(g.id);
+    if (o?.type === 'fire' && o.target && !(d.preview && d.preview.group === g.id)) {
+      drawFireOrder(ctx, g.pos, o.target, { color: th.pencil, px, seed: hashSeed(g.id, o.target.x, o.target.y) });
+      continue;
+    }
     if (!o?.path?.length) continue;
     if (d.preview && d.preview.group === g.id) continue;
     const progress = d.anim && d.anim.group === g.id ? d.anim.progress : 1;
@@ -270,9 +292,18 @@ export function drawBattle(ctx, cam, dpr, th, d) {
     const g = d.groups.find((x) => x.id === d.preview.group);
     if (g) drawPathOrder(ctx, g.pos, d.preview.path, { reach: d.preview.reach, color: th.accent, th, px, preview: true });
   }
-  if (d.preview?.cell) drawTargetCell(ctx, d.preview.cell, d.preview.ok ? th.accent : th.danger, px, d.preview.ok);
+  if (d.preview?.sight) {
+    const sl = d.preview.sight;
+    drawSightLine(ctx, sl.from, sl.to, sl.blockedAt, { th, px, label: sl.label });
+  }
+  if (d.preview?.fire) {
+    const g = d.groups.find((x) => x.id === d.preview.group);
+    if (g) drawFireOrder(ctx, g.pos, d.preview.fire, { color: th.accent, px, preview: true });
+  }
+  if (d.preview?.cell && !d.preview.fire) drawTargetCell(ctx, d.preview.cell, d.preview.ok ? th.accent : th.danger, px, d.preview.ok);
+  if (d.sightLine) drawSightLine(ctx, d.sightLine.from, d.sightLine.to, d.sightLine.blockedAt, { th, px, label: d.sightLine.label });
 
-  for (const gh of d.ghosts ?? []) drawUnit(ctx, cam, th, { ...gh, side: d.side === 'a' ? 'b' : 'a' }, '?', { ghost: true });
+  for (const gh of d.ghosts ?? []) drawGhost(ctx, cam, th, gh, { color: gh.side === 'a' ? th.own : th.enemy });
   for (const g of d.groups) {
     if (g.status === 'lost') continue;
     const o = d.orders.get(g.id);
@@ -281,5 +312,6 @@ export function drawBattle(ctx, cam, dpr, th, d) {
       idle: d.planning && g.side === d.side && !o,
       hold: o?.type === 'hold',
     });
+    if (g.side === d.side || g.suppressed !== undefined) drawSuppression(ctx, cam, g, th, px, g.suppressed >= PINNED);
   }
 }

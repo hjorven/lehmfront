@@ -11,6 +11,10 @@
       "supplies": { "carts": 4, "cartsTotal": 6 },
       "reputation": 61,
       "trust": 48,
+      "intel": [
+        { "group": "b02", "turnsAgo": 2, "sector": { "x": 37, "y": 22 }, "source": "Grabenspiegel" },
+        { "group": "b03", "turnsAgo": 4, "source": "Luftbild" }
+      ],
       "groups": [
         { "type": "rifles", "pos": { "x": 32, "y": 8 }, "morale": 72 },
         { "type": "mg", "pos": { "x": 33, "y": 19 }, "morale": 64 },
@@ -20,6 +24,9 @@
     "b": {
       "faction": "morrow",
       "control": "ai",
+      "intel": [
+        { "group": "a02", "turnsAgo": 1, "sector": { "x": 42, "y": 18 }, "source": "Grabenspiegel" }
+      ],
       "supplies": { "carts": 3, "cartsTotal": 5 },
       "groups": [
         { "type": "rifles", "pos": { "x": 45, "y": 9 } },

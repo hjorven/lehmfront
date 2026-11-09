@@ -168,7 +168,8 @@ test('Checkliste: angemeldete Pruefpunkte, Warnungen zuerst, Fehler werden Warnu
 
 test('Werkzeug-Register: Bewegen und Halten, Tasten eindeutig', () => {
   const ids = allTools().map((t) => t.id);
-  assert.deepEqual(ids, ['move', 'hold']);
+  // Weitere Pakete melden eigene Werkzeuge an (P05 Feuern); Bewegen steht vor Halten
+  assert.ok(ids.includes('move') && ids.includes('hold') && ids.indexOf('move') < ids.indexOf('hold'), ids.join());
   assert.equal(toolByKey('B').id, 'move');
   assert.equal(toolByKey('h').id, 'hold');
   assert.throws(() => registerTool({ id: 'x', key: 'b', label: 'X', canUse: () => true, begin() {} }), /schon an move/);

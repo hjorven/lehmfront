@@ -160,6 +160,22 @@ export function createInitialState(map, scenario, seed) {
   const ids = new Set(groups.map((g) => g.id));
   if (ids.size !== groups.length) throw new Error('Doppelte Gruppen-ID im Szenario');
 
+  // Anfangswissen ueber den Gegner (P05): sides[x].intel = [{ group, turnsAgo, sector?, source? }] wird zu Geistern
+  for (const side of SIDES) {
+    const known = scenario.sides[side].intel;
+    if (!Array.isArray(known)) continue;
+    const lastSeen = {};
+    for (const k of [...known].sort((p, q) => compareId(String(p.group), String(q.group)))) {
+      const g = groups.find((x) => x.id === k.group && x.side !== side);
+      if (!g) throw new Error(`Aufklärung von Seite ${side}: Gruppe ${k.group} gibt es beim Gegner nicht`);
+      const e = { pos: { ...g.pos }, turn: 1 - Math.max(0, k.turnsAgo | 0), type: g.type };
+      if (k.sector) e.sector = { x: k.sector.x, y: k.sector.y };
+      if (k.source) e.source = String(k.source);
+      lastSeen[g.id] = e;
+    }
+    sides[side].intel = { lastSeen };
+  }
+
   return {
     version: STATE_VERSION,
     seed: seed >>> 0,

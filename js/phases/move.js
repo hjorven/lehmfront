@@ -20,7 +20,9 @@ export const POSITION_FACTOR = 40;
 
 /** Bewegungsbudget einer Gruppe in Zehnteln */
 export function moveBudget(group, kind) {
-  return unitType(group.type).speed * (kind === 'battle' ? BATTLE_FACTOR : POSITION_FACTOR);
+  const full = unitType(group.type).speed * (kind === 'battle' ? BATTLE_FACTOR : POSITION_FACTOR);
+  // Niedergehalten (P05, sight.PINNED): nur noch halb so weit, die Gruppe kriecht
+  return (group.suppressed ?? 0) >= 0.75 ? Math.floor(full / 2) : full;
 }
 
 /** Kosten eines Schritts von a nach b (Zehntel), diagonal 14/10 */
