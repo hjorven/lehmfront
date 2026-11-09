@@ -28,7 +28,7 @@ test('Schritte: eindeutige ids, Text, Absender, genau ein letzter Schritt am End
   assert.match(DRILL_PATH, /ausbildung=1/);
 });
 
-test('Bedingungen: Wählen, Bewegen, Graben, MG, Runde, Loren, Karte schieben', () => {
+test('Bedingungen: Wählen, Bewegen, Graben, MG, Runde, Loren', () => {
   assert.equal(step('waehlen').done(fakeApi(), start), false);
   assert.equal(step('waehlen').done(fakeApi({ selected: 'b01' }), start), false, 'fremde Gruppe zählt nicht');
   assert.equal(step('waehlen').done(fakeApi({ selected: 'a01' }), start), true);
@@ -42,8 +42,7 @@ test('Bedingungen: Wählen, Bewegen, Graben, MG, Runde, Loren, Karte schieben', 
   assert.equal(step('runde').done(fakeApi(), start), false);
   assert.equal(step('runde').done(fakeApi({ state: { ...fakeApi().state, turn: 2 } }), start), true);
   assert.equal(step('loren').done(fakeApi({ toolInfo: { id: 'supply' } }), start), true);
-  assert.equal(step('karte').done(fakeApi({ cam: { x: 14, y: 10, zoom: 20 } }), start), true);
-  assert.equal(step('karte').done(fakeApi(), start), false);
+  assert.equal(step('karte').manual, true, 'Lesen mit Weiter, kein Weiterschalten durch Kamerasprünge');
 });
 
 test('nextStep hält an Schritten mit Weiter und überspringt geschaffte', () => {

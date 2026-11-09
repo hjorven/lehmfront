@@ -258,3 +258,10 @@ test('Lageaustausch: RLS an, lesen für alle, anlegen und löschen nur eigene, �
   assert.match(sql, />= 20/);
   assert.match(sql, /set search_path = ''/);
 });
+
+test('Lageaustausch gehärtet: nur title, author, code beim Anlegen, Code nur base64url', () => {
+  const sql = read('supabase/migrations/0003_lagen_haerten.sql');
+  assert.match(sql, /grant insert \(title, author, code\) on public\.lagen to authenticated/);
+  assert.match(sql, /grant select on public\.lagen to anon, authenticated/);
+  assert.match(sql, /\^L1\\\.\[A-Za-z0-9_-\]\+\$/);
+});

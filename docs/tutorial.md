@@ -138,13 +138,13 @@ Geht etwas schief, das man beim nächsten Mal anders machen kann, schreibt jeman
 
 | Notiz | Bedeutet |
 |---|---|
-| Traverse fehlt! | Verluste durch Längsfeuer. Graben mit Traversen neu ziehen |
+| Traverse fehlt! (Graben G) | Verluste durch Längsfeuer. Graben mit Traversen neu ziehen |
 | erst umbauen (U) | Eroberter Graben zeigt noch zur falschen Seite |
 | Draht! Erst Gasse schneiden | Sturm hängt im Draht. Pioniere vorn oder Artillerie zuerst |
 | Wasser: entwässern (W) | Graben läuft voll. Lattenrost und Pumpe legen |
-| Weg zu | Loren kommen nicht durch. Laufgraben oder Gleis ist unterbrochen |
+| Weg zu: Loren kommen nicht durch | Loren kommen nicht durch. Laufgraben oder Gleis ist unterbrochen |
 | Lorenplan prüfen (L) | Ein Abschnitt hungert oder hat keine Munition |
-| ohne Deckung: eingraben | Granatfeuer trifft eine Gruppe im offenen Feld |
+| ohne Deckung: eingraben (G) | Granatfeuer trifft eine Gruppe im offenen Feld |
 | eigene Walze zu dicht! | Die Feuerwalze trifft die eigenen Sturmgruppen |
 
 Die Notizen bleiben für die ganze Mission auf dem Blatt.

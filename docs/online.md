@@ -77,7 +77,7 @@ weiter; ihr Replay-Link nutzt die Regeln der Seite, kann also nach großen Regel
 
 ## Lageaustausch (seit 1.6.0)
 
-Migration `0002_lagen.sql` ist eingespielt (2026-11-09, Management-API). Keine Edge Function nötig: Lesen
+Migrationen `0002_lagen.sql` und `0003_lagen_haerten.sql` sind eingespielt (2026-11-09, Management-API; 0003: Anlegen nur mit title, author, code, Code nur base64url). Keine Edge Function nötig: Lesen
 darf jeder, Anlegen und Löschen nur der Verfasser (RLS), Ändern niemand, höchstens 20 Lagen je Spieler
 (Trigger). Der Server prüft nur Form und Größe des Codes; ob eine Lage spielbar ist, prüft der Client mit
 `lageProblems` vor dem Spielen und Öffnen. Titel und Verfasser ohne `<>&"`.

@@ -178,7 +178,7 @@ export async function mount(root, params) {
   let archive = createArchive(scenId);
   let filmFrame = null;         // Bild des laufenden Phasenfilms, sonst null
   let pendingDark = null;       // { from, to }: Tag-Nacht-Uebergang, den der naechste Film zeigt
-  let helpShown = false;
+  let helpShown = params.has('ausbildung'); // Grundausbildung: der Zettel ersetzt den Starthinweis
   let suppressTap = false;
   let modalOpen = false;
   let tidyUi = null;            // aufgeraeumte Kaertchen und Karte frei (js/ui/tidy.js)

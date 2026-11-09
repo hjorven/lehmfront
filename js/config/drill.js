@@ -14,13 +14,12 @@ const selectedOwn = (a) => {
   const g = a.selected ? a.state.groups.find((x) => x.id === a.selected) : null;
   return !!g && g.side === a.side;
 };
-const moved = (a, s) => !!s.cam && (Math.abs(a.cam.x - s.cam.x) + Math.abs(a.cam.y - s.cam.y) > 1.5 || Math.abs(a.cam.zoom - s.cam.zoom) > 1);
 
 export const DRILL_STEPS = [
   {
     id: 'karte', von: 'Harms', title: 'Die Lagekarte',
     text: 'Das ist unser Abschnitt an der Asse. Blau sind unsere Gräben und Gruppen, rot die von drüben. Schieb die Karte mit Maus oder Finger, zoom mit dem Mausrad oder mit zwei Fingern.',
-    done: moved, manual: true,
+    manual: true,
   },
   {
     id: 'waehlen', von: 'Harms', title: 'Eine Gruppe wählen',

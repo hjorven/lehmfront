@@ -19,8 +19,11 @@ export function attachDrill({ ui, root, api, steps = DRILL_STEPS, startAt = null
   ensureCss('css/drill.css');
   root.classList.add('drilling');
   const saved = readDrill();
+  // Fortsetzen: die Grundausbildung beginnt immer mit einem frischen Gefecht. Schritte, die einen Spielstand
+  // voraussetzen (nach "Runde ausfuehren"), gelten dann nicht mehr: zurueck bis vor den ersten davon.
+  const firstNeedsTurn = steps.findIndex((s) => s.id === 'runde');
   let index = Number.isInteger(startAt) ? Math.min(startAt, steps.length - 1)
-    : saved && !saved.done && Number.isInteger(saved.step) ? Math.min(saved.step, steps.length - 1) : 0;
+    : saved && !saved.done && Number.isInteger(saved.step) ? Math.min(saved.step, firstNeedsTurn >= 0 ? firstNeedsTurn : steps.length - 1, steps.length - 1) : 0;
   let start = snapshot(api);
   let marked = null;
   let passing = false;
@@ -49,7 +52,7 @@ export function attachDrill({ ui, root, api, steps = DRILL_STEPS, startAt = null
       <p class="dr-text">${esc(s.text)}</p>
       <span class="dr-from">– ${esc(s.von)}</span>
       <div class="dr-progress" aria-hidden="true">${steps.map((_, i) => `<i class="${i < index ? 'done' : i === index ? 'now' : ''}"></i>`).join('')}</div>
-      <footer>${index > 0 ? '<button type="button" class="btn dr-back">Zurück</button>' : ''}
+      <footer>${index > 0 ? '<button type="button" class="btn dr-back">Voriger Schritt</button>' : ''}
         ${s.final
           ? `<a class="btn dr-go" href="?scene=feldzug">Zur Kampagne</a><a class="btn" href="?scene=handbuch">Handbuch</a><button type="button" class="btn dr-stay">Weiterspielen</button>`
           : auto ? `<span class="dr-wait">Auf der Karte erledigen</span><button type="button" class="btn dr-skip">Überspringen</button>`
@@ -79,15 +82,25 @@ export function attachDrill({ ui, root, api, steps = DRILL_STEPS, startAt = null
   function place() {
     const shield = ui.querySelector('.shield');
     const narrow = ui.clientWidth <= 700;
-    if (!narrow || !shield || shield.hidden || !shield.getClientRects().length) { card.style.bottom = ''; return; }
-    const top = shield.getBoundingClientRect().top - ui.getBoundingClientRect().top;
+    const box = ui.getBoundingClientRect();
+    if (!narrow) {
+      // Breit: Werkzeughinweise und Meldungen stehen oben links (.hint); der Zettel rutscht darunter
+      const hint = ui.querySelector('.hint');
+      const hb = hint && !hint.hidden && hint.getClientRects().length ? hint.getBoundingClientRect() : null;
+      card.style.top = hb ? `${Math.round(hb.bottom - box.top + 8)}px` : '';
+      card.style.bottom = '';
+      return;
+    }
+    card.style.top = '';
+    if (!shield || shield.hidden || !shield.getClientRects().length) { card.style.bottom = ''; return; }
+    const top = shield.getBoundingClientRect().top - box.top;
     card.style.bottom = `${Math.max(88, ui.clientHeight - top + 6)}px`;
   }
 
   const timer = setInterval(() => {
     place();
     const s = steps[index];
-    if (passing || !s?.done || s.final) return;
+    if (passing || !s?.done || s.final || s.manual) return; // Schritte mit "Weiter" schaltet nur der Spieler
     let ok = false;
     try { ok = !!s.done(api, start); } catch { ok = false; }
     if (!ok) return;

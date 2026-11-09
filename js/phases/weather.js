@@ -13,6 +13,7 @@ import { cellKey, getCell, patchCell, otherSide } from '../state.js';
 import { darknessAt } from '../ui/daytime.js';
 import { surname } from './hold.js';
 import { addStepCostRule } from './move.js';
+import { postOf } from '../morale.js';
 import { reportOpen } from '../config/reports.js';
 import {
   rollWeather, stepWet, stepSnow, snowAt, snowMoveCost, SNOW_COLD, SNOW_WORDS, MAX_WET, waterGain, waterLoss, mudAt, mudMoveCost, trenchOf, isSink, flareAt, flareProblem,
@@ -123,17 +124,22 @@ function runWeather(ctx) {
     });
   }
 
-  // Kaelte: bei hohem Schnee frieren nachts die Posten vorn, die nicht im Unterstand sitzen
-  for (const g of ctx.groups()) {
-    if (!s.night) break;
-    const sn = snowAt(s, map, g.pos.x, g.pos.y);
-    const cold = SNOW_COLD[sn] ?? 0;
-    if (!cold || g.inDugout || g.status === 'rest') continue;
+  // Kaelte: bei hohem Schnee frieren nachts die Posten vorn, die nicht im Unterstand sitzen (eine Meldung je Seite)
+  const frozen = { a: [], b: [] };
+  for (const g of s.night ? ctx.groups() : []) {
+    const cold = SNOW_COLD[snowAt(s, map, g.pos.x, g.pos.y)] ?? 0;
+    if (!cold || g.inDugout || (map && postOf(map, g) !== 'front')) continue;
     g.morale = Math.max(0, g.morale - cold);
+    frozen[g.side]?.push({ g, cold });
+  }
+  for (const side of ['a', 'b']) {
+    const list = frozen[side];
+    if (!list.length) continue;
+    const most = Math.max(...list.map((f) => f.cold));
     ctx.emit('snow_cold', {
-      side: g.side, group: g.id, secret: true, minor: true, amount: cold,
-      reason: `${name(g)} friert im Schnee bei ${cellLabel(g.pos.x, g.pos.y)}: Moral sinkt um ${cold}. Im Unterstand wäre es wärmer.`,
-      at: { ...g.pos },
+      side, group: list[0].g.id, groups: list.map((f) => f.g.id), secret: true, minor: true, amount: most,
+      reason: `${list.length === 1 ? name(list[0].g) + ' friert' : list.length + ' Gruppen frieren'} vorn im Schnee: Moral sinkt um ${most === 1 ? '1' : 'bis zu ' + most}. Im Unterstand wäre es wärmer.`,
+      at: { ...list[0].g.pos },
     });
   }
 

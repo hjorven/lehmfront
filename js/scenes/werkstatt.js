@@ -579,7 +579,7 @@ export async function mount(root, params = new URLSearchParams(location.search))
       try { lage = await decodeLage(r.lage.code); } catch (err) { flash(err.message, true); return; }
       const bad = lageProblems(lage);
       if (bad.length) { flash(`Diese Lage ist kaputt: ${bad[0]}`, true); return; }
-      if (b.dataset.netplay) location.href = '?scene=gefecht&lage=' + r.lage.code;
+      if (b.dataset.netplay) location.href = '?scene=gefecht&lage=' + encodeURIComponent(r.lage.code);
       else adopt(lageToDoc(lage), `„${r.lage.title}“ aus dem Netz geöffnet.`);
     } else if (b.dataset.netdel) {
       const net = await import('../net.js');

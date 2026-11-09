@@ -40,7 +40,7 @@ button{font:inherit;color:inherit}
 .menu-drill{position:relative}
 .menu-new{position:absolute;left:calc(100% + 14px);top:50%;transform:translateY(-50%) rotate(-3deg);white-space:nowrap;font:700 21px/1 var(--font-hand);color:var(--ink);pointer-events:none}
 .menu-new::before{content:"";position:absolute;right:calc(100% + 4px);top:50%;width:12px;border-top:2px solid var(--ink2)}
-@media (max-width:640px){.menu-new{position:static;transform:rotate(-2deg);margin-left:auto;font-size:18px}.menu-new::before{display:none}.menu-drill.new small{display:none}}
+@media (max-width:860px){.menu-new{position:static;transform:rotate(-2deg);margin-left:auto;font-size:18px}.menu-new::before{display:none}.menu-drill.new small{display:none}}
 .menu-more{display:flex;gap:8px;margin-top:14px;width:100%;max-width:520px}
 .title .menu-more .menu-akte{margin-top:0;flex:1 1 0;min-width:0}
 .title{padding-bottom:max(48px,env(safe-area-inset-bottom))}

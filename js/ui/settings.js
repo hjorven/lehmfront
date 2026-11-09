@@ -55,6 +55,7 @@ export const TOUCH = [
   ['Gruppe antippen', 'wählen; Befehl unten in der Werkzeugreihe'],
   ['Lang drücken', 'Befehle der Gruppe im Kreis'],
   ['Ziel antippen', 'vormerken (Bleistift), noch einmal antippen setzt den Befehl'],
+  ['Leeres Feld antippen', 'mit gewählter Gruppe: Sichtlinie dorthin; noch einmal antippen hebt die Auswahl auf'],
   ['Ziehen, zwei Finger', 'Karte schieben und zoomen'],
   ['Lasche an der Werkzeugreihe', 'weitere Befehle; die Zahl sagt, wie viele noch verdeckt sind'],
   ['„Vor der Runde“', 'Prüfpunkt antippen springt zur Gruppe (wie Leertaste)'],

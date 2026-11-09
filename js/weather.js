@@ -77,14 +77,14 @@ export function rollWeather(rng, prev) {
     if (roll < row[k]) { kind = k; break; }
     roll -= row[k];
   }
-  // Im Winter faellt statt Regen Schnee (Wurf unveraendert, nur die Art)
-  if (prev?.season === 'winter' && kind === 'rain') kind = 'snow';
   // Wind dreht selten, Sturm bringt starken Wind
   const wind = { dir: prev?.wind?.dir ?? 'w', speed: prev?.wind?.speed ?? 1 };
   if (rng() < 0.2) wind.dir = WIND_DIRS[(WIND_DIRS.indexOf(wind.dir) + (rng() < 0.5 ? 1 : 7)) % 8] ?? 'w';
   wind.speed = kind === 'storm' ? 3 : kind === 'fog' ? 0 : clamp(wind.speed + (rng() < 0.5 ? -1 : 1), 1, 2);
   const rain = kind === 'storm' ? 1 : kind === 'rain' ? (rng() < 0.5 ? 0.5 : 0.7) : 0;
   const fog = kind === 'fog' ? (rng() < 0.5 ? 0.7 : 0.9) : 0;
+  // Im Winter faellt statt Regen Schnee. Erst nach allen Wuerfen umgestellt, damit die Wurffolge wie vorher bleibt
+  if (prev?.season === 'winter' && kind === 'rain') return { kind: 'snow', rain: 0, fog, wind };
   return { kind, rain, fog, wind };
 }
 

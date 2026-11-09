@@ -20,10 +20,9 @@ import { BUILDINGS, ETAPPE_LEVELS } from '../config/buildings.js';
 import {
   placeBuilding, repairBuilding, advanceConstruction, etappeYield, etappeLevel, chooseReward, buildTimeFor,
 } from '../etappe.js';
-import { etappeOf, plotCells, plotCenter, plotName, plotAt, syncRails, isBuilt } from '../etappe-map.js';
+import { etappeOf, plotCells, plotCenter, plotName, plotAt, plotRect, syncRails, isBuilt } from '../etappe-map.js';
 import { sideSeesCell, darknessOf } from '../sight.js';
 import { addBattery } from '../artillery.js';
-import { plotRect } from '../etappe-map.js';
 
 /** Hoechstens so viele Bauauftraege je Stellungsrunde */
 export const MAX_BUILDS = 8;

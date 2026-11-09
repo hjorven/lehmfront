@@ -359,9 +359,10 @@ test('Schnee im Spiel: legt zu, bremst ab Knöcheltiefe, nachts frieren Posten a
   // nach Runde 1 ist Nacht (startHour 12 + 12): Kaelte in der naechsten Stellungsrunde
   const night = { ...r.state, night: true };
   const r2 = resolveTurn(night, [], [], 7, 2, { map });
-  const cold = r2.log.find((e) => e.type === 'snow_cold' && e.group === 'a01');
+  const cold = r2.log.find((e) => e.type === 'snow_cold' && e.side === 'a');
   assert.ok(cold, 'Kälte bei Nacht');
-  assert.match(cold.reason, /friert im Schnee/);
+  assert.match(cold.reason, /friert vorn im Schnee/);
+  assert.ok(cold.groups.includes('a01'));
 });
 
 test('Tauwetter: Regen auf Schnee macht den Boden nass und meldet es', () => {

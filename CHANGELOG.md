@@ -24,7 +24,7 @@ Besser für Einsteiger, offene Macken geschlossen, Lagen online teilen.
 
 ### Online
 
-- **Lageaustausch** in der Werkstatt: eigene Lagen ins Netz stellen, die neuesten Lagen anderer spielen oder öffnen, eigene wieder herausnehmen, Link `?scene=werkstatt&netz=<Kennung>`. Neue Tabelle `lagen` (`supabase/migrations/0002_lagen.sql`, RLS: lesen alle, anlegen und löschen nur eigene, höchstens 20 je Spieler).
+- **Lageaustausch** in der Werkstatt: eigene Lagen ins Netz stellen, die neuesten Lagen anderer spielen oder öffnen, eigene wieder herausnehmen, Link `?scene=werkstatt&netz=<Kennung>`. Neue Tabelle `lagen` (`supabase/migrations/0002_lagen.sql`, `0003_lagen_haerten.sql`, RLS: lesen alle, anlegen und löschen nur eigene, höchstens 20 je Spieler).
 
 ### Überraschung
 

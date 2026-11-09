@@ -41,7 +41,9 @@ export async function mount(root, params) {
   applyTheme(themeAt(dark ? 1 : 0));
   audio.init();
 
-  const novice = !readDrill()?.done;
+  let played = false;
+  try { played = !!localStorage.getItem('lehmfront-campaign'); } catch { /* ohne Speicher */ }
+  const novice = !readDrill()?.done && !played;
   const choice = {
     map: ['zufall', ...BATTLE_MAPS.map((m) => m.id)].includes(params.get('karte')) ? params.get('karte') : 'velde',
     mapSeed: (num(params.get('kseed'), 0) >>> 0) || newSeed(),
