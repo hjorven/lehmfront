@@ -65,7 +65,7 @@ test('registerCue: spaetere Pakete melden eigene Klaenge an, eigene Stereo-Angab
 });
 
 test('Vorbelegte Klaenge gibt es alle in der Engine', () => {
-  const types = ['move', 'redeploy', 'fire', 'nightfall', 'daybreak', 'ghost_cleared', 'order_invalid', 'assault', 'artillery', 'mine', 'flare', 'supply'];
+  const types = ['move', 'redeploy', 'fire', 'dig', 'rebuild', 'spoil_seen', 'nightfall', 'daybreak', 'ghost_cleared', 'order_invalid', 'assault', 'artillery', 'mine', 'flare', 'supply'];
   for (const type of types) {
     for (const side of ['a', 'b']) {
       for (const c of planCues([{ type, side, steps: 2, ammo: 1, at: at(10, 12) }], ctx)) {

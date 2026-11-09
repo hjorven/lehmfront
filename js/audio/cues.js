@@ -130,3 +130,8 @@ registerCue('mine', (e, ctx) => shellCue(e, ctx, 0.75));
 registerCue('flare', () => [{ name: 'flare', opts: { intensity: 0.5 } }]);
 for (const t of ['supply', 'cart', 'lore', 'carts_arrived']) registerCue(t, () => [{ name: 'lore', opts: { intensity: 0.4 } }]);
 registerCue('weather', (e) => (e.weather?.kind === 'rain' || e.weather?.kind === 'storm' ? [{ name: 'rain', opts: { intensity: 0.5 } }] : null));
+
+// Seit P04: Graben ausheben und umbauen (Erde im Schlamm), Aushub beim Gegner gesehen (Notiz)
+registerCue('dig', (e, ctx) => (own(e, ctx) ? [{ name: 'steps', opts: { count: 4, intensity: 0.3 } }] : null));
+registerCue('rebuild', (e, ctx) => (own(e, ctx) ? [{ name: 'steps', opts: { count: 3, intensity: 0.3 } }] : null));
+registerCue('spoil_seen', () => [{ name: 'pencil', opts: { count: 2, intensity: 0.35 } }]);
