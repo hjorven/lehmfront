@@ -1,15 +1,20 @@
-// Wetter und Tageszeit im Gefechtsbildschirm (P10): Wetterebene einhaengen, Klang nachfuehren,
+// Wetter und Tageszeit im Gefechtsbildschirm (P10): Wetterebene einhaengen, Klaenge der Wetter-Ereignisse,
 // Tag-Nacht-Uebergang am Ende des Phasenfilms (Haken aus P07), Szenen-Parameter fuer Screenshots.
 // Parameter: weather=clear|overcast|rain|storm|fog, wet=0..3 (Naesse, fuellt auch Graeben in Senken),
 //   flares=x,y;x,y (Leuchtkugeln dieser Runde, 1-basiert wie auf der Karte).
 import { createWeatherLayer } from '../render/weather-layer.js';
-import { setAmbience } from '../audio/engine.js';
+import { registerCue } from '../audio/cues.js';
 import { themeAt, applyTheme } from '../theme.js';
 import { setTransitionHook } from './film.js';
 import { reducedMotion } from './dom.js';
 import { patchCell } from '../state.js';
 import { isSink, WEATHER_KINDS, FLARE_RADIUS } from '../weather.js';
 import { trenchCells } from '../phases/weather.js';
+
+// Klaenge (P19-Haken): Umgebung (Regen, Wind) regelt js/audio/director.js schon aus state.weather
+registerCue('weather', (e) => (e.kind === 'rain' || e.kind === 'storm' ? [{ name: 'rain', opts: { intensity: e.kind === 'storm' ? 0.7 : 0.45 } }] : null));
+registerCue('flood', (e, ctx) => (e.side === ctx.side ? [{ name: 'rain', opts: { intensity: 0.3 } }] : null));
+registerCue('drain', (e, ctx) => (e.side === ctx.side ? [{ name: 'steps', opts: { count: 3, intensity: 0.3 } }] : null));
 
 const ease = (t) => (t < 0.5 ? 2 * t * t : 1 - 2 * (1 - t) * (1 - t));
 
@@ -57,25 +62,9 @@ export function attachWeather({ root, before, map, seed, cam, staticCanvas, getT
   // Uebergang am Filmende: etwa zwei Sekunden, weich beschleunigt und abgebremst (Plan 7.7)
   setTransitionHook(({ t, from, to }) => applyTheme(themeAt(from + (to - from) * ease(t))));
 
-  let lastAmb = '';
-  function ambience(state, darkness) {
-    const w = state.weather ?? {};
-    const amb = {
-      darkness,
-      rain: w.kind === 'storm' ? 1 : w.kind === 'rain' ? w.rain ?? 0.6 : 0,
-      wind: Math.min(1, (w.wind?.speed ?? 1) / 3),
-      battle: state.turnKind === 'battle' ? 0.7 : 0.15,
-    };
-    const key = JSON.stringify(amb);
-    if (key === lastAmb) return;
-    lastAmb = key;
-    try { setAmbience(amb); } catch { /* Klang ist Beiwerk */ }
-  }
-
   return {
     update(state, side) {
       layer.setState(state, { side, still: quiet });
-      ambience(state, getTheme().darkness ?? 0);
     },
     frame(state) { layer.setState(state, { still: quiet }); },
     resize: (w, h, dpr) => layer.resize(w, h, dpr),
