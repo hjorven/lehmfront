@@ -108,6 +108,8 @@
 .orderlist .who{font-weight:700}
 .orderlist .what{color:var(--ink2);font-size:12.5px}
 .orderlist li.idle .what{color:var(--danger)}
+.orderlist .what .note{font:700 15px/1 var(--font-hand);font-style:normal;color:var(--ink);white-space:nowrap}
+.orderlist .what .note.warn{color:var(--danger)}
 .orderlist .clr{width:40px;background:none;border:0;border-left:1px dotted var(--line);font-size:18px;color:var(--ink2)}
 .orderlist .row:hover,.report li button:hover{background:var(--track)}
 .report li{border-bottom:1px dotted var(--line);border-left:4px solid var(--own)}

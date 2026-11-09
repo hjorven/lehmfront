@@ -21,12 +21,12 @@ export function createOrderList(root, { onJump, onClear, onClose }) {
     get open() { return !el.hidden; },
     show() { el.hidden = false; el.querySelector('[data-jump]')?.focus(); },
     hide() { el.hidden = true; },
-    /** rows: [{ id, name, mark, text, set (true wenn ausdruecklicher Befehl), carried }] */
+    /** rows: [{ id, name, mark, text, set (true wenn ausdruecklicher Befehl), carried, note?: { text, warn } (P12: zu lange vorn) }] */
     update(rows, sub) {
       el.querySelector('.sub').textContent = sub;
       el.querySelector('ol').innerHTML = rows.map((r) => `<li class="${r.set ? 'set' : 'idle'}">
         <button type="button" class="row" data-jump="${esc(r.id)}"><span class="mark">${esc(r.mark)}</span>
-          <span class="who">${esc(r.name)}</span><span class="what">${esc(r.text)}</span></button>
+          <span class="who">${esc(r.name)}</span><span class="what">${esc(r.text)}${r.note ? ` <i class="note${r.note.warn ? ' warn' : ''}">${esc(r.note.text)}</i>` : ''}</span></button>
         ${r.set ? `<button type="button" class="clr" data-clear="${esc(r.id)}" aria-label="Befehl für ${esc(r.name)} zurücknehmen">×</button>` : ''}
       </li>`).join('');
     },

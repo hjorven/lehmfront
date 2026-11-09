@@ -32,6 +32,8 @@ import '../ui/overlays/index.js';
 import { planMove, pathRounds } from '../ui/tools/move.js';
 import { currentWagons } from '../ui/tools/supply.js';
 import { planAssault } from '../ui/tools/assault.js';
+import { moraleRows, listNote } from '../ui/tools/relieve.js';
+import { freeRestCell } from '../morale.js';
 import { capacityOf, addWounded } from '../supply.js';
 import {
   groupName, groupMark, typeName, leaderShort, fatigueWord, weatherName, clockText, roundTitle, orderLabel, plural,
@@ -414,7 +416,7 @@ export async function mount(root, params) {
   function updateList() {
     const rows = groupsOf(state, side).map((g) => {
       const o = orderOf(book, side, g.id);
-      return { id: g.id, name: groupLabel(g), mark: groupMark(state, g), text: orderText(g, o), set: !!o, carried: !!o?.carried };
+      return { id: g.id, name: groupLabel(g), mark: groupMark(state, g), text: orderText(g, o), set: !!o, carried: !!o?.carried, note: o?.type === 'relieve' ? null : listNote(map, state, g) };
     });
     const n = rows.filter((r) => r.set).length;
     orderList.update(rows, `${n} von ${rows.length} mit Befehl`);
@@ -447,6 +449,7 @@ export async function mount(root, params) {
         <div><span>Erschöpfung</span><b>${fatigueWord(g.fatigue)}</b></div>
         <div><span>Erfahrung</span><b>${g.experience} / 4</b></div>
         ${groundRow(g)}
+        ${moraleRows(map, state, g).map((r) => `<div${r.warn ? ' class="warn"' : ''}><span>${esc(r.label)}</span><b>${esc(r.value)}</b></div>`).join('')}
         ${g.suppressed >= 0.3 ? `<div class="warn"><span>Unter Feuer</span><b>${g.suppressed >= PINNED ? 'niedergehalten' : 'geduckt'}</b></div>` : ''}
       </div>
       <footer><span>Befehl</span><b>${esc(orderText(g, o))}</b></footer>
@@ -1105,6 +1108,33 @@ export async function mount(root, params) {
       for (const k of ['27,12', '27,13', '28,13', '26,12', '32,13', '33,14', '32,14', '33,13']) state.cells[k] = { ...(state.cells[k] ?? {}), trenchBlocked: true };
       if (demo === 'lorenplan') api.tool('supply');
       else { api.overlay(1); centerOn(cam, 20, 15, Math.max(cam.zoom, narrow() ? 20 : 26)); onCamera(); }
+    }
+    else if (demo === 'abloesung' || demo === 'abloesung-liste' || demo === 'ruhelager') {
+      // P12: eine Gruppe zu lange vorn, eine ruht im Ruhelager, einem Trupp ist der Gruppenfuehrer gefallen
+      state = structuredClone(state);
+      const g = (i) => getGroup(state, own[i].id);
+      Object.assign(g(0), { frontTurns: 7, fatigue: 78, morale: 46 });
+      Object.assign(g(1), { frontTurns: 4, fatigue: 40 });
+      const rest = freeRestCell(map, state, side, { x: 12, y: 12 });
+      if (rest) Object.assign(g(4), { pos: { ...rest.cell }, restAt: { ...rest.cell }, status: 'rest', fatigue: 30, frontTurns: 0 });
+      Object.assign(g(3), { leaderFell: { name: g(3).leader.name, home: g(3).leader.home, turns: 2 }, leader: { name: 'Jost Wendler', home: g(3).leader.home }, morale: 41 });
+      Object.assign(g(2), { greenTurns: 2, strength: g(2).size, experience: 0 });
+      if (demo === 'abloesung') {
+        api.select(own[0].id);
+        api.tool('relieve');
+        api.hover(g(4).pos.x, g(4).pos.y);
+      } else if (demo === 'abloesung-liste') {
+        api.order({ group: own[2].id, type: 'hold' });
+        api.list();
+      } else {
+        // Ruhelager: die Melder sind unterbesetzt, Auffuellen mit gruenem Ersatz senkt die Erfahrung
+        Object.assign(g(4), { strength: Math.max(1, g(4).size - 2), experience: 2 });
+        state.sides[side].replacements = { tenths: 40 };
+        centerOn(cam, g(4).pos.x + 4, g(4).pos.y + 2, Math.max(cam.zoom, narrow() ? 22 : 26)); onCamera();
+        api.select(own[4].id);
+        api.tool('relieve');
+        api.hover(g(4).pos.x, g(4).pos.y);
+      }
     }
     else if (demo === 'graben' || demo === 'traversen' || demo === 'grabenplan') {
       // P04: Pioniere ziehen einen geraden Graben zwischen den Linien, Warnung Laengsfeuer

@@ -472,3 +472,28 @@ test('Determinismus: gleiche Eingabe, gleiches Ergebnis', () => {
   };
   assert.equal(play(), play());
 });
+
+// ------------------------------------------------------------------ Oberflaeche (rein)
+
+test('Oberflaeche: Schild, Befehlsliste und Pruefpunkt "zu lange vorn"', async () => {
+  const { moraleRows, listNote, refillInfo } = await import('../js/ui/tools/relieve.js');
+  const { checklist } = await import('../js/ui/summary.js');
+  const { map, state } = setup();
+  const g = getGroup(state, 'a01');
+  g.frontTurns = C.TOO_LONG;
+  const rows = moraleRows(map, state, g);
+  assert.deepEqual(rows.map((r) => r.value), [`vorn seit ${C.TOO_LONG} Runden`, 'zu lange vorn']);
+  assert.ok(rows.every((r) => r.warn));
+  assert.deepEqual(listNote(map, state, g), { text: `zu lange vorn (${C.TOO_LONG})`, warn: true });
+  assert.equal(listNote(map, state, { ...g, frontTurns: 1 }), null);
+  assert.equal(moraleRows(map, state, getGroup(state, 'a02'))[0].value, 'Reserve');
+  const warn = checklist({ state, side: 'a', orders: [], map }).filter((c) => c.check === 'abloesung');
+  assert.equal(warn.length, 1);
+  assert.match(warn[0].text, /zu lange vorn/);
+  const none = checklist({ state, side: 'a', orders: [{ group: 'a01', type: 'relieve' }], map }).filter((c) => c.check === 'abloesung');
+  assert.equal(none.length, 0, 'mit Ablösebefehl keine Warnung');
+  const a2 = getGroup(state, 'a02');
+  a2.strength = 6;
+  state.sides.a.replacements = { tenths: 30 };
+  assert.deepEqual(refillInfo(state, a2), { veterans: 0, green: 3, total: 3, experience: 0, morale: 52 });
+});
