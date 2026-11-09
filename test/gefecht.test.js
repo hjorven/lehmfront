@@ -16,7 +16,8 @@ import { darknessAt } from '../js/ui/daytime.js';
 import { groupName, groupMark, fatigueWord, leaderShort } from '../js/ui/labels.js';
 import { overlaySlots } from '../js/ui/overlays.js';
 import '../js/ui/overlays/index.js';
-import { planOrders } from '../js/ai/dummy.js';
+import { planOrders } from '../js/ai.js';
+import { viewFor as viewOf } from '../js/view.js';
 
 const read = (p) => JSON.parse(readFileSync(new URL(p, import.meta.url)));
 const MAP = loadMap(read('../data/maps/asse.json'));
@@ -38,7 +39,10 @@ test('Szenario Gefecht frei: 5 gegen 3 auf begehbaren Feldern, Seite b ist KI', 
     const c = cellAt(MAP, g.pos.x, g.pos.y);
     assert.ok(c && !c.building && c.terrain !== 'wasser', `${g.id} steht auf begehbarem Feld`);
   }
-  assert.deepEqual(planOrders(), []);
+  // Seite b plant mit dem KI-Kommandanten (P13): nur Befehle fuer eigene Gruppen oder Seitenbefehle
+  const orders = planOrders(viewOf(fresh(), [], 'b', env), { map: MAP, seed: 7 });
+  assert.ok(Array.isArray(orders));
+  for (const o of orders) assert.ok(!o.group || o.group.startsWith('b'), JSON.stringify(o));
 });
 
 test('Verlegen: Budget der Stellungsrunde, Rest bleibt als Ereignis', () => {

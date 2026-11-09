@@ -21,4 +21,5 @@ Neue Ideen landen hier, nicht im Code (Plan 13). Mit Datum und Paket, aus dem si
 - 2026-11-09, P15: Antworten von zu Hause: Zwischen zwei Missionen kommt gelegentlich ein Brief zurück an jemanden aus dem Abschnitt, der inzwischen gefallen ist. Er geht ungeöffnet mit dem Vermerk „Empfänger gefallen, zurück an Absender“ in die Ablage.
 - 2026-11-09, P15: Das Buch des Abschnitts könnte im Endlosmodus weitergeführt werden und beim Ende als letzte Seite die Summe aller Namen nennen, ohne Kommentar.
 - 2026-11-09, P15: Feldpost einer Gruppe, die lange vorn war, könnte zunehmend kürzer werden (Vorlage kürzen nach `abloesung_verspaetet`).
-
+- 2026-11-09, P13: Lask könnte auch falsche Notizen streuen (Stufe lask, Akt 3): der Spieler lernt, die Handschrift zu prüfen (zittrig = echt, sauber = Köder).
+- 2026-11-09, P13: Der Taktik-Lehrling könnte nach einer Mission seine Vorschläge mit den echten Befehlen vergleichen („Ich hätte bei 33/7 gewartet“) und so zu einer eigenen kleinen Figur werden.

@@ -20,7 +20,10 @@ import { drawBattle, hitUnit, unitBox } from '../render/units-layer.js';
 import { playSfx, audio } from '../audio/engine.js';
 import { frontAmbience } from '../audio/director.js';
 import { mountSoundControls } from '../ui/sound.js';
-import { planOrders } from '../ai/dummy.js';
+import { decide } from '../ai.js';
+import { maybeIntercept, noteFromDecision } from '../ai/notes.js';
+import { attachLehrling } from '../ui/lehrling.js';
+import { createLaskNote, laskNoteOverlay } from '../ui/lask-note.js';
 import {
   createOrderBook, setOrder, clearOrder, undo, canUndo, listOrders, orderOf, seal, nextRound,
 } from '../ui/orderbook.js';
@@ -87,6 +90,12 @@ export async function mount(root, params) {
   applyWeatherParams(state, map, params);
   const humans = mode === 'hotseat' ? ['a', 'b'] : ['a'];
   const env = { map };
+  // KI-Kommandant (P13): Doktrin und Schwierigkeit aus dem Szenario (sides.b.ai), per URL &doktrin= &ki=
+  const aiCfg = { doctrine: params.get('doktrin') || scenario.sides.b.ai?.doctrine, difficulty: params.get('ki') || scenario.sides.b.ai?.difficulty };
+  let aiMemory;                 // Gedaechtnis der KI ueber die Runden
+  let aiNext = null;            // { turn, decision }: Lasks naechster Zug, schon nach der Runde gerechnet (Notizen)
+  let pendingNote = null;       // abgefangene Notiz, erscheint nach dem Phasenfilm
+  let noteMark = null;          // Bleistiftkringel der letzten Notiz auf der Karte
   // Karte mit Graeben, Kratern usw. aus dem Spielzustand (Anzeige und Werkzeuge); env.map bleibt die Grundkarte
   // Nur Felder, die die planende Seite kennt (Nebel des Krieges fuer Graeben, Aufwurf usw.)
   let seenCells = viewFor(state, [], 'a', env).cells; // Seite a plant zuerst
@@ -196,7 +205,8 @@ export async function mount(root, params) {
       hover: tool?.pick ? tool.hoverCell : null,
       preview: prev ? { ...prev, group: tool.group.id, cell: tool.hoverCell, ok: prev.ok ?? !!prev.path } : null,
       sightLine: !tool && hoverSight ? hoverSight : null,
-      overlays: [artilleryOverlay(state), ...(decor ? [{ draw: decor }] : []), ...activeOverlays()],
+      overlays: [artilleryOverlay(state), ...(decor ? [{ draw: decor }] : []), ...activeOverlays(),
+        ...(noteMark ? [laskNoteOverlay(noteMark)] : []), ...lehrling.overlays()],
       plans: sidePlans[side],
       time: performance.now(),
     });
@@ -265,6 +275,39 @@ export async function mount(root, params) {
   });
   // Klang (P19): Knopf rechts, auf dem Handy als Karte in der Seitenleiste
   mountSoundControls({ bar: ui.querySelector('.hud-right'), sheet: ui.querySelector('.hud-sheet') });
+  // Taktik-Lehrling (P13, Taste T) und abgefangene Notizen von Lask
+  const lehrling = attachLehrling({
+    ui, bar: ui.querySelector('.hud-right'), sheet: ui.querySelector('.hud-sheet'), decide, viewFor, map, env, seed, cfg: aiCfg,
+    now: () => ({ state, side, log: lastLog, orderOf: (id) => orderOf(book, side, id), plans: sidePlans[side] }),
+    canOpen: () => { if (book[side]?.sealed || filmFrame) { flash('Der Lehrling hilft beim Planen, nicht jetzt.'); return false; } return true; },
+    adopt: (o) => { if (book[side]?.sealed) return; book = setOrder(book, side, o); helpShown = true; playSfx('pencil', { count: 2, intensity: 0.5 }); },
+    adoptPlan: (o) => {
+      if (book[side]?.sealed) return;
+      // Feuerplaene nach ID zusammenfuehren, damit eigene Plaene des Spielers bleiben
+      const have = sidePlans[side][o.type]?.plans ?? [];
+      const plans = [...have.filter((p) => !o.plans.some((q) => q.id === p.id)), ...o.plans];
+      sidePlans[side] = { ...sidePlans[side], [o.type]: { ...o, plans } };
+      flash(have.length ? 'Feuerplan des Lehrlings zu den eigenen Plänen gelegt.' : 'Feuerplan des Lehrlings übernommen.');
+    },
+    label: (g) => groupLabel(g), mark: (g) => groupMark(state, g), describe: (g, o) => orderText(g, o),
+    focus: ({ group, at }) => {
+      const p = group ? getGroup(state, group)?.pos : at;
+      if (group) select(group);
+      // Auf dem Handy liegt das Kaertchen unten: das Ziel ins obere Drittel holen
+      if (p) { centerOn(cam, p.x + 0.5, p.y + 0.5 + (narrow() ? (root.clientHeight * 0.2) / cam.zoom : 0)); onCamera(); refresh(); }
+    },
+    beforeOpen: () => { cancelTool(false); if (orderList.open) closeList(); report.hide(); playSfx('paper', { intensity: 0.4 }); },
+    changed: () => refresh(),
+  });
+  const laskNote = createLaskNote(ui, {
+    onJump: (at) => { laskNote.hide(); centerOn(cam, at.x + 0.5, at.y + 0.5, Math.max(cam.zoom, narrow() ? 24 : 20)); onCamera(); refresh(); dynCv.focus({ preventScroll: true }); },
+    onClose: () => { laskNote.hide(); playSfx('paper', { intensity: 0.3 }); dynCv.focus({ preventScroll: true }); },
+  });
+  function showNote(note) {
+    noteMark = note;
+    laskNote.show(note);
+    playSfx('paper', { intensity: 0.7 });
+  }
   const toolbar = createToolbar(ui, {
     onTool: (id, disabled) => {
       const def = allTools().find((t) => t.id === id);
@@ -408,6 +451,7 @@ export async function mount(root, params) {
       label: mode === 'hotseat' && side === 'a' && !book.b?.sealed ? 'Befehle versiegeln' : 'Runde ausführen',
     });
     if (orderList.open) updateList();
+    lehrling.sync();
     updateShield();
     if (!filmFrame) weather.update(state, side);
     drawDyn();
@@ -494,6 +538,7 @@ export async function mount(root, params) {
     if (!u.ok) { flash(u.why, 'warn'); return; }
     cancelTool(false);
     radial.hide();
+    lehrling.close();
     helpShown = true;
     if (g) selectedId = g.id;
     tool = { def, group: g, pick: null, preview: null, hoverCell: null, pickHint: '' };
@@ -592,6 +637,7 @@ export async function mount(root, params) {
   function toggleList() { if (orderList.open) closeList(); else openList(); }
   function openList() {
     report.hide();
+    lehrling.close();
     if (archiveView.open) closeArchive(false);
     updateList();
     orderList.show();
@@ -696,6 +742,7 @@ export async function mount(root, params) {
       // Ende des Gefechts: die eigene Begruendung als Hinweis
       const end = lastLog.find((e) => e.type === 'battle_end' && e.side === side);
       if (end) flash(end.reason, end.outcome === 'taken' || end.outcome === 'defended' ? '' : 'warn');
+      if (pendingNote) { showNote(pendingNote); pendingNote = null; }
     }
     refresh();
     if (clockSnapDue && !filmReplay) snapClock();
@@ -738,7 +785,14 @@ export async function mount(root, params) {
   function resolveNow() {
     const withPlans = (s, list) => [...list, ...Object.keys(sidePlans[s]).sort().map((k) => sidePlans[s][k])];
     const ordersA = withPlans('a', listOrders(book, 'a'));
-    const ordersB = humans.includes('b') ? withPlans('b', listOrders(book, 'b')) : planOrders(viewFor(state, [], 'b', env), { map, seed });
+    let ordersB;
+    if (humans.includes('b')) ordersB = withPlans('b', listOrders(book, 'b'));
+    else {
+      const d = aiNext?.turn === state.turn ? aiNext.decision : decide(viewFor(state, lastLog, 'b', env), { map, seed, ...aiCfg, memory: aiMemory });
+      aiMemory = d.memory;
+      const fresh = new Set(d.orders.map((o) => o.group).filter(Boolean));
+      ordersB = [...d.orders, ...listOrders(book, 'b').filter((o) => o.carried && !fresh.has(o.group))];
+    }
     const input = { state, ordersA, ordersB, seed, turn: state.turn, env };
     const r = resolveTurn(state, ordersA, ordersB, seed, state.turn, env);
     const before = state;
@@ -747,6 +801,15 @@ export async function mount(root, params) {
     hoverSight = null;
     lastLog = r.log;
     lastRound = { input, result: r };
+    // P13: Lasks naechsten Zug schon jetzt rechnen; manchmal faellt dabei eine Notiz in die eigenen Haende
+    aiNext = null;
+    if (!humans.includes('b') && !state.result) {
+      const lv = viewFor(state, lastLog, 'b', env);
+      const d = decide(lv, { map, seed, ...aiCfg, memory: aiMemory });
+      aiNext = { turn: state.turn, decision: d };
+      pendingNote = maybeIntercept({ decision: d, laskView: lv, playerView: viewFor(state, lastLog, 'a', env), seed, difficulty: d.difficulty });
+    }
+    lehrling.afterRound(humans);
     archive = archiveRound(archive, input, r);
     // Unvollendete Wege laufen als Befehl weiter, solange die Rundenart passt
     const carry = { a: [], b: [] };
@@ -956,6 +1019,8 @@ export async function mount(root, params) {
     if (e.key === 'Escape') {
       if (radial.open) { radial.hide(); refresh(); dynCv.focus({ preventScroll: true }); }
       else if (tool) cancelTool();
+      else if (laskNote.open) { laskNote.hide(); playSfx('paper', { intensity: 0.3 }); dynCv.focus({ preventScroll: true }); }
+      else if (lehrling.open) lehrling.close();
       else if (hud.popoverOpen) hud.closePopover();
       else if (orderList.open) closeList();
       else if (root.classList.contains('sheet-open')) { root.classList.remove('sheet-open'); hud.setSheet(false); }
@@ -977,6 +1042,7 @@ export async function mount(root, params) {
     if (e.key === 'Enter' && !onButton) { e.preventDefault(); openSummary(); return; }
     if (/^[1-4]$/.test(e.key)) { toggleOverlay(Number(e.key)); return; }
     if ((e.key === 'p' || e.key === 'P') && !toolByKey(e.key)) { e.preventDefault(); openArchive(); return; }
+    if ((e.key === 't' || e.key === 'T') && !toolByKey(e.key)) { e.preventDefault(); lehrling.toggle(); return; }
     if (e.key.length === 1) {
       const def = toolByKey(e.key);
       if (!def) return;
@@ -1099,6 +1165,17 @@ export async function mount(root, params) {
         commitSide();
       }
     } else if (demo === 'bedrohung') { api.overlay(2); }
+    else if (demo === 'lehrling' || demo === 'lehrling-nimm') {
+      // P13: Taktik-Lehrling; "-nimm" uebernimmt den ersten Vorschlag
+      lehrling.toggle();
+      if (demo === 'lehrling-nimm') ui.querySelector('.lr-take')?.click();
+    } else if (demo === 'notiz') {
+      // P13: abgefangene Notiz aus Lasks echtem naechsten Zug (hier ohne Wurf erzwungen)
+      const lv = viewFor(state, [], 'b', env);
+      const d = decide(lv, { map, seed, ...aiCfg, posture: params.get('lage') || undefined });
+      const note = noteFromDecision(d, lv, { seed, difficulty: d.difficulty });
+      showNote({ ...note, found: 'von einem Beobachter aus dem Niemandsland geholt' });
+    }
     else if (demo === 'sichtlinie') { api.select(own[0].id); hoverSight = sightLabel(sightLine(map, own[0], { x: 41, y: 12 }, darknessOf(state))); }
     else if (demo === 'lorenplan' || demo === 'versorgung') {
       // Lage fuer Screenshots: Verwundete in B und C, Abschnitt A durch verschuettete Graeben abgeschnitten

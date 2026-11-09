@@ -46,6 +46,7 @@
     "b": {
       "faction": "morrow",
       "control": "ai",
+      "ai": { "doctrine": "masse", "difficulty": "veteran" },
       "intel": [
         { "group": "a02", "turnsAgo": 1, "sector": { "x": 42, "y": 18 }, "source": "Grabenspiegel" }
       ],

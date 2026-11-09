@@ -1,0 +1,57 @@
+/* Taktik-Lehrling und abgefangene Notizen (P13). Farben nur aus den Token in css/style.css. */
+.lr-btn kbd{font:11px var(--font-num);color:var(--ink2);border:var(--border);border-radius:var(--radius);padding:0 4px}
+.lr-btn.on{background:var(--ink);color:var(--card);border-color:var(--ink)}
+.lr-btn.on kbd{color:var(--card);border-color:var(--card)}
+.lr-card{display:none}
+
+.lehrling{position:absolute;right:136px;top:100px;width:360px;max-height:calc(100% - 190px);display:flex;flex-direction:column;font-size:13.5px;z-index:3;border-top:4px solid var(--accent)}
+.lehrling[hidden]{display:none}
+.lehrling header{display:flex;align-items:baseline;gap:10px;padding:9px 12px;border-bottom:var(--border)}
+.lehrling header b{font:400 16px var(--font-head)}
+.lehrling .sub{color:var(--ink2);font-size:12.5px;margin-right:auto}
+.lr-lage{margin:0;padding:8px 12px;border-bottom:1px dotted var(--line);line-height:1.4}
+.lr-list{list-style:none;margin:0;padding:0;overflow:auto}
+.lr-list li{display:flex;align-items:stretch;border-bottom:1px dotted var(--line)}
+.lr-list li:last-child{border-bottom:0}
+.lr-row{flex:1;display:grid;grid-template-columns:30px 1fr;column-gap:8px;padding:7px 10px 8px 12px;background:none;border:0;text-align:left;color:var(--ink);font:inherit}
+.lr-row:hover{background:var(--track)}
+.lr-n{grid-row:1/4;align-self:start;display:grid;place-items:center;width:26px;height:26px;border:2px solid var(--accent);border-radius:50%;font:700 17px/1 var(--font-hand);background:var(--paper)}
+.lr-who{font-weight:700}
+.lr-who small{font:11px var(--font-num);color:var(--ink2);font-weight:400}
+.lr-what{font-size:13px}
+.lr-why{font:400 17px/1.15 var(--font-hand);color:var(--ink2);margin-top:2px}
+.lr-take{width:64px;background:none;border:0;border-left:1px dotted var(--line);font:700 13px var(--font-ui);color:var(--ink)}
+.lr-take:hover:not([disabled]){background:var(--ink);color:var(--card)}
+.lr-take[disabled]{color:var(--ink2);font-weight:400}
+.lr-list li.done .lr-row{opacity:.6}
+.lr-list li.done .lr-n{border-color:var(--line)}
+.lr-empty{padding:10px 12px;color:var(--ink2)}
+.lehrling footer{display:flex;align-items:center;gap:10px;padding:8px 12px;border-top:var(--border)}
+.lr-all{justify-content:center;font-weight:700;min-height:38px;white-space:nowrap;flex:none}
+.lr-foot{font:400 16px/1.1 var(--font-hand);color:var(--ink2)}
+
+/* Abgefangene Notiz: ausgerissener Zettel mit Bleistiftschrift */
+.lask-note{position:absolute;left:50%;top:50%;transform:translate(-50%,-55%) rotate(-1.6deg);width:min(380px,calc(100% - 32px));z-index:6;display:flex;flex-direction:column;gap:8px;filter:drop-shadow(var(--shadow))}
+.lask-note[hidden]{display:none}
+.ln-stamp{align-self:flex-start;transform:rotate(-3deg);padding:2px 8px;border:2px solid var(--danger);color:var(--danger);font:700 12px var(--font-num);letter-spacing:.06em;text-transform:uppercase;background:var(--card)}
+.ln-paper{background:var(--card);padding:16px 18px 18px;clip-path:polygon(0 3%,6% 0,14% 2%,23% 0,31% 3%,42% 1%,51% 3%,62% 0,71% 2%,83% 0,92% 3%,100% 1%,100% 96%,93% 100%,84% 97%,72% 100%,63% 97%,52% 100%,41% 98%,30% 100%,19% 97%,9% 100%,0 98%);border-left:3px double var(--line)}
+.ln-text{margin:0;font:400 23px/1.25 var(--font-hand);color:var(--ink)}
+.ln-line{display:block}
+.ln-line:first-child{font-size:19px;color:var(--ink2)}
+.ln-smudge{filter:blur(2.4px);opacity:.75}
+.ln-sig{display:block;text-align:right;font-size:26px;margin-top:4px}
+.ln-vermerk{margin:0;padding:6px 10px;background:var(--card);border:var(--border);font:12px/1.4 var(--font-num);color:var(--ink2)}
+.ln-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.ln-actions{display:flex;gap:8px}
+.ln-actions .btn{flex:1;justify-content:center;min-height:44px;font-weight:700}
+
+@media (max-width:699px){
+  .lr-btn{display:none !important}
+  .lr-card{display:block;padding:8px 10px 10px}
+  .lr-card .k{display:block;padding:0 0 4px}
+  .lr-card p{margin:0 0 6px;font-size:12.5px;color:var(--ink2)}
+  .lr-card .btn{width:100%;justify-content:center;min-height:44px}
+  .lehrling{left:8px;right:8px;width:auto;top:auto;bottom:calc(80px + env(safe-area-inset-bottom));max-height:56%}
+  .lr-take{width:60px;min-height:44px}
+  .ln-text{font-size:21px}
+}
