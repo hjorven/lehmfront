@@ -1,10 +1,11 @@
 // Bezeichnungen fuer die Oberflaeche: Gruppennamen, Zustandswoerter, Wetter, Uhrzeit. Rein, ohne DOM.
+import { windOf, windText } from '../gas.js';
 import { unitType } from '../config/units.js';
 import { ORDER_TYPES } from '../config/orders.js';
 import { compareId } from '../state.js';
 
 /** Kurzzeichen im Kartensymbol: Schuetzen tragen ihre Nummer, alle anderen ein Kuerzel */
-export const MARKS = { mg: 'MG', pioneers: 'Pi', medics: 'San', runners: 'Me', observers: 'Beo', mortar: 'Mö' };
+export const MARKS = { mg: 'MG', pioneers: 'Pi', medics: 'San', runners: 'Me', observers: 'Beo', mortar: 'Mö', fieldgun: 'FK', flamethrowers: 'Fw' };
 
 /** Laufende Nummer einer Gruppe auf ihrer Seite (1-basiert, nach ID, aufgeriebene zaehlen mit) */
 export function groupNumber(state, group) {
@@ -42,7 +43,9 @@ const GROUND = ['', 'Boden weich', 'Schlamm', 'grundlos'];
 export function weatherName(w) {
   const name = WEATHER[w?.kind] ?? 'klar';
   const g = GROUND[Math.max(0, Math.min(3, w?.wet | 0))];
-  return g ? `${name}, ${g}` : name;
+  // P24: mit Gas zaehlt der Wind (nur Lagen mit Windvorhersage)
+  const wind = w?.windForecast ? windText(windOf({ weather: w })) : null;
+  return [name, g, wind].filter(Boolean).join(', ');
 }
 
 export function clockText(clock) {

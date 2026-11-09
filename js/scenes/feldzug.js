@@ -136,7 +136,8 @@ export async function mount(root, params) {
     if (!c.ended) {
       let map = null;
       try {
-        const scen = await fetchJson(`data/scenarios/${scenarioForMission(ret.mission, campaign)}.json`);
+        const sid = scenarioForMission(ret.mission, campaign);
+        const scen = await fetchJson(`data/${/^akt1-m\d+$/.test(sid) ? 'missions' : 'scenarios'}/${sid}.json`);
         map = loadMap(await fetchJson(`data/maps/${scen.map}.json`));
       } catch { map = null; }
       const r = await playInterlude({

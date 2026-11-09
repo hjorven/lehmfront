@@ -36,6 +36,8 @@ export const DAY = {
   pencil: '#4a4540', stain: '#8a5a2b', fold: '#a8987a', frame: '#3a3128', desk: '#3a3027', shade: '#000000',
   // Wetter (P10): Schlammsignatur, Nebelgrau, Licht der Leuchtkugel, Wasser auf dem Papier
   mud: '#6b4f30', fog: '#aaa69a', flareLight: '#f3c66a', wetPaper: '#d9ccab',
+  // Akt 3 (P24): Gaswolke (gedecktes Senfgelb), vergilbtes Papier, wo Gas lag
+  gas: '#8d7a17', gasStain: '#c9b46a',
   jitter: 0.045, shadeAlpha: 0.22, foldAlpha: 0.35, stainAlpha: 0.22,
 };
 
@@ -46,6 +48,7 @@ export const NIGHT = {
   rail: '#8a846f', marsh: '#7aa4bd', chalk: '#5a5c4c', rock: '#8a8270', village: '#a49e88',
   pencil: '#b3ae9a', stain: '#5a4630', fold: '#2a2e22', frame: '#a8a28c', desk: '#050605', shade: '#000000',
   mud: '#9a8260', fog: '#4b4f47', flareLight: '#ffcf73', wetPaper: '#1a1d16',
+  gas: '#d6c25a', gasStain: '#4a4420',
   jitter: 0.03, shadeAlpha: 0.5, foldAlpha: 0.45, stainAlpha: 0.18,
 };
 
@@ -226,6 +229,7 @@ export const BLUEPRINT = {
   rail: '#eef3fb', marsh: '#a8c0e8', chalk: '#3c64ab', rock: '#cfdcf2', village: '#eef3fb',
   pencil: '#ffffff', stain: '#10306a', fold: '#2f5ca8', frame: '#dce6f7', desk: '#0b1d42', shade: '#000000',
   mud: '#9fb6e0', fog: '#2f5597', flareLight: '#ffd45c', wetPaper: '#143470',
+  gas: '#ffd45c', gasStain: '#1f4a8e',
   jitter: 0, shadeAlpha: 0.3, foldAlpha: 0.25, stainAlpha: 0,
 };
 

@@ -1,4 +1,5 @@
 // Alle Werkzeuge. Neues Werkzeug: Datei in js/ui/tools/ und eine Import-Zeile hier (alphabetisch).
+import './akt3.js';
 import './artillery.js';
 import './assault.js';
 import './dig.js';

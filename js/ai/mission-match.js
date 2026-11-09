@@ -31,7 +31,7 @@ export function runMission(opts) {
     for (const side of ['a', 'b']) {
       const cfg = side === 'a'
         ? { posture: opts.passive ? 'halten' : undefined, doctrine: 'ausgewogen', difficulty: 'lask', goals: goalsA }
-        : { doctrine: opts.scenario.sides.b.ai?.doctrine, difficulty: opts.scenario.sides.b.ai?.difficulty };
+        : { doctrine: opts.scenario.sides.b.ai?.doctrine, difficulty: opts.scenario.sides.b.ai?.difficulty, goals: opts.scenario.sides.b.ai?.goals ?? null };
       const d = decide(viewFor(state, log, side, env), { map, seed, side, memory: memory[side], ...cfg });
       memory[side] = d.memory;
       orders[side] = opts.passive && side === 'a' ? [] : d.orders;

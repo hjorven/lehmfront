@@ -60,7 +60,7 @@ function enemyStub(g) {
 /**
  * Sicht einer Seite auf Zustand und Protokoll.
  * env (optional): { map } fuer Sichtlinien und Deckung, { darkness } ueberschreibt die Dunkelheit der Uhr.
- * Liefert { side, turn, turnKind, night, darkness, clock, weather, battle, result, map, own, enemy, groups, cells, log, ghosts }.
+ * Liefert { side, turn, turnKind, night, darkness, clock, weather, battle, result, map, scenario, own, enemy, groups, cells, log, ghosts }.
  */
 export function viewFor(state, log, side, env = {}) {
   const foe = otherSide(side);
@@ -104,6 +104,8 @@ export function viewFor(state, log, side, env = {}) {
     battle: structuredClone(state.battle),
     result: structuredClone(state.result),
     map: { ...state.map },
+    // Merkmale der Lage sind oeffentlich (P24: die KI prueft Gas, Flieger, Waffenruhe wie der Spieler)
+    scenario: state.scenario ? { id: state.scenario.id ?? null, act: state.scenario.act ?? null, features: [...(state.scenario.features ?? [])] } : null,
     own: structuredClone(state.sides[side]),
     enemy: { faction: state.sides[foe].faction },
     groups,

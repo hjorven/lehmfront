@@ -137,6 +137,7 @@ export async function mount(root, params) {
   if (fixed) aiCfg = { doctrine: sai.doctrine, difficulty: sai.difficulty };
   else if (modeInfo?.map) aiCfg = { doctrine: sai.doctrine ?? urlAi.doctrine, difficulty: sai.difficulty ?? urlAi.difficulty };
   else aiCfg = { doctrine: urlAi.doctrine ?? sai.doctrine, difficulty: urlAi.difficulty ?? sai.difficulty };
+  if (sai.goals) aiCfg.goals = sai.goals; // P24: Szenarioziele der KI (z. B. Fliegerziele in Akt 3)
   let aiMemory;                 // Gedaechtnis der KI ueber die Runden
   let aiNext = null;            // { turn, decision }: Lasks naechster Zug, schon nach der Runde gerechnet (Notizen)
   let pendingNote = null;       // abgefangene Notiz, erscheint nach dem Phasenfilm

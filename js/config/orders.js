@@ -27,6 +27,13 @@ export const ORDER_TYPES = {
   sector:      { id: 'sector',      label: 'Feuersektor',     kind: 'both',     target: 'cell' },
   drain:       { id: 'drain',       label: 'Entwässern',      kind: 'position', target: 'cell' },
   flare:       { id: 'flare',       label: 'Leuchtkugel',     kind: 'both',     target: 'cell', night: true },
+  // P24 (Akt 3): Gas, Flieger, Scheinbatterien und Tarnnetze, Waffenruhe, Bergen draussen
+  gas:         { id: 'gas',         label: 'Gas abblasen',    kind: 'position', target: null },
+  gas_shell:   { id: 'gas_shell',   label: 'Gasgranaten',     kind: 'position', target: null, scope: 'side' },
+  recon:       { id: 'recon',       label: 'Flieger',         kind: 'position', target: null, scope: 'side' },
+  decoy:       { id: 'decoy',       label: 'Tarnen',          kind: 'position', target: null, scope: 'side' },
+  truce:       { id: 'truce',       label: 'Waffenruhe',      kind: 'position', target: null, scope: 'side' },
+  recover:     { id: 'recover',     label: 'Bergen',          kind: 'position', target: 'cell' },
 
   move:        { id: 'move',        label: 'Bewegen',         kind: 'battle',   target: 'path' },
   fire:        { id: 'fire',        label: 'Feuern',          kind: 'battle',   target: 'cell' },
@@ -34,4 +41,5 @@ export const ORDER_TYPES = {
   assault:     { id: 'assault',     label: 'Sturm',           kind: 'battle',   target: 'path' },
   shift_fire:  { id: 'shift_fire',  label: 'Feuer verlegen',  kind: 'battle',   target: 'cell' },
   cease_fire:  { id: 'cease_fire',  label: 'Feuer einstellen', kind: 'battle',  target: null },
+  flame:       { id: 'flame',       label: 'Flammenstoß',     kind: 'battle',   target: 'cell' },
 };

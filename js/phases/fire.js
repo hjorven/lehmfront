@@ -95,6 +95,8 @@ export function fireOdds(state, map, shooter, targetPos, targetSide, { darkness 
   let cover = cov.cover;
   // Steilfeuer trifft in den Graben
   if (indirect && coverValue(cover) > coverValue('crater')) cover = 'crater';
+  // P24: Feldgeschuetz im Direktfeuer schlaegt durch Brustwehr und Mauern (unit.pierce)
+  if (t.pierce && coverValue(cover) > coverValue(t.pierce)) cover = t.pierce;
   const enfilade = !indirect && enfiladeRule(state, map, shooter.pos, targetPos);
   const base = { shots: effectiveShots(shooter), cover, coverLabel: cov.label, reversed: cov.reversed, enfilade, distance: d, range: t.range, indirect };
   if (!canFire(shooter)) return { ...base, ok: false, why: `${t.name} feuert nicht`, p: 0, expected: 0, los: null };

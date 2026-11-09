@@ -1,0 +1,351 @@
+{
+  "id": "akt3-m3",
+  "name": "Augen am Himmel",
+  "map": "kroning",
+  "act": 3,
+  "features": [
+    "decoy",
+    "plane"
+  ],
+  "startHour": 6,
+  "turnKind": "position",
+  "weather": {
+    "kind": "clear",
+    "season": "winter",
+    "wind": {
+      "dir": "w",
+      "speed": 1
+    },
+    "fixed": true
+  },
+  "cells": [],
+  "sides": {
+    "a": {
+      "faction": "kaldern",
+      "supplies": {
+        "carts": 4,
+        "cartsTotal": 6,
+        "material": 30
+      },
+      "artillery": {
+        "batteries": [
+          {
+            "id": "batterie1",
+            "type": "feldhaubitzen",
+            "x": 11,
+            "y": 26,
+            "w": 2,
+            "h": 2,
+            "label": "Batterie 1"
+          },
+          {
+            "id": "batterie2",
+            "type": "feldhaubitzen",
+            "x": 13,
+            "y": 33,
+            "w": 2,
+            "h": 2,
+            "label": "Batterie 2"
+          },
+          {
+            "id": "batterie3",
+            "type": "feldhaubitzen",
+            "x": 8,
+            "y": 21,
+            "w": 2,
+            "h": 2,
+            "label": "Batterie 3 (neu)"
+          },
+          {
+            "id": "batterie4",
+            "type": "schwere",
+            "x": 12,
+            "y": 37,
+            "w": 2,
+            "h": 2,
+            "label": "Schwere Batterie 4 (neu)"
+          }
+        ],
+        "exchange": {
+          "x": 14,
+          "y": 11
+        },
+        "lines": [
+          {
+            "id": "k8",
+            "to": "batterie3",
+            "points": [
+              [
+                15,
+                12
+              ],
+              [
+                9,
+                21
+              ]
+            ]
+          },
+          {
+            "id": "k9",
+            "to": "batterie4",
+            "points": [
+              [
+                15,
+                12
+              ],
+              [
+                13,
+                37
+              ]
+            ]
+          }
+        ]
+      },
+      "ai": {
+        "goals": {
+          "decoy": [
+            {
+              "x": 9,
+              "y": 28
+            },
+            {
+              "x": 10,
+              "y": 34
+            }
+          ],
+          "camo": [
+            {
+              "x": 3,
+              "y": 15
+            }
+          ],
+          "recon": [
+            {
+              "x": 54,
+              "y": 29
+            }
+          ]
+        }
+      },
+      "air": 1,
+      "groups": [
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 29,
+            "y": 5
+          },
+          "morale": 66
+        },
+        {
+          "type": "mg",
+          "pos": {
+            "x": 30,
+            "y": 12
+          },
+          "morale": 66
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 29,
+            "y": 20
+          },
+          "morale": 64
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 30,
+            "y": 28
+          },
+          "morale": 64
+        },
+        {
+          "type": "pioneers",
+          "pos": {
+            "x": 24,
+            "y": 24
+          },
+          "morale": 68,
+          "leader": {
+            "name": "Swantje Fedders",
+            "home": "Grauwarf"
+          }
+        },
+        {
+          "type": "pioneers",
+          "pos": {
+            "x": 24,
+            "y": 12
+          },
+          "morale": 66
+        },
+        {
+          "type": "observers",
+          "pos": {
+            "x": 24,
+            "y": 8
+          },
+          "morale": 66
+        }
+      ]
+    },
+    "b": {
+      "faction": "morrow",
+      "control": "ai",
+      "ai": {
+        "doctrine": "material",
+        "difficulty": "lask",
+        "goals": {
+          "recon": [
+            {
+              "x": 6,
+              "y": 16
+            },
+            {
+              "x": 11,
+              "y": 27
+            },
+            {
+              "x": 10,
+              "y": 33
+            }
+          ]
+        }
+      },
+      "supplies": {
+        "carts": 3,
+        "cartsTotal": 5
+      },
+      "artillery": {
+        "exchange": {
+          "x": 51,
+          "y": 20
+        },
+        "batteries": [
+          {
+            "id": "mb1",
+            "type": "feldhaubitzen",
+            "x": 54,
+            "y": 27,
+            "w": 2,
+            "h": 2,
+            "label": "Batterie Zelva 1"
+          },
+          {
+            "id": "mb2",
+            "type": "feldhaubitzen",
+            "x": 56,
+            "y": 32,
+            "w": 2,
+            "h": 2,
+            "label": "Batterie Zelva 2"
+          },
+          {
+            "id": "mb3",
+            "type": "schwere",
+            "x": 52,
+            "y": 3,
+            "w": 2,
+            "h": 2,
+            "label": "Schwere Batterie Raudas"
+          }
+        ],
+        "lines": [
+          {
+            "id": "m1",
+            "to": "Abschnitt Mitte",
+            "points": [
+              [
+                51,
+                20
+              ],
+              [
+                47,
+                20
+              ],
+              [
+                46,
+                18
+              ]
+            ]
+          },
+          {
+            "id": "m2",
+            "to": "mb1",
+            "points": [
+              [
+                51,
+                20
+              ],
+              [
+                54,
+                27
+              ]
+            ]
+          },
+          {
+            "id": "m3",
+            "to": "mb2",
+            "points": [
+              [
+                51,
+                20
+              ],
+              [
+                56,
+                32
+              ]
+            ]
+          },
+          {
+            "id": "m4",
+            "to": "mb3",
+            "points": [
+              [
+                51,
+                20
+              ],
+              [
+                52,
+                4
+              ]
+            ]
+          }
+        ]
+      },
+      "air": 1,
+      "groups": [
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 41,
+            "y": 4
+          }
+        },
+        {
+          "type": "mg",
+          "pos": {
+            "x": 42,
+            "y": 12
+          }
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 42,
+            "y": 18
+          }
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 41,
+            "y": 26
+          }
+        }
+      ]
+    }
+  }
+}

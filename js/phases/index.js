@@ -1,4 +1,5 @@
 // Alle Phasen-Module. Neue Mechanik: eine Zeile ergaenzen (alphabetisch, damit Rebases selten kollidieren).
+import './air.js';
 import './artillery.js';
 import './battle.js';
 import './build.js';
@@ -7,6 +8,8 @@ import './clock.js';
 import './dig.js';
 import './dugout.js';
 import './fire.js';
+import './flame.js';
+import './gas.js';
 import './hold.js';
 import './intel.js';
 import './melee.js';
@@ -18,7 +21,9 @@ import './rebuild.js';
 import './sap.js';
 import './season.js';
 import './setup-akt2.js';
+import './setup-akt3.js';
 import './supply.js';
+import './truce.js';
 import './tunnel.js';
 import './veterans.js';
 import './weather.js';
