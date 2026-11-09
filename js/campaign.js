@@ -291,7 +291,7 @@ export function checkThresholds(campaign, mission = campaign.mission) {
 
 /**
  * Ende einer Mission in die Kampagne buchen (vor playInterlude, damit Tagebuch und Briefe die neuen Werte lesen).
- * input: { mission, outcome: 'sieg'|'niederlage', rounds (archive.rounds), finalState, order, orderMet?,
+ * input: { mission, outcome: 'sieg'|'niederlage', rounds (archive.rounds), finalState, order, orderMet?, flags?,
  *          start: { reputation, trust } (Werte, mit denen die Mission begann) }
  * Liefert { campaign, changes, reached, ended }.
  */
@@ -313,6 +313,8 @@ export function finishMission(campaign, input) {
   });
   applyChanges(c, changes);
   c.ledger.push({ mission, stage: 'mission', outcome, changes });
+  // Flags der Mission (harms_gefallen, velde_verloren ...), die das Missionsziel meldet
+  for (const f of [...(input.flags ?? [])].sort()) if (typeof f === 'string' && !c.flags.includes(f)) c.flags.push(f);
   c.outcomes[mission] = outcome;
 
   // Front auf der Feldzugskarte: Sieg schiebt sie ein Stueck vor, Niederlage zurueck
@@ -419,6 +421,10 @@ export function defaultJudge({ rounds, side }) {
 export function judgeMission(mission, { state, rounds, side = 'a', final = false }) {
   const counts = missionCounts(rounds, side);
   if (counts.mutiny || state?.sides?.[side]?.mutiny) return { outcome: 'niederlage', orderMet: false, why: 'Meuterei', done: true };
+  if (state?.result) {
+    const won = state.result.winner === side;
+    return { outcome: won ? 'sieg' : 'niederlage', orderMet: won, why: state.result.reason, done: true };
+  }
   const fn = judges.get(mission);
   const r = fn ? fn({ state, rounds, side, counts }) : null;
   if (r) return { ...r, done: true };

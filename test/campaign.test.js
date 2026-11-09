@@ -272,8 +272,9 @@ test('finishMission bucht Achsen, Verlauf, Front und naechste Mission', () => {
   assert.equal(c.history.length, 2);
   assert.equal(c.reply.band, replyBand(c.ansehen));
   assert.equal(c.ledger.at(-1).changes.length, f.changes.length);
-  const lost = finishMission(c, { mission: 'a1m2', outcome: 'niederlage', rounds: [] }).campaign;
+  const lost = finishMission(c, { mission: 'a1m2', outcome: 'niederlage', rounds: [], flags: ['velde_verloren'] }).campaign;
   assert.deepEqual(lost.front, [1, 0]);
+  assert.ok(lost.flags.includes('velde_verloren'), 'Flags der Mission');
 });
 
 test('Meuterei im Gefecht: Mission verloren, Kampagne endet', () => {
@@ -385,6 +386,8 @@ test('Runde mit Kampagne laeuft durch und ist deterministisch', () => {
   const r2 = resolveTurn(s, [], [], 7, 1, { map });
   assert.deepEqual(r1.log, r2.log);
   assert.ok(r1.log.some((e) => e.type === 'mutiny'));
+  assert.equal(r1.finished, true, 'Meuterei beendet die Partie');
+  assert.equal(r1.state.result.winner, 'b');
   const j = judgeMission('a1m1', { state: r1.state, rounds: [{ turn: 1, kind: 'position', log: r1.log }] });
   assert.equal(j.outcome, 'niederlage');
 });

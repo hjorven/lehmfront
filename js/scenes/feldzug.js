@@ -130,7 +130,7 @@ export async function mount(root, params) {
     const order = index.list.find((e) => e.art === 'befehl' && e.mission === ret.mission) ?? null;
     const f = finishMission(campaign, {
       mission: ret.mission, outcome: ret.outcome, orderMet: ret.orderMet, rounds: ret.rounds ?? [],
-      finalState: ret.finalState ?? null, order, start: ret.start ?? null,
+      finalState: ret.finalState ?? null, order, start: ret.start ?? null, flags: ret.flags ?? [],
     });
     let c = f.campaign;
     if (!c.ended) {

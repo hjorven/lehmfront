@@ -29,6 +29,8 @@ jobs:
           npx playwright install --with-deps chromium
           node tools/shot.mjs --check
           node tools/shot.mjs --check --path "/?scene=papier"
+          node tools/shot.mjs --check --path "/?scene=feldzug&demo=mitte"
+          node tools/shot.mjs --check --path "/?scene=feldzug&demo=tief&stempel=verweigern&bericht=traversen"
           node tools/shot.mjs --check --path "/?scene=karte"
           node tools/shot.mjs --check --path "/?scene=karte&night=1"
           node tools/shot.mjs --check --path "/?scene=etappe"

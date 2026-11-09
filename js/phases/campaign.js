@@ -28,6 +28,8 @@ export function runCampaign(ctx) {
         reason: `Vertrauen ${s.trust}: Die Gruppen kommen nicht mehr aus den Unterständen. Sie halten den Graben, aber sie gehen nirgends mehr hin. Die Mission ist verloren.`,
         at: centerOf(state, side),
       });
+      // Die Partie endet (resolve.js: state.result); die Feldzugskarte wertet sie als verloren
+      ctx.finish?.({ winner: side === 'a' ? 'b' : 'a', reason: 'Meuterei: Die Truppe geht nicht mehr. Die Mission ist verloren.' });
     }
     if (!s.campaign.threatened && (s.reputation ?? 50) < THREAT_BELOW) {
       s.campaign = { ...s.campaign, threatened: ctx.turn };

@@ -44,7 +44,7 @@ export function campaignMission(params) {
     if (ended) return;
     ended = true;
     saveMissionReturn({
-      mission, outcome: result.outcome, orderMet: result.orderMet ?? result.outcome === 'sieg', why: result.why ?? '',
+      mission, outcome: result.outcome, orderMet: result.orderMet ?? result.outcome === 'sieg', why: result.why ?? '', flags: result.flags ?? [],
       rounds: slimRounds(archive.rounds), finalState: slimState(state), start: startValues,
     });
     location.href = location.pathname + '?scene=feldzug';
