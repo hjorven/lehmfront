@@ -74,7 +74,6 @@ export function openFirePlanEditor(opts) {
     wantLine: false,     // naechstes Ziehen legt die Linie neu
   };
   m.sel = m.plans[0]?.id ?? null;
-  if (!m.plans.length && art.batteries.length) addPlan('creep', { wantLine: true });
 
   const el = document.createElement('section');
   el.className = 'fp card';
@@ -447,7 +446,10 @@ export function openFirePlanEditor(opts) {
     el.remove();
   }
 
-  render();
+  // Ohne Plan beginnt der Editor mit einer Feuerwalze, deren Linie man gleich zieht. Erst hier, wenn das Planblatt
+  // (el) und alle Funktionen stehen; vorher stuerzte das Oeffnen ohne vorhandenen Plan ab.
+  if (!m.plans.length && art.batteries.length) addPlan('creep', { wantLine: true });
+  else render();
   return { close, draw, tap, model: m, el, center: () => centerOf(planCellsAt({ ...(sel() ?? {}), fired: 0 }, sel()?.start ?? 1, map)) };
 }
 

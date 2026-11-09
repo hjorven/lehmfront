@@ -3,7 +3,9 @@
 Diese Anleitung führt dich in etwa zwanzig Minuten von null bis zur ersten eigenen Partie. Sie ergänzt zwei Dinge im Spiel selbst:
 
 - **Grundausbildung** (Hauptmenü, oberster Eintrag): ein Zettel führt dich Schritt für Schritt durch die erste Partie an der Asse. Etwa zehn Minuten.
-- **Handbuch** (Hauptmenü unten, im Gefecht unter Menü, Reiter Tasten): alle Begriffe, Werte und Tasten zum Nachschlagen.
+- **Grundausbildung Teil 2**: Beobachter, Feldinfo, Artillerie (Feuerplan), Gebäude bauen, Ablösen und Ersatz.
+- **Pause mit Nachschlagen** (im Gefecht Esc oder „Menü“): alles über Einheiten, Gelände, Gebäude, Artillerie und Bauen, ohne die Partie zu verlassen.
+- **Handbuch** (Hauptmenü unten): dasselbe zum Nachschlagen außerhalb des Gefechts.
 
 Spielen: https://hjorven.github.io/lehmfront/ (Desktop, Tablet und Handy, ohne Installation, danach auch offline)
 
@@ -15,6 +17,8 @@ Spielen: https://hjorven.github.io/lehmfront/ (Desktop, Tablet und Handy, ohne I
 2. [Starten](#2-starten)
 3. [Der Bildschirm](#3-der-bildschirm)
 4. [Die erste Runde](#4-die-erste-runde)
+   - [Pause und Nachschlagen](#pause-und-nachschlagen)
+   - [Was ist auf diesem Feld?](#was-ist-auf-diesem-feld)
 5. [Ausführen, Film und Telegramm](#5-ausführen-film-und-telegramm)
 6. [Versorgung, Etappe, Ablösung](#6-versorgung-etappe-ablösung)
 7. [Angreifen](#7-angreifen)
@@ -46,6 +50,10 @@ Jede Meldung im Spiel trägt eine Begründung. Wenn etwas schiefgeht, steht da, 
 Beim ersten Besuch steht neben **Grundausbildung** mit Bleistift „Neu hier? Hier anfangen.“ Fang dort an. Die Grundausbildung ist eine echte Partie an der Asse gegen den schwächsten Gegner (Rekrut), ohne Rundenlimit. Ein Zettel zeigt dir, was als Nächstes zu tun ist, und umkringelt das passende Bedienelement mit Bleistift. Erledigst du den Schritt auf der Karte, hakt der Zettel ihn selbst ab.
 
 ![Der Zettel der Grundausbildung](bilder/tutorial/02-grundausbildung.jpg)
+
+![Grundausbildung Teil 2](bilder/tutorial/30-grundausbildung-teil2.jpg)
+
+Nach Teil 1 steht im Hauptmenü **Grundausbildung · Teil 2**: Beobachter, die Karte fragen (Feldinfo), Feuerplan, Gebäude bauen, Ablösen und das Nachschlagen in der Pause.
 
 In der Grundausbildung gibt es am Anfang **keinen einzigen Befehl**. Jeder Befehl erscheint erst, wenn der Zettel ihn vorstellt: zuerst Bewegen und Halten, dann Graben, Feuern und am Ende der Lorenplan. Auch „Vor der Runde“ und der Lehrling kommen erst, wenn sie dran sind.
 
@@ -89,6 +97,35 @@ Danach empfiehlt das Spiel:
 Wählst du eine Gruppe, erscheint ihr **Schild**: Stärke, Moral, Erschöpfung, Erfahrung, Posten und Befehl. Ohne Befehl hält die Gruppe. Das ist erlaubt und oft richtig: Du musst nicht jede Gruppe anfassen.
 
 ## 4. Die erste Runde
+
+### Pause und Nachschlagen
+
+![Pausenmenü](bilder/tutorial/27-pause.jpg)
+
+**Esc** (oder der Knopf **Menü** oben rechts, auf dem Handy in der Leiste oben) öffnet die Pause:
+
+- **Weiterspielen**
+- **Nachschlagen**: Einheiten, Gelände, Gebäude, Werte, Begriffe, Tasten und fünf Anleitungen (Artillerie steuern, Gebäude bauen, was zuerst bauen, neue Leute, Beobachter). Die Partie läuft nicht weiter, solange du liest.
+- **Speichern und Einstellungen** (Dienstbuch)
+- **Grundausbildung**, **Zum Hauptmenü** (mit Warnung, wenn noch Befehle offen sind)
+
+![Nachschlagen im Spiel](bilder/tutorial/28-nachschlagen.jpg)
+
+### Was ist auf diesem Feld?
+
+![Feldinfo](bilder/tutorial/29-feldinfo.jpg)
+
+Ohne gewählte Gruppe ein Feld antippen: Ein Kärtchen erklärt Boden (Wald, Dorf, Sumpf ...), Höhe, Graben mit Feuerrichtung, Draht, Trichter, Gebäude, Schlamm und Schnee. Kurz gesagt:
+
+| Gelände | Bedeutet |
+|---|---|
+| Wald | Deckung, versperrt die Sicht in beide Richtungen, etwas langsamer |
+| Dorf | gute Deckung (wie ein Schützenloch), versperrt die Sicht |
+| Sumpf | dreimal so langsam, wird schnell zu tiefem Schlamm |
+| Fels, Kreide | fest, Graben dauert länger (Fels: fast unmöglich) |
+| Höhe | von oben sieht man weiter und über niedrige Felder hinweg |
+
+Auch das Schild einer Gruppe sagt jetzt in einem Satz, was sie kann. Beispiel Beobachter: „Sehen am weitesten, auf Hügeln und Türmen noch weiter. Nur sie können im Gefecht die Artillerie verlegen oder stoppen.“
 
 ### Gruppe wählen und bewegen
 
@@ -182,17 +219,25 @@ Alles kommt über die **Feldbahn** nach vorn. **Lorenplan** (L) zeigt den Zug de
 
 Verwundete fahren auf denselben Wagen zurück. Bleiben sie liegen, kostet das Vertrauen.
 
-### Die Etappe
+### Die Etappe: Gebäude bauen
 
-![Etappenfenster mit Pappmodell](bilder/tutorial/18-etappe.jpg)
+![Etappenfenster mit Pappmodell](bilder/tutorial/32-etappe-bauen.jpg)
+
+1. Ohne gewählte Gruppe **Etappe** (M) antippen.
+2. Links im Modell ein freies Feld wählen. Rechts steht jedes Gebäude mit einem Satz, wozu es gut ist, was es an dieser Stelle bringt (mit Nachbarbonus), was es kostet und wie lange es dauert.
+3. **… bauen**, dann **Aufträge übernehmen** und die Runde ausführen. Bezahlt wird mit **Material** aus dem Depot (oben links).
+
+Was zuerst? Bei knappen Loren Feldbahnhof oder Depot, für Moral die Feldküche neben das Ruhelager, bei vielen Verwundeten das Feldlazarett, sobald hinten Granaten einschlagen die Werkstatt, bei viel Ersatz das Ausbildungslager. Alle Gebäude mit Wirkung, Kosten und Bauzeit stehen unter Nachschlagen, Gebäude.
 
 Das hintere Drittel deiner Karte ist die **Etappe**. **Etappe** (M) öffnet das drehbare Modell: links die Parzellen, rechts was dort gebaut werden kann, mit Ertrag und **Nachbarbonus** (zum Beispiel bringen Depot und Feldbahnhof nebeneinander mehr Loren). Gebäude kosten Material und Bauzeit in Stellungsrunden. Neu in dieser Ausgabe: eine fertige **Batteriestellung** bringt Geschütze, eine **Werkstatt** setzt zerschossene Gebäude von selbst instand.
 
-### Ablösen
+### Ablösen und neue Leute
 
 ![Ablösung mit Bleistiftvermerken](bilder/tutorial/19-abloesung.jpg)
 
-Gruppen vorn werden jede Runde müder. Ab sechs Runden vorn steht rot „zu lange vorn“, dann sinken Moral und Vertrauen. **Ablösen** (R): Gruppe vorn wählen und die Ablösung aus Reserve oder Ruhelager antippen. Die Gruppe hinten selbst antippen füllt sie mit Ersatz auf (grüner Ersatz senkt die Erfahrung).
+Gruppen vorn werden jede Runde müder. Ab sechs Runden vorn steht rot „zu lange vorn“, dann sinken Moral und Vertrauen. **Ablösen** (R): Gruppe vorn wählen, dann eine Gruppe aus Reserve oder Ruhelager antippen (sie übernimmt das Feld) oder einfach ein Feld der Etappe (das Feld bleibt leer).
+
+**Neue Truppen** kannst du nicht aufstellen. Aber jede Runde kommen Ersatzleute ins Depot, mehr bei hohem Ansehen beim Stab. Aufgefüllt wird hinten: die Gruppe hinten wählen, **Ablösen** (R), dann die Gruppe selbst antippen. Die Vorschau zeigt, wie viele kommen. Genesene Verwundete kommen zuerst und behalten ihre Erfahrung, Ersatz ist grün. Mit einem **Ausbildungslager** bringt Ersatz Erfahrung 1 mit.
 
 ## 7. Angreifen
 
@@ -203,7 +248,16 @@ Ein Angriff ist ein geplantes Ereignis, kein Klick. Die Reihenfolge:
 3. **Angriff ansetzen.** In der Stellungsrunde mit **Sturm** (S) den Weg festlegen.
 4. **Gefechtsrunden.** Ab dann geht es in Fünf-Minuten-Schritten weiter.
 
-### Feuerplan und Feuerwalze
+### Feuerplan und Feuerwalze: so steuerst du die Artillerie
+
+Die Batterien (Kästchen „A“ hinten in der Etappe) steuerst du nicht einzeln, sondern mit einem **Feuerplan**:
+
+1. In der Stellungsrunde **Feuerplan** (A) antippen. Die Karte wird zur blauen Blaupause.
+2. Oben mit **„+“** eine Art wählen: **Vorbereitung** (vor einem Angriff auf den Graben), **Sperrfeuer** (schießt, wenn der Gegner kommt), **Walze** (wandert vor dem eigenen Sturm her), **Störfeuer**, **Gegenbatterie**.
+3. Die Linie auf die Karte ziehen. Rechts Batterien an- oder abwählen, Dauer, Beginn und Schritt einstellen.
+4. **Übernehmen**. Die Artillerie schießt, sobald ein Angriff läuft; Störfeuer und Gegenbatterie sofort.
+
+![Feuerplan-Editor](bilder/tutorial/31-feuerplan-neu.jpg)
 
 ![Feuerwalze](bilder/tutorial/14-feuerplan.jpg)
 
@@ -294,6 +348,12 @@ Die **Kampagne** führt in vier Akten zu je sechs Missionen durch den Krieg. Zwi
 Gesperrte Befehle reagieren nicht auf ihre Taste. Die vollständige Liste mit allen Befehlen späterer Akte steht im Handbuch und im Dienstbuch (Reiter Tasten).
 
 ## 13. Häufige Fragen
+
+**Gibt es ein Menü?** Ja: Esc oder „Menü“ öffnet die Pause mit Nachschlagen, Speichern, Einstellungen und dem Weg ins Hauptmenü.
+
+**Kann ich die Artillerie steuern?** Ja, mit dem Feuerplan (A) in der Stellungsrunde, siehe Abschnitt 7. Im Gefecht lenken nur Beobachter mit Telefonleitung.
+
+**Wie bekomme ich neue Truppen?** Gar nicht als neue Gruppen, aber als Ersatz zum Auffüllen, siehe Abschnitt 6.
 
 **Wo sind die anderen Befehle?** Am Anfang gibt es nur wenige. Weitere kommen mit der Grundausbildung und Akt 1 dazu (siehe Abschnitt 2). Alle sofort: Dienstbuch, Darstellung, „Befehle im Gefecht“.
 

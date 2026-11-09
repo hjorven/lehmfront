@@ -78,7 +78,11 @@ import { attachLageRules } from '../ui/lage-rules.js';
 import { createKoop } from '../ui/koop.js';
 import { marginNotes, marginOverlay } from '../ui/margin-notes.js';
 import { attachDrill } from '../ui/drill.js';
-import { allowedTools, offered, readLevel, raiseLevel, akt1Level, takeNewTools, hiddenChecks, orderAllowed } from '../unlocks.js';
+import { DRILL2_STEPS, DRILL2_KEY } from '../config/drill.js';
+import { UNIT_HELP } from '../config/help.js';
+import { fieldInfo, createFieldCard } from '../ui/fieldinfo.js';
+import { attachPauseMenu } from '../ui/pause-menu.js';
+import { allowedTools, offered, readLevel, raiseLevel, akt1Level, takeNewTools, hiddenChecks, orderAllowed, MAX_LEVEL } from '../unlocks.js';
 import { showUnlocked } from '../ui/unlock-note.js';
 
 const num = (v, d) => (v === null || v === '' || !Number.isFinite(Number(v)) ? d : Number(v));
@@ -217,6 +221,7 @@ export async function mount(root, params) {
     <div class="g-ui"></div>`;
   const $ = (s) => root.querySelector(s);
   const staticCv = $('.g-static'), dynCv = $('.g-dyn'), ui = $('.g-ui');
+  const fieldCard = createFieldCard(ui, esc); // Feldinfo (frueh, weil Auswahl und Film sie schliessen)
   const narrow = () => root.clientWidth < NARROW;
 
   // Tageszeit aus der Uhr
@@ -382,8 +387,15 @@ export async function mount(root, params) {
   if (resumed && koop) koop.restore(resumed.rules?.koop);
   if (rules.overlays) lageOverlays = () => rules.overlays(state);
   // P18: Dienstbuch (Einstellungen, Spielstaende, Klang, Tasten) und laufende Akte nach jeder Runde
+  const pause = attachPauseMenu({
+    ui, drill: params.has('ausbildung'),
+    onOpen: () => { if (tool) cancelTool(false); radial.hide(); ui.querySelector('.unlock-note')?.remove(); modalOpen = true; fieldCard.hide(); refresh(); },
+    onClose: () => { modalOpen = false; refresh(); dynCv.focus({ preventScroll: true }); },
+    openSettings: () => gameMenu.open(),
+    pendingOrders: () => (book[side]?.sealed ? 0 : ordersNow().length + Object.keys(sidePlans[side] ?? {}).length),
+  });
   const gameMenu = attachGameMenu({
-    ui, params,
+    ui, params, onMenu: () => { if (!modalOpen && !filmFrame && !root.classList.contains('fp-open')) pause.open(); },
     snapshot: () => ({ state, map: liveMap, archive, aiMemory, lastLog, rules: { ...rules.snapshot(), ...(koop ? { koop: koop.snapshot() } : {}) }, side, book,
       decor: { burns: burns.map(({ x, y, r, seed, turn }) => ({ x, y, r, seed, turn })), stains: weather.layer.exportStains?.() ?? [] } }),
     busy: () => (online?.kind === 'match' ? 'Online-Gefechte liegen beim Stab, nicht in der Kartentasche.'
@@ -650,6 +662,7 @@ export async function mount(root, params) {
     if (!g || !visible || g.status === 'lost' || radial.open || filmFrame || tool?.cleanup) { shield.hide(); return; }
     if (g.side !== side) {
       shield.show(`<header><b>Feind</b><span>${esc(typeName(g))}</span></header>
+        ${UNIT_HELP[g.type] ? `<p class="role">${esc(UNIT_HELP[g.type])}</p>` : ''}
         <div class="rows"><div><span>Feld</span><b>${cellLabel(g.pos.x, g.pos.y)}</b></div><div><span>Deckung</span><b>${esc(coverAt(state, map, g.pos, g.side).label)}</b></div></div>
         <footer><span>Gesichtet</span><b>diese Runde</b></footer>`, shieldAnchor(g));
       return;
@@ -658,6 +671,7 @@ export async function mount(root, params) {
     const prev = tool?.group?.id === g.id && tool.pick ? tool.preview : null;
     shield.show(`<header><b>${esc(groupLabel(g))}</b><span>${esc(leaderShort(g))}</span></header>
       <div class="type">${esc(typeName(g))}</div>
+      ${UNIT_HELP[g.type] ? `<p class="role">${esc(UNIT_HELP[g.type])}</p>` : ''}
       <div class="rows">
         <div><span>Stärke</span><b>${g.strength} / ${g.size}</b></div>
         <div><span>Moral</span><b>${g.morale}</b></div>
@@ -691,6 +705,7 @@ export async function mount(root, params) {
   }
   function select(id, { center = false } = {}) {
     if (tool) cancelTool(false);
+    if (id) fieldCard?.hide();
     hoverSight = null;
     radial.hide();
     selectedId = id;
@@ -707,6 +722,7 @@ export async function mount(root, params) {
     if (tidyUi?.bare) tidyUi.setBare(false); // Befehle nur mit sichtbaren Kaertchen
     if (!def || !offered(allowed, def.id)) return;
     if (book[side]?.sealed || modalOpen) return;
+    fieldCard.hide();
     const u = usable(def, g, state, env);
     if (!u.ok) { flash(u.why, 'warn'); return; }
     cancelTool(false);
@@ -835,6 +851,7 @@ export async function mount(root, params) {
 
   // ---------- Runde ausfuehren ----------
   function openSummary(preset = 0) {
+    fieldCard.hide();
     if (modalOpen) return;
     if (state.result) { flash(state.result.reason); return; }
     if (rules.ended) { rules.show(); return; }
@@ -891,7 +908,7 @@ export async function mount(root, params) {
         to: faction(state.sides[waiting].faction).name, from: faction(state.sides[side].faction).name, note: state.turn,
         writable: !koop,
         onGo: () => {
-          modalOpen = false; side = waiting; updateLiveMap(); homeView(); onCamera();
+          modalOpen = false; side = waiting; fieldCard.hide(); updateLiveMap(); homeView(); onCamera();
           if (reportDue.has(side)) showReport();
           refresh(); dynCv.focus({ preventScroll: true });
         },
@@ -921,6 +938,7 @@ export async function mount(root, params) {
     selectedId = null;
     modalOpen = true;
     root.classList.add('filming');
+    fieldCard.hide();
     report.show({ title: `Telegramm · ${title}`, sub: `${film.lines.length} ${film.lines.length === 1 ? 'Zeile' : 'Zeilen'}`, lines: film.lines });
     report.setFilmActive(true);
     filmReplay = replay;
@@ -1159,14 +1177,18 @@ export async function mount(root, params) {
         hoverSight = null;
         select(null);
       }
-      else if (cell && !closedSomething && state.turnKind === 'position' && !book[side]?.sealed) {
+      else if (cell && !closedSomething) {
         // P11: Antippen eines Gebaeudes oder vorgemerkten Baus der eigenen Etappe (ohne gewaehlte Gruppe)
-        // oeffnet das Etappenfenster auf diesem Feld
-        const et = etappeOf(state, side);
-        const plot = plotAt(et, cell.x, cell.y);
-        const hit = plot && ([...et.buildings, ...(sidePlans[side].etappe?.builds ?? [])]
-          .some((b) => b.x === plot.x && b.y === plot.y && b.type !== 'gleis'));
-        if (hit) startTool(allTools().find((t) => t.id === 'etappe'), null, { focus: plot });
+        // oeffnet das Etappenfenster auf diesem Feld, wenn es den Befehl schon gibt; sonst erklaert die Feldinfo das Feld
+        let opened = false;
+        if (state.turnKind === 'position' && !book[side]?.sealed && offered(allowed, 'etappe')) {
+          const et = etappeOf(state, side);
+          const plot = plotAt(et, cell.x, cell.y);
+          const hit = plot && ([...et.buildings, ...(sidePlans[side].etappe?.builds ?? [])]
+            .some((b) => b.x === plot.x && b.y === plot.y && b.type !== 'gleis'));
+          if (hit) { startTool(allTools().find((t) => t.id === 'etappe'), null, { focus: plot }); opened = true; }
+        }
+        if (!opened) { fieldCard.show(fieldInfo(liveMap, { weather: state.weather, cells: seenCells }, cell.x, cell.y, side), p); playSfx('paper', { intensity: 0.2 }); }
       }
     },
   });
@@ -1250,7 +1272,8 @@ export async function mount(root, params) {
     // ^ links neben der 1 (auf dem Mac mit deutscher Tastatur meldet der Browser die Taste teils als IntlBackslash)
     if ((e.key === '^' || e.code === 'Backquote' || (e.key === 'Dead' && e.code === 'IntlBackslash')) && !e.repeat) { e.preventDefault(); tidyUi.toggleBare(); return; }
     if (e.key === 'Escape') {
-      if (tidyUi.bare) tidyUi.setBare(false);
+      if (ui.querySelector('.unlock-note')) ui.querySelector('.unlock-note').remove();
+      else if (tidyUi.bare) tidyUi.setBare(false);
       else if (radial.open) { radial.hide(); refresh(); dynCv.focus({ preventScroll: true }); }
       else if (tool) cancelTool();
       else if (laskNote.open) { laskNote.hide(); playSfx('paper', { intensity: 0.3 }); dynCv.focus({ preventScroll: true }); }
@@ -1259,7 +1282,9 @@ export async function mount(root, params) {
       else if (orderList.open) closeList();
       else if (root.classList.contains('sheet-open')) { root.classList.remove('sheet-open'); hud.setSheet(false); }
       else if (report.open) report.hide();
+      else if (fieldCard.open) fieldCard.hide();
       else if (selectedId) select(null);
+      else if (!filmFrame && !root.classList.contains('fp-open')) pause.open();
       return;
     }
     // Feuerplan-Editor offen: keine Werkzeugtasten, sonst gingen die ungespeicherten Plaene verloren
@@ -1371,6 +1396,7 @@ export async function mount(root, params) {
     get plans() { return sidePlans; },
     get plannerWindow() { return plannerWindow; },
     get allowed() { return allowed ? [...allowed] : null; },
+    get fieldOpen() { return fieldCard.open; },
     /** Grundausbildung: Befehle freischalten (Liste der ids, kumulativ) */
     allowTools: (ids) => { if (!allowed) return; allowed = new Set([...allowed, ...ids]); applyNovice(); refresh(); },
   };
@@ -1378,7 +1404,11 @@ export async function mount(root, params) {
   // Grundausbildung: Zettel mit Schritten fuer Anfaenger (js/ui/drill.js, Schritte in js/config/drill.js)
   if (params.has('ausbildung') && !params.has('demo')) {
     const at = Number(params.get('ausbildung'));
-    api.drill = attachDrill({ ui, root, api, startAt: Number.isInteger(at) && at > 1 ? at - 1 : null });
+    const two = params.get('teil') === '2';
+    api.drill = attachDrill({
+      ui, root, api, startAt: Number.isInteger(at) && at > 1 ? at - 1 : null,
+      ...(two ? { steps: DRILL2_STEPS, key: DRILL2_KEY, finalLevel: MAX_LEVEL, part: 2 } : {}),
+    });
   }
   const demo = params.get('demo');
   if (demo) {
@@ -1586,6 +1616,10 @@ export async function mount(root, params) {
       }
       centerOn(cam, narrow() ? 44 : 41, 10, 22);
     }
+    else if (demo === 'feuerplan-leer') { api.tool('fireplan'); } // ohne vorhandenen Plan (Fehler bis 1.7.0)
+    else if (demo === 'pause') { pause.open(); }
+    else if (demo === 'nachschlagen') { pause.open('help'); }
+    else if (demo === 'feldinfo') { fieldCard.show(fieldInfo(liveMap, { weather: state.weather, cells: seenCells }, 40, 10, side)); }
     else if (demo === 'feuerplan' || demo === 'walze' || demo === 'verlegen' || demo === 'einschlag') {
       // P09: Walze vor Abschnitt A, Vorbereitungsfeuer auf den Graben vor Abschnitt B
       const walze = { id: 'w1', kind: 'creep', batteries: ['batterie1', 'batterie2'], a: { x: 38, y: 4 }, b: { x: 38, y: 12 }, dir: 'E', step: 1, rounds: 6, start: 1 };

@@ -6,7 +6,7 @@ export const HOLD_MS = 1400;
 const R = 74, C = 2 * Math.PI * R;
 
 /** Modaler Rahmen mit Fokusfalle. Liefert { el, close } */
-function modal(root, cls, label, onClose) {
+export function modal(root, cls, label, onClose) {
   const back = document.createElement('div');
   back.className = 'modal-back ' + cls;
   back.innerHTML = `<div class="modal card" role="dialog" aria-modal="true" aria-label="${esc(label)}"></div>`;
@@ -16,7 +16,7 @@ function modal(root, cls, label, onClose) {
   const trap = (e) => {
     if (e.key === 'Escape' && onClose) { e.preventDefault(); e.stopPropagation(); onClose(); return; }
     if (e.key !== 'Tab') return;
-    const f = [...box.querySelectorAll('button:not([disabled]), [tabindex="0"]')];
+    const f = [...box.querySelectorAll('button:not([disabled]), [tabindex="0"], a[href], summary, input:not([disabled])')].filter((x) => x.getClientRects().length);
     if (!f.length) return;
     const i = f.indexOf(document.activeElement);
     if (e.shiftKey && (i <= 0)) { e.preventDefault(); f[f.length - 1].focus(); }

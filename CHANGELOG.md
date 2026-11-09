@@ -1,5 +1,18 @@
 # Änderungen
 
+## 1.8.0 (2026-11-09)
+
+Erklären statt raten.
+
+- **Pausenmenü** (Esc oder „Menü“): Weiterspielen, Nachschlagen, Speichern und Einstellungen, Grundausbildung, zum Hauptmenü (mit Warnung bei offenen Befehlen).
+- **Nachschlagen im Spiel**: Einheiten, Gelände, Gebäude (mit Wirkung, Kosten, Bauzeit), Werte, Begriffe, Tasten und Anleitungen (Artillerie steuern, Gebäude bauen, was zuerst bauen, neue Leute, Beobachter). Dasselbe im Handbuch.
+- **Feldinfo**: Ein Feld ohne gewählte Gruppe antippen erklärt Boden, Höhe, Graben mit Feuerrichtung, Draht, Trichter, Gebäude, Schlamm und Schnee.
+- **Schild der Gruppe** sagt in einem Satz, was die Einheit kann (auch beim Gegner).
+- **Etappenfenster** nennt bei jeder Bauoption, wozu das Gebäude gut ist.
+- **Grundausbildung Teil 2**: Beobachter, Feldinfo, Feuerplan, Gebäude bauen, Ablösen, Nachschlagen. Im Hauptmenü nach Teil 1.
+- **Behoben**: Der Feuerplan-Editor stürzte beim Öffnen ab, wenn noch kein Feuerplan bestand (seit 1.0). Die Artillerie ließ sich so im normalen Spiel nicht planen. Jetzt öffnet er mit einer Feuerwalze; die CI prüft das.
+- Die Feldinfo schließt sich, sobald ein Befehl beginnt; der Zettel der Grundausbildung weicht nach rechts aus, wenn links getippt werden muss.
+
 ## 1.7.0 (2026-11-09)
 
 Übersichtlicher für Einsteiger: nicht mehr alles auf einmal.

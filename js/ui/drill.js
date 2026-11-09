@@ -3,7 +3,7 @@
 // Bedienelement und das Weiterschalten, sobald der Schritt auf der Karte geschafft ist.
 import { ensureCss, esc } from './dom.js';
 import { playSfx } from '../audio/engine.js';
-import { DRILL_STEPS, DRILL_LEVEL, drillUnlocks, readDrill, writeDrill } from '../config/drill.js';
+import { DRILL_STEPS, DRILL_LEVEL, DRILL2_PATH, DRILL_KEY, drillUnlocks, readDrill, writeDrill } from '../config/drill.js';
 import { raiseLevel, UNLOCK_SEEN_KEY } from '../unlocks.js';
 
 const TICK_MS = 350;
@@ -16,13 +16,14 @@ function snapshot(api) {
  * attachDrill({ ui, root, api, steps?, startAt? }) haengt den Zettel ein (startAt: Schritt ab 0, fuer Bilder). api ist die Schnittstelle des Gefechts
  * (state, book, side, selected, cam, toolInfo, plans). Rueckgabe { get index, go(i), destroy() }.
  */
-export function attachDrill({ ui, root, api, steps = DRILL_STEPS, startAt = null }) {
+export function attachDrill({ ui, root, api, steps = DRILL_STEPS, startAt = null, key = DRILL_KEY, finalLevel = DRILL_LEVEL, part = 1 }) {
   ensureCss('css/drill.css');
   root.classList.add('drilling');
-  const saved = readDrill();
+  const store = { getItem: (k) => localStorage.getItem(k === DRILL_KEY ? key : k), setItem: (k, v) => localStorage.setItem(k === DRILL_KEY ? key : k, v) };
+  const saved = readDrill(store);
   // Fortsetzen: die Grundausbildung beginnt immer mit einem frischen Gefecht. Schritte, die einen Spielstand
   // voraussetzen (nach "Runde ausfuehren"), gelten dann nicht mehr: zurueck bis vor den ersten davon.
-  const firstNeedsTurn = steps.findIndex((s) => s.id === 'runde');
+  const firstNeedsTurn = steps.findIndex((s) => /^runde/.test(s.id));
   let index = Number.isInteger(startAt) ? Math.min(startAt, steps.length - 1)
     : saved && !saved.done && Number.isInteger(saved.step) ? Math.min(saved.step, firstNeedsTurn >= 0 ? firstNeedsTurn : steps.length - 1, steps.length - 1) : 0;
   let start = snapshot(api);
@@ -52,28 +53,31 @@ export function attachDrill({ ui, root, api, steps = DRILL_STEPS, startAt = null
       const seen = JSON.parse(localStorage.getItem(UNLOCK_SEEN_KEY) ?? '[]');
       localStorage.setItem(UNLOCK_SEEN_KEY, JSON.stringify([...new Set([...(Array.isArray(seen) ? seen : []), ...u.tools])]));
     } catch { /* ohne Speicher */ }
-    if (steps[index].final) raiseLevel(DRILL_LEVEL);
+    if (steps[index].final) raiseLevel(finalLevel);
   }
 
   function render() {
     const s = steps[index];
     unlock();
     const auto = !s.manual && !s.final && s.done;
-    card.innerHTML = `<header><span class="dr-k">Grundausbildung · ${index + 1} von ${steps.length}</span>
+    card.innerHTML = `<header><span class="dr-k">Grundausbildung${part > 1 ? ' II' : ''} · ${index + 1} von ${steps.length}</span>
         <button type="button" class="dr-mini" aria-label="Zettel ein- oder ausklappen" aria-expanded="${!card.classList.contains('dr-min')}">${card.classList.contains('dr-min') ? '+' : '–'}</button>
         <button type="button" class="dr-x" aria-label="Grundausbildung beenden" title="Beenden">×</button></header>
-      <b class="dr-title">${esc(s.title)}</b>
+      <b class="dr-title">${part > 1 ? 'Teil 2 · ' : ''}${esc(s.title)}</b>
       <p class="dr-text">${esc(s.text)}</p>
       <span class="dr-from">– ${esc(s.von)}</span>
       <div class="dr-progress" aria-hidden="true">${steps.map((_, i) => `<i class="${i < index ? 'done' : i === index ? 'now' : ''}"></i>`).join('')}</div>
       <footer>${index > 0 ? '<button type="button" class="btn dr-back">Voriger Schritt</button>' : ''}
         ${s.final
-          ? `<a class="btn dr-go" href="?scene=feldzug">Zur Kampagne</a><a class="btn" href="?scene=handbuch">Handbuch</a><button type="button" class="btn dr-stay">Weiterspielen</button>`
+          ? (s.next === 'teil2'
+            ? `<a class="btn dr-go" href="${esc(DRILL2_PATH)}">Teil 2</a><a class="btn" href="?scene=feldzug">Zur Kampagne</a><button type="button" class="btn dr-stay">Weiterspielen</button>`
+            : `<a class="btn dr-go" href="?scene=feldzug">Zur Kampagne</a><button type="button" class="btn dr-stay">Weiterspielen</button>`)
           : auto ? `<span class="dr-wait">Auf der Karte erledigen</span><button type="button" class="btn dr-skip">Überspringen</button>`
             : '<button type="button" class="btn dr-next dr-go">Weiter</button>'}</footer>`;
     mark(s.anchor);
+    card.classList.toggle('dr-right', s.place === 'right');
     place();
-    writeDrill({ step: index, done: !!(saved?.done || s.final) });
+    writeDrill({ step: index, done: !!(saved?.done || s.final) }, store);
   }
 
   function go(i) {
@@ -88,7 +92,7 @@ export function attachDrill({ ui, root, api, steps = DRILL_STEPS, startAt = null
     if (e.target.closest('.dr-mini')) { card.classList.toggle('dr-min'); render(); return; }
     if (e.target.closest('.dr-back')) { go(index - 1); return; }
     if (e.target.closest('.dr-next') || e.target.closest('.dr-skip')) { playSfx('paper', { intensity: 0.3 }); go(index + 1); return; }
-    if (e.target.closest('.dr-stay')) { writeDrill({ step: index, done: true }); close(); }
+    if (e.target.closest('.dr-stay')) { writeDrill({ step: index, done: true }, store); close(); }
   });
   // Enter gehoert dem Gefecht ("Runde ausfuehren"); der Zettel reagiert nur auf Klicks und Tippen
 
@@ -106,8 +110,11 @@ export function attachDrill({ ui, root, api, steps = DRILL_STEPS, startAt = null
       return;
     }
     card.style.top = '';
-    if (!shield || shield.hidden || !shield.getClientRects().length) { card.style.bottom = ''; return; }
-    const top = shield.getBoundingClientRect().top - box.top;
+    // Schild oder Feldinfo unten angedockt: der Zettel setzt sich darueber
+    const field = ui.querySelector('.field-card');
+    const below = [shield, field].filter((x) => x && !x.hidden && x.getClientRects().length);
+    if (!below.length) { card.style.bottom = ''; return; }
+    const top = Math.min(...below.map((x) => x.getBoundingClientRect().top)) - box.top;
     card.style.bottom = `${Math.max(88, ui.clientHeight - top + 6)}px`;
   }
 

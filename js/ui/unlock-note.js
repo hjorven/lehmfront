@@ -16,6 +16,7 @@ export function showUnlocked(ui, tools, { first = false } = {}) {
     ${first ? '<p class="un-lead">Mehr brauchst du für den Anfang nicht. Weitere Befehle kommen nach und nach dazu.</p>' : ''}
     <ul>${tools.map((t) => `<li><span class="un-ico">${icon(t.icon ?? '', 24)}</span>
       <span><b>${esc(t.label)}</b> <kbd>${esc(String(t.key ?? '').toUpperCase())}</kbd><br>${esc(TOOL_HELP[t.id] ?? '')}</span></li>`).join('')}</ul>
+    <p class="un-more">Genauer: Esc oder „Menü“, dann „Nachschlagen“.</p>
     <button type="button" class="btn un-ok">Verstanden</button>`;
   ui.append(el);
   playSfx('paper', { intensity: 0.5 });

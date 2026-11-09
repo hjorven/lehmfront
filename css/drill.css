@@ -26,8 +26,10 @@
 @media (prefers-reduced-motion:reduce){.dr-target{animation:none}}
 .reduced-motion .dr-target{animation:none}
 
+/* Schritte, bei denen links getippt wird (Etappe): Zettel rechts */
+.dr-card.dr-right{left:auto;right:124px}
 @media (max-width:700px){
-  .dr-card{left:8px;right:8px;width:auto;top:auto;bottom:calc(88px + env(safe-area-inset-bottom));padding:8px 12px 10px 14px;transform:none}
+  .dr-card,.dr-card.dr-right{left:8px;right:8px;width:auto;top:auto;bottom:calc(88px + env(safe-area-inset-bottom));padding:8px 12px 10px 14px;transform:none}
   /* Ist das Schild der Gruppe unten angedockt, setzt js/ui/drill.js den Zettel darueber (style.bottom) */
   .dr-min .dr-text,.dr-min .dr-progress,.dr-min footer{display:none}
   .dr-mini{display:inline-flex}
