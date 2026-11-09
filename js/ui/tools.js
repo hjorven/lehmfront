@@ -11,6 +11,8 @@
 //     setOrder(order)                    Befehl ins Befehlsbuch (mit Undo)
 //     pickCell({ title?, hint, preview(cell) -> { path?, text? } | null, pick(cell) -> true wenn erledigt })
 //                                        Zielwahl auf der Karte; preview zeichnet Vorschau und Text im Schild
+//                                        Mit dem Finger merkt das erste Antippen ein gueltiges Ziel nur vor (Bleistift), das zweite
+//                                        waehlt; confirm: false waehlt sofort (z. B. eigene Editoren)
 //     hint(text)                         Hinweis-Kaertchen setzen
 //     cancel()                           Werkzeug beenden
 //   Fuer Seitenbefehle (needsGroup: false) zusaetzlich:
