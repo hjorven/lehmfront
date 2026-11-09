@@ -28,7 +28,7 @@ export const NIGHT_FROM = 0.6;
 export const DAY = {
   // Kaertchen
   paper: '#efe6cf', card: '#f8f2e3', ink: '#2a2420', ink2: '#6e6253', line: '#8a7d66', track: '#d9cfb6',
-  own: '#1f4e9c', enemy: '#a3271f', accent: '#c99a1a', danger: '#a3271f',
+  own: '#1f4e9c', enemy: '#a3271f', accent: '#9c7410', danger: '#a3271f',
   // Karte
   faint: '#cbbf9f', contour: '#b79b6a', forest: '#7f8f5c', forestLine: '#46552c', water: '#7fa0b8', wire: '#4a4036', crater: '#a89470',
   rail: '#3a3128', marsh: '#3f6680', chalk: '#9a8e70', rock: '#5c5244', village: '#3b332c',

@@ -7,10 +7,11 @@
 @font-face{font-family:"Caveat";font-weight:400;font-display:swap;src:url(../assets/fonts/caveat-latin-400-normal.woff2) format("woff2")}
 @font-face{font-family:"Caveat";font-weight:700;font-display:swap;src:url(../assets/fonts/caveat-latin-700-normal.woff2) format("woff2")}
 
-/* Grundtoken: Stil 01 Generalstabskarte (Tag). Nacht = Stil 04, siehe js/theme.js (Plan 7.7) */
+/* P18: Ocker dunkler (#9c7410 statt #c99a1a), damit Auswahlrahmen auf Tagpapier 3 : 1 erreichen.
+   Grundtoken: Stil 01 Generalstabskarte (Tag). Nacht = Stil 04, siehe js/theme.js (Plan 7.7) */
 :root{
   --paper:#efe6cf; --card:#f8f2e3; --ink:#2a2420; --ink2:#6e6253; --line:#8a7d66; --track:#d9cfb6;
-  --own:#1f4e9c; --enemy:#a3271f; --accent:#c99a1a; --danger:#a3271f;
+  --own:#1f4e9c; --enemy:#a3271f; --accent:#9c7410; --danger:#a3271f;
   --font-ui:"IBM Plex Sans",system-ui,sans-serif; --font-head:"Special Elite","Courier New",monospace;
   --font-num:"IBM Plex Mono",monospace; --font-hand:"Caveat",cursive;
   --radius:3px; --border:1px solid var(--line); --shadow:0 1px 2px rgba(40,30,10,.18);

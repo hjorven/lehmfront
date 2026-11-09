@@ -1,0 +1,19 @@
+{
+  "name": "Lehmfront",
+  "short_name": "Lehmfront",
+  "description": "Taktisches Grabenkriegsspiel in 2D, rundenbasiert, auch ohne Netz spielbar.",
+  "lang": "de",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#efe6cf",
+  "theme_color": "#2a2420",
+  "categories": ["games"],
+  "icons": [
+    { "src": "assets/icons/lehmfront-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "assets/icons/lehmfront-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "assets/icons/lehmfront-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

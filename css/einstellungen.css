@@ -1,0 +1,148 @@
+/* P18: Dienstbuch (Einstellungen, Spielstaende) und globale Barrierefreiheit.
+   Gedrucktes = Stil 03. Farben nur ueber die Token aus css/style.css und js/theme.js. */
+
+/* ---------- Fokus: ueberall sichtbar, mit Tinte statt Ocker (Ocker hat auf Tagpapier nur 2 : 1) ---------- */
+html :focus-visible{outline:2px solid var(--ink) !important;outline-offset:2px}
+html .g-dyn:focus-visible{outline:3px solid var(--ink) !important;outline-offset:-3px}
+
+/* ---------- Bewegung reduziert (Einstellung), zusaetzlich zur Systemeinstellung ---------- */
+html[data-motion="reduce"] *,html[data-motion="reduce"] *::before,html[data-motion="reduce"] *::after{
+  animation:none !important;transition:none !important;scroll-behavior:auto !important}
+
+/* ---------- Animationstempo: Dauern der Kaertchen (css/motion.css) skalieren ---------- */
+html[data-speed="0.5"]{--dur-quick:.24s;--dur-sheet:.48s;--dur-slow:.84s}
+html[data-speed="1.5"]{--dur-quick:.08s;--dur-sheet:.16s;--dur-slow:.28s}
+html[data-speed="2"]{--dur-quick:.06s;--dur-sheet:.12s;--dur-slow:.21s}
+
+/* ---------- Textgroesse: Kaertchen wachsen als Ganzes, die Karte bleibt ---------- */
+.settings,.title,.gefecht .telegram,.gefecht .archive,.gefecht .orderlist,.gefecht .hint,.gefecht .check,
+.gefecht .modal-back > *,.gefecht .report,.update-note{zoom:var(--text-scale,1)}
+/* Kopfkaertchen nur auf breiten Schirmen mitwachsen lassen; auf dem Handy ist die Leiste oben schon voll */
+@media (min-width:700px){.gefecht .round,.gefecht .res-row,.gefecht .axes,.gefecht .hud-right{zoom:var(--text-scale,1)}}
+
+/* ---------- Menueknopf im Gefecht: Desktop rechte Leiste, Handy in der Seitenleiste ---------- */
+.gefecht .menu-btn kbd{margin-left:2px}
+.gefecht .menu-card{display:none}
+@media (max-width:699px){
+  .gefecht .menu-btn{display:none !important}
+  .gefecht .menu-card{display:flex;width:100%;min-height:48px;justify-content:space-between;font-weight:700}
+}
+
+/* ---------- Hoher Kontrast: Linien und Hilfstexte kraeftiger (gilt auch gegen die Tageszeit-Variablen) ---------- */
+html[data-contrast="high"] body{
+  --line:color-mix(in srgb,var(--ink) 78%,var(--paper)) !important;
+  --ink2:color-mix(in srgb,var(--ink) 88%,var(--paper)) !important;
+  --border:1.5px solid var(--line);
+}
+
+/* ---------- Farbunabhaengige Signaturen im DOM: Warnzeilen und Gegner tragen ein Zeichen ---------- */
+html[data-signs="on"] .telegram li.warn .tg-head::before,html[data-signs="on"] .archive li.warn .tg-head::before,
+html[data-signs="on"] .check-list li.warn::before{content:"!";width:auto;height:auto;margin-right:4px;border-radius:0;background:none;
+  font:700 12px var(--font-num);color:var(--danger)}
+html[data-signs="on"] .telegram li.warn,html[data-signs="on"] .archive li.warn{border-left-style:double;border-left-width:6px}
+
+/* ---------- Dienstbuch ---------- */
+.set-back{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:16px;background:var(--scrim);animation:lf-fade .2s ease-out}
+.settings{position:relative;display:grid;grid-template-columns:150px 1fr;grid-template-rows:auto 1fr auto;width:min(720px,calc((100vw - 32px) / var(--text-scale,1)));
+  max-height:min(640px,calc((100dvh - 32px) / var(--text-scale,1)));color:var(--ink);border-top:3px double var(--line)}
+.set-head{grid-column:1 / -1;display:flex;align-items:baseline;gap:12px;padding:12px 14px 10px 16px;border-bottom:var(--border)}
+.set-head h2{margin:0;font:400 22px/1.1 var(--font-head)}
+.set-sub{margin-right:auto;font:12px var(--font-num);color:var(--ink2)}
+.settings .x{min-width:44px;min-height:44px;margin:-10px -8px -10px 0;background:none;border:0;font:24px/1 var(--font-ui);color:var(--ink);cursor:pointer}
+.set-tabs{display:flex;flex-direction:column;gap:2px;padding:10px 0 10px 10px;border-right:var(--border)}
+.set-tabs button{min-height:44px;padding:8px 12px;background:none;border:var(--border);border-right:0;border-radius:var(--radius) 0 0 var(--radius);
+  text-align:left;font:400 15px var(--font-head);color:var(--ink2);cursor:pointer;margin-right:-1px}
+.set-tabs button[aria-selected="true"]{background:var(--card);color:var(--ink);border-color:var(--line);position:relative}
+.set-tabs button[aria-selected="true"]::after{content:"";position:absolute;right:-1px;top:0;bottom:0;width:2px;background:var(--card)}
+.set-tabs button:hover{color:var(--ink)}
+.set-panel{padding:12px 16px 14px;overflow:auto;min-height:0}
+.set-panel[hidden]{display:none}
+.set-status{grid-column:1 / -1;margin:0;padding:8px 16px 10px;min-height:36px;border-top:var(--border);font:13px var(--font-num);color:var(--ink2)}
+.set-status:empty{display:none}
+.set-status.warn{color:var(--danger)}
+.set-note,.set-help{margin:0 0 10px;font-size:13px;line-height:1.45;color:var(--ink2)}
+.set-help{margin:6px 0 0}
+.set-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.settings .btn{min-height:44px;justify-content:center;font-size:14px}
+.settings .btn.quiet{color:var(--ink2);box-shadow:none}
+.settings .btn.armed{background:var(--ink);color:var(--card);border-color:var(--ink)}
+
+/* Kartentaschen */
+.set-slots{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.set-slot{display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;gap:6px 12px;padding:8px 10px;border:var(--border);border-radius:var(--radius);background:var(--paper)}
+.set-slot canvas{grid-row:1 / 3;display:block;border-radius:2px}
+.set-slot.empty canvas{opacity:.6}
+.set-slot-text{display:flex;flex-direction:column;min-width:0}
+.set-slot-text b{font:400 16px/1.2 var(--font-head)}
+.set-hand{font:700 19px/1.1 var(--font-hand);color:var(--ink);transform:rotate(-1.2deg);transform-origin:left}
+.set-meta{font:12px var(--font-num);color:var(--ink2)}
+.set-stamp{align-self:flex-start;margin-top:3px;padding:1px 6px;border:1.5px solid currentColor;font:700 11px var(--font-num);text-transform:uppercase;letter-spacing:.06em;transform:rotate(-2deg)}
+.set-stamp.warn{color:var(--danger)}
+.set-slot-acts{display:flex;flex-wrap:wrap;gap:6px}
+.set-slot-acts .btn{min-height:40px;padding:6px 10px;font-size:13px}
+.set-import{position:relative}
+
+/* Darstellung */
+.set-choice{margin:0 0 14px;padding:0;border:0}
+.set-choice legend{padding:0;margin-bottom:6px;font:12px/1.2 var(--font-ui);letter-spacing:.06em;text-transform:uppercase;color:var(--ink2)}
+.set-seg{display:flex;flex-wrap:wrap;border:var(--border);border-radius:var(--radius);width:max-content;max-width:100%;overflow:hidden}
+.set-seg label{position:relative;display:block}
+.set-seg input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer}
+.set-seg span{display:grid;place-items:center;min-height:42px;padding:6px 14px;font-size:14px;border-right:var(--border);background:var(--card)}
+.set-seg label:last-child span{border-right:0}
+.set-seg input:checked + span{background:var(--ink);color:var(--card);font-weight:700}
+.set-seg input:focus-visible + span{outline:2px solid var(--ink);outline-offset:-5px;box-shadow:inset 0 0 0 3px var(--card)}
+.set-sample{display:flex;align-items:center;flex-wrap:wrap;gap:12px;padding:10px 12px;margin-top:4px;border:1px dashed var(--line);background:var(--paper)}
+.set-unit{display:grid;place-items:center;min-width:40px;height:26px;padding:0 6px;background:var(--card);border:2px solid var(--own);font:700 13px var(--font-num)}
+.set-unit.enemy{border-color:var(--enemy)}
+html[data-signs="on"] .set-unit.enemy{border-style:double;border-width:4px}
+.set-line{flex:1;min-width:180px;padding:4px 10px;border-left:4px solid var(--danger);background:var(--card)}
+html[data-signs="on"] .set-line{border-left-style:double;border-left-width:6px}
+html[data-signs="on"] .set-line .tg-head::before{content:"!";margin-right:4px;font-weight:700;color:var(--danger)}
+.set-line .tg-head{display:block;font:11px/1.3 var(--font-num);letter-spacing:.06em;color:var(--ink2)}
+.set-line .tg-text{display:block;font:14px/1.38 var(--font-head)}
+
+/* Tasten */
+.set-keys + .set-keys{margin-top:14px}
+.set-keys h3{margin:0 0 6px;font:12px/1.2 var(--font-ui);letter-spacing:.06em;text-transform:uppercase;color:var(--ink2)}
+.set-keys dl{margin:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:2px 16px}
+.set-keys dl > div{display:grid;grid-template-columns:minmax(84px,auto) 1fr;gap:10px;align-items:baseline;padding:3px 0;border-bottom:1px dotted var(--line)}
+.set-keys dt{font-size:12px;color:var(--ink2);white-space:nowrap}
+.set-keys dd{margin:0;font-size:14px}
+.settings kbd{display:inline-block;min-width:22px;padding:1px 5px;border:var(--border);border-bottom-width:2px;border-radius:2px;background:var(--card);
+  font:700 12px var(--font-num);color:var(--ink);text-align:center}
+
+/* Klang im Dienstbuch: die Karte der Seitenleiste nicht verstecken */
+.settings .snd-panel{max-width:360px;font-size:14px}
+
+@media (max-width:699px){
+  .set-back{padding:0;place-items:stretch}
+  .settings{grid-template-columns:1fr;grid-template-rows:auto auto 1fr auto;max-height:none;height:calc(100dvh / var(--text-scale,1));width:calc(100vw / var(--text-scale,1));border-radius:0;border-top:0;
+    padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
+  .set-tabs{flex-direction:row;overflow-x:auto;padding:8px 8px 0;border-right:0;border-bottom:var(--border);gap:4px}
+  .set-tabs button{flex:none;border:var(--border);border-bottom:0;border-radius:var(--radius) var(--radius) 0 0;margin:0 0 -1px;font-size:14px;padding:8px 10px}
+  .set-tabs button[aria-selected="true"]::after{display:none}
+  .set-tabs button[aria-selected="true"]{border-bottom:1px solid var(--card)}
+  .set-panel{padding:12px 12px 16px}
+  .set-slot{grid-template-columns:auto 1fr}
+  .set-slot-acts{grid-column:1 / -1}
+  .set-slot-acts .btn{flex:1;min-height:44px}
+  .set-seg{width:100%}
+  .set-seg label{flex:1}
+  .set-seg span{padding:6px 8px;font-size:13.5px}
+}
+
+/* ---------- Hinweis auf neue Feldausgabe (Service Worker) ---------- */
+.update-note{position:fixed;left:50%;top:calc(10px + env(safe-area-inset-top));z-index:60;transform:translateX(-50%);display:flex;align-items:center;gap:12px;
+  max-width:calc(100% - 24px);padding:8px 8px 8px 14px;border-top:3px double var(--line);animation:lf-feed .4s cubic-bezier(.2,.75,.25,1)}
+.update-note p{margin:0;font:14px/1.35 var(--font-head)}
+.update-note .btn{min-height:44px;white-space:nowrap}
+.update-note .x{min-width:44px;min-height:44px;background:none;border:0;font:22px var(--font-ui);color:var(--ink2);cursor:pointer}
+@keyframes lf-fade{from{opacity:0}}
+@keyframes lf-feed{from{opacity:0;translate:0 14px}}
+@media (prefers-reduced-motion:reduce){.set-back,.update-note{animation:none}}
+
+/* ---------- Hauptmenue ---------- */
+.menu-list .btn[hidden]{display:none}
+.title .menu-akte{margin-top:14px;min-width:min(320px,100%);min-height:44px;background:transparent;box-shadow:none;border-style:dashed}
+#menu-weiter{border-width:2px;border-color:var(--ink)}

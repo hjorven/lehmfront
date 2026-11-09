@@ -10,6 +10,9 @@ export function createShield(root) {
   function place() {
     if (!anchor || el.hidden) return;
     const vw = root.clientWidth, vh = root.clientHeight;
+    // P18: Reicht der Platz zwischen Kopfleiste und Telegramm nicht, zeigt das Schild nur Kopf und Befehl
+    el.classList.remove('compact');
+    if (el.offsetHeight > vh - anchor.safeTop - anchor.safeBottom) el.classList.add('compact');
     const w = el.offsetWidth, h = el.offsetHeight;
     const gap = 12;
     let left = Math.round(anchor.x - w / 2);
