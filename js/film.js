@@ -207,6 +207,7 @@ export function planFilm(input, result, side) {
         at: { ...e.at },
         group: e.side === side ? e.group ?? null : null,
         type: e.type,
+        event: e,
       });
     });
   });

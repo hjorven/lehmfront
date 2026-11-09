@@ -7,6 +7,8 @@
 // Der Systemmodus (hell/dunkel) gilt hier wie bei Briefen zwischen den Missionen (Plan 7.7).
 import { createRng } from '../rng.js';
 import { loadPaperStyles, createPaperLayer } from '../ui/paper/index.js';
+import { paperHooks } from '../audio/director.js';
+import { audio } from '../audio/engine.js';
 
 const LABELS = {
   letter: 'Brief',
@@ -47,12 +49,15 @@ export async function mount(root, params) {
 
   const lightParam = params.get('licht');
   const light = lightParam === 'nacht' ? 'night' : lightParam === 'tag' ? 'day' : 'auto';
+  // Zwischen den Missionen: nur die karge Musik, keine Front (wartet auf das erste Tippen)
+  audio.init();
+  audio.startMusic();
   const paper = createPaperLayer(stageWrap, {
     light,
-    hooks: {
-      // Hier haengt spaeter K1 den Klang ein (Tastenanschlag, Wagenruecklauf, Stempel)
+    // Klang (P19): Anschlag, Wagenruecklauf, Stempel, Rascheln
+    hooks: paperHooks({
       onStamp: ({ sheetId }) => stageWrap.dispatchEvent(new CustomEvent('papier-stempel', { detail: sheetId })),
-    },
+    }),
   });
 
   const only = params.get('nur');

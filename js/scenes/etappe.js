@@ -4,6 +4,7 @@
 //   &view=55,-20   Kippen und Drehen      &act=2         Gebaeude spaeterer Akte zeigen
 //   &material=40   Material im Depot
 import { renderEtappe } from '../ui/etappe3d/index.js';
+import { playSfx, audio } from '../audio/engine.js';
 import { placeBuilding, advanceConstruction, chooseReward, etappeYield, repairBuilding } from '../etappe.js';
 
 // 10 x 6 Felder hinter der eigenen Linie. Zeichen: w Wiese, l Lehm, k Kreide, f Fels, d Dorf, W Wald, s Sumpf, ~ Wasser
@@ -92,20 +93,27 @@ export function mount(root, params) {
 
   const showStatus = () => { status.textContent = `Stellungsrunde ${round} · Material ${material}`; };
 
+  // Hinter der Linie: die Front nur als fernes Grollen
+  audio.init();
+  audio.setAmbience({ darkness: night ? 0.8 : 0.15, battle: 0.06, rain: 0, wind: 0.15 });
   const win = renderEtappe(host, {
     ...props(),
-    onSelect: (x, y) => { selected = { x, y }; win.update({ selected }); },
+    onSelect: (x, y) => { selected = { x, y }; playSfx('paper', { intensity: 0.2 }); win.update({ selected }); },
     onBuild: (x, y, type) => {
       const r = placeBuilding(etappe, x, y, type, { act, material });
-      if (!r.ok) return;
+      if (!r.ok) { playSfx('pencil', { count: 1, intensity: 0.3 }); return; }
       material -= r.cost;
       etappe = r.etappe;
+      // Bauauftrag: Bleistift auf den Plan, dann der Stempel der Bauleitung
+      playSfx('pencil', { count: 3, intensity: 0.45 });
+      playSfx('stamp', { delay: 0.35, intensity: 0.6 });
       showStatus();
       win.update(props());
     },
     onRepair: (id) => {
       const r = repairBuilding(etappe, id, { material });
       if (!r.ok) return;
+      playSfx('steps', { count: 3, intensity: 0.35 });
       material -= r.cost;
       etappe = r.etappe;
       showStatus();
@@ -114,12 +122,16 @@ export function mount(root, params) {
     onChooseReward: (level, id) => {
       const r = chooseReward(etappe, level, id);
       if (!r.ok) return;
+      playSfx('stamp');
       etappe = r.etappe;
       win.update(props());
     },
   });
 
   next.addEventListener('click', () => {
+    // Neue Stellungsrunde: die Uhr rastet ein, eine Lore bringt den Ertrag
+    playSfx('clock-lock');
+    playSfx('lore', { delay: 0.4, intensity: 0.45 });
     const s = advanceConstruction(etappe);
     etappe = s.etappe;
     material += etappeYield(etappe).total.material || 0;

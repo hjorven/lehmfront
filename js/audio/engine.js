@@ -238,6 +238,21 @@ export function createAudioEngine({ win = globalThis.window, seed = 7 } = {}) {
       emit();
     },
 
+    // Umgebung und Musik verstummen kurz und kommen dann langsam zurueck (Gefallene, P19)
+    hush(seconds = 3) {
+      if (!nodes || ac.state !== 'running') return false;
+      const t = ac.currentTime;
+      const s = Math.max(0.5, Math.min(10, Number(seconds) || 3));
+      for (const b of ['ambience', 'music']) {
+        const p = nodes[b].gain;
+        p.cancelScheduledValues(t);
+        p.setValueAtTime(p.value, t);
+        p.setTargetAtTime(0, t, 0.12);
+        p.setTargetAtTime(busGain(b), t + s, 0.9);
+      }
+      return true;
+    },
+
     // Gefechtslage nur fuer die Musik, wenn die Umgebung aus ist
     setMusicBattle(battle) {
       music?.setBattle(clamp01(battle));

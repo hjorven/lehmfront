@@ -8,6 +8,7 @@ import { viewFor } from '../view.js';
 import { applyTheme, themeAt } from '../theme.js';
 import { clockText } from './labels.js';
 import { esc, reducedMotion } from './dom.js';
+import { cueEvents, cueSection } from '../audio/director.js';
 
 /**
  * Haken fuer den Tag-Nacht-Uebergang in der letzten Sekunde des Films (Plan 7.7).
@@ -102,7 +103,12 @@ export function createFilmPlayer(root, { onFrame, onEnd, onLines }) {
     const fr = frameAt(t);
     onFrame(fr);
     const n = linesUntil(film, t);
-    if (n !== lastLines) { onLines(n, playing); lastLines = n; }
+    if (n !== lastLines) {
+      // Klang nur beim Abspielen, nicht beim Scrubbing (P19)
+      if (playing && lastLines >= 0 && n > lastLines) cueEvents(film.lines.slice(lastLines, n), { side, state: fr.state });
+      onLines(n, playing);
+      lastLines = n;
+    }
     // Uebergang in der letzten Sekunde
     // (auch beim Zurueckspulen: dann wieder Richtung Ausgangszustand)
     if (trans) {
@@ -115,6 +121,7 @@ export function createFilmPlayer(root, { onFrame, onEnd, onLines }) {
   function updateBar(fr) {
     const s = film.sections[fr.section];
     if (fr.section !== lastSection) {
+      if (playing && lastSection >= 0) cueSection(s.key);
       el.querySelectorAll('.film-tab').forEach((b, i) => {
         b.classList.toggle('on', i === fr.section);
         b.setAttribute('aria-selected', String(i === fr.section));

@@ -50,6 +50,13 @@ Jeder Thread traegt hier nach dem Merge ein, was fertig ist und was offen bleibt
   - Oberfläche: `js/ui/film.js` (Filmleiste mit Phasenreitern, Weiter pro Phase, Durchlaufen, Überspringen, Zeitleiste, Tasten Enter/Leertaste, Esc, Pfeile), `js/ui/telegram.js` (Fernschreiberstreifen Stil 03, Klick springt zum Ort und im Film zum Zeitpunkt), `js/ui/archive.js` (Aktenordner „Protokoll“, Taste P), `js/render/film-layer.js` (Geist am Ausgangsort und Bleistiftspur). Ersetzt das Meldungen-Kärtchen aus P03.
   - Demo-Zustände: `?scene=gefecht&demo=film|telegramm|archiv`.
 
+- P19 Klang im Spiel (Teil 1, Feinschliff folgt):
+  - `js/audio/cues.js` (rein): Ereignis-Haken `registerCue(type, fn)`, Vorbelegung fuer alle bisherigen Ereignisse (Schritte, Gewehr, MG, Leuchtkugel bei Einbruch der Nacht, Kraehe bei Tagesanbruch, Radieren beim Geist, Uhr in der Uhrphase) und fuer kommende (Sturm, Artillerie nah/fern nach Abstand zu eigenen Gruppen, Mine, Loren, Wetter). Grundton der Front `ambienceFor` aus Tageszeit, Wetter, Rundenart und dem, was die eigene Seite in der letzten Runde mitbekommen hat.
+  - `js/audio/director.js` spielt ab; eingehaengt in Phasenfilm, Gefecht (Pfeife nach dem Halten-Ring beim Sturm, Musik), Papier, Etappe.
+  - Regler: Knopf „Ton“ rechts im Gefecht mit Klappkarte, auf dem Handy als Karte „Klang“ in der Seitenleiste (`js/ui/sound.js`, auch fuer P18 nutzbar).
+  - Ueberraschung: wird eine Gruppe aufgerieben, verstummt die ganze Front fuer drei Sekunden, dann schlaegt die Uhr einmal und das Grollen kommt langsam zurueck (`audio.hush`).
+  - Offen: Feinschliff der Ansichten (Uebergaenge, Mikroanimationen, Token-Konsistenz) als zweiter PR; Hauptmenue und Feldzugskarte bekommen ihren Klang, sobald es sie gibt.
+
 ### Für die nächsten Pakete (nach P07)
 
 - Tag-Nacht-Optik (P10): `setTransitionHook(({ t, from, to }) => ...)` aus `js/ui/film.js`. Wird in der letzten Sekunde des Films mit t 0..1 gerufen (beim Zurückspulen auch rückwärts), `from`/`to` sind die Dunkelheit vor und nach der Runde. Standard ist `applyTheme(themeAt(...))`.
