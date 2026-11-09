@@ -13,3 +13,6 @@ Neue Ideen landen hier, nicht im Code (Plan 13). Mit Datum und Paket, aus dem si
 - 2026-11-08, P02: Ältere Kartenblätter einer Kampagne könnten Radierspuren früherer Grabenverläufe zeigen, wo eine Linie aufgegeben wurde.
 - 2026-11-08, T1: Lasks Schachpartie mit Ruta laeuft in seinen Briefen weiter. Die Uebersetzerin de Groot stellt sie in der Fernmeldestelle nach. Ein Fundstueck oder Erfolg koennte das Brett mit der Stellung am Kriegsende zeigen.
 - 2026-11-08, T1: Geske Harms strickt Socken mit einer laengeren linken Socke. Wenn Harms faellt, schickt sie zwoelf Paar fuer die Truppe: koennte als kleiner Moralbonus fuer eine Gruppe im Spiel auftauchen.
+- 2026-11-09, P09: Der Feuerplan könnte als Durchschlag ins Protokoll wandern; nach dem Gefecht zeichnet ein Stabsoffizier mit Rotstift ein, wo die Walze wirklich lag und wo die Sturmgruppe war (Abstand in Metern als Randnotiz).
+- 2026-11-09, P09: Ein Beobachter mit zerschossener Leitung könnte Leuchtkugeln schießen (eine Farbe = Feuer vorverlegen); der Gegner sieht sie auch und kann sie nachahmen.
+- 2026-11-09, P09: Schwere Granaten, die nicht explodieren (Blindgänger), bleiben als Bleistiftkreuz auf der Karte und können Wochen später einen Graben sperren, bis ein Pionier sie räumt.

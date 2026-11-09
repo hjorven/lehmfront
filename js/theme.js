@@ -178,3 +178,21 @@ export function animateDarkness(from, to, { duration = 2000, el, onDone } = {}) 
   raf = requestAnimationFrame(step);
   return () => cancelAnimationFrame(raf);
 }
+
+/**
+ * Stil 02 Blaupause (Plan 7.8): verworfen als Spielfeld, aber der Feuerplan-Editor (P09) legt ihn ueber die Karte,
+ * solange man eine Walze plant. Technische Zeichnung: weisse Linien auf Preussischblau, ohne Zittern.
+ * blueprintTheme(base) behaelt darkness der Spielzeit (Regeln und Vorschau rechnen weiter mit der echten Sicht).
+ */
+export const BLUEPRINT = {
+  paper: '#173b7c', card: '#1b4589', ink: '#f3f6fc', ink2: '#bccbe8', line: '#7d97cb', track: '#2b5299',
+  own: '#ffffff', enemy: '#ffb36b', accent: '#ffd45c', danger: '#ff9a7a',
+  faint: '#2c58a3', contour: '#5d80c2', forest: '#3866b0', forestLine: '#dce6f7', water: '#4473be', wire: '#dce6f7', crater: '#24498f',
+  rail: '#eef3fb', marsh: '#a8c0e8', chalk: '#3c64ab', rock: '#cfdcf2', village: '#eef3fb',
+  pencil: '#ffffff', stain: '#10306a', fold: '#2f5ca8', frame: '#dce6f7', desk: '#0b1d42', shade: '#000000',
+  jitter: 0, shadeAlpha: 0.3, foldAlpha: 0.25, stainAlpha: 0,
+};
+
+export function blueprintTheme(base = current) {
+  return { ...BLUEPRINT, darkness: base?.darkness ?? 0, dark: true, flare: false, blueprint: true };
+}

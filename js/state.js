@@ -5,6 +5,7 @@ import { createRng } from './rng.js';
 import { unitType } from './config/units.js';
 import { faction } from './config/factions.js';
 import { NAMES } from './config/names.js';
+import { initArtillery } from './artillery.js';
 
 export const STATE_VERSION = 2;
 export const SIDES = ['a', 'b'];
@@ -150,6 +151,8 @@ export function createInitialState(map, scenario, seed) {
       control: s.control ?? 'human',
     };
     if (s.supply) sides[side].supply = structuredClone(s.supply); // Versorgung der Front (js/supply.js)
+    const art = initArtillery(map, s.artillery, side, f.id); // Batterien, Leitungen, Feuerplaene (js/artillery.js)
+    if (art.batteries.length || art.lines.length) sides[side].artillery = art;
     const used = new Set();
     (s.groups ?? []).forEach((spec, i) => {
       if (!inBounds(map, spec.pos)) throw new Error(`Gruppe ${i} von Seite ${side} steht ausserhalb der Karte`);

@@ -15,10 +15,18 @@
         { "group": "b02", "turnsAgo": 2, "sector": { "x": 37, "y": 22 }, "source": "Grabenspiegel" },
         { "group": "b03", "turnsAgo": 4, "source": "Luftbild" }
       ],
+      "artillery": {
+        "lines": [
+          { "id": "k4", "to": "batterie2", "points": [[17, 12], [15, 24], [17, 32]] },
+          { "id": "k5", "to": "B-Stelle Mitte", "points": [[17, 12], [25, 16.5], [32, 16.5]] }
+        ]
+      },
       "groups": [
         { "type": "rifles", "pos": { "x": 32, "y": 8 }, "morale": 72 },
         { "type": "mg", "pos": { "x": 33, "y": 19 }, "morale": 64 },
-        { "type": "pioneers", "pos": { "x": 27, "y": 27 }, "morale": 70 }
+        { "type": "pioneers", "pos": { "x": 27, "y": 27 }, "morale": 70 },
+        { "type": "observers", "pos": { "x": 33, "y": 17 }, "morale": 68 },
+        { "type": "runners", "pos": { "x": 24, "y": 15 }, "morale": 66 }
       ]
     },
     "b": {
@@ -28,6 +36,22 @@
         { "group": "a02", "turnsAgo": 1, "sector": { "x": 42, "y": 18 }, "source": "Grabenspiegel" }
       ],
       "supplies": { "carts": 3, "cartsTotal": 5 },
+      "artillery": {
+        "exchange": { "x": 54, "y": 19 },
+        "batteries": [
+          { "id": "mb1", "type": "feldhaubitzen", "x": 55, "y": 7, "w": 2, "h": 2, "label": "Batterie Morrow 1" },
+          { "id": "mb2", "type": "schwere", "x": 56, "y": 28, "w": 2, "h": 2, "label": "Batterie Morrow 2" }
+        ],
+        "lines": [
+          { "id": "m1", "to": "Abschnitt Nord", "points": [[54, 19], [50, 10], [47, 10]] },
+          { "id": "m2", "to": "Abschnitt Süd", "points": [[54, 19], [50, 28], [47, 28]] },
+          { "id": "m3", "to": "mb1", "points": [[54, 19], [55, 8]] },
+          { "id": "m4", "to": "mb2", "points": [[54, 19], [56, 28]] }
+        ],
+        "plans": [
+          { "id": "sperr", "kind": "barrage", "batteries": ["mb1", "mb2"], "a": { "x": 38, "y": 6 }, "b": { "x": 38, "y": 30 }, "dir": "W", "start": 1, "rounds": 4 }
+        ]
+      },
       "groups": [
         { "type": "rifles", "pos": { "x": 45, "y": 9 } },
         { "type": "mg", "pos": { "x": 46, "y": 20 } },

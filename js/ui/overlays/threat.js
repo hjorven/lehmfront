@@ -1,13 +1,14 @@
 // Overlay 2 Bedrohung (Plan 7.4, Bild feature-07): was die eigene Seite ueber den Gegner weiss.
 // Schraffiert: bekannte MG-Kegel (aus Aufklaerung oder beim Feuern gesehen), verblassen mit dem Alter.
 // Gestrichelte Pfeile: zuletzt gesehene Bewegung mit Richtung und Alter. Geister tragen ihre Quelle (Luftbild ...).
-// Artilleriereichweiten meldet P09 hier spaeter dazu.
+// Artillerie (P09): aufgeklaerte feindliche Batterien mit Reichweite, eigene Feuerplaene des Gegners bleiben verborgen.
 import { registerOverlay } from '../overlays.js';
 import { viewFor } from '../../view.js';
 import { unitType } from '../../config/units.js';
 import { directionOf } from '../../sight.js';
 import { drawCone, drawGhostTrail, ghostAlpha, ageText } from '../../render/fire-layer.js';
 import { FONTS } from '../../render/map-layer.js';
+import { drawEnemyBatteries } from '../../render/artillery-layer.js';
 
 let cache = { state: null, side: null, view: null };
 function viewOf(state, map, side) {
@@ -22,6 +23,7 @@ registerOverlay({
   draw(ctx, { map, state, side, theme, px }) {
     const v = viewOf(state, map, side);
     const foeColor = side === 'a' ? theme.enemy : theme.own;
+    drawEnemyBatteries(ctx, state, side, { th: theme, px, color: foeColor });
     // Sichtbare MGs zeichnet die Einheitenebene schon; hier nur das Wissen ueber nicht sichtbare
     const known = v.ghosts.filter((g) => g.sector);
     for (const g of known) {
