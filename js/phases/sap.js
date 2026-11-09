@@ -79,7 +79,7 @@ function runSap(ctx) {
     const fields = (n) => `${n} ${n === 1 ? 'Feld' : 'Felder'}`;
     let reason;
     if (!done.length && !stuck) reason = `${name}: die Sappe steht schon.`;
-    else if (!done.length) reason = `${name} gräbt sich bei ${cellLabel(stuck.x, stuck.y)} durch den nassen Boden. Das Feld ist noch nicht durch.`;
+    else if (!done.length) reason = `${name} gräbt sich bei ${cellLabel(stuck.x, stuck.y)} durch ${live(map, state, stuck.x, stuck.y)?.terrain === 'kreide' ? 'die Kreide' : (state.weather?.wet ?? 0) >= 2 ? 'den nassen Lehm' : 'den Boden'}. Das Feld ist noch nicht durch.`;
     else if (!rest.length) reason = `${name} hat die Sappe bis ${cellLabel(done[done.length - 1].x, done[done.length - 1].y)} vorgetrieben, gedeckt bis zum Kopf.`;
     else reason = `${name} treibt die Sappe ${fields(done.length)} vor, bis ${cellLabel(done[done.length - 1].x, done[done.length - 1].y)}. Noch ${fields(rest.length)} offen.`;
     ctx.emit('sap', {
@@ -102,7 +102,7 @@ function runSap(ctx) {
       side: foe, secret: true, by: watchers[0].id, sap: true,
       reason: state.night
         ? `Im Dunkeln Spatengeräusche bei ${cellLabel(s.at.x, s.at.y)}, ganz nah. Der Gegner treibt eine Sappe vor.`
-        : `Frischer Lehm bei ${cellLabel(s.at.x, s.at.y)}, mitten auf der Weide: eine Sappe kommt näher.`,
+        : `Frischer Aufwurf bei ${cellLabel(s.at.x, s.at.y)}, mitten im Niemandsland: eine Sappe kommt näher.`,
       at: { ...s.at },
     });
   }

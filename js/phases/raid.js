@@ -117,14 +117,14 @@ function runRaid(ctx) {
       const where = path.find((p) => distance(p, spotter.pos) <= RAID.spotRadius + 2) ?? path[Math.floor(path.length / 2)];
       const lit = !!flareAt(state, where);
       ctx.emit('raid_spotted', {
-        side: foe, group: spotter.id, secret: true, raider: g.id,
+        side: foe, group: spotter.id, secret: true,
         reason: lit
           ? `Im Licht der Leuchtkugel stehen bei ${cellLabel(where.x, where.y)} Gestalten im Draht. ${groupLabel(spotter)} schießt.`
           : `${groupLabel(spotter)} hört bei ${cellLabel(where.x, where.y)} Draht klirren und schießt in die Dunkelheit.`,
         at: { ...where },
       });
       const n = roll(ctx.rng, RAID.spottedLoss[0], RAID.spottedLoss[1]);
-      if (n) inflictLosses(ctx, g, n, `${name} wird bei ${cellLabel(where.x, where.y)} entdeckt und beschossen: ${n} ${n === 1 ? 'Verlust' : 'Verluste'}.`, { cause: 'raid' });
+      if (n) inflictLosses(ctx, g, n, `${name} wird bei ${cellLabel(where.x, where.y)} entdeckt und beschossen: ${n} ${n === 1 ? 'Verlust' : 'Verluste'}.`, { cause: 'raid', at: { ...where } });
       if (g.status === 'lost') continue;
       if (Math.floor(ctx.rng() * 100) < RAID.abortPct) {
         g.pos = home;
@@ -137,7 +137,9 @@ function runRaid(ctx) {
       .sort((p, q) => distance(p.pos, target) - distance(q.pos, target) || (p.id < q.id ? -1 : 1));
     const night = !!state.night;
     if (!defenders.length) {
-      const found = reveal(state, g.side, target, RAID.intelRadius, 'Stoßtrupp', ctx.turn + 1);
+      // Papiere und Feldpost gibt es nur in einem feindlichen Graben, auf der Weide liegt nichts
+      const inTrench = live(map, state, target.x, target.y)?.trench?.side === mapSideOf(foe);
+      const found = inTrench ? reveal(state, g.side, target, RAID.intelRadius, 'Stoßtrupp', ctx.turn + 1) : [];
       ctx.emit('raid', {
         side: g.side, group: g.id, secret: true, outcome: 'empty', revealed: found,
         reason: `${name} findet bei ${cellLabel(target.x, target.y)} niemanden. ${found.length ? `Spuren, Feldpost und ein Kochgeschirr verraten ${found.length} ${found.length === 1 ? 'Gruppe' : 'Gruppen'} in der Nähe.` : 'Nur Wasser und leere Patronenhülsen.'} Vor der Dämmerung ist der Trupp zurück.`,
@@ -173,7 +175,7 @@ function runRaid(ctx) {
       const kills = Math.min(def.strength, roll(ctx.rng, 0, 1));
       if (kills) inflictLosses(ctx, def, kills, `${groupLabel(def)} verliert im Handgemenge ${kills} ${kills === 1 ? 'Mann' : 'Mann'}.`, { cause: 'raid' });
       const lost = roll(ctx.rng, 0, 1);
-      if (lost) inflictLosses(ctx, g, lost, `${name}: ${lost} Verwundeter auf dem Rückweg.`, { cause: 'raid' });
+      if (lost) inflictLosses(ctx, g, lost, `${name}: ${lost} Verwundeter auf dem Rückweg.`, { cause: 'raid', at: { ...target } });
       const radius = RAID.interrogateRadius;
       const found = reveal(state, g.side, target, radius, 'Gefangenenbefragung', ctx.turn + 1);
       let batteries = 0;
@@ -194,7 +196,7 @@ function runRaid(ctx) {
       ctx.emit('raid', { side: g.side, group: g.id, secret: true, outcome: 'success', count: taken, reason: `${name} ist vor der Dämmerung zurück.`, at: home, minor: true });
     } else {
       const n = roll(ctx.rng, RAID.repelledLoss[0], RAID.repelledLoss[1]);
-      inflictLosses(ctx, g, n, `${name} bleibt im Graben bei ${cellLabel(target.x, target.y)} hängen: ${n} ${n === 1 ? 'Verlust' : 'Verluste'}.`, { cause: 'raid' });
+      inflictLosses(ctx, g, n, `${name} bleibt im Graben bei ${cellLabel(target.x, target.y)} hängen: ${n} ${n === 1 ? 'Verlust' : 'Verluste'}.`, { cause: 'raid', at: { ...target } });
       def.deeds = { ...(def.deeds ?? {}), wachsam: (def.deeds?.wachsam ?? 0) + 1 };
       if (night) def.deeds.nacht = (def.deeds.nacht ?? 0) + 1;
       if (g.status !== 'lost' && g.strength > 1 && ctx.rng() < 0.35) {
@@ -203,7 +205,7 @@ function runRaid(ctx) {
         ctx.emit('prisoners', { side: foe, group: def.id, secret: true, count: 1, reason: `${groupLabel(def)} wirft einen Stoßtrupp zurück und hält einen Mann fest.`, at: { ...def.pos } });
       }
       ctx.emit('raid_repelled', {
-        side: foe, group: def.id, secret: true, raider: g.id,
+        side: foe, group: def.id, secret: true,
         reason: `${groupLabel(def)} wehrt bei ${cellLabel(def.pos.x, def.pos.y)} einen Stoßtrupp ab.`,
         at: { ...def.pos },
       });
@@ -213,4 +215,5 @@ function runRaid(ctx) {
   }
 }
 
-registerPhase({ id: 'raid', kind: 'position', order: ORDER.position.movement + 5, run: runRaid });
+// Nach den Leuchtkugeln dieser Runde (flares bei movement + 9), damit ihr Licht den Trupp verraten kann
+registerPhase({ id: 'raid', kind: 'position', order: ORDER.position.movement + 9.5, run: runRaid });

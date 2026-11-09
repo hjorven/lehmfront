@@ -261,3 +261,23 @@ test('P23: Missionen im Simulator sind deterministisch und gewinnbar', () => {
   const passive = runMission({ map: MAP, scenario: scenario('akt2-m1'), mission: 'a2m1', seed: 3, passive: true });
   assert.equal(passive.outcome, 'niederlage');
 });
+
+test('P23: Leuchtkugeln derselben Runde verraten den Stoßtrupp', () => {
+  let lit = 0;
+  for (let seed = 1; seed <= 12; seed++) {
+    const { logs } = play(start('akt2-m4', seed), 1, () => ({
+      a: [{ group: 'a01', type: 'raid', target: { x: 40, y: 20 } }],
+      b: [{ group: 'b01', type: 'flare', target: { x: 37, y: 20 } }],
+    }), seed);
+    if (logs.some((e) => e.type === 'raid_spotted' && /Leuchtkugel/.test(e.reason))) lit++;
+    for (const e of logs.filter((x) => x.type === 'raid_spotted' || x.type === 'raid_repelled')) assert.equal(e.raider, undefined, 'keine fremde Gruppen-ID');
+  }
+  assert.ok(lit > 0, 'mindestens einmal im Licht entdeckt');
+});
+
+test('P23: Ein gefallener Vell kommt in späteren Missionen nicht wieder', () => {
+  const st = start('akt2-m6');
+  assert.ok(st.groups.some((x) => x.officer?.id === 'vell'));
+  const s2 = prepareAkt2(st, { flags: ['vell_angriff', 'vell_gefallen'] }, 'a');
+  assert.ok(!s2.groups.some((x) => x.officer?.id === 'vell'));
+});

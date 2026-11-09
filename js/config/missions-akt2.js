@@ -58,6 +58,10 @@ export function prepareAkt2(state, campaign, side = 'a') {
   const st = s.sides[side];
   if (!st) return s;
   if (Array.isArray(st.reports) && !st.reports.includes('lattenroste')) st.reports = [...st.reports, 'lattenroste'].sort();
+  // Gefallene Offiziere kommen nicht wieder: die Gruppe fuehrt dann ihr Gruppenfuehrer
+  if ((campaign?.flags ?? []).includes('vell_gefallen')) {
+    for (const g of s.groups) if (g.side === side && g.officer?.id === 'vell') delete g.officer;
+  }
   const doc = doctrineFromFlags(campaign?.flags ?? []);
   if (doc) {
     st.doctrine = doc;
@@ -80,7 +84,8 @@ export function prepareAkt2(state, campaign, side = 'a') {
 /** a2m1: Sappe bis zum Heuwagen und drei entwaesserte Grabenfelder, in acht Stellungsrunden */
 export function judgeA2m1({ state, rounds, side, final }) {
   const sap = trenchSide(state, HEUWAGEN) === ms(side);
-  const drained = Object.values(state?.cells ?? {}).filter((c) => c.drain && c.trench !== null).length;
+  // Nur eigene Lattenroste zaehlen (aus den eigenen Meldungen), jedes Feld einmal
+  const drained = new Set(ownLog(rounds, side, 'drain').filter((e) => !e.blocked).flatMap((e) => (e.cells ?? []).map((c) => c.x + ',' + c.y))).size;
   if (sap && drained >= 3) return { outcome: 'sieg', orderMet: true, why: 'Sappe am Heuwagen, Senke entwässert' };
   const n = positionRounds(rounds);
   if (n >= LIMITS.a2m1 || final) {

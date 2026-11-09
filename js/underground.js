@@ -134,10 +134,7 @@ export function activeTunnel(state, groupId) {
 export function tunnelCellWork(cell) {
   const t = cell?.terrain;
   if (t === 'wasser') return Infinity;
-  if (t === 'kreide') return 70;
-  if (t === 'fels') return 180;
-  if (t === 'sumpf') return 200;
-  return 100;
+  return TUNNEL.cellWork[t] ?? TUNNEL.cellWork.lehm;
 }
 
 /** Stollen pruefen (rein): null oder deutscher Grund */

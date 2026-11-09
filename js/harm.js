@@ -6,13 +6,14 @@ import { surname } from './phases/hold.js';
 export const groupLabel = (g) => 'Gruppe ' + surname(g.leader.name);
 
 /**
- * Verluste zufuegen. Liefert die tatsaechliche Zahl. extra: weitere Felder fuer das Ereignis (cause, public ...).
+ * Verluste zufuegen. Liefert die tatsaechliche Zahl. extra: weitere Felder fuer das Ereignis (cause, public, at ...).
  */
 export function inflictLosses(ctx, g, amount, reason, extra = {}) {
   const n = Math.max(0, Math.min(g.strength, Math.floor(amount)));
   if (n <= 0) return 0;
   g.strength -= n;
-  ctx.emit('losses', { side: g.side, group: g.id, amount: n, cause: extra.cause ?? 'other', reason, at: { ...g.pos }, ...extra });
+  const { at, ...rest } = extra; // at: Ort des Geschehens, wenn die Gruppe nicht dort steht (Stosstrupp)
+  ctx.emit('losses', { side: g.side, group: g.id, amount: n, cause: extra.cause ?? 'other', reason, ...rest, at: { ...(at ?? g.pos) } });
   if (g.strength <= 0) {
     g.strength = 0;
     g.status = 'lost';

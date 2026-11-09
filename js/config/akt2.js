@@ -15,8 +15,9 @@ export const SAP = {
 export const TUNNEL = {
   maxCells: 18,       // laengster Stollen
   reach: 1,           // Stolleneingang neben der Gruppe (im eigenen Graben)
-  rate: { pioneers: 2, rifles: 1 },   // Felder je Stellungsrunde
-  chalkBonus: 1,      // in der Kreide geht es schneller (aber man hoert jeden Spaten)
+  // Arbeit je Stollenfeld nach Boden (100 = eine Runde volle Schuetzengruppe; Pioniere schaffen doppelt so viel).
+  // Kreide schneidet sich leicht, traegt aber jeden Spatenschlag weit (siehe LISTEN.chalk).
+  cellWork: { kreide: 70, lehm: 100, wald: 120, dorf: 120, fels: 180, sumpf: 200 },
   diggers: ['pioneers', 'rifles'],
   collapseWet: 2,     // ab dieser Naesse kann eine Stuetze nachgeben
   collapsePct: 6,     // Chance je Runde und Stollen bei Naesse
@@ -71,7 +72,7 @@ export const OFFICER = {
 
 export const OFFICER_SKILLS = {
   sturm:  { id: 'sturm',  label: 'Sturm',  text: 'Nahkampf und Stoßtrupp ein Viertel stärker', melee: 125 },
-  ruhe:   { id: 'ruhe',   label: 'Ruhe',   text: 'Moralproben leichter, Unterdrückung klingt schneller ab', check: 12 },
+  ruhe:   { id: 'ruhe',   label: 'Ruhe',   text: 'Moralproben in der Nähe leichter', check: 12 },
   graben: { id: 'graben', label: 'Graben', text: 'Graben und Sappen ein Fünftel schneller', dig: 120 },
   nacht:  { id: 'nacht',  label: 'Nacht',  text: 'Stoßtrupps werden seltener entdeckt', spot: -8 },
 };

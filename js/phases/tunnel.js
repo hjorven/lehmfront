@@ -53,6 +53,9 @@ function blow(ctx, side, t) {
   const camouflet = !foeTrench.length && !state.groups.some((g) => g.side === foe && g.status !== 'lost' && distance(g.pos, c) <= r);
   t.status = 'blown';
   t.blownTurn = ctx.turn;
+  // Wer diesen Stollen gehoert hat, hoert ihn jetzt nicht mehr
+  const fh = sideOf(state, foe).heard[t.id];
+  if (fh) fh.gone = ctx.turn;
   const crater = [];
   if (camouflet) {
     const k = c.x + ',' + c.y;
@@ -95,6 +98,8 @@ function blow(ctx, side, t) {
   // Gegenstollen: feindliche Stollen nahe der Ladung stuerzen ein
   for (const ft of sideOf(state, foe).tunnels) {
     if (ft.status !== 'digging' && ft.status !== 'charged') continue;
+    // Gleichzeitig faellige Ladungen gehen beide hoch: keine Seite gewinnt nur durch die Reihenfolge a vor b
+    if (ft.status === 'charged' && ft.chargedTurn < ctx.turn) continue;
     if (!dugCells(ft).some((p) => distance(p, c) <= TUNNEL.camoufletRadius)) continue;
     ft.status = 'collapsed';
     ft.collapsedTurn = ctx.turn;
@@ -197,7 +202,7 @@ function runTunnels(ctx) {
   for (const side of SIDES) {
     const foe = otherSide(side);
     const s = sideOf(state, side);
-    const ears = ctx.groups(side).filter((g) => g.type === 'listeners' || ownTrenchAt(map, state, g, side));
+    const ears = ctx.groups(side).filter((g) => !g.inDugout && (g.type === 'listeners' || ownTrenchAt(map, state, g, side)));
     for (const t of sideOf(state, foe).tunnels) {
       if (t.status !== 'digging' && t.status !== 'charged') continue;
       if (!t.dug) continue;
