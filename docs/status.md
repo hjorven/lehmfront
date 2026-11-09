@@ -74,6 +74,11 @@ Jeder Thread traegt hier nach dem Merge ein, was fertig ist und was offen bleibt
   - Overlay 1 Versorgung: Loren als fließende Punkte entlang des Wegs, Verwundete als rote Kreuze zurück, abgeschnittene Abschnitte rot und knappe ocker schraffiert, Bruchstellen mit Kreuz und „Weg zu“.
   - Prüfpunkt „versorgung“ (abgeschnitten, Vorrat reicht nicht bis morgen, Verwundete ohne Lore) und eine Zeile in der Zusammenfassung. Demo: `?scene=gefecht&demo=lorenplan` und `&demo=versorgung`.
   - Überraschung: Die Wagen tragen Kreideaufschriften („für Janssen“, „holt 3 Verw.“), kommt eine Lore nicht durch, steht „Weg zu“ durchgestrichen auf der Bordwand.
+- P04 Graben:
+  - Regeln rein in `js/trench.js`: Stufen `LEVELS` (1 Schützenloch, 2 Schützengraben, 3 ausgebaut mit Faschinen, 4 betoniert; Deckung passt zu `COVER` in `js/rules.js`), `cellsFromPoints` (gezeichnete Linie in Felder, Zurückzeichnen radiert), `straightRuns`/`enfiladeRuns` (Längsfeuer ab 4 Feldern gerade), `insertTraverses` (keine Gerade über 3), `defaultFacings`, `captureTrench`, `trenchCover`, `enfiladeOf`.
+  - Phasen `js/phases/dig.js` (Graben ausheben über Runden, Arbeit bleibt im Feld, Material für Stufe 3 und 4, Beton für Morrow erst ab Akt 3) und `js/phases/rebuild.js` (Umbauen: eine Stellungsrunde je drei Felder, Pioniere doppelt). Grabbudget 100 je Runde mal Faktoren in Prozent aus `registerDigFactor(id, fn)` (Einheit, Stärke, Wetter, Erschöpfung, Vertrauen; gleiche id ersetzt).
+  - Werkzeuge Graben (G) und Umbauen (U) mit Zeichenfläche (`js/ui/linedraw.js`, ein Finger zeichnet, zwei Finger bewegen die Karte) und Kärtchen wie im Mockup: Warnung Längsfeuer mit eingezeichneter MG-Schusslinie, „Traversen einfügen“, Stufe, Feuer- oder Laufgraben, Richtung, Dauer im Vergleich Schützen/Pioniere, bremsende Faktoren.
+  - Demo: `?scene=gefecht&demo=graben|traversen|grabenplan|umbauen`.
 
 ### Für die nächsten Pakete (P03, P10)
 
@@ -98,6 +103,16 @@ Jeder Thread traegt hier nach dem Merge ein, was fertig ist und was offen bleibt
 - P08/P09: Feuer-Ereignisse tragen `ammo` (MG 2, sonst 1) zum Abbuchen; Munition wird noch nicht verbraucht. Artilleriereichweiten gehören ins Bedrohungs-Overlay (`js/ui/overlays/threat.js`).
 - P04: Längsfeuer-Regel mit `setEnfiladeRule(fn)` aus `js/phases/fire.js` ersetzen; Traversen als `trench.traverse` werden schon erkannt.
 - P12: `losses`- und `suppressed`-Ereignisse und `g.underFire` sind die Haken für Moralproben.
+
+### Für die nächsten Pakete (nach P04)
+
+- Gräben im Spiel stehen in `state.cells[k].trench` (`{ side: 'own'|'enemy', kind, level, facing, captured? }`, Kartenseite wie in der Karte). Für Regeln und Anzeige: `applyCellState(map, state.cells)` aus `js/map.js` legt den Zustand über die Karte.
+- P05 Feuer: `trenchCover(map, x, y, side)` liefert `{ cover, reversed }` für `hitChance`, `enfiladeOf(map, target, shooter)` sagt, ob ein Schütze einen geraden Abschnitt längs bestreicht (Deckung dann 30 Prozent über `coverValue(..., { enfilade: true })`).
+- P06/P09 Sturm und Nahkampf: `captureTrench(state, map, x, y, side)` beim Einbruch aufrufen; der Graben gibt dann halbe Deckung, bis er umgebaut ist.
+- Wetter (P10?), Etappe (P11, Pionierpark) und Moral (P12) melden Grabfaktoren mit `registerDigFactor` an oder ersetzen die vorläufigen.
+- Dynamische Ebene: `registerDecor({ id, order, draw(ctx, d) })` und `registerOrderPainter(type, fn)` aus `js/render/decor.js` zeichnen eigene Dinge, ohne `units-layer.js` anzufassen.
+- Werkzeuge dürfen `orderTypes` und `describe(order, group, state, map)` angeben (Text in Schild und Befehlsliste). Zeichenwerkzeuge bekommen in `ctx` zusätzlich `ui`, `cam`, `onCancel(fn)`, `redraw(camera?)`, `expose(api)`.
+- Ereignisse dürfen `carry` (ein Befehl) tragen; der Gefechtsbildschirm setzt ihn in der nächsten Runde als Befehl („läuft weiter“), wenn die Rundenart passt.
 
 ## Offen und bekannte Macken
 
@@ -138,6 +153,8 @@ Jeder Thread traegt hier nach dem Merge ein, was fertig ist und was offen bleibt
 - P05: Sicht- und Schussweite sind Chebyshev-Abstand (Quadrat), nur der MG-Kegel ist rund wie gezeichnet. Niedergehaltene Gruppen feuern auf ausdrücklichen Befehl weiter (mit Zittern), nur nicht von selbst. Geister in Gräben werden erst aus dem Nachbarfeld ausradiert (ein Unterstand kann eine Gruppe verbergen).
 - P05: Feuer in Gefechtsrunden trifft nur Gruppen, die nach der Bewegung sichtbar sind; Feuer während der Bewegung (Sperrfeuer auf den Weg) gibt es noch nicht.
 - P05: Mit `night=` (ab 0,5) stellt die Szene die Uhr auf 22 Uhr, damit Regeln und Optik übereinstimmen.
+- P04: Die Gruppe rückt beim Graben zum zuletzt bearbeiteten Feld nach. Ist das Feld besetzt, bleibt sie stehen; ein weitergetragener Rest gilt, solange irgendein Feld davon höchstens drei Felder entfernt ist. Grabgeschwindigkeit und Materialkosten sind Startwerte für das Balancing (P21).
+- P04: Laufgräben warnen nicht vor Längsfeuer, `enfiladeOf` zählt sie im Gefecht aber mit.
 
 ## Freigaben und Entscheidungen von Jorven
 
@@ -181,3 +198,7 @@ Stand 2026-11-08, von Jorven bestaetigt:
 - P08: Lorenplan ist ein Befehl der ganzen Seite (kein Gruppenbefehl) und gilt weiter, bis er geändert wird. Neben Munition, Verpflegung und Material gibt es die Sanitätslore (fährt leer, holt vier Verwundete) und „frei“ (Lore bleibt stehen). Beladene Loren nehmen auf dem Rückweg einen Verwundeten mit.
 - P08: Abschnitte sind gleich hohe Bänder von Nord nach Süd; Gleis, Depot und Laufgraben dürfen bis zu zwei Felder auseinanderliegen (Träger), weil die Asse-Karte keine durchgehende Verbindung zeichnet.
 - P08: Ohne eigene Bruchstellen-Grafik auf der Karte: Das Versorgungs-Overlay markiert verschüttete Gräben und zerschossene Gleise mit rotem Kreuz und schreibt „Weg zu“ an die Stelle.
+- P04: Grabenstufen 1 bis 4 statt 1 bis 3 im Kartenformat (betoniert neu). Arbeit wird je Feld aufsummiert, ein angefangenes Feld wird erst Schützenloch, dann Graben.
+- P04: Die Gruppe wandert beim Graben die Linie entlang (sie steht am Ende am zuletzt bearbeiteten Feld), statt am Platz zu bleiben.
+- P04, Überraschung: frischer Aufwurf. Frisch gegrabene Felder tragen zwei Runden lang Lehmhaufen auf der Feindseite; Gegner in Sichtweite (tags 10 Felder, nachts 3) bekommen eine Meldung „Frisch aufgeworfener Lehm bei ...“ bzw. nachts „Spatengeräusche“. Nachts graben lohnt sich also. Beim Zeichnen zeigt eine gestrichelte Schusslinie mit „MG?“, von wo ein gerader Abschnitt bestrichen werden kann.
+- P04: Umbauen geht auch an eigenen, nie eroberten Gräben (Feuerrichtung drehen). Antippen eines eroberten Feldes nimmt den ganzen eroberten Abschnitt.

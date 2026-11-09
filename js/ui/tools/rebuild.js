@@ -182,7 +182,7 @@ registerTool({
       update();
     });
 
-    const setFrom = (points) => {
+    const setFrom = (points, done = true) => {
       const raw = cellsFromPoints(points);
       if (raw.length === 1) {
         const seg = capturedSegment(map, raw[0], ms);
@@ -190,14 +190,19 @@ registerTool({
         // Abschnitt in Reihenfolge entlang des Grabens: vom naechsten Feld aus ablaufen
         if (seg.length > 1) s.cells = orderAlong(s.cells);
       } else s.cells = rebuildCells(map, raw, ms);
-      if (raw.length && !s.cells.length) ctx.hint(`${cellLabel(raw[0].x, raw[0].y)}: dort ist kein eigener Graben.`);
+      if (done && raw.length && !s.cells.length) ctx.hint(`${cellLabel(raw[0].x, raw[0].y)}: dort ist kein eigener Graben.`);
       update();
     };
 
     const surface = startLineDraw(ctx.ui, ctx.cam, {
       label: 'Umbau zeichnen',
       onCamera: () => ctx.redraw(true),
-      onDraw(points) { if (points) setFrom(points); },
+      onDraw(points, done) {
+        if (!points) { if (s.prev) s.cells = s.prev; s.prev = null; update(); return; }
+        if (!s.prev) s.prev = s.cells;
+        if (done) s.prev = null;
+        setFrom(points, done);
+      },
     });
     ctx.onCancel(() => { surface.destroy(); panel.destroy(); draft = null; ctx.redraw(); });
     ctx.expose?.({ draw: setFrom, act(id) { panel.el.querySelector(`[data-act="${id}"]`)?.click(); } });

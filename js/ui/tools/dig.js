@@ -421,7 +421,10 @@ registerTool({
       label: 'Graben zeichnen',
       onCamera: () => ctx.redraw(true),
       onDraw(points, done) {
-        if (!points) return;
+        // Abgebrochener Strich (Pinch): vorige Linie wiederherstellen
+        if (!points) { if (s.prev) Object.assign(s, s.prev); s.prev = null; update(); return; }
+        if (!s.prev) s.prev = { cells: s.cells, traversed: s.traversed, level: s.level };
+        if (done) s.prev = null;
         s.cells = cellsFromPoints(points);
         s.traversed = false;
         if (!s.userLevel) s.level = s.cells.length === 1 && s.kind === 'fire' ? 1 : 2;

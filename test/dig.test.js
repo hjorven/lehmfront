@@ -333,3 +333,36 @@ test('Umbauen: nur eigene Gräben, nicht zu weit weg', () => {
 test('Stufen passen zur Deckungstabelle', () => {
   assert.deepEqual(LEVELS.slice(1).map((l) => coverValue(l.cover)), [0.45, 0.6, 0.7, 0.8]);
 });
+
+test('Rückeroberung: Auftritt zeigt wieder zum Feind, also volle Deckung', () => {
+  const s = createInitialState(MAP, scenario([fullRifles({ x: 5, y: 5 })]), 1);
+  s.cells['6,3'] = { trench: { side: 'own', kind: 'fire', level: 2, facing: 'E' }, rebuild: { work: 20, side: 'own' } };
+  assert.ok(captureTrench(s, MAP, 6, 3, 'b'));
+  assert.equal(s.cells['6,3'].trench.captured, true, 'für b zeigt E nach hinten');
+  assert.equal(s.cells['6,3'].rebuild, undefined, 'angefangener Umbau verfällt');
+  assert.ok(captureTrench(s, MAP, 6, 3, 'a'));
+  assert.equal(s.cells['6,3'].trench.captured, undefined);
+  assert.equal(trenchCover(applyCellState(MAP, s.cells), 6, 3, 'a').reversed, false);
+});
+
+test('Umbauen über viele Runden: Gruppe rückt nach, der Rest bleibt gültig', () => {
+  const s0 = createInitialState(MAP, scenario([fullRifles({ x: 11, y: 0 })], [{ type: 'rifles', pos: { x: 15, y: 11 } }]), 1);
+  s0.groups[0].size = 10;
+  for (const p of line(12, 0, 11)) {
+    s0.cells[p.x + ',' + p.y] = { trench: { side: 'enemy', kind: 'fire', level: 2, facing: 'W' } };
+    captureTrench(s0, MAP, p.x, p.y, 'a');
+  }
+  const { state, logs } = play(s0, [{ group: 'a01', type: 'rebuild', path: line(12, 0, 11) }], 4);
+  for (const log of logs) assert.equal(log.filter((e) => e.type === 'order_invalid').length, 0, JSON.stringify(log.filter((e) => e.type === 'order_invalid')));
+  const m = applyCellState(MAP, state.cells);
+  for (const p of line(12, 0, 11)) assert.equal(cellAt(m, p.x, p.y).trench.captured, undefined, `${p.x}/${p.y}`);
+});
+
+test('Graben über fertige Felder: kein Sprung der Gruppe', () => {
+  const s0 = createInitialState(MAP, scenario([fullRifles({ x: 5, y: 0 })]), 1);
+  for (const p of line(6, 0, 5)) s0.cells[p.x + ',' + p.y] = { trench: { side: 'own', kind: 'fire', level: 2, facing: 'E' } };
+  const r = resolveTurn(s0, [{ group: 'a01', type: 'dig', path: line(6, 0, 6) }], [], 1, 1, { map: MAP });
+  const g = r.state.groups.find((x) => x.id === 'a01');
+  assert.ok(Math.max(Math.abs(g.pos.x - 5), Math.abs(g.pos.y - 0)) <= 1 + 3);
+  assert.match(validateOrder({ group: 'a01', type: 'dig', path: line(6, 0, 1), facing: ['E', 'X'] }, s0, 'a', { map: MAP }), /Feuerrichtung/);
+});

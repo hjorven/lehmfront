@@ -11,7 +11,7 @@ export function startLineDraw(host, cam, { onDraw = () => {}, onCamera = () => {
   el.setAttribute('aria-label', label);
   host.prepend(el);
   const pointers = new Map();
-  let points = null, pinch = null;
+  let points = null, pinch = null, started = false;
   const local = (e) => { const r = el.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
   const pinchState = () => {
     const [a, b] = [...pointers.values()];
@@ -23,14 +23,17 @@ export function startLineDraw(host, cam, { onDraw = () => {}, onCamera = () => {
     el.setPointerCapture?.(e.pointerId);
     pointers.set(e.pointerId, local(e));
     if (pointers.size === 1) {
+      // Erst melden, wenn sich der Finger bewegt oder losgelassen wird: ein zweiter Finger (Pinch)
+      // soll die vorige Linie nicht durch ein einzelnes Feld ersetzen
       const p = local(e);
       points = [screenToWorld(cam, p.x, p.y)];
-      onDraw(points, false);
+      started = false;
     } else if (pointers.size === 2) {
-      // Zweiter Finger: Zeichnen abbrechen, Karte bewegen
+      // Zweiter Finger: Strich verwerfen, Karte bewegen
+      if (started) onDraw(null, false);
       points = null;
+      started = false;
       pinch = pinchState();
-      onDraw(null, false);
     }
   };
   const move = (e) => {
@@ -50,7 +53,10 @@ export function startLineDraw(host, cam, { onDraw = () => {}, onCamera = () => {
       const last = points[points.length - 1];
       if (Math.abs(w.x - last.x) + Math.abs(w.y - last.y) > 0.08) {
         points.push(w);
-        onDraw(points, false);
+        if (started || Math.abs(w.x - points[0].x) + Math.abs(w.y - points[0].y) > 0.35) {
+          started = true;
+          onDraw(points, false);
+        }
       }
     }
   };
@@ -61,7 +67,9 @@ export function startLineDraw(host, cam, { onDraw = () => {}, onCamera = () => {
     if (pointers.size === 0 && points) {
       const done = points;
       points = null;
-      onDraw(done, e.type === 'pointerup');
+      started = false;
+      if (e.type === 'pointerup') onDraw(done, true);
+      else onDraw(null, false);
     }
   };
   const wheel = (e) => {

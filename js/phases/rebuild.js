@@ -7,7 +7,7 @@
 import { registerPhase, ORDER } from './registry.js';
 import { registerOrderValidator } from '../orders.js';
 import { cellAt, cellLabel, distance, DIR } from '../map.js';
-import { mapSideOf, oppositeDir } from '../trench.js';
+import { mapSideOf, oppositeDir, facesAway } from '../trench.js';
 import { digRate, DIG_REACH, MAX_DIG_CELLS } from './dig.js';
 import { surname } from './hold.js';
 
@@ -26,7 +26,7 @@ function trenchAt(state, map, p) {
 export function rebuildEstimate(map, state, group, cells) {
   const { rate } = digRate(state, group, map);
   let cost = 0;
-  for (const p of cells) cost += REBUILD_WORK - Math.min(REBUILD_WORK, state.cells[p.x + ',' + p.y]?.rebuild?.work ?? 0);
+  for (const p of cells) cost += REBUILD_WORK - Math.min(REBUILD_WORK, (state.cells[p.x + ',' + p.y]?.rebuild?.side === mapSideOf(group.side) ? state.cells[p.x + ',' + p.y].rebuild.work : 0));
   const rounds = cost === 0 ? 0 : rate > 0 ? Math.floor((cost + rate - 1) / rate) : Infinity;
   return { rounds, rate, cost };
 }
@@ -44,7 +44,8 @@ function checkRebuild(order, group, state, env) {
     seen.add(k);
   }
   if (!env.map) return null;
-  if (distance(group.pos, path[0]) > DIG_REACH) return `Umbau beginnt zu weit von der Gruppe (Feld ${cellLabel(path[0].x, path[0].y)})`;
+  const near = order.carried ? Math.min(...path.map((p) => distance(group.pos, p))) : distance(group.pos, path[0]);
+  if (near > DIG_REACH) return `Umbau beginnt zu weit von der Gruppe (Feld ${cellLabel(path[0].x, path[0].y)})`;
   for (const p of path) {
     const t = trenchAt(state, env.map, p);
     if (!t) return `Feld ${cellLabel(p.x, p.y)}: dort ist kein Graben`;
@@ -58,25 +59,29 @@ registerOrderValidator('rebuild', checkRebuild);
 function runRebuild(ctx) {
   const { state, map } = ctx;
   if (!map) return;
+  const occupied = new Map(ctx.groups().map((x) => [x.pos.x + ',' + x.pos.y, x.id]));
   for (const o of ctx.ordersOfType('rebuild')) {
     const g = ctx.group(o.group);
     if (!g || g.status === 'lost') continue;
     const ms = mapSideOf(g.side);
     let budget = digRate(state, g, map).rate;
     let turned = 0, captured = 0, last = null, lost = 0;
+    const workedCells = [];
     let i = 0;
     for (; i < o.path.length && budget > 0; i++) {
       const p = o.path[i];
       const k = p.x + ',' + p.y;
       const t = trenchAt(state, map, p);
       if (!t || t.side !== ms) { lost++; continue; } // inzwischen verloren: ueberspringen
-      const have = state.cells[k]?.rebuild?.work ?? 0;
+      const rb = state.cells[k]?.rebuild;
+      const have = rb && rb.side === ms ? rb.work : 0;
       const need = REBUILD_WORK - have;
       const spend = Math.min(need, budget);
       budget -= spend;
       if (spend < need) {
-        state.cells[k] = { ...(state.cells[k] ?? {}), rebuild: { work: have + spend } };
+        state.cells[k] = { ...(state.cells[k] ?? {}), rebuild: { work: have + spend, side: ms } };
         last = p;
+        workedCells.push(p);
         break;
       }
       const facing = o.facing?.[i] ?? oppositeDir(t.facing);
@@ -85,23 +90,36 @@ function runRebuild(ctx) {
       delete cell.rebuild;
       cell.trench = { ...t, facing };
       delete cell.trench.captured;
+      if (facesAway(facing, ms)) cell.trench.captured = true; // nach hinten gedreht: halbe Deckung zur Front
       state.cells[k] = cell;
       turned++;
       last = p;
+      workedCells.push(p);
     }
     const rest = o.path.slice(i).filter((p) => {
       const t = trenchAt(state, map, p);
       return t && t.side === ms;
     }).map((p) => ({ x: p.x, y: p.y }));
     // Ein angefangenes Feld (break oben) gehoert zum Rest; i zeigt darauf
+    // Gruppe rueckt wie beim Graben entlang der bearbeiteten Felder nach
+    for (let j = workedCells.length - 1; j >= 0; j--) {
+      const p = workedCells[j];
+      const k = p.x + ',' + p.y;
+      if (p.x === g.pos.x && p.y === g.pos.y) break;
+      if (occupied.has(k) || distance(g.pos, p) > workedCells.length + DIG_REACH) continue;
+      occupied.delete(g.pos.x + ',' + g.pos.y);
+      g.pos = { x: p.x, y: p.y };
+      occupied.set(k, g.id);
+      break;
+    }
     const name = 'Gruppe ' + surname(g.leader.name);
     const n = (k) => `${k} ${k === 1 ? 'Feld' : 'Felder'}`;
     let reason;
     if (!turned && !rest.length) reason = `${name}: Umbau nicht möglich, der Graben ist nicht mehr in eigener Hand.`;
     else if (!turned) reason = `${name} baut bei ${cellLabel((last ?? rest[0]).x, (last ?? rest[0]).y)} den Schützenauftritt um. Noch ${n(rest.length)}.`;
     else if (rest.length) reason = `${name} dreht ${n(turned)} Graben um${captured ? ', jetzt volle Deckung zur neuen Front' : ''}. Noch ${n(rest.length)}.`;
-    else reason = `${name} hat den Umbau fertig: ${n(turned)}${captured ? ' eroberter Graben geben wieder volle Deckung' : ' zeigen in die neue Richtung'}.`;
-    if (lost) reason += ` ${n(lost)} sind nicht mehr in eigener Hand.`;
+    else reason = captured ? `${name} hat den Umbau fertig: Der eroberte Graben gibt auf ${n(turned)} wieder volle Deckung.` : `${name} hat den Umbau fertig: ${n(turned)} Graben ${turned === 1 ? 'zeigt' : 'zeigen'} in die neue Richtung.`;
+    if (lost) reason += ` ${n(lost)} ${lost === 1 ? 'ist' : 'sind'} nicht mehr in eigener Hand.`;
     const restFacing = o.facing ? o.path.map((p, j) => ({ p, f: o.facing[j] })).filter(({ p }) => rest.some((r) => r.x === p.x && r.y === p.y)).map(({ f }) => f) : undefined;
     ctx.emit('rebuild', {
       side: g.side, group: g.id, secret: true, cells: turned, captured, rest,

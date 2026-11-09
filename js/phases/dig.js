@@ -14,7 +14,7 @@
 //   Aufwurfs (tags weit, nachts kurz) bekommen eine Meldung, dass dort gegraben wird.
 import { registerPhase, ORDER } from './registry.js';
 import { registerOrderValidator } from '../orders.js';
-import { cellAt, cellLabel, distance, TERRAIN } from '../map.js';
+import { cellAt, cellLabel, distance, TERRAIN, DIR } from '../map.js';
 import { unitType } from '../config/units.js';
 import { faction } from '../config/factions.js';
 import { groupsOf, otherSide } from '../state.js';
@@ -157,7 +157,7 @@ function checkDig(order, group, state, env) {
   const level = order.level ?? 2;
   if (!Number.isInteger(level) || level < 1 || level > MAX_LEVEL) return 'unbekannte Grabenstufe';
   if (order.kind !== undefined && order.kind !== 'fire' && order.kind !== 'comm') return 'unbekannte Grabenart';
-  if (order.facing !== undefined && (!Array.isArray(order.facing) || order.facing.length !== path.length)) return 'Feuerrichtung passt nicht zur Linie';
+  if (order.facing !== undefined && (!Array.isArray(order.facing) || order.facing.length !== path.length || order.facing.some((f) => !DIR[f]))) return 'Feuerrichtung passt nicht zur Linie';
   if (level === 4 && !concreteAllowed(state, group.side)) return 'Beton gibt es erst später';
   if (!(unitType(group.type).digRate > 0)) return `${unitType(group.type).name} gräbt nicht`;
   const seen = new Set();
@@ -170,7 +170,9 @@ function checkDig(order, group, state, env) {
   }
   if (!env.map) return null;
   const map = env.map;
-  if (distance(group.pos, path[0]) > DIG_REACH) return `Graben beginnt zu weit von der Gruppe (Feld ${cellLabel(path[0].x, path[0].y)})`;
+  // Der Anfang muss nah sein; ein weitergetragener Rest darf irgendwo neben der Gruppe weitergehen
+  const near = order.carried ? Math.min(...path.map((p) => distance(group.pos, p))) : distance(group.pos, path[0]);
+  if (near > DIG_REACH) return `Graben beginnt zu weit von der Gruppe (Feld ${cellLabel(path[0].x, path[0].y)})`;
   for (const p of path) {
     const base = cellAt(map, p.x, p.y);
     const cell = { ...base, ...(state.cells[p.x + ',' + p.y] ?? {}) };
@@ -201,6 +203,7 @@ function runDig(ctx) {
     const { rate, factors: used } = digRate(state, g, map);
     let budget = rate;
     let done = 0, worked = 0, last = null, firstWorked = null, noMaterial = null;
+    const workedCells = [];
     let i = 0;
     for (; i < o.path.length; i++) {
       const p = o.path[i];
@@ -236,6 +239,7 @@ function runDig(ctx) {
       }
       state.cells[k] = { ...(state.cells[k] ?? {}), ...patch };
       worked++;
+      workedCells.push(p);
       if (!firstWorked) firstWorked = p;
       last = p;
       spoil.push({ at: p, side: g.side });
@@ -252,14 +256,17 @@ function runDig(ctx) {
     }
     const rest = o.path.slice(restFrom).map((p) => ({ x: p.x, y: p.y }));
     if (worked) g.fatigue = Math.min(100, (g.fatigue ?? 0) + DIG_FATIGUE);
-    // Gruppe rueckt zum zuletzt bearbeiteten Feld nach
-    if (last && distance(g.pos, last) > 0) {
-      const k = last.x + ',' + last.y;
-      if (!occupied.has(k)) {
-        occupied.delete(g.pos.x + ',' + g.pos.y);
-        g.pos = { x: last.x, y: last.y };
-        occupied.set(k, g.id);
-      }
+    // Gruppe rueckt entlang der bearbeiteten Felder nach: zum letzten freien, hoechstens so weit,
+    // wie sie Felder bearbeitet hat (fertige Felder ueberspringen ist keine Abkuerzung)
+    for (let j = workedCells.length - 1; j >= 0; j--) {
+      const p = workedCells[j];
+      const k = p.x + ',' + p.y;
+      if (p.x === g.pos.x && p.y === g.pos.y) break;
+      if (occupied.has(k) || distance(g.pos, p) > workedCells.length + DIG_REACH) continue;
+      occupied.delete(g.pos.x + ',' + g.pos.y);
+      g.pos = { x: p.x, y: p.y };
+      occupied.set(k, g.id);
+      break;
     }
     const name = 'Gruppe ' + surname(g.leader.name);
     const what = kind === 'comm' ? 'Laufgraben' : levelName(level);
@@ -272,11 +279,12 @@ function runDig(ctx) {
     })();
     const slow = used.filter((f) => f.pct < 100 && f.id !== 'einheit').map((f) => f.label);
     let reason;
+    const fields = (k) => `${k} ${k === 1 ? 'Feld' : 'Felder'}`;
     if (!worked && !rest.length) reason = `${name}: der Graben steht schon.`;
-    else if (!worked) reason = noMaterial ? `${name} kommt nicht voran: kein Material für ${levelName(noMaterial)}.` : `${name} kommt mit dem ${what} nicht voran.`;
-    else if (!rest.length) reason = `${name} hat den ${what} fertig: ${o.path.length} ${o.path.length === 1 ? 'Feld' : 'Felder'} von ${span(o.path[0], o.path[o.path.length - 1])}.`;
-    else reason = `${name} gräbt am ${what} ${span(firstWorked, last)}, ${soil}${slow.length ? ', gebremst durch ' + slow.join(' und ') : ''}. Es fehlen noch ${rest.length} ${rest.length === 1 ? 'Feld' : 'Felder'}.`;
-    if (noMaterial && worked) reason += ` Für ${levelName(noMaterial)} fehlt Material.`;
+    else if (!worked) reason = noMaterial ? `${name} kommt nicht voran: kein Material für die Stufe „${levelName(noMaterial)}“.` : `${name} kommt nicht voran (${what}).`;
+    else if (!rest.length) reason = `${name} ist fertig: ${fields(o.path.length)} ${what} von ${span(o.path[0], o.path[o.path.length - 1])}.`;
+    else reason = `${name} gräbt ${span(firstWorked, last)} aus (${what}, ${soil}${slow.length ? ', gebremst durch ' + slow.join(' und ') : ''}). Noch ${fields(rest.length)} offen.`;
+    if (noMaterial && worked) reason += ` Für die Stufe „${levelName(noMaterial)}“ fehlt Material.`;
     const carry = rest.length && !noMaterial
       ? { group: g.id, type: 'dig', path: rest, level, kind, facing: facings.slice(restFrom) }
       : null;

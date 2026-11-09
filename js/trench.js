@@ -250,8 +250,20 @@ export function captureTrench(state, map, x, y, side) {
   const cur = state.cells[k]?.trench !== undefined ? state.cells[k].trench : base?.trench ?? null;
   const ms = mapSideOf(side);
   if (!cur || cur.side === ms) return false;
-  state.cells[k] = { ...(state.cells[k] ?? {}), trench: { ...cur, side: ms, captured: true } };
+  const t = { ...cur, side: ms };
+  delete t.captured;
+  // Halbe Deckung nur, wenn der Auftritt vom neuen Feind weg zeigt (bei Rueckeroberung zeigt er wieder richtig)
+  if (facesAway(t.facing, ms)) t.captured = true;
+  const cell = { ...(state.cells[k] ?? {}), trench: t };
+  delete cell.rebuild; // angefangener Umbau des alten Besitzers gilt nicht weiter
+  state.cells[k] = cell;
   return true;
+}
+
+/** Zeigt eine Feuerrichtung vom Feind der Kartenseite weg? */
+export function facesAway(facing, mapSide) {
+  const f = DIR[facing], e = enemyDir(mapSide);
+  return !!f && f.dx * e.dx + f.dy * e.dy < 0;
 }
 
 /**
