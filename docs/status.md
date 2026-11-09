@@ -87,12 +87,29 @@ Jeder Thread traegt hier nach dem Merge ein, was fertig ist und was offen bleibt
   - Werkzeuge Graben (G) und Umbauen (U) mit Zeichenfläche (`js/ui/linedraw.js`, ein Finger zeichnet, zwei Finger bewegen die Karte) und Kärtchen wie im Mockup: Warnung Längsfeuer mit eingezeichneter MG-Schusslinie, „Traversen einfügen“, Stufe, Feuer- oder Laufgraben, Richtung, Dauer im Vergleich Schützen/Pioniere, bremsende Faktoren.
   - Demo: `?scene=gefecht&demo=graben|traversen|grabenplan|umbauen`.
 
+- P10 Wetter, Schlamm, Krater, Tag und Nacht, Leuchtkugeln:
+  - `js/weather.js` (rein): Wetter als Markow-Kette (klar, bedeckt, Regen, Sturm, Nebel; `WEATHER_TABLE`), Bodennässe `weather.wet` 0..3, Senken (`isSink`), Wasser im Graben (`state.cells[k].water` 0..3, Senken zuerst und doppelt, Hang läuft ab, Boden wirkt mit), Schlamm `mudAt` 0..3 aus Nässe, Boden, Senke, Krater (auch trocken mindestens 1), `cells.mud` und Grabenwasser, Entwässerung `cells.drain`. Wirkung: `mudMoveCost` (Bewegung), `digFactor` (Graben, für P04), Moral in der Wetterphase, `weatherSight`/`sightDarkness` (Nebel und Regen kürzen die Sicht), `flareAt`.
+  - `js/phases/weather.js`: Phasen `weather` (Stellungsrunde, am Ende kurz vor der Uhr: Wetter der nächsten zwölf Stunden würfeln, Nässe, Gräben füllen und leeren, Moral im Schlamm), `drain` (Befehl Entwässern: Lattenrost und Pumpensumpf in bis zu 3 Grabenfeldern, 2 Material), `flares` (beide Rundenarten nach der Bewegung, vor dem Feuer: Leuchtkugel auf Befehl, Posten schießen von selbst, wenn sie nachts Bewegung in 6 Feldern hören, höchstens 2 je Seite und Runde). Szenarien können das Wetter festlegen (`weather.fixed: true`).
+  - Tag und Nacht sind Spielzustand: Stellungsrunden wechseln Tag und Nacht, Gefechtsrunden erben die Tageszeit ihrer Stellungsrunde (`js/phases/clock.js`, `darknessAt` mit `night`). `darknessOf(state)` (Sichtregeln) = Tageszeit plus Wetter; die Optik nimmt die reine Tageszeit, Nebel zeichnet die Wetterebene.
+  - Leuchtkugel: Kreis mit Radius 4 ist eine Runde lang taghell (`darknessAtCell` in `js/sight.js`, gilt für Sicht, Sicht-Overlay und Trefferchance); wer sich darin bewegt, bekommt eine rote Meldung „gerät ins Licht“.
+  - Bewegung: `addStepCostRule(fn)` in `js/phases/move.js` für Zusatzkosten je Feld aus dem Spielzustand; Schlamm meldet sich dort an, Vorschau und A* rechnen mit.
+  - Darstellung `js/render/weather-layer.js` (eigenes Canvas zwischen Karte und Einheiten) und `js/ui/weather-fx.js`: Wasserflecken, Schlammsignatur (allgemeine Nässe locker, Krater, Senken und Wasser voll), Wasserwellen im Graben, Lattenrost, Regenstriche nach Wind, Nebel als Grau mit Lücken, so weit die eigenen Gruppen sehen, Leuchtkugeln steigen, brennen flackernd am Schirm und hinterlassen einen Bleistiftkreis. Klänge der neuen Ereignisse über `registerCue` (P19), die Umgebung regelt `js/audio/director.js` aus `state.weather`. Tag-Nacht-Übergang am Filmende jetzt zwei Sekunden (`TIMING.transition`), weich beschleunigt.
+  - Werkzeuge Leuchtkugel (K, nur bei Dunkelheit sichtbar) und Entwässern (W, nur in Stellungsrunden). Werkzeuge können sich mit `shown(state)` ausblenden (`shownTools`). Schild zeigt „Boden“ (Schlamm, Wasser), Kopfzeile „Regen, Schlamm“.
+  - Szenen-Parameter: `?scene=gefecht&weather=clear|overcast|rain|storm|fog&wet=0..3&flares=41,10;38,17` (Felder 1-basiert).
+
+### Für die nächsten Pakete (nach P10)
+
+- P04: Grabgeschwindigkeit mit `digFactor(state, map, x, y)` aus `js/weather.js` multiplizieren. Neue Gräben in `state.cells` bekommen Wasser automatisch (die Wetterphase liest Karte und Zustand). „Entwässerung als Grabenverbesserung“ ist Befehl `drain`; P04 darf sie in sein Umbau-Werkzeug übernehmen.
+- P06: Draht-Zusatzkosten ebenfalls über `addStepCostRule`. P09: Einschläge setzen `crater` (und gern `mud: 1`) in `state.cells`, Schlamm folgt von selbst; zeichnen muss P09 neue Krater selbst (die Wetterebene zeichnet nur Schlamm).
+- P12: Moralverlust im Schlamm ist das Ereignis `mud_morale` (Phase `weather`). P14: Ereignisse `weather`, `flood`, `drain`, `flare`, `flare_exposed` für Zähler.
+- P22 (Endlos, Jahreszeiten): `WEATHER_TABLE` je Jahreszeit tauschen oder `weather.fixed` setzen; Schnee kennt `WEATHER_NAMES` schon, hat aber noch keine Regel.
+
 ### Für die nächsten Pakete (P03, P10)
 
 - Karte einbinden: `createMapLayer(canvas, map, { getCamera, getTheme })`, Kamera mit `createCamera({ bounds: sheetBounds(map) })` und `attachCameraControls(el, cam, { onChange, onTap, onHover })`. Muster: `js/scenes/karte.js`.
 - Dynamische Ebene (Einheiten, Overlays) als zweites Canvas darüber, Weltkoordinaten per `applyCameraTransform(ctx, cam, dpr)`.
 - Neuer Graben: Zelle in `map.cells` ändern, dann `layer.setMap(map)` (baut die Geometrie neu, etwa 5 bis 10 ms auf dem Desktop).
-- Tageszeit: `applyTheme(themeAt(darkness))`; Regeln lesen dieselbe Zahl über `visibilityFromDarkness`. `theme.flare` ist ab 0,5 wahr (Leuchtkugeln zeichnet P10).
+- Tageszeit: `applyTheme(themeAt(darkness))`; Regeln lesen dieselbe Zahl über `visibilityFromDarkness`. `theme.flare` ist ab 0,5 wahr (Leuchtkugeln zeichnet jetzt `js/render/weather-layer.js`).
 
 ### Für die nächsten Pakete (nach P03)
 
@@ -152,6 +169,9 @@ Jeder Thread traegt hier nach dem Merge ein, was fertig ist und was offen bleibt
 - P03: Doppelklick zum Zoomen löst in der Zielwahl auch ein Antippen aus (Ziel wird gesetzt, Strg+Z nimmt es zurück). Antippen und Doppelklick werden nicht mit Verzögerung getrennt, damit das Antippen sofort reagiert.
 - P03: Im Hotseat bleiben die Kartenfarben fest (Kaldern blau, Morrow rot); die Seite b plant also mit roten Symbolen. Der Nebel gilt pro planender Seite.
 - P03: Die Bewegungsregeln sind eine erste Fassung (keine Begegnungen, kein Draht-Abbremsen außer über die Feldkosten); Verlegen in Stellungsrunden darf nicht ins Niemandsland.
+- P10: Das Wetter wechselt nur zu Beginn einer Stellungsrunde; Gefechtsrunden behalten es. Schnee hat noch keine Regel. Ohne Ruhelager (P11/P12) erholt sich die Moral vom Schlamm noch nicht.
+- P10: Leuchtkugeln kosten noch nichts (keine Munition), Posten schießen höchstens zwei je Runde. Die Szene zeigt den Kreis der letzten Runde beim Planen weiter (als Bleistiftkreis), die Regel gilt nur in der Runde, in der sie geschossen wurde (`flare.turn`). Auf dem Handy passen tagsüber 5 Werkzeuge nicht ganz neben „Runde ausführen“; die Leiste scrollt.
+- P10: Die Tropfenflecken (Überraschung) leben nur im Speicher der Szene, nicht im Spielzustand; nach dem Neuladen liegen nur die vorbereiteten Flecken je Nässe da. Das Zerlaufen der Tinte kopiert die statische Karte versetzt; bei sehr schnellem Zoomen kann es einen Augenblick nachhängen.
 - P07: Das Archiv lebt nur im Speicher der Szene; Speichern und Laden (P18) muss `archive` mitnehmen (reines JSON, die Karte steckt nicht darin). Pro Runde liegt der ganze Startzustand drin, bei sehr langen Missionen wird das groß.
 - P07: Ein Film rechnet je Abschnitt eine Teilrunde neu (heute 2 bis 3). Mit vielen Phasen und großen Karten sollte P21 messen, ob das auf schwachen Handys flüssig bleibt.
 - P07: Der Gegner bekommt im Film nur Ereignisse, die er sieht (`viewFor`); feindliche Gruppen erscheinen, sobald sie im Zwischenstand sichtbar sind.
@@ -199,6 +219,10 @@ Stand 2026-11-08, von Jorven bestaetigt:
 - P03: Langer Druck öffnet das radiale Menü auch mit der Maus, zusätzlich Rechtsklick. Der Finger kann vom Druckpunkt direkt zum Befehl gleiten und loslassen (Marking-Menü), Antippen geht ebenso.
 - P03: „Bewegen“ ist ein Werkzeug für beide Rundenarten: in Stellungsrunden wird daraus „Verlegen“ (redeploy), in Gefechtsrunden „Bewegen“ (move). Unfertige Wege laufen als Befehl weiter („läuft weiter“ in der Befehlsliste).
 - P03: Gruppen ohne Befehl tragen auf der Karte ein Bleistift-Fragezeichen; der Plan nennt das nur in der Checkliste.
+- P10: Regen fällt sichtbar auf das Blatt: Tropfen landen als kleine Ringe, ein Teil bleibt als Fleck, und an jedem Fleck zerläuft die Tinte der Karte ein wenig nach unten. Nebel ist nicht gleichmäßig grau, sondern lässt frei, was die eigenen Gruppen im Nebel sehen (dieselbe Regel wie die Sicht). Leuchtkugeln hinterlassen nach dem Verlöschen einen gestrichelten Kreis.
+- P10: Tag-Nacht-Übergang am Filmende zwei statt eine Sekunde (Plan: „etwa zwei Sekunden“), mit weichem Anfang und Ende. Gefechtsrunden laufen nicht mehr durch die Dämmerung, sie erben Tag oder Nacht (Plan 7.7).
+- P10: Das Wetter wird am Ende der Stellungsrunde für die nächste gewürfelt (Plan 10.6 nennt Schritt 2), damit Vorschau und Auflösung mit demselben Schlamm und Nebel rechnen (Plan 7.7: man plant mit dem, was gilt). Nebel bei Nacht kürzt die Sicht unter die Nachtsicht (`visibilityFromDarkness` nimmt dafür Werte über 1). Wasser und Lattenroste zeichnet die Karte nur in eigenen Gräben.
+- P10: Schlamm wird nicht pro Feld gespeichert, sondern aus Nässe, Boden, Senke, Krater und Feldzustand berechnet; der Spielzustand bleibt klein, und jede Regel liest dieselbe Zahl.
 - P07: „Überspringen“ springt nicht ans Ende, sondern in die letzte Sekunde: der Tag-Nacht-Wechsel läuft immer sichtbar ab. Jede Telegrammzeile trägt eine Zeitgruppe, Phase und Feld („0750 BEWEGUNG · FELD 25/10“) und endet mit STOP. Das Protokoll zeigt alte Runden als Durchschläge in Kopierstift-Farbe.
 - P03: Nach der Runde zeigt ein schlichtes Meldungen-Kärtchen alle Begründungen (Klick springt zum Ort), bis P07 das Telegramm bringt.
 - P05: Der Nebel des Krieges braucht kein eigenes Grau: Feinde, die man nicht sieht, bleiben als Bleistiftskizze stehen, die jede Runde blasser und lückenhafter wird, als würde jemand radieren. Ist der Platz wieder einsehbar und leer, wird die Skizze ausradiert (Meldung im Protokoll).

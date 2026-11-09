@@ -26,11 +26,30 @@ export function moveBudget(group, kind) {
   return kind === 'battle' && (group.suppressed ?? 0) >= PINNED ? Math.floor(full / 2) : full;
 }
 
-/** Kosten eines Schritts von a nach b (Zehntel), diagonal 14/10 */
-export function stepCost(map, a, b) {
+/**
+ * Zusatzkosten fuer das Betreten eines Feldes aus dem Spielzustand (Schlamm P10, spaeter Draht P06 ...).
+ * fn(state, map, {x,y}) -> Zehntel. Regeln melden sich hier an, statt stepCost umzuschreiben.
+ */
+const costRules = [];
+export function addStepCostRule(fn) {
+  costRules.push(fn);
+  return () => { const i = costRules.indexOf(fn); if (i >= 0) costRules.splice(i, 1); };
+}
+
+/** Summe der Zusatzkosten eines Feldes (Zehntel) */
+export function extraCost(state, map, p) {
+  if (!state) return 0;
+  let sum = 0;
+  for (const fn of costRules) sum += fn(state, map, p) || 0;
+  return sum;
+}
+
+/** Kosten eines Schritts von a nach b (Zehntel), diagonal 14/10. Mit state zaehlen die Zusatzkosten mit. */
+export function stepCost(map, a, b, state = null) {
   const c = map ? cellAt(map, b.x, b.y) : null;
-  const base = c ? enterCost(c) : 10;
+  let base = c ? enterCost(c) : 10;
   if (!Number.isFinite(base)) return Infinity;
+  base += extraCost(state, map, b);
   return a.x !== b.x && a.y !== b.y ? Math.floor((base * 14) / 10) : base;
 }
 
@@ -84,7 +103,7 @@ function runMove(ctx) {
       if (m.done) continue;
       if (m.steps >= m.o.path.length) { m.done = true; continue; }
       const p = m.o.path[m.steps];
-      const cost = stepCost(map, m.g.pos, p);
+      const cost = stepCost(map, m.g.pos, p, ctx.state);
       if (!Number.isFinite(cost) || (m.steps > 0 && cost > m.budget)) { m.done = true; m.blockedBy = null; continue; }
       const who = occupied.get(p.x + ',' + p.y);
       if (who && who !== m.g.id) { m.blockedBy = { at: p, group: who }; continue; }

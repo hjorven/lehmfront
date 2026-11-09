@@ -373,7 +373,8 @@ test('Verluste aus dem Feuer werden zu Verwundeten, die auf eine Lore warten', a
     const s = createInitialState(map, structuredClone(SCEN), 7);
     s.turnKind = 'battle';
     const r = resolveTurn(s, [], [], 7, 1, { map });
-    const w = r.log.find((e) => e.type === 'wounded');
+    // Nur die Test-Verluste von a02 (Gefechtsrunden erben seit P10 den Tag, das MG trifft daher auch selbst)
+    const w = r.log.find((e) => e.type === 'wounded' && e.group === 'a02');
     assert.ok(w && w.count > 0 && w.count <= 5);
     assert.equal(woundedCount(r.state.sides.a.supply.sections.B), w.count);
     assert.deepEqual(resolveTurn(s, [], [], 7, 1, { map }), r);

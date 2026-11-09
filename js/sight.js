@@ -15,6 +15,7 @@ import { cellAt, lineOfSight, distance, TERRAIN, DIRS } from './map.js';
 import { COVER, visibilityFromDarkness } from './rules.js';
 import { darknessAt } from './ui/daytime.js';
 import { groupsOf, otherSide, getCell } from './state.js';
+import { sightDarkness, flareAt } from './weather.js';
 
 export const BASE_SIGHT = 12;
 export const HEIGHT_SIGHT = 1;
@@ -38,9 +39,17 @@ function hasTerrain(map) {
   return !!(map && Array.isArray(map.cells));
 }
 
-/** Dunkelheit 0..1 laut Spieluhr, dieselbe Zahl wie die Optik (Plan 7.7) */
+/**
+ * Dunkelheit 0..1 fuer die Sichtregeln: Tageszeit (dieselbe Zahl wie die Optik, Plan 7.7) plus Wetter.
+ * Bei klarem Wetter ist sie gleich der Tageszeit; Nebel und Regen kuerzen die Sicht zusaetzlich (js/weather.js).
+ */
 export function darknessOf(state) {
-  return darknessAt(state.clock, state.turnKind, state.night);
+  return sightDarkness(darknessAt(state.clock, state.turnKind, state.night), state.weather);
+}
+
+/** Dunkelheit an einem Feld: im Kreis einer Leuchtkugel ist es taghell (nur das Wetter bleibt) */
+export function darknessAtCell(state, p, darkness) {
+  return state && flareAt(state, p) ? Math.min(darkness, sightDarkness(0, state.weather)) : darkness;
 }
 
 export function heightOf(map, p) {
@@ -127,7 +136,8 @@ export function sightRange(map, viewer, targetPos, darkness, { concealed = false
 export function spot(state, map, viewer, target, darkness) {
   const d = distance(viewer.pos, target.pos);
   const concealed = isConcealed(state, map, target);
-  const range = sightRange(map, viewer, target.pos, darkness, { concealed, flash: !!target.fired, dugout: !!target.inDugout });
+  const dk = darknessAtCell(state, target.pos, darkness);
+  const range = sightRange(map, viewer, target.pos, dk, { concealed, flash: !!target.fired, dugout: !!target.inDugout });
   if (d > range) return { visible: false, d, range, blockedAt: null, cells: [] };
   if (d <= 1 || !hasTerrain(map)) return { visible: true, d, range, blockedAt: null, cells: [] };
   const los = lineOfSight(map, viewer.pos, target.pos, { eye: 1, target: concealed ? 0 : 1 });
@@ -147,7 +157,8 @@ export function seesCellFrom(map, viewer, p, darkness, { concealed = false } = {
 
 /** Sieht irgendeine einsatzfaehige Gruppe der Seite das Feld p? */
 export function sideSeesCell(state, map, side, p, darkness = darknessOf(state), opts = {}) {
-  return groupsOf(state, side).some((g) => seesCellFrom(map, g, p, darkness, opts));
+  const dk = darknessAtCell(state, p, darkness);
+  return groupsOf(state, side).some((g) => seesCellFrom(map, g, p, dk, opts));
 }
 
 /** IDs aller feindlichen Gruppen, die die Seite sieht (sortiert) */
@@ -165,11 +176,13 @@ export function visibleCells(state, map, side, darkness = darknessOf(state)) {
   const w = map.width, h = map.height;
   const out = new Uint8Array(w * h);
   for (const g of groupsOf(state, side)) {
-    const r = sightRange(map, g, g.pos, darkness) + (g.type === 'observers' ? 3 * OBSERVER_HEIGHT_SIGHT : 3);
+    // Mit Leuchtkugeln reicht der Blick in deren Kreis so weit wie am Tag
+    const scan = state?.flares?.length ? Math.min(darkness, sightDarkness(0, state.weather)) : darkness;
+    const r = sightRange(map, g, g.pos, scan) + (g.type === 'observers' ? 3 * OBSERVER_HEIGHT_SIGHT : 3);
     for (let y = Math.max(0, g.pos.y - r); y <= Math.min(h - 1, g.pos.y + r); y++) {
       for (let x = Math.max(0, g.pos.x - r); x <= Math.min(w - 1, g.pos.x + r); x++) {
         const i = y * w + x;
-        if (!out[i] && seesCellFrom(map, g, { x, y }, darkness)) out[i] = 1;
+        if (!out[i] && seesCellFrom(map, g, { x, y }, darknessAtCell(state, { x, y }, darkness))) out[i] = 1;
       }
     }
   }
@@ -224,7 +237,8 @@ export function inCone(from, aim, p, width, range = Infinity) {
 }
 
 /** Sichtlinie fuer die Anzeige beim Zeigen: { from, to, blockedAt, d, range, visible } */
-export function sightLine(map, viewer, p, darkness) {
+export function sightLine(map, viewer, p, darkness, state = null) {
+  darkness = darknessAtCell(state, p, darkness);
   const d = distance(viewer.pos, p);
   const range = sightRange(map, viewer, p, darkness);
   const los = hasTerrain(map) && d > 1 ? lineOfSight(map, viewer.pos, p, { eye: 1, target: 1 }) : { visible: true, blockedAt: null };

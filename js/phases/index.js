@@ -7,3 +7,4 @@ import './intel.js';
 import './move.js';
 import './rebuild.js';
 import './supply.js';
+import './weather.js';

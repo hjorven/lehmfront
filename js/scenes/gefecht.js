@@ -24,7 +24,7 @@ import {
   createOrderBook, setOrder, clearOrder, undo, canUndo, listOrders, orderOf, seal, nextRound,
 } from '../ui/orderbook.js';
 import { summarize, checklist, HOLD_TYPES } from '../ui/summary.js';
-import { allTools, toolByKey, usable } from '../ui/tools.js';
+import { allTools, shownTools, toolByKey, usable } from '../ui/tools.js';
 import '../ui/tools/index.js';
 import { overlaySlots } from '../ui/overlays.js';
 import '../ui/overlays/index.js';
@@ -46,6 +46,8 @@ import { planFilm, replayTo } from '../film.js';
 import { createArchive, archiveRound, inputOf, entryTitle } from '../archive.js';
 import { phasesFor } from '../phases/registry.js';
 import { createFilmPlayer } from '../ui/film.js';
+import { attachWeather, applyWeatherParams } from '../ui/weather-fx.js';
+import { mudAt, MUD_WORDS, waterAt, WATER_WORDS } from '../weather.js';
 import { createTelegram } from '../ui/telegram.js';
 import { createArchiveView } from '../ui/archive.js';
 import { drawFilmTrails } from '../render/film-layer.js';
@@ -70,6 +72,7 @@ export async function mount(root, params) {
   const seed = (num(params.get('seed'), 1917) >>> 0) || 1;
   let state = createInitialState(map, scenario, seed);
   if (params.get('kind') === 'battle') { state.turnKind = 'battle'; state.battle = { round: 1 }; }
+  applyWeatherParams(state, map, params);
   const humans = mode === 'hotseat' ? ['a', 'b'] : ['a'];
   const env = { map };
   // Karte mit Graeben, Kratern usw. aus dem Spielzustand (Anzeige und Werkzeuge); env.map bleibt die Grundkarte
@@ -131,6 +134,7 @@ export async function mount(root, params) {
   }
 
   const layer = createMapLayer(staticCv, liveMap, { getCamera: () => cam, getTheme: currentTheme });
+  const weather = attachWeather({ root, before: dynCv, map, seed, cam, staticCanvas: staticCv, getTheme: currentTheme, still: params.has('demo') });
   const dctx = dynCv.getContext('2d');
   let dpr = 1;
 
@@ -245,7 +249,7 @@ export async function mount(root, params) {
     onArchive: () => openArchive(),
   });
   const player = createFilmPlayer(ui, {
-    onFrame: (fr) => { filmFrame = fr; drawDyn(); },
+    onFrame: (fr) => { filmFrame = fr; weather.frame(fr.state); drawDyn(); },
     onLines: (n, typing) => report.setCount(n, typing),
     onEnd: () => endFilm(),
   });
@@ -309,7 +313,7 @@ export async function mount(root, params) {
     hud.update(hudModel());
     const g = selectedOwn();
     toolbar.update({
-      tools: allTools().map((t) => ({ tool: t, ...usable(t, g, state, env) })),
+      tools: shownTools(state).map((t) => ({ tool: t, ...usable(t, g, state, env) })),
       active: tool?.def.id ?? null,
       canUndo: canUndo(book, side),
       count: ordersNow().length,
@@ -317,6 +321,7 @@ export async function mount(root, params) {
     });
     if (orderList.open) updateList();
     updateShield();
+    if (!filmFrame) weather.update(state, side);
     drawDyn();
   }
 
@@ -355,10 +360,18 @@ export async function mount(root, params) {
         <div><span>Moral</span><b>${g.morale}</b></div>
         <div><span>Erschöpfung</span><b>${fatigueWord(g.fatigue)}</b></div>
         <div><span>Erfahrung</span><b>${g.experience} / 4</b></div>
+        ${groundRow(g)}
         ${g.suppressed >= 0.3 ? `<div class="warn"><span>Unter Feuer</span><b>${g.suppressed >= PINNED ? 'niedergehalten' : 'geduckt'}</b></div>` : ''}
       </div>
       <footer><span>Befehl</span><b>${esc(orderText(g, o))}</b></footer>
       ${prev?.text ? `<div class="preview${(prev.ok ?? !!prev.path) ? '' : ' bad'}">${esc(prev.text)}</div>` : ''}`, shieldAnchor(g));
+  }
+  // Boden unter der Gruppe (P10): Schlamm oder Wasser im Graben
+  function groundRow(g) {
+    const w = waterAt(state, g.pos.x, g.pos.y), m = mudAt(state, map, g.pos.x, g.pos.y);
+    if (!w && !m) return '';
+    const text = w >= 2 ? WATER_WORDS[w] : MUD_WORDS[m];
+    return `<div${m >= 2 ? ' class="warn"' : ''}><span>Boden</span><b>${esc(text)}</b></div>`;
   }
   function placeShield() {
     const g = selectedId ? getGroup(state, selectedId) : null;
@@ -671,7 +684,7 @@ export async function mount(root, params) {
     cancelTool(false);
     selectedId = g.id;
     const r = root.getBoundingClientRect();
-    const items = allTools().map((t) => ({ id: t.id, def: t, label: t.label, icon: t.icon, group: g.id, ...usable(t, g, state, env) }));
+    const items = shownTools(state).map((t) => ({ id: t.id, def: t, label: t.label, icon: t.icon, group: g.id, ...usable(t, g, state, env) }));
     if (orderOf(book, side, g.id)) {
       items.push({ id: '__clear', label: 'Löschen', icon: '<path d="M6 6 L18 18"/><path d="M18 6 L6 18"/>', group: g.id, ok: true, why: '' });
     }
@@ -698,6 +711,7 @@ export async function mount(root, params) {
 
   function onCamera() {
     layer.invalidate();
+    weather.invalidate();
     drawDyn();
   }
 
@@ -713,7 +727,7 @@ export async function mount(root, params) {
       if (!tool?.pick) {
         const g = selectedOwn();
         const cell = p && g && !modalOpen ? cellFromScreen(p).cell : null;
-        const next = cell && (cell.x !== g.pos.x || cell.y !== g.pos.y) ? sightLabel(sightLine(map, g, cell, darknessOf(state))) : null;
+        const next = cell && (cell.x !== g.pos.x || cell.y !== g.pos.y) ? sightLabel(sightLine(map, g, cell, darknessOf(state), state)) : null;
         const k = (s) => (s ? `${s.to.x},${s.to.y},${s.from.x},${s.from.y}` : '');
         if (k(next) !== k(hoverSight)) { hoverSight = next; drawDyn(); }
         return;
@@ -867,13 +881,14 @@ export async function mount(root, params) {
     const w = root.clientWidth, h = root.clientHeight;
     resizeCamera(cam, w, h);
     layer.resize(w, h, dpr);
+    weather.resize(w, h, dpr);
     dynCv.width = Math.round(w * dpr);
     dynCv.height = Math.round(h * dpr);
     dynCv.style.width = w + 'px';
     dynCv.style.height = h + 'px';
     drawDynNow();
   }
-  onThemeChange((th) => { darkness = th.darkness; layer.invalidate(); drawDyn(); });
+  onThemeChange((th) => { darkness = th.darkness; layer.invalidate(); weather.invalidate(); drawDyn(); });
   new ResizeObserver(resize).observe(root);
   audio.init?.();
   // Grundton der Front und karge Musik; beides wartet still auf das erste Tippen

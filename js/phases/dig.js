@@ -12,6 +12,7 @@
 // - Was fehlt, steht als carry im Ereignis; der Gefechtsbildschirm traegt es als Befehl weiter.
 // - Ueberraschung: frischer Aufwurf. Ein bearbeitetes Feld traegt fresh = Runde; Gegner in Sichtweite des
 //   Aufwurfs (tags weit, nachts kurz) bekommen eine Meldung, dass dort gegraben wird.
+import { digFactor } from '../weather.js';
 import { registerPhase, ORDER } from './registry.js';
 import { registerOrderValidator } from '../orders.js';
 import { cellAt, cellLabel, distance, TERRAIN, DIR } from '../map.js';
@@ -76,10 +77,13 @@ registerDigFactor('staerke', ({ group }) => {
 });
 
 const WEATHER_PCT = { rain: 80, storm: 60, snow: 70, frost: 60 };
-registerDigFactor('wetter', ({ state }) => {
+registerDigFactor('wetter', ({ state, group, map }) => {
   const w = state.weather ?? {};
   let pct = WEATHER_PCT[w.kind] ?? 100;
   if (Number.isFinite(w.rain) && w.rain > 0) pct = Math.min(pct, 100 - Math.min(40, Math.floor(w.rain * 20)));
+  // Schlamm am Standort (P10, js/weather.js): Naesse, Boden, Senke, Krater, Wasser im Graben
+  const mud = group?.pos ? Math.round(digFactor(state, map, group.pos.x, group.pos.y) * 100) : 100;
+  if (mud < pct) return { pct: mud, label: 'Schlamm' };
   return pct === 100 ? null : { pct, label: w.kind === 'frost' ? 'gefrorener Boden' : 'Regen und Schlamm' };
 });
 

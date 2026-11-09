@@ -38,7 +38,8 @@ export function hitChance({ distance, range, cover, visibility, experience, supp
 
 /** Sichtweite aus Dunkelheit (Plan 7.7): Optik und Regel haengen am selben Wert */
 export function visibilityFromDarkness(darkness) {
-  const d = Math.max(0, Math.min(1, darkness));
+  // Ueber 1 hinaus nur durch Wetter bei Nacht (js/weather.js sightDarkness), die Sicht faellt nie unter 0
+  const d = Math.max(0, Math.min(1 / 0.6, darkness));
   return 1 - 0.6 * d;
 }
 

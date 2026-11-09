@@ -3,6 +3,8 @@
 //
 // Werkzeug: { id, key, label, icon, order?, needsGroup?, canUse(group, state, env) -> true | false | 'Grund', begin(ctx) }
 //   needsGroup: false = Befehl der ganzen Seite (Lorenplan); canUse bekommt dann eventuell group = null
+//   shown(state) optional: false blendet das Werkzeug in Werkzeugreihe und radialem Menue aus (z. B. Leuchtkugel am Tag),
+//     die Taste bleibt und erklaert, warum es gerade nicht geht
 //   key: eine Taste (Plan 7.6: G U B F H D L), icon: SVG-Pfad(e) im 24er-Raster als String (stroke, currentColor)
 //   begin(ctx) startet den Befehl. ctx (vom Gefechtsbildschirm):
 //     group, state, map, side            gewaehlte Gruppe und Lage (nur lesen)
@@ -37,6 +39,11 @@ export function unregisterTool(id) {
 /** Alle Werkzeuge in Anzeigereihenfolge (order, dann id) */
 export function allTools() {
   return [...tools.values()].sort((a, b) => a.order - b.order || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+}
+
+/** Werkzeuge, die in dieser Lage angeboten werden (shown) */
+export function shownTools(state) {
+  return allTools().filter((t) => typeof t.shown !== 'function' || t.shown(state));
 }
 
 export function toolByKey(key) {
