@@ -93,6 +93,14 @@ function makeLeader(rng, factionId, used) {
   return { name, home: pick(rng, pool.homes) };
 }
 
+/**
+ * Neuer Gruppenfuehrer fuer eine Seite (P12: wenn der alte faellt, uebernimmt einer aus der Gruppe).
+ * usedNames: Menge aller Namen, die auf der Seite schon vergeben sind oder waren.
+ */
+export function newLeader(rng, factionId, usedNames) {
+  return makeLeader(rng, factionId, usedNames);
+}
+
 function clamp(v, lo, hi) {
   return Math.max(lo, Math.min(hi, v));
 }

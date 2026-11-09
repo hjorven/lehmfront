@@ -40,6 +40,8 @@ const sources = new Map();
 
 /**
  * Weitere Ereignisart als Quelle von Gefallenen: fn(event, helpers) -> [{ group, count, cause }]
+ * Mit person: { name, home } ist es ein benannter Toter (count 1); replaces: true ersetzt einen namenlosen
+ * Gefallenen derselben Gruppe und Runde (P12: der Gruppenfuehrer war unter den Verlusten).
  * helpers.woundedFor(group) liefert die Verwundeten derselben Runde.
  */
 export function registerCasualtySource(type, fn) {
@@ -109,6 +111,21 @@ export function rollCasualties(rounds, opts) {
       if (!fn) return;
       for (const c of fn(e, helpers)) {
         if (!(c.count > 0)) continue;
+        // P12: ein benannter Toter (gefallener Gruppenfuehrer), der schon unter den Verlusten der Runde zaehlt,
+        // ersetzt dort einen zufaelligen Namen statt einen weiteren Toten anzulegen
+        if (c.person) {
+          const g = groups[c.group] ?? {};
+          const entry = {
+            name: c.person.name, home: c.person.home ?? '', leader: true, group: c.group, groupLabel: g.label ?? (c.group ? c.group : 'Abschnitt'),
+            turn: r.turn, cause: c.cause, causeText: causeText(c.cause), at: e.at ? { x: e.at.x, y: e.at.y } : null,
+          };
+          used.add(c.person.name);
+          let k = -1;
+          if (c.replaces) for (let j = fallen.length - 1; j >= 0; j--) if (fallen[j].group === c.group && fallen[j].turn === r.turn && !fallen[j].leader) { k = j; break; }
+          if (k >= 0) fallen[k] = { ...entry, cause: fallen[k].cause, causeText: fallen[k].causeText };
+          else fallen.push(entry);
+          continue;
+        }
         const g = groups[c.group] ?? {};
         const rng = createRng(hashText(`${seed}|${mission}|${r.turn}|${idx}|${c.group}|${c.kind}`));
         for (let i = 0; i < c.count; i++) {

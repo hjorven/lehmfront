@@ -319,7 +319,7 @@ export function drawBattle(ctx, cam, dpr, th, d) {
     const o = d.orders.get(g.id);
     drawUnit(ctx, cam, th, g, g.mark, {
       selected: g.id === d.selectedId,
-      idle: d.planning && g.side === d.side && !o,
+      idle: d.planning && g.side === d.side && !o && g.status !== 'rest',
       hold: o?.type === 'hold',
     });
     if (g.side === d.side || g.suppressed !== undefined) drawSuppression(ctx, cam, g, th, px, g.suppressed >= PINNED);

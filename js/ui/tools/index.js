@@ -9,5 +9,6 @@ import './flare.js';
 import './hold.js';
 import './move.js';
 import './rebuild.js';
+import './relieve.js';
 import './supply.js';
 import './wire.js';

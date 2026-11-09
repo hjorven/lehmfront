@@ -52,6 +52,8 @@
 
 /* ---------- Rundenende-Checkliste ---------- */
 .check{position:absolute;left:12px;bottom:12px;width:min(250px,22vw);padding:9px 12px 10px;font-size:13px}
+/* P12: die Liste waechst mit den Pruefpunkten; ueber der Werkzeugreihe enden und selbst scrollen */
+@media (min-width:701px){.check{bottom:100px;max-height:calc(100% - 590px);min-height:120px;overflow-y:auto}}
 .check-list{list-style:none;margin:6px 0 0;padding:0}
 .check-list li{display:flex;align-items:baseline;gap:8px;padding:2px 0}
 .check-list li::before{content:"";flex:none;width:8px;height:8px;border-radius:50%;background:var(--own);transform:translateY(-1px)}
@@ -108,6 +110,8 @@
 .orderlist .who{font-weight:700}
 .orderlist .what{color:var(--ink2);font-size:12.5px}
 .orderlist li.idle .what{color:var(--danger)}
+.orderlist .what .note{font:700 15px/1 var(--font-hand);font-style:normal;color:var(--ink);white-space:nowrap}
+.orderlist .what .note.warn{color:var(--danger)}
 .orderlist .clr{width:40px;background:none;border:0;border-left:1px dotted var(--line);font-size:18px;color:var(--ink2)}
 .orderlist .row:hover,.report li button:hover{background:var(--track)}
 .report li{border-bottom:1px dotted var(--line);border-left:4px solid var(--own)}

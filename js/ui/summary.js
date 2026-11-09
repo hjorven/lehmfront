@@ -23,7 +23,8 @@ export const LOW_AMMO = 25;
 
 registerCheck('ohne-befehl', ({ state, side, orders }) => {
   const has = new Set(orders.map((o) => o.group));
-  const idle = groupsOf(state, side).filter((g) => !has.has(g.id));
+  // P12: Gruppen im Ruhelager ruhen mit Absicht und brauchen keinen Befehl
+  const idle = groupsOf(state, side).filter((g) => !has.has(g.id) && g.status !== 'rest');
   if (!idle.length) return [{ tone: 'ok', text: 'Alle Gruppen haben einen Befehl' }];
   return idle.map((g) => ({ tone: 'warn', text: `${groupName(state, g)} ohne Befehl`, group: g.id, at: g.pos }));
 });
@@ -86,7 +87,7 @@ export function summarize({ state, side, orders, map = null, plans = {} }) {
     lines.push({ tone: 'own', count: String(list.length), text: `${head}: ${who.join(', ')}`, type: t });
   }
   const has = new Set(orders.map((o) => o.group));
-  const idle = groupsOf(state, side).filter((g) => !has.has(g.id));
+  const idle = groupsOf(state, side).filter((g) => !has.has(g.id) && g.status !== 'rest');
   if (idle.length) {
     lines.push({ tone: 'warn', count: String(idle.length), text: `${idle.length === 1 ? 'Gruppe' : 'Gruppen'} ohne Befehl (${idle.map((g) => groupName(state, g)).join(', ')}), ${idle.length === 1 ? 'hält' : 'halten'}` });
   }
