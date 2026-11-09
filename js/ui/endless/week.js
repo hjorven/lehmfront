@@ -7,13 +7,12 @@
 //   const campaignRun = campaignMission(params) ?? endlessWeek(params, map);
 //   suffix(state), overlays() fuer Rundentitel und Zielfeld auf der Karte.
 import { slimRounds } from '../../campaign.js';
-import { weekRounds, weekOver, WEEK_ROUNDS, seasonOf, fallLimit } from '../../modes/endless.js';
-import { groundHeld } from '../../ai/match.js';
+import { weekRounds, weekOver, WEEK_ROUNDS, seasonOf, sectorFallen } from '../../modes/endless.js';
 import { SEASONS } from '../../config/seasons.js';
 import { FONTS } from '../../render/map-layer.js';
 import { playSfx } from '../../audio/engine.js';
 import { esc, ensureCss } from '../dom.js';
-import { loadRun, loadWeekStart, saveWeekReturn } from './store.js';
+import { loadRun, loadWeekStart, loadWeekReturn, saveWeekReturn, matchesWeek, weekQuery } from './store.js';
 
 const KIND_WORD = {
   halten: 'Halten', feld_nehmen: 'Feld nehmen', stosstrupp: 'Stoßtrupp', gefangene: 'Gefangene', graben_zuruecknehmen: 'Graben zurücknehmen',
@@ -23,9 +22,12 @@ export function endlessWeek(params, map = null) {
   if (!params.has('endlos')) return null;
   const run = loadRun();
   const start = loadWeekStart();
-  if (!run || !start || run.ended || start.endless?.week !== run.week) {
-    // Keine laufende Woche (schon gemeldet, Zurueck-Taste, anderes Geraet): zum Wochentisch statt still ein freies Gefecht
-    location.replace(location.pathname + '?scene=frontabschnitt');
+  const toTable = () => { location.replace(location.pathname + '?scene=frontabschnitt'); return null; };
+  // Keine laufende Woche (schon gemeldet, Zurueck-Taste, anderes Geraet): zum Wochentisch statt still ein freies Gefecht
+  if (!run || !start || run.ended || start.endless?.week !== run.week || loadWeekReturn()?.week === run.week) return toTable();
+  // Alte oder veraenderte Adresse (anderer Gegner, andere Karte): auf die Adresse der laufenden Woche
+  if (!matchesWeek(params, run)) {
+    location.replace(location.pathname + '?' + weekQuery(run).toString());
     return null;
   }
   const order = run.order;
@@ -45,8 +47,8 @@ export function endlessWeek(params, map = null) {
     if (!ok) {
       dialog(ui, {
         title: 'Meldung nicht gespeichert',
-        text: 'Der Browser nimmt die Wochenmeldung nicht an (Speicher voll oder gesperrt). Bitte Speicher freigeben und erneut melden.',
-        confirm: 'Verstanden', onConfirm: () => {},
+        text: 'Der Browser nimmt die Wochenmeldung nicht an (Speicher voll oder gesperrt). Bitte Speicher freigeben (z. B. alte Spielstände im Dienstbuch löschen) und erneut melden.',
+        confirm: 'Erneut melden', onConfirm: () => finish(why, state, archive, ui),
       });
       return;
     }
@@ -88,8 +90,14 @@ export function endlessWeek(params, map = null) {
       // Der Wochenbeginn aus dem Speicher ersetzt den Anfangszustand des Szenarios
       return structuredClone(start);
     },
-    mount(ui, { getState, isBusy = () => false, setModal: sm }) {
+    mount(ui, { getState, getArchive, isBusy = () => false, setModal: sm }) {
       if (sm) setModal = sm;
+      // Ein Spielstand aus einer anderen Woche (Dienstbuch) gehoert nicht in diese Woche
+      const now = getState();
+      if (now.endless?.week !== run.week) { toTable(); return; }
+      // Neu geladen, waehrend die Woche schon vorbei war: Ende gleich wieder anbieten
+      this.afterRound(now, getArchive ? getArchive() : { rounds: [] });
+      if (pending) setTimeout(() => this.afterFilm(ui), 600);
       ensureCss('css/feldzug.css');
       ensureCss('css/frontabschnitt.css');
       const host = ui.querySelector('.hud-right');
@@ -107,21 +115,34 @@ export function endlessWeek(params, map = null) {
       ui.append(card);
       const close = () => { card.hidden = true; btn.setAttribute('aria-expanded', 'false'); };
       btn.setAttribute('aria-expanded', 'false');
-      btn.addEventListener('click', () => {
+      const toggle = () => {
         if (isBusy() && card.hidden) return;
         if (!card.hidden) { close(); return; }
         card.innerHTML = cardHtml(getState());
         card.hidden = false;
+        // Auf dem Desktop direkt unter dem Knopf (die Knopfreihe rechts ist unterschiedlich lang)
+        const b = btn.getBoundingClientRect(), u = ui.getBoundingClientRect();
+        card.style.top = matchMedia('(max-width: 699px)').matches ? '' : `${Math.round(b.bottom - u.top + 8)}px`;
         btn.setAttribute('aria-expanded', 'true');
         card.querySelector('.ew-x').addEventListener('click', close);
         playSfx('paper', { intensity: 0.4 });
-      });
+      };
+      btn.addEventListener('click', toggle);
+      // Handy: die Knopfreihe rechts ist eingeklappt, der Befehl steht dann als Karte in der Seitenleiste
+      const sheet = ui.querySelector('.hud-sheet');
+      if (sheet) {
+        const sc = document.createElement('section');
+        sc.className = 'card lr-card ew-sheet';
+        sc.innerHTML = `<span class="k">Woche ${run.week} · ${esc(SEASONS[seasonOf(run.week)].name)}</span><p>${esc(order?.titel ?? 'Stabsbefehl')}${order?.target ? ', Feld ' + esc(order.feld) : ''}</p><button type="button" class="btn">Befehl zeigen</button>`;
+        sc.querySelector('button').addEventListener('click', toggle);
+        sheet.append(sc);
+      }
       card.addEventListener('keydown', (e) => { if (e.key === 'Escape') { e.stopPropagation(); close(); btn.focus(); } });
     },
     suffix(state) {
-      if (ended || pending) return ` · Woche ${run.week} · vorbei`;
+      if (ended || pending) return ` · W${run.week} vorbei`;
       const left = Math.max(0, WEEK_ROUNDS - weekRounds(state));
-      return state.turnKind === 'battle' ? ` · Woche ${run.week}` : ` · Woche ${run.week} · noch ${left}`;
+      return state.turnKind === 'battle' ? ` · W${run.week}` : ` · W${run.week}, noch ${left}`;
     },
     /** Zielfeld des Stabsbefehls: mit Bleistift umrandet, daneben die Befehlsart */
     overlays() {
@@ -157,15 +178,17 @@ export function endlessWeek(params, map = null) {
       let why = null;
       if (state.sides.a?.mutiny || (state.result && state.result.winner !== 'a')) why = state.sides.a?.mutiny ? 'meuterei' : 'gefallen';
       else if (!alive) why = 'gefallen';
-      else if (map && groundHeld(state, map, 'b') >= fallLimit(map, 'a')) why = 'gefallen';
+      else if (map && sectorFallen(state, map, 'a')) why = 'gefallen';
+      else if (!state.groups.some((g) => g.side === 'b' && g.status !== 'lost')) why = 'leer';
       else if (weekOver(state)) why = 'woche';
       if (why) pending = { why, state, archive };
     },
     afterFilm(ui) {
-      if (ended) return true;
-      if (!pending || dialogOpen) return !!pending;
+      // Im Frontabschnitt meldet nur der Wochentisch das Ende, nie die Abschlussmeldung von Gefecht frei
+      if (ended || !pending || dialogOpen) return true;
       const { why, state, archive } = pending;
       const TEXT = {
+        leer: ['Drüben ist niemand mehr', `Der Graben gegenüber ist leer. Woche ${run.week} endet früher; der Stab schickt Ersatz nach drüben, nicht zu Ihnen.`],
         woche: ['Die Woche ist um', `Vierzehn Stellungsrunden. Woche ${run.week} geht als Meldung an den Stab. Am Tisch liegen dann Liste, Post und der nächste Befehl.`],
         gefallen: ['Der Abschnitt hält nicht mehr', 'Die Linie ist nicht mehr zu halten. Die Meldung geht trotzdem hinaus.'],
         meuterei: ['Die Truppe geht nicht mehr', 'Die Gruppen bleiben in den Unterständen. Sie halten den Graben, aber sie gehen nirgends mehr hin.'],

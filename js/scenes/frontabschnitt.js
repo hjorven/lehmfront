@@ -2,7 +2,7 @@
 // links die Karte des Abschnitts mit dem Zielfeld der Woche und darunter das Kerbholz (jede Woche eine Kerbe im
 // Balken, Jahreszeiten angeschrieben, Punkte fuer die Namen der Woche), rechts Lage, Befehl, Stempel, die Leute.
 // Nach einer Woche liegen Gefallenenliste, Wochenmeldung, Feldpost, Wochenanfang und der neue Befehl auf dem Tisch.
-// Parameter: demo=tisch|ende|neu (Beispielstaende ohne Speichern, fuer Screenshots), woche=<n> (Demo-Woche).
+// Parameter: demo=neu|tisch|woche|ende (Beispielstaende ohne Speichern, fuer Screenshots), woche=<n> (Demo-Woche).
 import { loadMap, applyCellState } from '../map.js';
 import { createInitialState } from '../state.js';
 import { initEtappen } from '../etappe-map.js';
@@ -26,7 +26,7 @@ import { createRng } from '../rng.js';
 import { loadTexts, loadNarrativeStyles } from '../ui/narrative/load.js';
 import { playSteps } from '../ui/narrative/reader.js';
 import {
-  loadRun, saveRun, loadWeekStart, saveWeekStart, loadWeekReturn, clearWeekReturn, clearRun, bestRuns, addBestRun, weeklyBoard, addWeeklyEntry,
+  weekQuery, loadRun, saveRun, loadWeekStart, saveWeekStart, loadWeekReturn, clearWeekReturn, clearRun, bestRuns, addBestRun, weeklyBoard, addWeeklyEntry,
 } from '../ui/endless/store.js';
 import { esc, ensureCss } from '../ui/dom.js';
 import { audio, playSfx } from '../audio/engine.js';
@@ -46,13 +46,6 @@ function mondayKey(now = new Date()) {
   const d = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   d.setDate(d.getDate() - ((d.getDay() + 6) % 7));
   return dayKey(d.getFullYear(), d.getMonth() + 1, d.getDate());
-}
-
-/** Abfrage fuer die Woche im Gefecht (gleiche Karte, gleiches Szenario, Gegner nach Woche) */
-export function weekQuery(run) {
-  const q = new URLSearchParams({ scene: 'gefecht', endlos: '1', karte: run.map, fraktion: run.faction, ki: enemyDifficulty(run.week), seed: String(run.seed) });
-  if (run.map === 'zufall') q.set('kseed', String(run.mapSeed));
-  return q;
 }
 
 async function battleFor(run) {
@@ -113,6 +106,9 @@ export async function mount(root, params) {
 
   let run = null, state = null, map = null;
   let lastPlayed = {};
+  let saveFailed = false;
+  let starting = false;
+  let observer = null;
 
   // ------------------------------------------------------------------ Woche buchen und Tisch
 
@@ -123,10 +119,14 @@ export async function mount(root, params) {
     if (!r.ended) {
       next = prepareWeek(ret.finalState, r, m);
       r.order = generateOrder(index.list, r, next, m);
-      saveWeekStart(next);
     }
-    saveRun(r);
-    clearWeekReturn();
+    // Erst der Lauf, dann der Wochenbeginn (am Ende: der Endzustand fuer die Karte). Die Meldung bleibt liegen, bis
+    // beides gespeichert ist: fehlt der Wochenbeginn, baut ihn der naechste Besuch aus der Meldung neu (rein, gleich).
+    const okRun = saveRun(r);
+    const okStart = okRun && saveWeekStart(next);
+    if (okRun && okStart) clearWeekReturn();
+    else saveFailed = true;
+    if (!okRun) { lastPlayed = {}; return { run: r0, state: start }; }
     lastPlayed = { record: f.record, changes: f.changes, casualties: f.casualties, rounds: ret.rounds ?? [], endState: ret.finalState };
     return { run: r, state: next };
   }
@@ -187,7 +187,9 @@ export async function mount(root, params) {
         ring.hidden = false;
       }
     };
-    new ResizeObserver(fit).observe(sheet);
+    observer?.disconnect();
+    observer = new ResizeObserver(fit);
+    observer.observe(sheet);
     fit();
   }
 
@@ -195,7 +197,7 @@ export async function mount(root, params) {
   function kerbholz(r) {
     const weeks = r.weeks;
     const n = Math.max(weeks.length + (r.ended ? 0 : 1), 6);
-    const step = 14, pad = 18, w = pad * 2 + n * step, h = 74;
+    const step = 14, pad = 18, w = pad * 2 + n * step, h = 80;
     let marks = '';
     weeks.forEach((wk, i) => {
       const x = pad + i * step + step / 2;
@@ -206,7 +208,7 @@ export async function mount(root, params) {
         : `<line class="kb-cut${wk.held ? '' : ' kb-weak'}" x1="${x}" y1="${28}" x2="${x}" y2="${28 + deep}"/>`;
       if (wk.fallen) {
         const dots = Math.min(8, wk.fallen);
-        for (let k = 0; k < dots; k++) marks += `<circle class="kb-dot" cx="${x - 3 + (k % 2) * 6}" cy="${60 + Math.floor(k / 2) * 3.4}" r="1.1"/>`;
+        for (let k = 0; k < dots; k++) marks += `<circle class="kb-dot" cx="${x - 3 + (k % 2) * 6}" cy="${61 + Math.floor(k / 2) * 4.2}" r="1.7"/>`;
       }
       if (i === 0 || isSeasonStart(wk.week)) marks += `<text class="kb-season" x="${x - 4}" y="18">${esc(SEASONS[wk.season].name)}</text>`;
     });
@@ -287,7 +289,7 @@ export async function mount(root, params) {
       <section class="mb-form card fa-card" aria-label="Frontabschnitt">
         <div class="fa-head"><span class="mb-sub">${wl ? `Wochenlage · ${esc(dayLabel(run.key))}` : 'Frontabschnitt'}</span>
           <h1>Woche ${run.week}${wl ? ` von ${weekLimit(run)}` : ''}</h1>
-          <p class="fa-season">${esc(season.name)}${left > 1 ? `, noch ${left} Wochen bis zum ${esc(nextSeason.name)}` : `, letzte Woche vor dem ${esc(nextSeason.name)}`}</p></div>
+          <p class="fa-season">${esc(season.name)}${wl ? `, noch ${weekLimit(run) - run.week + 1} ${weekLimit(run) - run.week + 1 === 1 ? 'Woche' : 'Wochen'} bis zur Übergabe` : left > 1 ? `, noch ${left} Wochen bis zum ${esc(nextSeason.name)}` : `, letzte Woche vor dem ${esc(nextSeason.name)}`}</p></div>
         ${axes()}
         <dl class="fa-facts">
           <div><dt>Punkte</dt><dd>${run.score.points}</dd></div>
@@ -295,6 +297,7 @@ export async function mount(root, params) {
           <div><dt>Drüben</dt><dd>${esc(DIFFICULTIES[enemyDifficulty(run.week)].label)}</dd></div>
           <div><dt>Namen</dt><dd>${run.book.fallen.length}</dd></div>
         </dl>
+        ${saveFailed ? '<p class="fa-warn" role="alert">Der Browser nimmt den Stand nicht an (Speicher voll oder gesperrt). Bitte Speicher freigeben und die Seite neu laden, sonst geht die Woche verloren.</p>' : ''}
         ${orderHtml()}
         <div class="mb-go fa-go">
           <a class="btn mb-start fa-start" href="?${esc(weekQuery(run).toString())}">Zur Woche ${run.week} <small>${WEEK_ROUNDS} Stellungsrunden</small></a>
@@ -354,7 +357,7 @@ export async function mount(root, params) {
       ${mapPane(map.sheet?.title || map.name, `${run.weeks.length} ${run.weeks.length === 1 ? 'Woche' : 'Wochen'}`)}
       <section class="mb-form card fa-card fa-end" aria-label="Ende des Abschnitts">
         <div class="fa-head"><span class="mb-sub">${wl ? `Wochenlage · ${esc(dayLabel(run.key))}` : 'Frontabschnitt'}</span>
-          <h1>${esc(END_WORD[run.ended] ?? 'Ende')}</h1></div>
+          <h1>Ende in Woche ${run.endWeek ?? run.week}</h1></div>
         <div class="rm-stamp fa-end-stamp s-${run.ended === 'wochenlage' || run.ended === 'abgegeben' ? 'won' : 'lost'}" aria-hidden="true">${esc(END_WORD[run.ended] ?? 'Ende')}</div>
         <p class="fa-endtext">${esc(text)}</p>
         ${scoreTable()}
@@ -408,7 +411,7 @@ export async function mount(root, params) {
       <div class="mb-map fa-map">
         <div class="mb-sheet"><canvas aria-hidden="true"></canvas></div>
         <div class="mb-cap"><span class="mb-name"></span><span>Derselbe Abschnitt, Woche um Woche</span></div>
-        <p class="mb-blurb">Dieselben Leute, derselbe Graben. Alle sechs Wochen eine neue Jahreszeit, drüben wird es jede Woche schwerer. Es endet, wenn der Abschnitt fällt, der Stab Sie ablöst oder die Truppe nicht mehr geht.</p>
+        <p class="mb-blurb">Dieselben Leute, derselbe Graben. Alle sechs Wochen eine neue Jahreszeit, drüben wird es jede Woche schwerer. Es endet, wenn der Abschnitt fällt, der Stab die Abschnittsführung ablöst oder die Truppe nicht mehr geht.</p>
       </div>
       <div class="fa-side">
       <form class="mb-form card fa-new-form" aria-label="Frontabschnitt übernehmen">
@@ -467,9 +470,11 @@ export async function mount(root, params) {
       preview();
     });
     const begin = async (c) => {
-      if (demo) return;
+      if (demo || starting) return;
+      starting = true;
+      for (const b of root.querySelectorAll('.mb-start, .fa-weekly-go')) b.disabled = true;
       playSfx('stamp');
-      const s = await startRun(c, index);
+      const s = await startRun({ ...c, runId: Date.now() % 1e9 }, index);
       run = s.run; state = s.state; map = s.map;
       saveWeekStart(state);
       saveRun(run);
@@ -503,10 +508,15 @@ export async function mount(root, params) {
       map = (await battleFor(run)).map;
       if (!state && !run.ended) { clearRun(); run = null; } // Wochenbeginn verloren (Speicher geleert): neu anfangen
       const ret = loadWeekReturn();
+      // Lauf gebucht, Wochenbeginn aber nicht gespeichert: aus der liegengebliebenen Meldung neu bauen
+      if (run && ret && ret.week === run.week - 1 && state?.endless?.week !== run.week) {
+        state = run.ended ? ret.finalState : prepareWeek(ret.finalState, run, map);
+        if (saveWeekStart(state)) clearWeekReturn(); else saveFailed = true;
+      }
       if (run && ret && !run.ended && ret.week === run.week && state?.endless?.week === run.week) {
         ({ run, state } = await processWeek(run, state, ret, map));
-        await playTable({ run, state, map, ...lastPlayed });
-      } else if (run && ret && (run.ended || ret.week !== run.week)) clearWeekReturn(); // alte Meldung
+        if (lastPlayed.record) await playTable({ run, state, map, ...lastPlayed });
+      } else if (run && ret && ret.week !== run.week - 1 && (run.ended || ret.week !== run.week)) clearWeekReturn(); // alte Meldung
     }
   }
   render();

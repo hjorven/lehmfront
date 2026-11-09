@@ -85,19 +85,21 @@ export function groupReplacementsFor(ansehen) {
 /**
  * Neuer Lauf. opts: { mode: 'endlos'|'wochenlage', faction, map: 'zufall'|Karten-ID, mapSeed, seed, key? }
  */
-export function newRun({ mode = 'endlos', faction = 'kaldern', map = 'zufall', mapSeed = 1, seed = 1, key = null } = {}) {
+export function newRun({ mode = 'endlos', faction = 'kaldern', map = 'zufall', mapSeed = 1, seed = 1, key = null, runId = 0 } = {}) {
   const c = newCampaign({ side: 'a', faction, seed: seed >>> 0 });
   return {
     ...c,
     mission: 'w1',
     mode: mode === 'wochenlage' ? 'wochenlage' : 'endlos',
     key,
+    runId: runId >>> 0,
     map,
     mapSeed: mapSeed >>> 0,
     week: 1,
     order: null,
     base: null,
     score: { weeks: 0, gained: 0, rescued: 0, fallen: 0, points: 0 },
+    heldMax: 0,
     weeks: [],
     ended: null,
     endWeek: null,
@@ -160,8 +162,9 @@ const mapSide = (side) => (side === 'a' ? 'own' : 'enemy');
 
 /** Wem gehoert der Graben auf einem Feld gerade (Zustand vor Karte)? 'own' | 'enemy' | null */
 export function trenchSideAt(state, map, x, y) {
-  const live = state.cells?.[x + ',' + y]?.trench;
-  if (live) return live.side ?? null;
+  const cell = state.cells?.[x + ',' + y];
+  // trench: null heisst zerstoert (js/trench.js), das gilt vor der Karte
+  if (cell && 'trench' in cell) return cell.trench?.side ?? null;
   return map.cells[y * map.width + x]?.trench?.side ?? null;
 }
 
@@ -181,6 +184,20 @@ function frontCells(map, ms) {
 export function ownFireCells(map, side = 'a') {
   const ms = mapSide(side);
   return map.cells.filter((c) => c.trench && c.trench.side === ms && c.trench.kind === 'fire').length;
+}
+
+/** Eigene Feuergrabenfelder (urspruenglich), die gerade der Gegner haelt (Sappen drueben zaehlen nicht) */
+export function lostFireCells(state, map, side = 'a') {
+  const ms = mapSide(side), foe = mapSide(side === 'a' ? 'b' : 'a');
+  let n = 0;
+  for (const c of map.cells) if (c.trench && c.trench.side === ms && c.trench.kind === 'fire' && trenchSideAt(state, map, c.x, c.y) === foe) n++;
+  return n;
+}
+
+/** Ist der Abschnitt gefallen? Keine eigene Gruppe mehr oder der Gegner haelt genug eigenen Feuergraben */
+export function sectorFallen(state, map, side = 'a') {
+  if (!state.groups.some((g) => g.side === side && g.status !== 'lost')) return true;
+  return lostFireCells(state, map, side) >= fallLimit(map, side);
 }
 
 /** Ab so vielen verlorenen eigenen Grabenfeldern ist der Abschnitt gefallen */
@@ -289,7 +306,7 @@ export function judgeOrder(order, { start, end, rounds = [], map, side = 'a' }) 
     }
     case 'stosstrupp': {
       const hit = rounds.some((r) => (r.log ?? []).some((e) => e.side === side
-        && (e.type === 'melee' || e.type === 'breach') && near(e.cell ?? e.at, t, 2)));
+        && (e.type === 'breach' || (e.type === 'melee' && e.outcome === 'taken')) && near(e.cell ?? e.at, t, 2)));
       const caught = rounds.some((r) => (r.log ?? []).some((e) => e.side === foe && e.type === 'group_captured' && near(e.at, t, 3)));
       return hit || caught ? { met: true, why: `Der Stoßtrupp war bei Feld ${order.feld} im Graben.` } : { met: false, why: `Bei Feld ${order.feld} war niemand drüben im Graben.` };
     }
@@ -307,6 +324,8 @@ export const hoursOf = (clock) => (clock?.day ?? 1) * 24 + (clock?.hour ?? 0);
 
 /** Gespielte Stellungsrunden dieser Woche (aus der Uhr: eine Stellungsrunde = 12 Stunden) */
 export function weekRounds(state) {
+  // Die Phase "endless-rounds" (js/phases/season.js) zaehlt die Stellungsrunden; die Uhr nur als Rueckfall
+  if (Number.isFinite(state.endless?.rounds)) return state.endless.rounds;
   const start = state.endless?.startHours ?? hoursOf(state.clock);
   return Math.max(0, Math.floor((hoursOf(state.clock) - start) / 12));
 }
@@ -418,7 +437,7 @@ export function prepareWeek(state, run, map) {
     }
   }
   s.groups.sort(byId);
-  s.endless = { week, startHours: hoursOf(s.clock), arrivals, reinforced, season };
+  s.endless = { week, startHours: hoursOf(s.clock), rounds: 0, arrivals, reinforced, season };
   return s;
 }
 
@@ -455,10 +474,12 @@ export function finishWeek(runIn, { start, end, rounds = [], map }) {
   // Punkte nach Plan 8.3
   const alive = end.groups.some((g) => g.side === side && g.status !== 'lost');
   const lostStart = groundHeld(start, map, foe), lostEnd = groundHeld(end, map, foe);
-  const limit = fallLimit(map, side);
-  const fell = !alive || lostEnd >= limit;
-  const held = !fell && lostEnd - lostStart < 3;
-  const gained = Math.max(0, groundHeld(end, map, side) - groundHeld(start, map, side));
+  const fell = sectorFallen(end, map, side);
+  const held = alive && !fell && lostEnd - lostStart < 3;
+  // Gewonnen zaehlt nur, was ueber den bisher besten Stand hinausgeht (verlieren und zuruecknehmen bringt nichts)
+  const heldNow = groundHeld(end, map, side);
+  const gained = Math.max(0, heldNow - Math.max(run.heldMax ?? 0, groundHeld(start, map, side)));
+  run.heldMax = Math.max(run.heldMax ?? 0, heldNow);
   const carried = (st) => st?.sides?.[side]?.supply?.stats?.woundedCarried ?? 0;
   const rescued = Math.max(0, carried(end) - carried(start));
   const fallen = Math.max(0, tally.losses[side] - tally.wounded[side]) + Math.max(0, diedOfWounds(end, side) - diedOfWounds(start, side));

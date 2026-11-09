@@ -1,6 +1,8 @@
 // Speicher des Endlosmodus (P22): der Lauf, der Zustand zu Wochenbeginn und die Rueckmeldung einer Woche.
 // localStorage mit Rueckfall in den Speicher (privates Fenster, gesperrter Speicher). Dazu zwei lokale Listen:
 // die besten Laeufe im Endlosmodus und das Wochenbuch der Wochenlage (nur auf diesem Geraet).
+import { enemyDifficulty } from '../../modes/endless.js';
+
 const RUN = 'lehmfront-endlos';
 const SNAP = 'lehmfront-endlos-woche';
 const RETURN = 'lehmfront-endlos-rueckmeldung';
@@ -39,7 +41,21 @@ export function clearRun() { write(RUN, null); write(SNAP, null); write(RETURN, 
 /** Kennung der laufenden Woche (fuer das Wiederaufnehmen der Akte im Gefecht, P18) */
 export function weekStamp() {
   const r = read(RUN);
-  return r ? `${r.seed}-${r.mapSeed}-${r.week}-${r.weeks?.length ?? 0}` : null;
+  return r ? `${r.runId ?? 0}-${r.seed}-${r.mapSeed}-${r.week}-${r.weeks?.length ?? 0}` : null;
+}
+
+/** Abfrage fuer die Woche im Gefecht (gleiche Karte, gleiches Szenario, Gegner nach Woche) */
+export function weekQuery(run) {
+  const q = new URLSearchParams({ scene: 'gefecht', endlos: '1', karte: run.map, fraktion: run.faction, ki: enemyDifficulty(run.week), seed: String(run.seed) });
+  if (run.map === 'zufall') q.set('kseed', String(run.mapSeed));
+  return q;
+}
+
+/** Passt die Adresse zur laufenden Woche? (Karte, Fraktion, Gegner, Seed; sonst alte Lesezeichen oder Handarbeit) */
+export function matchesWeek(params, run) {
+  const want = weekQuery(run);
+  for (const k of ['karte', 'kseed', 'fraktion', 'ki', 'seed']) if ((params.get(k) ?? '') !== (want.get(k) ?? '')) return false;
+  return true;
 }
 
 const okEntry = (e) => e && typeof e === 'object' && typeof e.name === 'string' && Number.isFinite(e.points);

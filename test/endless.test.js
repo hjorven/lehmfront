@@ -62,9 +62,11 @@ test('Woche vorbereiten: Jahreszeit, Achsen, Nachschub nicht doppelt, Wochenbegi
   const low = prepareWeek(state, { ...run, ansehen: 0 }, map);
   assert.ok(low.sides.a.supplies.income.ammo < state.sides.a.supplies.income.ammo);
   assert.equal(low.sides.a.reputation, 0);
-  // Uhr: 14 Stellungsrunden sind 7 Tage
-  const later = { ...state, clock: { ...state.clock, day: state.clock.day + 7 } };
+  // Die Phase zaehlt die Stellungsrunden; ohne Zaehler gilt die Uhr (14 Stellungsrunden sind 7 Tage)
+  const later = { ...state, endless: { ...state.endless, rounds: WEEK_ROUNDS } };
   assert.equal(weekRounds(later), WEEK_ROUNDS);
+  const { rounds: _r, ...noCount } = state.endless;
+  assert.equal(weekRounds({ ...state, endless: noCount, clock: { ...state.clock, day: state.clock.day + 7 } }), WEEK_ROUNDS);
   assert.ok(weekOver(later));
   assert.ok(!weekOver({ ...later, turnKind: 'battle' }), 'ein laufendes Gefecht wird zu Ende gefuehrt');
 });
@@ -145,7 +147,12 @@ test('Befehl pruefen: halten, Feld nehmen, Gefangene, Stosstrupp', () => {
   assert.equal(judgeOrder(pris, { start: state, end: state, map, rounds: [...one, ...one] }).met, true);
   const raid = { befehlsart: 'stosstrupp', target: { x: foe.x, y: foe.y }, feld: 'X' };
   assert.equal(judgeOrder(raid, { start: state, end: state, map, rounds: [] }).met, false);
-  assert.equal(judgeOrder(raid, { start: state, end: state, map, rounds: [{ log: [{ type: 'melee', side: 'a', at: { x: foe.x + 1, y: foe.y } }] }] }).met, true);
+  assert.equal(judgeOrder(raid, { start: state, end: state, map, rounds: [{ log: [{ type: 'melee', side: 'a', outcome: 'repelled', at: { x: foe.x + 1, y: foe.y } }] }] }).met, false, 'abgewiesen zaehlt nicht');
+  assert.equal(judgeOrder(raid, { start: state, end: state, map, rounds: [{ log: [{ type: 'melee', side: 'a', outcome: 'taken', at: { x: foe.x + 1, y: foe.y } }] }] }).met, true);
+  // Zerstoerter Graben (trench: null) gehoert niemandem, auch wenn die Karte ihn noch kennt
+  const gone = structuredClone(state);
+  gone.cells[foe.x + ',' + foe.y] = { trench: null };
+  assert.equal(trenchSideAt(gone, map, foe.x, foe.y), null);
   const dead = structuredClone(state);
   for (const g of dead.groups) if (g.side === 'a') g.status = 'lost';
   assert.equal(judgeOrder(halten, { start: state, end: dead, map }).met, false);
@@ -172,6 +179,14 @@ test('Woche abschliessen: Punkte nach Plan 8.3, naechste Woche, Buch des Abschni
   assert.equal(f.run.ended, null);
   // Rein: gleiche Eingabe, gleiches Ergebnis
   assert.deepEqual(finishWeek(run, { start: state, end, rounds, map }), f);
+  // Feld verlieren und zuruecknehmen bringt keine Punkte doppelt
+  const foe = map.cells.find((c) => c.trench?.side === 'enemy' && c.trench.kind === 'fire');
+  const won = structuredClone(state);
+  won.cells[foe.x + ',' + foe.y] = { trench: { ...foe.trench, side: 'own' } };
+  const w1 = finishWeek(run, { start: state, end: won, map });
+  assert.equal(w1.record.gained, 1);
+  const w2 = finishWeek(w1.run, { start: state, end: won, map });
+  assert.equal(w2.record.gained, 0);
 });
 
 test('Enden: Abschnitt gefallen, Meuterei, Abloesung, Wochenlage nach vier Wochen', () => {
