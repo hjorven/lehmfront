@@ -69,7 +69,7 @@ export function doctrineForAct(act) {
  * Schwierigkeiten. Alle arbeiten auf derselben gefilterten Sicht (kein Schummeln); sie unterscheiden sich darin,
  * wie gruendlich der Kommandant liest und plant.
  *   ghostAge: Geister bis zu diesem Alter (Runden) zaehlen als Feind
- *   noise: Unsicherheit beim Schaetzen der Kraefte und beim Wahl des Ziels (Prozent)
+ *   noise: Unsicherheit beim Schaetzen der Kraefte und bei der Wahl des Ziels (Prozent)
  *   slip: Chance in Prozent, dass eine Gruppe ihren Befehl verschlaeft (haelt)
  *   mgAware, wireAware: weicht bekannten MG-Kegeln und Draht beim Sturmweg aus
  *   flares, observers, rearrange: nutzt Leuchtkugeln, stellt Beobachter um, verteilt Gruppen auf die Front

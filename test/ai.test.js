@@ -264,3 +264,22 @@ test('Symmetrie: gleiche KI auf gespiegelter Karte landet nahe 50 Prozent', () =
   // Verluste aehnlich (hoechstens doppelt so viele auf einer Seite)
   assert.ok(sum.losses.a <= 2 * sum.losses.b + runs && sum.losses.b <= 2 * sum.losses.a + runs, JSON.stringify(sum.losses));
 });
+
+test('Genommener Graben wird gehalten, nicht sofort wieder geraeumt', () => {
+  const s = fresh(5);
+  const t = MAP_JSON.trenches.find((x) => x.side === 'enemy' && x.kind === 'fire' && !s.groups.some((g) => g.pos.x === x.x && g.pos.y === x.y));
+  const g = s.groups.find((x) => x.id === 'a01');
+  g.pos = { x: t.x, y: t.y };
+  s.cells[t.x + ',' + t.y] = { trench: { side: 'own', kind: 'fire', level: t.level, facing: t.facing, captured: true } };
+  const d = decide(viewFor(s, [], 'a', env), { map: MAP, seed: 5, posture: 'halten' });
+  assert.ok(!d.advice.some((a) => a.group === 'a01' && a.tag === 'Zurück in den Graben'), JSON.stringify(d.advice.filter((a) => a.group === 'a01')));
+});
+
+test('Notiz ohne Sturmgruppen spricht nicht von null Rotten', () => {
+  const v = viewFor(fresh(), [], 'b', env);
+  const d = decide(v, { map: MAP, seed: 3, posture: 'sturm' });
+  const empty = { ...d, intent: { ...d.intent, groups: [] } };
+  const n = noteFromDecision(empty, v, { seed: 3 });
+  assert.equal(n.posture, 'vorbereiten');
+  assert.ok(!n.lines.join(' ').includes('0 Rotten'));
+});
