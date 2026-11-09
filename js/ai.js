@@ -32,6 +32,7 @@ import { runAiBlocks } from './ai/blocks.js';
 import { truceVeto } from './truce.js';
 import './ai/akt2.js'; // Befehlspruefungen der Mechaniken (die KI prueft ihre Befehle vor der Abgabe)
 import './ai/akt3.js'; // P24: Flieger, Gas, Flammenwerfer, Waffenruhe
+import './ai/akt4.js'; // P26: geraeumte Linie besetzen, Panzerwagen, Pionierbruecke
 
 export { POSTURES, DOCTRINES, DIFFICULTIES };
 

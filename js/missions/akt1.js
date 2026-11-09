@@ -6,7 +6,7 @@
 // Zeilen fuer den Auftragszettel im Gefecht (js/ui/mission-hints.js), damit Anzeige und Wertung nie auseinanderlaufen.
 import { registerMissionJudge } from '../campaign.js';
 import {
-  positionRounds, lineStatus, trenchesLost, heldCells, groupsAt, eventsOf, figureFallen,
+  positionRounds, lineStatus, trenchesLost, heldCells, groupsAt, eventsOf, figureFallen, GOAL_LINES,
 } from './goals.js';
 import { sectionsOf, frontGroups } from '../supply.js';
 import { UPKEEP } from '../config/supply.js';
@@ -220,6 +220,6 @@ export function goalLines({ mission, state, rounds, side = 'a', map }) {
         { text: `Bis zur Ablösung (Tag 28): ${due(cfg.rounds)}`, done: played >= cfg.rounds && lost <= cfg.tolerate },
       ];
     }
-    default: return [];
+    default: return GOAL_LINES.get(mission)?.({ mission, state, rounds, side, map }) ?? [];
   }
 }

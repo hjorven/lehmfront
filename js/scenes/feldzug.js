@@ -2,21 +2,22 @@
 // (Abrechnung, Gefallenenliste, Post, Entscheidungen), vorzeitige Enden, Aufbruch zum naechsten Einsatz.
 // Aufruf: index.html?scene=feldzug
 //   &seed=n             Seed eines neuen Feldzugs
-//   &demo=mitte|tief|hoch|ende   Beispielstand fuer Screenshots (wird nicht gespeichert)
+//   &demo=mitte|tief|hoch|ende|schluss   Beispielstand fuer Screenshots (wird nicht gespeichert)
+//   &ende=haelt|waffenstillstand|durchbruch|abgeloest   mit demo=schluss: dieses Ende spielen (P26)
 //   &stempel=befolgen|umdeuten|verweigern   im Beispielstand den Befehl gleich abstempeln
 //   &bericht=<id>       im Beispielstand einen Erfahrungsbericht aufschlagen
 import { ensureCss } from '../ui/dom.js';
 import { loadTexts, loadNarrativeStyles } from '../ui/narrative/load.js';
 import { playPrologue, playInterlude, showJournal } from '../ui/narrative/index.js';
 import { playSteps } from '../ui/narrative/reader.js';
-import { diarySheet } from '../narrative/sheets.js';
-import { fillSheet, storyValues } from '../narrative/interlude.js';
+import { storyValues } from '../narrative/interlude.js';
 import { MISSIONS, pickSlot } from '../narrative/texts.js';
 import { loadMap } from '../map.js';
 import { audio, playSfx, setAmbience } from '../audio/engine.js';
 import { newCampaign, normalizeCampaign, finishMission, afterInterlude, stampOrder, replyBand } from '../campaign.js';
 import { scenarioForMission } from '../config/missions.js';
-import { createBoard, telegramLines } from '../ui/campaign/board.js';
+import { createBoard } from '../ui/campaign/board.js';
+import { endingSteps as buildEndingSteps, ENDING_TITLES } from '../narrative/ending.js';
 import {
   loadCampaign, saveCampaign, clearCampaign, saveMissionStart, loadMissionReturn, clearMissionReturn,
 } from '../ui/campaign/store.js';
@@ -29,7 +30,7 @@ export function missionSeed(campaign, mission) {
 }
 
 /** Beispielstaende fuer Screenshots und zum Ausprobieren */
-export function demoCampaign(kind) {
+export function demoCampaign(kind, ending = null) {
   const c = newCampaign({ seed: 214, ansehen: 50, vertrauen: 50 });
   const step = (m, outcome, a, v, front) => {
     c.outcomes[m] = outcome;
@@ -78,6 +79,21 @@ export function demoCampaign(kind) {
       { axis: 'vertrauen', amount: -3, key: 'sturm_verlust', reason: 'Sturm, der mehr als die Hälfte der Leute gekostet hat.' },
     ] });
   }
+  if (kind === 'schluss') {
+    // Nach a4m6: das Buch des Abschnitts mit einigen Namen, das Ende aus dem Parameter
+    const key = ['haelt', 'waffenstillstand', 'durchbruch', 'abgeloest'].includes(ending) ? ending : 'haelt';
+    for (const m of MISSIONS) if (!c.outcomes[m]) c.outcomes[m] = 'sieg';
+    c.mission = MISSIONS[MISSIONS.length - 1];
+    c.flags = ['ende_' + key, 'mine_gezuendet', 'kasten_durch'];
+    c.book.fallen = [
+      { name: 'Jost Kollmeyer', home: 'Hollerbrügge', groupLabel: 'Gruppe Kollmeyer', turn: 4, causeText: 'Granatfeuer' },
+      { name: 'Hilke Janssen', home: 'Brookdorp', groupLabel: 'Gruppe Janssen', turn: 9, causeText: 'beim Sturm' },
+      { name: 'Remmer Siebels', home: 'Ostmoor', groupLabel: 'Gruppe Siebels', turn: 12, causeText: 'MG-Feuer' },
+      { name: 'Antje Wessel', home: 'Ostmoor', groupLabel: 'Gruppe Wessel', turn: 3, causeText: 'Sprengfalle' },
+      { name: 'Dirk Ubben', home: 'Kelling', groupLabel: 'Gruppe Ubben', turn: 7, causeText: 'im Nahkampf' },
+    ];
+    c.ended = key;
+  }
   if (kind === 'ende') {
     c.ansehen = 8;
     c.history.push({ mission: 'a1m5', ansehen: 8, vertrauen: 33, outcome: 'sieg' });
@@ -87,17 +103,9 @@ export function demoCampaign(kind) {
   return c;
 }
 
-/** Schritte eines vorzeitigen Endes (data/texts/enden.json, ende = vorzeitig_*) fuer den Tisch der Erzaehlung */
-export function endingSteps(index, key, values) {
-  return index.list
-    .filter((e) => e.art === 'ende' && e.ende === key)
-    .sort((a, b) => (a.seite ?? 0) - (b.seite ?? 0))
-    .map((e) => {
-      const sheet = e.blatt === 'telegramm'
-        ? { id: e.id, kind: 'telegram', heading: 'STABSTELEGRAMM', number: '', urgent: true, fields: [], lines: telegramLines(e.text), footer: [], typed: true }
-        : diarySheet(e, { title: e.titel });
-      return { kind: e.blatt === 'telegramm' ? 'order' : 'diary', id: e.id, sheet: fillSheet(sheet, values), entry: e.id, about: e.titel };
-    });
+/** Schritte eines Endes fuer den Tisch der Erzaehlung (js/narrative/ending.js); bleibt fuer Aufrufer aus P14 */
+export function endingSteps(index, key, values, campaign = null) {
+  return buildEndingSteps(index, campaign ?? { flags: [], book: { fallen: [] } }, key, values);
 }
 
 export async function mount(root, params) {
@@ -112,7 +120,7 @@ export async function mount(root, params) {
   audio.init();
   document.title = 'Lehmfront · Feldzugskarte';
 
-  const demo = /^(mitte|tief|hoch|ende)$/.test(params.get('demo') ?? '') ? params.get('demo') : null;
+  const demo = /^(mitte|tief|hoch|ende|schluss)$/.test(params.get('demo') ?? '') ? params.get('demo') : null;
   const save = (c) => { if (!demo) saveCampaign(c); };
   let campaign;
   let board = null;
@@ -120,9 +128,9 @@ export async function mount(root, params) {
 
   async function playEnding(c) {
     const values = storyValues({}, null, c.storyValues);
-    const steps = endingSteps(index, c.ended, values);
+    const steps = endingSteps(index, c.ended, values, c);
     if (!steps.length) return;
-    const r = playSteps({ steps, title: c.ended === 'vorzeitig_meuterei' ? 'Meuterei' : 'Abgelöst', finishLabel: 'Zur Feldzugskarte' });
+    const r = playSteps({ steps, title: ENDING_TITLES[c.ended] ?? 'Ende', finishLabel: 'Zur Feldzugskarte' });
     await r.done;
   }
 
@@ -154,7 +162,7 @@ export async function mount(root, params) {
   }
 
   if (demo) {
-    campaign = demoCampaign(demo);
+    campaign = demoCampaign(demo, params.get('ende'));
     const st = params.get('stempel');
     if (/^(befolgen|umdeuten|verweigern)$/.test(st ?? '') && !campaign.ended) {
       const order = index.list.find((e) => e.art === 'befehl' && e.mission === campaign.mission);
@@ -228,6 +236,7 @@ export async function mount(root, params) {
     const t = pickSlot(index, 'stab.antwort', { ansehen: campaign.ansehen, vertrauen: campaign.vertrauen, outcome: campaign.reply.outcome });
     if (t) playSfx('teletype', { count: Math.max(2, Math.min(48, t.text.split(/\s+/).length * 2)), bell: true });
   }
+  if (demo === 'schluss') playEnding(campaign).then(() => board.update(campaign));
   const rep = params.get('bericht');
   if (demo && rep) board.el.querySelector(`[data-report="${CSS.escape(rep)}"]`)?.click();
 }

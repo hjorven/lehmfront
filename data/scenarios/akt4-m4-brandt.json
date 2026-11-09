@@ -1,0 +1,1278 @@
+{
+  "id": "akt4-m4-brandt",
+  "name": "Gerüchte",
+  "map": "raudas",
+  "act": 4,
+  "features": [
+    "fieldgun",
+    "occupy"
+  ],
+  "startHour": 6,
+  "turnKind": "position",
+  "weather": {
+    "kind": "overcast",
+    "season": "fruehling",
+    "wind": {
+      "dir": "w",
+      "speed": 1
+    },
+    "wet": 1
+  },
+  "cells": [
+    {
+      "x": 33,
+      "y": 1,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 33,
+      "y": 2,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 33,
+      "y": 3,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 40,
+      "y": 3,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 33,
+      "y": 4,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 40,
+      "y": 4,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 33,
+      "y": 5,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 34,
+      "y": 5,
+      "trench": {
+        "side": "own",
+        "kind": "comm",
+        "level": 2,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 35,
+      "y": 5,
+      "trench": {
+        "side": "own",
+        "kind": "comm",
+        "level": 2,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 36,
+      "y": 5,
+      "trench": {
+        "side": "own",
+        "kind": "comm",
+        "level": 2,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 37,
+      "y": 5,
+      "trench": {
+        "side": "own",
+        "kind": "comm",
+        "level": 2,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 38,
+      "y": 5,
+      "trench": {
+        "side": "own",
+        "kind": "comm",
+        "level": 2,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 39,
+      "y": 5,
+      "trench": {
+        "side": "own",
+        "kind": "comm",
+        "level": 2,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 40,
+      "y": 5,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 33,
+      "y": 6,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 40,
+      "y": 6,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 33,
+      "y": 7,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 40,
+      "y": 7,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 34,
+      "y": 8,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 40,
+      "y": 8,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 34,
+      "y": 9,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 40,
+      "y": 9,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 34,
+      "y": 10,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 40,
+      "y": 10,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 34,
+      "y": 11,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 40,
+      "y": 11,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 34,
+      "y": 12,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 35,
+      "y": 12,
+      "trench": {
+        "side": "own",
+        "kind": "comm",
+        "level": 2,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 36,
+      "y": 12,
+      "trench": {
+        "side": "own",
+        "kind": "comm",
+        "level": 2,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 37,
+      "y": 12,
+      "trench": {
+        "side": "own",
+        "kind": "comm",
+        "level": 2,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 38,
+      "y": 12,
+      "trench": {
+        "side": "own",
+        "kind": "comm",
+        "level": 2,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 39,
+      "y": 12,
+      "trench": {
+        "side": "own",
+        "kind": "comm",
+        "level": 2,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 40,
+      "y": 12,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 34,
+      "y": 13,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 40,
+      "y": 13,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 34,
+      "y": 14,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 40,
+      "y": 14,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 34,
+      "y": 15,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 40,
+      "y": 15,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 34,
+      "y": 16,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 33,
+      "y": 17,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 33,
+      "y": 18,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 39,
+      "y": 18,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 2,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 33,
+      "y": 19,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 39,
+      "y": 19,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 2,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 24,
+      "y": 20,
+      "trench": {
+        "side": "own",
+        "kind": "comm",
+        "level": 1,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 25,
+      "y": 20,
+      "trench": {
+        "side": "own",
+        "kind": "comm",
+        "level": 1,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 26,
+      "y": 20,
+      "trench": {
+        "side": "own",
+        "kind": "comm",
+        "level": 1,
+        "facing": "E"
+      },
+      "wire": null
+    },
+    {
+      "x": 27,
+      "y": 20,
+      "trench": {
+        "side": "own",
+        "kind": "comm",
+        "level": 1,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 28,
+      "y": 20,
+      "trench": {
+        "side": "own",
+        "kind": "comm",
+        "level": 1,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 29,
+      "y": 20,
+      "trench": {
+        "side": "own",
+        "kind": "comm",
+        "level": 1,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 30,
+      "y": 20,
+      "trench": {
+        "side": "own",
+        "kind": "comm",
+        "level": 1,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 31,
+      "y": 20,
+      "trench": {
+        "side": "own",
+        "kind": "comm",
+        "level": 1,
+        "facing": "E"
+      },
+      "wire": null
+    },
+    {
+      "x": 32,
+      "y": 20,
+      "trench": {
+        "side": "own",
+        "kind": "comm",
+        "level": 1,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 33,
+      "y": 20,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 39,
+      "y": 20,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 2,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 40,
+      "y": 20,
+      "trench": {
+        "side": "own",
+        "kind": "comm",
+        "level": 2,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 33,
+      "y": 21,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 34,
+      "y": 21,
+      "trench": {
+        "side": "own",
+        "kind": "comm",
+        "level": 2,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 35,
+      "y": 21,
+      "trench": {
+        "side": "own",
+        "kind": "comm",
+        "level": 2,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 36,
+      "y": 21,
+      "trench": {
+        "side": "own",
+        "kind": "comm",
+        "level": 2,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 37,
+      "y": 21,
+      "trench": {
+        "side": "own",
+        "kind": "comm",
+        "level": 2,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 38,
+      "y": 21,
+      "trench": {
+        "side": "own",
+        "kind": "comm",
+        "level": 2,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 39,
+      "y": 21,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 2,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 33,
+      "y": 22,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 39,
+      "y": 22,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 2,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 33,
+      "y": 23,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 33,
+      "y": 24,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 40,
+      "y": 24,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 33,
+      "y": 25,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 40,
+      "y": 25,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 33,
+      "y": 26,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 40,
+      "y": 26,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 34,
+      "y": 27,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 40,
+      "y": 27,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 34,
+      "y": 28,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 40,
+      "y": 28,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 34,
+      "y": 29,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 40,
+      "y": 29,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 34,
+      "y": 30,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 35,
+      "y": 30,
+      "trench": {
+        "side": "own",
+        "kind": "comm",
+        "level": 2,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 36,
+      "y": 30,
+      "trench": {
+        "side": "own",
+        "kind": "comm",
+        "level": 2,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 37,
+      "y": 30,
+      "trench": {
+        "side": "own",
+        "kind": "comm",
+        "level": 2,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 38,
+      "y": 30,
+      "trench": {
+        "side": "own",
+        "kind": "comm",
+        "level": 2,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 39,
+      "y": 30,
+      "trench": {
+        "side": "own",
+        "kind": "comm",
+        "level": 2,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 40,
+      "y": 30,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 34,
+      "y": 31,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 40,
+      "y": 31,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 34,
+      "y": 32,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 40,
+      "y": 32,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 34,
+      "y": 33,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 40,
+      "y": 33,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 34,
+      "y": 34,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 40,
+      "y": 34,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 34,
+      "y": 35,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 40,
+      "y": 35,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 34,
+      "y": 36,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 40,
+      "y": 36,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 34,
+      "y": 37,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 34,
+      "y": 38,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    }
+  ],
+  "mission": {
+    "id": "a4m4",
+    "lask": [
+      {
+        "from": 1,
+        "posture": "halten"
+      },
+      {
+        "from": 3,
+        "posture": "auto"
+      }
+    ]
+  },
+  "sides": {
+    "a": {
+      "faction": "kaldern",
+      "supplies": {
+        "carts": 4,
+        "cartsTotal": 6
+      },
+      "ai": {
+        "goals": {
+          "attack": {
+            "x": 47,
+            "y": 20
+          }
+        }
+      },
+      "refusal": true,
+      "groups": [
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 40,
+            "y": 10
+          },
+          "morale": 58
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 40,
+            "y": 14
+          },
+          "morale": 56
+        },
+        {
+          "type": "mg",
+          "pos": {
+            "x": 39,
+            "y": 19
+          },
+          "morale": 60
+        },
+        {
+          "type": "stormtroops",
+          "pos": {
+            "x": 39,
+            "y": 21
+          },
+          "morale": 62,
+          "experience": 2
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 40,
+            "y": 25
+          },
+          "morale": 56,
+          "leader": {
+            "name": "Otto Harms",
+            "home": "Ostmoor"
+          },
+          "harms": true
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 40,
+            "y": 29
+          },
+          "morale": 54
+        },
+        {
+          "type": "mg",
+          "pos": {
+            "x": 40,
+            "y": 33
+          },
+          "morale": 58
+        },
+        {
+          "type": "pioneers",
+          "pos": {
+            "x": 39,
+            "y": 18
+          },
+          "morale": 62,
+          "leader": {
+            "name": "Swantje Fedders",
+            "home": "Grauwarf"
+          }
+        },
+        {
+          "type": "medics",
+          "pos": {
+            "x": 33,
+            "y": 20
+          },
+          "morale": 68
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 39,
+            "y": 20
+          },
+          "strength": 4,
+          "morale": 80,
+          "experience": 1,
+          "leader": {
+            "name": "Ilse Brandt",
+            "home": "Haverstadt"
+          },
+          "brandt": true
+        }
+      ]
+    },
+    "b": {
+      "faction": "morrow",
+      "control": "ai",
+      "ai": {
+        "doctrine": "tiefe",
+        "difficulty": "veteran"
+      },
+      "supplies": {
+        "carts": 3,
+        "cartsTotal": 5
+      },
+      "artillery": {
+        "exchange": {
+          "x": 55,
+          "y": 20
+        },
+        "batteries": [
+          {
+            "id": "mb1",
+            "type": "feldhaubitzen",
+            "x": 56,
+            "y": 33,
+            "w": 2,
+            "h": 2,
+            "label": "Batterie Raudas Süd"
+          },
+          {
+            "id": "mb2",
+            "type": "feldhaubitzen",
+            "x": 56,
+            "y": 4,
+            "w": 2,
+            "h": 2,
+            "label": "Batterie Raudas Nord"
+          }
+        ],
+        "lines": [
+          {
+            "id": "m1",
+            "to": "Bahndamm",
+            "points": [
+              [
+                55,
+                20
+              ],
+              [
+                50,
+                20
+              ],
+              [
+                47,
+                20
+              ]
+            ]
+          },
+          {
+            "id": "m2",
+            "to": "mb1",
+            "points": [
+              [
+                55,
+                20
+              ],
+              [
+                56,
+                33
+              ]
+            ]
+          },
+          {
+            "id": "m3",
+            "to": "mb2",
+            "points": [
+              [
+                55,
+                20
+              ],
+              [
+                56,
+                5
+              ]
+            ]
+          }
+        ]
+      },
+      "groups": [
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 47,
+            "y": 9
+          }
+        },
+        {
+          "type": "mg",
+          "pos": {
+            "x": 47,
+            "y": 15
+          }
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 47,
+            "y": 20
+          }
+        },
+        {
+          "type": "mg",
+          "pos": {
+            "x": 47,
+            "y": 25
+          }
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 47,
+            "y": 31
+          }
+        }
+      ]
+    }
+  }
+}

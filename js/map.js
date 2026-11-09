@@ -211,6 +211,8 @@ export function lineOfSight(map, from, to, { eye = 1, target = 1 } = {}) {
 
 /** Bewegungskosten fuer das Betreten eines Feldes (Zehntel). Infinity = unpassierbar. */
 export function enterCost(cell) {
+  // P26: fertige Pionierbruecke ueber Wasser (state.cells[k].bridge, js/bridge.js BRIDGE.moveCost)
+  if (cell.bridge?.done) return cell.wire ? 42 : 12;
   let c = TERRAIN[cell.terrain].move;
   if (!Number.isFinite(c)) return Infinity;
   if (cell.building) return Infinity;

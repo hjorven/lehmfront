@@ -505,6 +505,57 @@ function plane(ac, out, p, t, rng) {
   return { end };
 }
 
+// Panzerwagen (P26): schwerer Motor im Leerlauf, dazu das Klirren der Ketten
+function engine(ac, out, p, t, rng) {
+  const dur = between(rng, 2.4, 3.2);
+  const g = gainNode(ac, out);
+  const lp = filter(ac, 'lowpass', 260, 1.4, g);
+  const end = envelope(g.gain, t, 0.4, 0.11 * p.gain, dur - 0.9, 0.5);
+  const f = between(rng, 38, 46);
+  const o = osc(ac, 'sawtooth', f, lp, t, end + 0.02);
+  o.frequency.setValueAtTime(f, t);
+  o.frequency.linearRampToValueAtTime(f * 1.25, t + dur * 0.5);
+  o.frequency.linearRampToValueAtTime(f * 0.9, end);
+  osc(ac, 'square', f * 0.5, lp, t, end + 0.02);
+  // Ketten: kurze, helle Klicks in unregelmaessigem Takt
+  let at = t + 0.3;
+  while (at < end - 0.2) {
+    tone(ac, out, at, { f0: between(rng, 1800, 2400), attack: 0.002, peak: 0.025 * p.gain, release: 0.05 });
+    at += between(rng, 0.11, 0.19);
+  }
+  return { end };
+}
+
+// Grosse Mine (P26): erst nichts, dann ein Grollen von unten, das lange nachrollt
+function mine(ac, out, p, t, rng) {
+  const g = gainNode(ac, out);
+  const lp = filter(ac, 'lowpass', 120, 0.8, g);
+  const start = t + 0.35;
+  const end = envelope(g.gain, start, 0.9, 0.9 * p.gain, 0.8, between(rng, 3.5, 4.5));
+  noise(ac, 'brown', lp, start, end + 0.02, rng);
+  lp.frequency.setValueAtTime(70, start);
+  lp.frequency.linearRampToValueAtTime(220, start + 1.0);
+  lp.frequency.linearRampToValueAtTime(90, end);
+  const o = osc(ac, 'sine', 31, lp, start, end + 0.02);
+  o.frequency.linearRampToValueAtTime(24, end);
+  return { end };
+}
+
+// Spaten auf leerer Granathuelse (P26, Waffenstillstand): drei helle, lange Schlaege
+function spade(ac, out, p, t, rng) {
+  const count = Number.isFinite(p.count) ? Math.max(1, Math.min(6, Math.floor(p.count))) : 3;
+  const base = between(rng, 410, 450);
+  let end = t;
+  let at = t;
+  for (let i = 0; i < count; i++) {
+    for (const [ratio, amp] of [[1, 0.12], [2.76, 0.06], [5.4, 0.025]]) {
+      end = Math.max(end, tone(ac, out, at, { f0: base * ratio, attack: 0.002, peak: amp * p.gain, release: 1.6 - ratio * 0.15 }));
+    }
+    at += between(rng, 0.9, 1.1);
+  }
+  return { end };
+}
+
 // Register: Name -> Funktion. Namen sind die API von playSfx.
 export const SOUNDS = {
   paper, pencil, stamp, teletype, tick,
@@ -515,6 +566,7 @@ export const SOUNDS = {
   rifle, whistle, flare, rain, wind, lore, steps,
   crow, cricket, drip, tinnitus,
   gasbell, flame, plane,
+  engine, mine, spade,
 };
 
 // Beschriftungen fuer Demo und spaetere Einstellungen. group ordnet die Knoepfe.
@@ -538,4 +590,7 @@ export const CATALOG = [
   { name: 'gasbell', label: 'Gasglocke', group: 'Front' },
   { name: 'flame', label: 'Flammenwerfer', group: 'Front' },
   { name: 'plane', label: 'Flieger', group: 'Front' },
+  { name: 'engine', label: 'Panzerwagen', group: 'Front' },
+  { name: 'mine', label: 'Große Mine', group: 'Front' },
+  { name: 'spade', label: 'Spaten auf Granathülse', group: 'Front' },
 ];

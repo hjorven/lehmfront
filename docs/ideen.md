@@ -42,3 +42,5 @@ Neue Ideen landen hier, nicht im Code (Plan 13). Mit Datum und Paket, aus dem si
 - 2026-11-09, P23: Gefangene aus einem Stoßtrupp könnten im nächsten Akt als Namen in der Feldpost der Gegenseite auftauchen.
 - 2026-11-09, P24: Die Gasglocke könnte nach einem Angriff verbeult sein und dann schiefer klingen; wer sie verliert, hört nur noch Rufe.
 - 2026-11-09, P24: Der Flieger könnte Fotos mitbringen, die als Fundstück-Fotos in der Ablage landen, mit Bleistiftkreisen um die Batterien (und um die eigene Attrappe, die drüben jemand für echt hielt).
+- 2026-11-09, P26: Das Wrack des Kastens könnte im Endlosmodus jede Jahreszeit anders aussehen (Rost, Gras, ein Vogelnest im Turm) und am Ende als Fundstück-Foto in der Ablage liegen.
+- 2026-11-09, P26: Nach dem Waffenstillstand könnte die Karte von Raudas noch einmal offen liegen, ohne Einheiten, nur mit den Bleistiftnamen der Gefallenen an den Feldern, wo sie fielen.

@@ -1,0 +1,334 @@
+{
+  "id": "akt4-m3",
+  "name": "Unter dem Hügel",
+  "map": "huegel214",
+  "act": 4,
+  "features": [
+    "tunnel"
+  ],
+  "startHour": 18,
+  "turnKind": "position",
+  "weather": {
+    "kind": "overcast",
+    "season": "fruehling",
+    "wind": {
+      "dir": "w",
+      "speed": 1
+    },
+    "wet": 1
+  },
+  "cells": [],
+  "mission": {
+    "id": "a4m3",
+    "lask": [
+      {
+        "from": 1,
+        "posture": "halten"
+      }
+    ]
+  },
+  "sides": {
+    "a": {
+      "faction": "kaldern",
+      "supplies": {
+        "carts": 4,
+        "cartsTotal": 6
+      },
+      "ai": {
+        "goals": {
+          "mine": true
+        }
+      },
+      "mine": {
+        "id": "mine214",
+        "label": "Große Mine",
+        "place": "Hügel 214",
+        "time": "04:10",
+        "gallery": [
+          {
+            "x": 31,
+            "y": 18
+          },
+          {
+            "x": 32,
+            "y": 18
+          },
+          {
+            "x": 33,
+            "y": 18
+          },
+          {
+            "x": 34,
+            "y": 18
+          },
+          {
+            "x": 35,
+            "y": 18
+          },
+          {
+            "x": 36,
+            "y": 18
+          },
+          {
+            "x": 37,
+            "y": 18
+          },
+          {
+            "x": 38,
+            "y": 18
+          },
+          {
+            "x": 39,
+            "y": 18
+          },
+          {
+            "x": 40,
+            "y": 18
+          }
+        ],
+        "chamber": {
+          "x": 41,
+          "y": 18
+        },
+        "fuse": 6
+      },
+      "groups": [
+        {
+          "type": "pioneers",
+          "pos": {
+            "x": 30,
+            "y": 18
+          },
+          "morale": 68,
+          "leader": {
+            "name": "Swantje Fedders",
+            "home": "Grauwarf"
+          }
+        },
+        {
+          "type": "listeners",
+          "pos": {
+            "x": 30,
+            "y": 16
+          },
+          "morale": 66,
+          "leader": {
+            "name": "Wiebke Albers",
+            "home": "Fennhusen"
+          }
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 29,
+            "y": 21
+          },
+          "morale": 64,
+          "leader": {
+            "name": "Otto Harms",
+            "home": "Ostmoor"
+          },
+          "harms": true
+        },
+        {
+          "type": "pioneers",
+          "pos": {
+            "x": 29,
+            "y": 23
+          },
+          "morale": 64
+        },
+        {
+          "type": "mg",
+          "pos": {
+            "x": 30,
+            "y": 12
+          },
+          "morale": 64
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 29,
+            "y": 26
+          },
+          "morale": 60
+        },
+        {
+          "type": "listeners",
+          "pos": {
+            "x": 29,
+            "y": 24
+          },
+          "morale": 60
+        }
+      ]
+    },
+    "b": {
+      "faction": "morrow",
+      "control": "ai",
+      "ai": {
+        "doctrine": "tiefe",
+        "difficulty": "veteran"
+      },
+      "supplies": {
+        "carts": 3,
+        "cartsTotal": 5
+      },
+      "artillery": {
+        "exchange": {
+          "x": 52,
+          "y": 19
+        },
+        "batteries": [
+          {
+            "id": "mb1",
+            "type": "feldhaubitzen",
+            "x": 54,
+            "y": 9,
+            "w": 2,
+            "h": 2,
+            "label": "Batterie Morrow 1"
+          },
+          {
+            "id": "mb2",
+            "type": "feldhaubitzen",
+            "x": 54,
+            "y": 27,
+            "w": 2,
+            "h": 2,
+            "label": "Batterie Morrow 2"
+          }
+        ],
+        "lines": [
+          {
+            "id": "m1",
+            "to": "Abschnitt Hügel",
+            "points": [
+              [
+                52,
+                19
+              ],
+              [
+                47,
+                18
+              ],
+              [
+                45,
+                18
+              ]
+            ]
+          },
+          {
+            "id": "m3",
+            "to": "mb1",
+            "points": [
+              [
+                52,
+                19
+              ],
+              [
+                54,
+                10
+              ]
+            ]
+          },
+          {
+            "id": "m4",
+            "to": "mb2",
+            "points": [
+              [
+                52,
+                19
+              ],
+              [
+                54,
+                27
+              ]
+            ]
+          }
+        ]
+      },
+      "groups": [
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 40,
+            "y": 22
+          }
+        },
+        {
+          "type": "mg",
+          "pos": {
+            "x": 40,
+            "y": 17
+          }
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 40,
+            "y": 19
+          }
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 40,
+            "y": 12
+          }
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 45,
+            "y": 18
+          }
+        },
+        {
+          "type": "listeners",
+          "pos": {
+            "x": 45,
+            "y": 21
+          }
+        }
+      ],
+      "tunnels": [
+        {
+          "group": "b01",
+          "path": [
+            {
+              "x": 39,
+              "y": 23
+            },
+            {
+              "x": 38,
+              "y": 22
+            },
+            {
+              "x": 37,
+              "y": 21
+            },
+            {
+              "x": 36,
+              "y": 21
+            },
+            {
+              "x": 35,
+              "y": 20
+            },
+            {
+              "x": 34,
+              "y": 20
+            },
+            {
+              "x": 33,
+              "y": 19
+            }
+          ],
+          "dug": 2
+        }
+      ]
+    }
+  }
+}

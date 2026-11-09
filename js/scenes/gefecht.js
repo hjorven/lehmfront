@@ -3,6 +3,7 @@
 // Parameter: scenario=asse-frei, mode=frei|hotseat, seed=<Zahl>, night=0..1 (erzwingt Dunkelheit),
 //   kind=battle (Gefechtsrunde testen), x, y, zoom (Kamera), demo=<Zustand fuer Screenshots>.
 import { loadMap, cellAt, cellLabel, applyCellState } from '../map.js';
+import { SEASONS } from '../config/seasons.js';
 import { captureTrench } from '../trench.js';
 import { initEtappen, withEtappe, etappeOf, plotAt } from '../etappe-map.js';
 import { createInitialState, groupsOf, getGroup, otherSide } from '../state.js';
@@ -196,7 +197,8 @@ export async function mount(root, params) {
   resizeCamera(cam, root.clientWidth, root.clientHeight);
   function homeView() {
     const own = groupsOf(state, side);
-    const cx = own.length ? own.reduce((s, g) => s + g.pos.x, 0) / own.length : map.width / 2;
+    // Szenario darf den Blick vorgeben (z. B. a4m5: das Ufer, nicht die Front), sonst Mitte der eigenen Gruppen
+    const cx = Number.isFinite(scenario.view?.x) ? scenario.view.x - (side === 'a' ? 4 : -4) : own.length ? own.reduce((s, g) => s + g.pos.x, 0) / own.length : map.width / 2;
     const vw = root.clientWidth, vh = root.clientHeight;
     if (vw < NARROW) centerOn(cam, side === 'a' ? cx + 4 : cx - 4, map.height * 0.42, Math.max(fitZoom(cam), vw / 20));
     // Tablet hochkant: Karte fuellt die Hoehe, Ausschnitt um die eigene Stellung bis ins Niemandsland
@@ -479,7 +481,9 @@ export async function mount(root, params) {
     const own = groupsOf(state, side);
     const morale = own.length ? Math.round(own.reduce((a, g) => a + g.morale, 0) / own.length) : 0;
     const daytime = state.night ? 'Nacht' : 'Tag';
-    const sector = map.sheet?.title?.replace(/^Lagekarte\s*/i, '') || map.name;
+    // Jahreszeit im Kartentitel nach dem Wetter der Lage (P26: Huegel 214 im Fruehjahr statt im Herbst)
+    const season = SEASONS[state.weather?.season]?.name;
+    const sector = (map.sheet?.title?.replace(/^Lagekarte\s*/i, '') || map.name).replace(/(Frühjahr|Frühling|Sommer|Herbst|Winter)$/, (m) => season ?? m);
     const orders = ordersNow();
     const battleNow = state.turnKind === 'battle';
     const clk = clockModel(state);

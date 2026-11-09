@@ -42,6 +42,12 @@ function crenel(ctx, x, h, amp, step, seed) {
   ctx.stroke();
 }
 
+/** Stempel je Ende des Feldzugs */
+export const ENDED_STAMPS = {
+  vorzeitig_meuterei: 'MEUTEREI', vorzeitig_abgeloest: 'ABGELÖST', abgeloest: 'ABGELÖST',
+  haelt: 'GEHALTEN', waffenstillstand: 'WAFFENSTILLSTAND', durchbruch: 'DURCHBRUCH',
+};
+
 /**
  * Zeichnen. opts: { campaign, next (naechste Mission oder null), ended, highlight (Mission unter dem Zeiger) }
  * Gibt die Trefferflaechen der Stationen zurueck: [{ m, x, y, r }].
@@ -235,15 +241,16 @@ export function drawWarMap(canvas, { campaign, next = null, ended = null, highli
     hits.push({ m, x, y, r: r + 4 });
   }
 
-  // Stempel bei vorzeitigem Ende
+  // Stempel am Ende des Feldzugs: rot bei Abloesung, Meuterei und Durchbruch, Tinte bei den stillen Enden (P26)
   if (ended) {
     ctx.save();
     ctx.translate(w / 2, h / 2);
     ctx.rotate(-0.12);
-    ctx.strokeStyle = C.danger;
-    ctx.fillStyle = C.danger;
+    const quiet = ended === 'haelt' || ended === 'waffenstillstand';
+    ctx.strokeStyle = quiet ? C.ink : C.danger;
+    ctx.fillStyle = quiet ? C.ink : C.danger;
     ctx.lineWidth = 4;
-    const label = ended === 'vorzeitig_meuterei' ? 'MEUTEREI' : 'ABGELÖST';
+    const label = ENDED_STAMPS[ended] ?? 'ABGELÖST';
     ctx.font = `${small ? 30 : 54}px ${FONT_HEAD}`;
     const tw = ctx.measureText(label).width;
     ctx.globalAlpha = 0.85;

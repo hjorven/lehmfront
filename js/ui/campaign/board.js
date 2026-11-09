@@ -16,6 +16,14 @@ const STAMP_MARK = { befolgen: 'VERSTANDEN', umdeuten: 'RÜCKFRAGE', verweigern:
 const sign = (n) => (n > 0 ? '+' + n : n < 0 ? '−' + Math.abs(n) : '±0');
 
 /** Telegrammtext in Zeilen (ein Satz je Zeile, mit STOP) */
+/** Unterzeile der Feldzugskarte nach dem Ende (P26) */
+const ENDED_HEAD = {
+  haelt: 'Der Abschnitt hält. Der Feldzug ist zu Ende.',
+  waffenstillstand: 'Waffenstillstand im Abschnitt. Der Feldzug ist zu Ende.',
+  durchbruch: 'Durchbruch bei Raudas. Der Feldzug ist zu Ende.',
+  abgeloest: 'Abgelöst am letzten Tag. Der Feldzug ist zu Ende.',
+};
+
 export function telegramLines(text) {
   return String(text ?? '').split(/\s*STOP\s*/).map((s) => s.trim()).filter(Boolean).map((s) => s + ' STOP');
 }
@@ -111,7 +119,7 @@ export function createBoard(root, opts) {
     const title = m ? missionTitle(index, m) : '';
     $('.fz-head').innerHTML = `<span class="k">Feldzugskarte · Abschnitt ${esc(sector)}</span>
       <b class="fz-title">Akt ${actRoman(act)}${actCard?.titel ? ' · ' + esc(actCard.titel.replace(/^Akt\s+\d+\s*:\s*/, '')) : ''}</b>
-      <span class="fz-sub">${campaign.ended ? 'Der Feldzug ist für Brandt zu Ende.' : m ? `Nächster Einsatz ${missionShort(m)}: ${esc(title)}${missionBuilt(m) ? '' : ' <i>(Übungslage an der Asse)</i>'}` : 'Alle Einsätze gespielt.'}</span>`;
+      <span class="fz-sub">${campaign.ended ? (ENDED_HEAD[campaign.ended] ?? 'Der Feldzug ist für Brandt zu Ende.') : m ? `Nächster Einsatz ${missionShort(m)}: ${esc(title)}${missionBuilt(m) ? '' : ' <i>(Übungslage an der Asse)</i>'}` : 'Alle Einsätze gespielt.'}</span>`;
   }
 
   function renderAxes() {

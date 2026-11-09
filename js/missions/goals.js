@@ -6,6 +6,10 @@ import { compareId } from '../state.js';
 const key = (x, y) => x + ',' + y;
 
 /** Kartenseite einer Spielseite */
+/** Zeilen fuer den Auftragszettel aus spaeteren Akten: registerGoalLines('a4m1', (ctx) => [{ text, done, warn? }]) */
+export const GOAL_LINES = new Map();
+export function registerGoalLines(mission, fn) { GOAL_LINES.set(mission, fn); }
+
 export const mapSideOf = (side) => (side === 'a' ? 'own' : 'enemy');
 
 /** Gespielte Stellungsrunden (Gefechtsrunden zaehlen nicht, sie dauern nur Minuten) */

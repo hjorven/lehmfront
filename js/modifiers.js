@@ -10,6 +10,7 @@
 //   'spot'    Zuschlag in Prozentpunkten auf die Chance, einen Stosstrupp zu entdecken (ctx: group = Posten oder Trupp)
 //   'exit'    true = kommt ohne Wartezeit aus dem Unterstand
 //   'dig'     Prozent auf das Grabtempo
+//   'armor'   Prozent auf Treffer und Unterdrueckung eines Schusses (P26: Panzerwagen), ctx { state, map, shooter, target }
 // fn(ctx) -> Zahl | null (null = keine Wirkung)
 const mods = new Map(); // art -> Map(id -> fn)
 
