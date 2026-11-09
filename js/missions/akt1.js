@@ -17,7 +17,7 @@ export const AKT1 = {
   a1m2: { rounds: 4 },
   a1m3: { rounds: 5, ammoRounds: 6, depotEmpty: 2 },
   a1m4: { rounds: 4, target: 'nest', silent: 2 },
-  a1m5: { rounds: 5, kuhle: [{ x: 24, y: 24 }, { x: 24, y: 25 }, { x: 24, y: 26 }, { x: 24, y: 27 }] },
+  a1m5: { rounds: 5, fit: 30, kuhle: [{ x: 24, y: 24 }, { x: 24, y: 25 }, { x: 24, y: 26 }, { x: 24, y: 27 }] },
   a1m6: { rounds: 8, tolerate: 2, harms: 'Otto Harms' },
 };
 
@@ -116,8 +116,9 @@ registerMissionJudge('a1m4', (ctx) => {
 
 export function kuhleStatus(map, state, side, cfg = AKT1.a1m5) {
   const held = heldCells(map, state, side, cfg.kuhle).length;
-  const men = groupsAt(state, side, cfg.kuhle, 1).length;
-  return { held, total: cfg.kuhle.length, men, ok: held === cfg.kuhle.length && men > 0 };
+  const there = groupsAt(state, side, cfg.kuhle, 1);
+  const men = there.filter((g) => g.morale >= cfg.fit).length;
+  return { held, total: cfg.kuhle.length, men, worn: there.length - men, ok: held === cfg.kuhle.length && men > 0 };
 }
 
 registerMissionJudge('a1m5', (ctx) => {
@@ -128,6 +129,7 @@ registerMissionJudge('a1m5', (ctx) => {
   if (played >= cfg.rounds || ctx.final) {
     if (k.ok && played >= cfg.rounds) return { outcome: 'sieg', orderMet: true, why: 'Die Lehmkuhle ist gehalten, bis der Regen aufhört' };
     if (k.held < k.total) return { outcome: 'niederlage', orderMet: false, why: 'Die Lehmkuhle ist verloren' };
+    if (!k.men && k.worn) return { outcome: 'niederlage', orderMet: false, why: 'Die Leute in der Lehmkuhle sind am Ende, niemand löste sie ab' };
     if (!k.men) return { outcome: 'niederlage', orderMet: false, why: 'Niemand mehr in der Lehmkuhle' };
     return { outcome: 'niederlage', orderMet: false, why: `Vor dem Ende des Regens gemeldet (${cfg.rounds} Stellungsrunden)` };
   }
@@ -146,7 +148,7 @@ registerMissionJudge('a1m6', (ctx) => {
     if (played >= cfg.rounds && lost <= cfg.tolerate) {
       return {
         outcome: 'sieg', orderMet: lost === 0, flags,
-        why: lost ? `Bis zur Ablösung gehalten, ${plural(lost, 'Grabenfeld', 'Grabenfelder')} bleiben drüben` : 'Bis zur Ablösung gehalten, kein Graben verloren',
+        why: lost ? `Bis zur Ablösung gehalten, ${plural(lost, 'Grabenfeld bleibt', 'Grabenfelder bleiben')} drüben` : 'Bis zur Ablösung gehalten, kein Graben verloren',
       };
     }
     return {
@@ -206,7 +208,7 @@ export function goalLines({ mission, state, rounds, side = 'a', map }) {
       const cfg = AKT1.a1m5;
       const k = kuhleStatus(map, state, side, cfg);
       return [
-        { text: `Lehmkuhle: ${k.held} von ${k.total} Feldern, ${k.men ? plural(k.men, 'Gruppe', 'Gruppen') + ' darin' : 'niemand darin'}`, done: k.ok, warn: !k.ok },
+        { text: `Lehmkuhle: ${k.held} von ${k.total} Feldern, ${k.men ? plural(k.men, 'frische Gruppe', 'frische Gruppen') + ' darin' : k.worn ? 'nur noch Erschöpfte darin' : 'niemand darin'}`, done: k.ok, warn: !k.ok },
         { text: `Halten bis der Regen aufhört: ${due(cfg.rounds)}`, done: played >= cfg.rounds && k.ok },
       ];
     }

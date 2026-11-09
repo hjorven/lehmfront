@@ -66,6 +66,7 @@ import { loadBattle } from '../modes/load.js';
 import { attachModeRules } from '../ui/result.js';
 import { attachGameMenu, resumeGame } from '../ui/gamemenu.js';
 import { campaignMission } from '../ui/campaign/mission.js';
+import { prepareMission, missionAi, withMissionOrders } from '../missions/script.js';
 
 const num = (v, d) => (v === null || v === '' || !Number.isFinite(Number(v)) ? d : Number(v));
 const LONG_PRESS_MS = 430;
@@ -92,9 +93,10 @@ export async function mount(root, params) {
   const seed = battle.seed ?? ((num(params.get('seed'), 1917) >>> 0) || 1);
   let state = createInitialState(map, scenario, seed);
   state = initEtappen(state, map, scenario); // P11: Etappe mit Grundausbau aus dem Szenario
+  state = prepareMission(state, scenario); // P16: Ablaufplan einer Kampagnenmission (Lask, Wetter), sonst unveraendert
   // P14: Einsatz aus der Kampagne (Ansehen, Vertrauen, Berichte, Nachschub, Ersatz), sonst null
   const campaignRun = campaignMission(params);
-  if (campaignRun) state = campaignRun.prepare(state);
+  if (campaignRun) state = campaignRun.prepare(state, map);
   if (!fixed && params.get('kind') === 'battle') { state.turnKind = 'battle'; state.battle = { round: 1 }; }
   if (!fixed) applyWeatherParams(state, map, params);
   // P18: Spielstand aus ?slot= ersetzt den Startzustand; Archiv und KI-Gedaechtnis folgen weiter unten
@@ -833,10 +835,10 @@ export async function mount(root, params) {
     let ordersB;
     if (humans.includes('b')) ordersB = withPlans('b', listOrders(book, 'b'));
     else {
-      const d = aiNext?.turn === state.turn ? aiNext.decision : decide(viewFor(state, lastLog, 'b', env), { map, seed, ...aiCfg, memory: aiMemory });
+      const d = aiNext?.turn === state.turn ? aiNext.decision : decide(viewFor(state, lastLog, 'b', env), { map, seed, ...aiCfg, ...missionAi(state), memory: aiMemory });
       aiMemory = d.memory;
       const fresh = new Set(d.orders.map((o) => o.group).filter(Boolean));
-      ordersB = [...d.orders, ...listOrders(book, 'b').filter((o) => o.carried && !fresh.has(o.group))];
+      ordersB = withMissionOrders([...d.orders, ...listOrders(book, 'b').filter((o) => o.carried && !fresh.has(o.group))], state);
     }
     const input = { state, ordersA, ordersB, seed, turn: state.turn, env };
     const r = resolveTurn(state, ordersA, ordersB, seed, state.turn, env);
@@ -851,7 +853,7 @@ export async function mount(root, params) {
     aiNext = null;
     if (!humans.includes('b') && !state.result) {
       const lv = viewFor(state, lastLog, 'b', env);
-      const d = decide(lv, { map, seed, ...aiCfg, memory: aiMemory });
+      const d = decide(lv, { map, seed, ...aiCfg, ...missionAi(state), memory: aiMemory });
       aiNext = { turn: state.turn, decision: d };
       pendingNote = maybeIntercept({ decision: d, laskView: lv, playerView: viewFor(state, lastLog, 'a', env), seed, difficulty: d.difficulty });
     }

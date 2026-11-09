@@ -226,6 +226,8 @@ export function buildM5() {
     wire: m.wire.filter((w) => !taken.has(key(w.x, w.y)) && !(w.side === 'own' && w.y >= 23 && w.y <= 28)),
   };
   m = raiseOwn(m, 2);
+  // Die Kuhle gehoert zur eigenen Stellung (ablösen geht nur dort)
+  m = { ...m, zones: m.zones.map((row, y) => (y >= 23 && y <= 28 ? row.slice(0, FRONT_X + 2) + 'SS' + row.slice(FRONT_X + 4) : row)) };
   return finish(m, 'akt1-m5', 'Asse-Nord, Lehmkuhle', {
     sheet: { ...m.sheet, blatt: 'Blatt 3, Tag 19' },
     labels: placeLabels(m),

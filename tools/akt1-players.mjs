@@ -1,7 +1,7 @@
 // Spielerinnen fuer den Missions-Simulator (P16): je Mission eine, die den Auftrag ernst nimmt ("gut"), und eine,
 // die es nicht tut ("passiv" oder "falsch"). Belegt, dass jede Mission gewinnbar und verlierbar ist
 // (test/akt1.test.js, tools/missions.mjs). Rein: Befehle aus Spielzustand und Sicht, kein Zufall.
-import { cellAt } from '../js/map.js';
+import { cellAt, findPath } from '../js/map.js';
 import { liveMap, trenchesLost } from '../js/missions/goals.js';
 import { supplyOf, depotAfterIncome, capacityOf, sectionsOf, frontGroups, upkeepOf, woundedCount } from '../js/supply.js';
 import { CART_LOAD } from '../js/config/supply.js';
@@ -104,21 +104,32 @@ function knownFoe(view, id) {
 }
 
 PLAYERS.a1m4 = {
-  // Beobachter nach vorn in die Muehle, dann Stoerfeuer beider Batterien auf das Nest, sobald es gesehen ist
+  // Beobachter nach vorn, dann ein Stosstrupp gegen das Nest mit Vorbereitungsfeuer beider Batterien darauf;
+  // im Gefecht schiesst der Moerser auf das Nest
   gut: (ctx) => {
-    const { state, view } = ctx;
-    if (state.turnKind !== 'position') return ctx.ai({});
+    const { state, view, map } = ctx;
+    // Ohne Sicht gilt die Meldung aus dem Briefing: das MG liegt vor dem Heuwagen
+    const nest = knownFoe(view, 'nest') ?? { pos: { x: 31, y: 14 }, seen: false };
+    if (state.turnKind !== 'position') {
+      const orders = ctx.ai({}).filter((o) => o.group !== ofType(state, 'mortar')[0]?.id);
+      const mortar = ofType(state, 'mortar')[0];
+      if (mortar && nest) orders.push({ group: mortar.id, type: 'fire', target: { ...nest.pos } });
+      return orders;
+    }
     const orders = ctx.ai({ posture: 'halten' }).filter((o) => o.type !== 'fire_plan');
+    const take = (g) => { const i = orders.findIndex((o) => o.group === g.id); if (i >= 0) orders.splice(i, 1); };
     const obs = ofType(state, 'observers')[0];
     if (obs && (obs.pos.x !== 22 || obs.pos.y !== 14)) {
-      const i = orders.findIndex((o) => o.group === obs.id);
-      if (i >= 0) orders.splice(i, 1);
+      take(obs);
       orders.push({ group: obs.id, type: 'redeploy', path: [{ x: 17, y: 13 }, { x: 18, y: 13 }, { x: 19, y: 13 }, { x: 20, y: 13 }, { x: 21, y: 13 }, { x: 22, y: 14 }] });
+      return orders;
     }
-    const nest = knownFoe(view, 'nest');
     const bats = (state.sides.a.artillery?.batteries ?? []).map((b) => b.id).sort();
     if (nest && bats.length) {
-      orders.push({ type: 'fire_plan', plans: bats.map((b, i) => ({ id: 'nest' + i, kind: 'harass', batteries: [b], target: { ...nest.pos } })) });
+      orders.push({ type: 'fire_plan', plans: [{ id: 'nest', kind: 'prep', batteries: bats, a: { x: nest.pos.x, y: nest.pos.y - 2 }, b: { x: nest.pos.x, y: nest.pos.y + 2 }, dir: 'E', start: 1, rounds: 3 }] });
+      const raider = ofType(state, 'rifles').sort((p, q) => Math.abs(p.pos.y - nest.pos.y) - Math.abs(q.pos.y - nest.pos.y))[0];
+      const path = raider && findPath(map, raider.pos, nest.pos)?.path?.slice(1);
+      if (path?.length) { take(raider); orders.push({ group: raider.id, type: 'attack', path }); }
     }
     return orders;
   },
@@ -126,6 +137,66 @@ PLAYERS.a1m4 = {
   falsch: (ctx) => {
     const bats = (ctx.state.sides.a.artillery?.batteries ?? []).map((b) => b.id).sort();
     return ctx.state.turnKind === 'position' && bats.length ? [{ type: 'fire_plan', plans: [{ id: 'gestern', kind: 'harass', batteries: [bats[0]], target: { x: 33, y: 10 } }] }] : [];
+  },
+  passiv: () => [],
+};
+
+const KUHLE = [{ x: 24, y: 24 }, { x: 24, y: 25 }, { x: 24, y: 26 }, { x: 24, y: 27 }];
+
+PLAYERS.a1m5 = {
+  // Kuhle besetzt halten, muede Gruppen abloesen (KI-Regel "zu lange vorn"), verlorene Felder zurueckholen
+  gut: (ctx) => {
+    const { state, map } = ctx;
+    if (state.turnKind !== 'position') return ctx.ai({});
+    if (trenchesLost(map, state, 'a').length) return ctx.ai({ posture: 'gegenstoss' });
+    const back = (g) => cellAt(map, g.pos.x, g.pos.y)?.zone === 'etappe';
+    const resting = new Set(own(state).filter((g) => g.status === 'rest' || back(g)).map((g) => g.id));
+    const orders = ctx.ai({ posture: 'halten' }).filter((o) => !resting.has(o.group) && !resting.has(o.by));
+    const inside = own(state).filter((g) => KUHLE.some((p) => p.x === g.pos.x && p.y === g.pos.y));
+    // Erschoepfte in der Kuhle gegen Ausgeruhte aus dem Ruhelager tauschen
+    const fresh = own(state).filter((g) => resting.has(g.id) && g.morale >= 50);
+    for (const g of inside.filter((x) => x.morale < 45).sort((p, q) => p.morale - q.morale)) {
+      const by = fresh.shift();
+      if (!by) break;
+      const i = orders.findIndex((o) => o.group === g.id || o.group === by.id);
+      if (i >= 0) orders.splice(i, 1);
+      orders.push({ group: g.id, type: 'relieve', by: by.id });
+    }
+    if (inside.length < 2) {
+      const free = KUHLE.find((p) => !own(state).some((g) => g.pos.x === p.x && g.pos.y === p.y));
+      const busy = new Set(orders.filter((o) => o.type === 'relieve').flatMap((o) => [o.group, o.by]));
+      const cand = own(state).filter((g) => g.type === 'rifles' && g.status !== 'rest' && !busy.has(g.id) && !inside.includes(g))
+        .sort((p, q) => Math.abs(p.pos.y - 25) - Math.abs(q.pos.y - 25))[0];
+      const path = cand && free && findPath(map, cand.pos, free)?.path?.slice(1);
+      if (path?.length) {
+        const i = orders.findIndex((o) => o.group === cand.id);
+        if (i >= 0) orders.splice(i, 1);
+        orders.push({ group: cand.id, type: 'redeploy', path });
+      }
+    }
+    return orders;
+  },
+  // Zieht die Leute aus dem Wasser auf trockenen Boden zurueck (gegen den Befehl des Stabs)
+  falsch: (ctx) => {
+    const { state, map } = ctx;
+    if (state.turnKind !== 'position') return [];
+    const out = [];
+    for (const g of own(state).filter((x) => x.pos.x === 24)) {
+      const path = findPath(map, g.pos, { x: 18, y: g.pos.y })?.path?.slice(1);
+      if (path?.length) out.push({ group: g.id, type: 'redeploy', path });
+    }
+    return out;
+  },
+  passiv: () => [],
+};
+
+PLAYERS.a1m6 = {
+  // Halten, ablösen, was zu lange vorn ist (KI-Regel), jeden verlorenen Graben sofort zurückholen
+  gut: (ctx) => {
+    const { state, map } = ctx;
+    if (state.turnKind !== 'position') return ctx.ai({});
+    if (trenchesLost(map, state, 'a').length) return ctx.ai({ posture: 'gegenstoss' });
+    return ctx.ai({ posture: 'halten' });
   },
   passiv: () => [],
 };

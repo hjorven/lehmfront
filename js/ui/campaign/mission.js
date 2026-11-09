@@ -13,6 +13,7 @@ import { registerCue } from '../../audio/cues.js';
 import { playSfx } from '../../audio/engine.js';
 import { esc, ensureCss } from '../dom.js';
 import { loadCampaign, loadMissionStart, saveMissionReturn } from './store.js';
+import '../../missions/index.js'; // Missionsziele der Akte (P16 ff.)
 
 // Klang der neuen Ereignisse im Phasenfilm
 registerCue('mutiny', () => [{ name: 'hush' }, { name: 'paper', opts: { intensity: 0.6 }, delay: 0.4 }]);
@@ -47,6 +48,7 @@ export function campaignMission(params) {
   let pending = null;          // entschiedenes Ende, wartet auf das Ende des Phasenfilms
   let dialogOpen = false;
   let setModal = () => {};
+  let mapRef = null;           // Grundkarte fuer Missionsziele (Linie, Graeben)
 
   function finish(result, state, archive, ui) {
     if (ended) return;
@@ -95,7 +97,8 @@ export function campaignMission(params) {
   return {
     mission,
     campaign,
-    prepare(state) {
+    prepare(state, map = null) {
+      mapRef = map;
       const s = applyCampaignToState(state, { ...campaign, mission }, side);
       startValues = startAxes(s, side);
       return s;
@@ -115,7 +118,7 @@ export function campaignMission(params) {
         if (isBusy() || ended || dialogOpen) return;
         const state = getState();
         const archive = getArchive();
-        const r = judgeMission(mission, { state, rounds: archive.rounds, side, final: true });
+        const r = judgeMission(mission, { state, rounds: archive.rounds, side, final: true, map: mapRef });
         playSfx('paper', { intensity: 0.5 });
         dialog(ui, {
           title: 'Einsatz melden',
@@ -132,7 +135,7 @@ export function campaignMission(params) {
     /** Nach jeder Runde: ist der Einsatz entschieden, wird das fuer das Ende des Phasenfilms vorgemerkt */
     afterRound(state, archive) {
       if (ended || pending) return;
-      const r = judgeMission(mission, { state, rounds: archive.rounds, side, final: false });
+      const r = judgeMission(mission, { state, rounds: archive.rounds, side, final: false, map: mapRef });
       if (r?.done) pending = { r, state, archive };
     },
     /** Nach dem Phasenfilm: der Enddialog (die Spielerin sieht erst, wie es ausging) */
