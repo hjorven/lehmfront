@@ -146,6 +146,7 @@ export function createPanel(aside, { onPick, onBuild, onChooseReward, onRepair, 
       btn.dataset.fk = 'opt-' + o.type;
       btn.setAttribute('aria-pressed', String(o === current));
       btn.append(h('b', null, o.name));
+      if (BUILDINGS[o.type]?.effect) btn.append(h('span', 'fx', BUILDINGS[o.type].effect));
       btn.append(h('span', 'y', yieldLine(o.own.base, o.own.every)));
       for (const bo of o.own.bonus) btn.append(h('em', null, bo.reason));
       for (const m of o.own.missing) btn.append(h('em', 'no', m));

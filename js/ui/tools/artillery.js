@@ -77,7 +77,7 @@ registerTool({
         preview: () => null,
         pick: (cell) => ed.tap(cell),
       });
-    }).catch(() => { ctx.hint('Feuerplan-Editor konnte nicht geladen werden.'); ctx.cancel(); });
+    }).catch((err) => { console.error(err); ctx.hint('Feuerplan-Editor konnte nicht geladen werden.'); ctx.cancel(); });
     ctx.onEnd?.(() => {
       ended = true;
       ed?.close();

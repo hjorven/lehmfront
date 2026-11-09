@@ -24,3 +24,8 @@ body[data-scene="handbuch"]{overflow:auto;height:auto;min-height:100%}
 .hb-foot{padding-top:20px}
 @media print{.hb-actions,.hb-foot,.hb-toc{display:none}}
 .hb-unlock{margin:12px 0 0;padding:10px 12px;border-left:3px solid var(--ink);background:var(--card);font:400 15px/1.45 var(--font-ui)}
+.hb-lead{margin:0 0 12px;font:400 15px/1.45 var(--font-ui);color:var(--ink2);max-width:70ch}
+.hb-how{display:grid;gap:8px}
+.hb-how details{border:var(--border);background:var(--card);padding:0 14px}
+.hb-how summary{cursor:pointer;min-height:44px;display:flex;align-items:center;font:700 15px/1.3 var(--font-ui)}
+.hb-how ol{margin:0 0 12px;padding-left:1.3em;display:grid;gap:6px;font:400 15px/1.45 var(--font-ui)}

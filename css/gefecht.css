@@ -93,6 +93,8 @@
 .shield header b{font:400 16px/1.2 var(--font-head)}
 .shield header span{font-size:12.5px;color:var(--ink2)}
 .shield .type{font-size:12px;color:var(--ink2);margin-bottom:5px}
+.shield .role{margin:0 0 6px;font:400 12.5px/1.35 var(--font-ui);color:var(--ink);max-width:250px}
+.shield.compact .role{display:none}
 .shield .rows div{display:flex;justify-content:space-between;padding:1px 0}
 .shield .rows b{font-family:var(--font-num)}
 .shield footer{display:flex;justify-content:space-between;gap:10px;margin-top:6px;padding-top:6px;border-top:1px dashed var(--line);font-size:13px}

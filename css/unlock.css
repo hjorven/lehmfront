@@ -14,3 +14,19 @@
 /* Einsteiger-Ansicht: weniger Knoepfe, solange Befehle gestuft sind (js/unlocks.js) */
 .novice-early .ov-btn,.novice-early .card.overlays,.novice-early .snd-btn,.novice-early .bare-btn{display:none !important}
 .no-axes .hud .axes{display:none !important}
+/* Feldinfo (js/ui/fieldinfo.js) */
+.field-card{position:absolute;left:calc(50% - 160px);top:100px;width:min(310px,calc(100% - 24px));z-index:6;padding:10px 14px 10px;background:var(--card);color:var(--ink);border:var(--border);box-shadow:var(--shadow)}
+.field-card[hidden]{display:none}
+.filming .field-card{display:none}
+.field-card header{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.field-card header b{font:400 17px/1.2 var(--font-head)}
+.fc-x{min-width:36px;min-height:36px;border:0;background:transparent;color:var(--ink2);font:600 20px var(--font-ui);cursor:pointer}
+.field-card dl{margin:0;display:grid;gap:6px}
+.field-card dl div{display:grid;grid-template-columns:72px 1fr;gap:8px}
+.field-card dt{font:500 12px/1.4 var(--font-num);color:var(--ink2)}
+.field-card dd{margin:0;font:400 13px/1.35 var(--font-ui)}
+.field-card dd b{display:block;font-weight:700}
+.field-card dd span{display:block;color:var(--ink)}
+.fc-tip{margin:8px 0 0;font:600 16px/1.2 var(--font-hand);color:var(--ink2)}
+@media (max-width:700px){.field-card{left:8px !important;right:8px;top:auto !important;width:auto;top:auto;bottom:calc(88px + env(safe-area-inset-bottom));max-height:45vh;overflow:auto}}
+.un-more{margin:0 0 8px;font:600 16px/1.2 var(--font-hand);color:var(--ink2)}

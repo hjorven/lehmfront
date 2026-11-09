@@ -45,6 +45,12 @@ const SHOTS = [
   ['24-handy-gefecht', '/?scene=gefecht&demo=befehle', HANDY],
   ['25-erste-befehle', '/?scene=gefecht&karte=velde&ki=rekrut', DESK],
   ['26-schnee-akt3', '/?scene=gefecht&scenario=akt3-m1&seed=5', DESK],
+  ['27-pause', '/?scene=gefecht&demo=pause', DESK],
+  ['28-nachschlagen', '/?scene=gefecht&demo=nachschlagen', DESK],
+  ['29-feldinfo', '/?scene=gefecht&demo=feldinfo', DESK],
+  ['30-grundausbildung-teil2', DRILL + '3&teil=2', DESK],
+  ['31-feuerplan-neu', '/?scene=gefecht&demo=feuerplan-leer', DESK],
+  ['32-etappe-bauen', '/?scene=gefecht&demo=etappe', DESK],
 ];
 
 mkdirSync(OUT, { recursive: true });

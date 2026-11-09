@@ -69,7 +69,7 @@ export async function resumeGame(params) {
  * snapshot() -> { state, map, archive, aiMemory, lastLog, rules, side }; busy() -> null | Grund, warum gerade nicht.
  * Liefert { open(tab), autosave(), get open }.
  */
-export function attachGameMenu({ ui, params, snapshot, busy, canOpen = () => true, ended = () => false, onOpen = () => {}, onClose = () => {} }) {
+export function attachGameMenu({ ui, params, snapshot, busy, canOpen = () => true, ended = () => false, onOpen = () => {}, onClose = () => {}, onMenu = null }) {
   ensureCss('css/einstellungen.css');
   const query = saveQuery(params);
   const keyP = resumeKeyFor(params);
@@ -78,14 +78,14 @@ export function attachGameMenu({ ui, params, snapshot, busy, canOpen = () => tru
     b.type = 'button';
     b.className = 'btn ' + cls;
     b.setAttribute('aria-haspopup', 'dialog');
-    b.setAttribute('aria-keyshortcuts', 'O');
-    b.innerHTML = 'Menü <kbd>O</kbd>';
-    b.addEventListener('click', () => open());
+    b.setAttribute('aria-keyshortcuts', onMenu ? 'Escape' : 'O');
+    b.innerHTML = onMenu ? 'Menü <kbd>Esc</kbd>' : 'Menü <kbd>O</kbd>';
+    b.addEventListener('click', () => (onMenu ? onMenu() : open()));
     return b;
   };
   ui.querySelector('.hud-right')?.prepend(mk('menu-btn'));
   const sheetBtn = mk('menu-card');
-  sheetBtn.innerHTML = 'Dienstbuch <small>Spielstände, Klang, Darstellung</small>';
+  sheetBtn.innerHTML = onMenu ? 'Menü <small>Pause, Nachschlagen, Speichern</small>' : 'Dienstbuch <small>Spielstände, Klang, Darstellung</small>';
   ui.querySelector('.hud-sheet')?.append(sheetBtn);
 
   const save = async (slot, label = '') => {

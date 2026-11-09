@@ -4,6 +4,13 @@ Jeder Thread traegt hier nach dem Merge ein, was fertig ist und was offen bleibt
 
 ## Fertig
 
+- 1.8.0 Erklären (`CHANGELOG.md`):
+  - Texte in `js/config/help.js` (`UNIT_HELP`, `TERRAIN_HELP`, `MAP_BUILDING_HELP`, `HOW_TO`). Handbuch-Inhalt als `js/ui/handbook-view.js` (Szene und Pausenmenü teilen ihn).
+  - Pausenmenü `js/ui/pause-menu.js` (`css/pause.css`): Esc am Ende der Esc-Kette, Knopf „Menü“ und Menüeintrag der Handy-Leiste (`onMenu` in `attachGameMenu`); Taste O öffnet weiter direkt das Dienstbuch. `modal` aus `js/ui/commit.js` exportiert.
+  - Feldinfo `js/ui/fieldinfo.js` (rein: `fieldInfo(map, state, x, y, side)`), Kärtchen beim Antippen eines Feldes ohne Gruppe (sofern es kein eigenes Etappengebäude mit freigeschaltetem Etappe-Befehl ist).
+  - Grundausbildung Teil 2: `DRILL2_STEPS`, `DRILL2_PATH` (`&teil=2`), eigener Fortschritt `lehmfront.ausbildung2`, Ende hebt auf Stufe 5. `attachDrill` nimmt `steps`, `key`, `finalLevel`, `part`; Schritte mit `place: 'right'`.
+  - Feuerplan-Editor: Absturz ohne vorhandenen Plan behoben (`addPlan` vor dem Planblatt), Fehler beim Laden landen jetzt in der Konsole. Demos `feuerplan-leer`, `pause`, `nachschlagen`, `feldinfo` (in der CI).
+
 - 1.7.0 Einsteiger: Befehle Schritt für Schritt (`CHANGELOG.md`):
   - `js/unlocks.js` (rein bis auf den Stand im Browser): Stufen `STAGES`, `allowedTools(ctx)` je Modus, `offered`, `hiddenChecks` (Prüfpunkte zu gesperrten Befehlen), `orderAllowed` (Lehrling), `TOOL_HELP`. Stand in `localStorage` `lehmfront.freigabe` (Startwert beim ersten Laden in `js/boot.js`: Neue 0, wer schon Spielstände hat 5), vorgestellte Befehle in `lehmfront.freigabe.gesehen`. Einstellung `orders` (`auto`/`all`) im Dienstbuch.
   - Gefecht: Werkzeugreihe, Befehlskreis und Tasten nur mit erlaubten Befehlen; Akt-1-Mission n hebt auf Stufe n; Zettel „Neu freigeschaltet“ (`js/ui/unlock-note.js`, `css/unlock.css`) erst, wenn das Gefecht steht; Klassen `novice`, `novice-early`, `no-axes` am Gefecht. `window.__gefecht.allowed` und `allowTools(ids)` für die Grundausbildung.

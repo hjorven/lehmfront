@@ -6,7 +6,7 @@ import { dayKey, dayLabel } from './modes/skirmish.js';
 import { boardFor } from './modes/board.js';
 import { AFTERMATH, campaignAftermath } from './aftermath.js';
 
-export const VERSION = '1.7.0';
+export const VERSION = '1.8.0';
 const FIELD_DAY_KEY = 'lehmfront.berichtigt'; // Druckvermerk auf dem Titelblatt (P21)
 const MONTHS = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
 
@@ -189,7 +189,12 @@ function menuDrill() {
     done = !!JSON.parse(localStorage.getItem('lehmfront.ausbildung') ?? 'null')?.done;
     played = !!localStorage.getItem(CAMPAIGN_KEY);
   } catch { /* ohne Speicher */ }
-  if (done) a.querySelector('small').textContent = 'abgeschlossen, jederzeit wiederholen';
+  let done2 = false;
+  try { done2 = !!JSON.parse(localStorage.getItem('lehmfront.ausbildung2') ?? 'null')?.done; } catch { /* ohne Speicher */ }
+  if (done && !done2) {
+    a.querySelector('small').textContent = 'Teil 2: Artillerie, Bauen, Ersatz';
+    a.href = a.getAttribute('href') + '&teil=2';
+  } else if (done) a.querySelector('small').textContent = 'abgeschlossen, jederzeit wiederholen';
   const fresh = !done && !played;
   a.classList.toggle('new', fresh);
   a.querySelector('.menu-new').hidden = !fresh;

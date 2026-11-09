@@ -7,7 +7,7 @@
 // VERSION haengt an der Liste: neue oder entfernte Dateien ergeben einen neuen Cache und den Update-Hinweis.
 
 // precache:start
-const VERSION = '2a2f6e64';
+const VERSION = '11db6154';
 const FILES = [
   'assets/fonts/caveat-latin-400-normal.woff2',
   'assets/fonts/caveat-latin-700-normal.woff2',
@@ -42,6 +42,7 @@ const FILES = [
   'css/motion.css',
   'css/narrative.css',
   'css/paper.css',
+  'css/pause.css',
   'css/sound.css',
   'css/style.css',
   'css/uhr.css',
@@ -164,6 +165,7 @@ const FILES = [
   'js/config/factions.js',
   'js/config/grounds.js',
   'js/config/handbook.js',
+  'js/config/help.js',
   'js/config/missions-akt2.js',
   'js/config/missions-akt3.js',
   'js/config/missions-akt4.js',
@@ -317,9 +319,11 @@ const FILES = [
   'js/ui/etappe3d/index.js',
   'js/ui/etappe3d/model.js',
   'js/ui/etappe3d/panel.js',
+  'js/ui/fieldinfo.js',
   'js/ui/film.js',
   'js/ui/fireplan.js',
   'js/ui/gamemenu.js',
+  'js/ui/handbook-view.js',
   'js/ui/hud.js',
   'js/ui/koop.js',
   'js/ui/labels.js',
@@ -350,6 +354,7 @@ const FILES = [
   'js/ui/paper/layer.js',
   'js/ui/paper/layout.js',
   'js/ui/paper/registry.js',
+  'js/ui/pause-menu.js',
   'js/ui/radial.js',
   'js/ui/result.js',
   'js/ui/settings.js',

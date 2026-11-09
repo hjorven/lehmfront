@@ -7,6 +7,9 @@ import { listOrders } from '../ui/orderbook.js';
 export const DRILL_KEY = 'lehmfront.ausbildung';
 /** Gefecht fuer die Grundausbildung: Asse-Nord, schwacher Gegner, ohne Rundenlimit, Seed fest */
 export const DRILL_PATH = '?scene=gefecht&karte=asse&ki=rekrut&runden=0&seed=1917&ausbildung=1';
+/** Teil 2: Artillerie, Bauen, Ersatz (gleiche Lage, eigener Fortschritt) */
+export const DRILL2_KEY = 'lehmfront.ausbildung2';
+export const DRILL2_PATH = DRILL_PATH + '&teil=2';
 
 const ownOrders = (a) => listOrders(a.book, a.side).filter((o) => o.group);
 const hasOrder = (a, types) => ownOrders(a).some((o) => types.includes(o.type));
@@ -80,7 +83,51 @@ export const DRILL_STEPS = [
   },
   {
     id: 'fertig', von: 'Harms', title: 'Geschafft',
-    text: 'Spiel ruhig weiter. Die Kampagne bringt die übrigen Befehle nach und nach, jeden mit einer kurzen Erklärung.',
+    text: 'Teil 2 zeigt Artillerie, Bauen und neue Leute. Esc oder „Menü“ öffnet jederzeit die Pause mit allen Erklärungen.',
+    final: true, next: 'teil2',
+  },
+];
+
+// Teil 2: beginnt mit den Befehlen aus Teil 1 und bringt Feuerplan, Etappe und Ablösen dazu.
+export const DRILL2_STEPS = [
+  {
+    id: 'beo', von: 'Harms', title: 'Der Beobachter',
+    text: 'Wähl das Kästchen „Beo“. Beobachter sehen am weitesten, auf Hügeln und Türmen noch weiter.',
+    tools: ['move', 'hold', 'dig', 'fire', 'supply'], done: (a) => !!a.selected && a.state.groups.some((g) => g.id === a.selected && g.type === 'observers'),
+  },
+  {
+    id: 'feld', von: 'Harms', title: 'Die Karte fragen',
+    text: 'Tipp ohne gewählte Gruppe auf ein Feld, etwa einen Wald oder Hügel. Dann steht da, was es bringt.',
+    done: (a) => !!a.fieldOpen,
+  },
+  {
+    id: 'feuerplan', von: 'Harms', title: 'Neuer Befehl: Feuerplan',
+    text: 'Die Batterien hinten („A“) steuerst du mit dem Feuerplan (A): Art mit „+“ wählen, Linie auf den Feind ziehen, „Übernehmen“.',
+    anchor: '[data-tool="fireplan"]', tools: ['fireplan'], done: (a) => !!a.plans?.[a.side]?.fire_plan,
+  },
+  {
+    id: 'etappe', von: 'Selin', title: 'Neuer Befehl: Etappe',
+    text: 'Gebaut wird hinten. Öffne „Etappe“ (M), wähl ein freies Feld und ein Gebäude, dann „Aufträge übernehmen“.',
+    anchor: '[data-tool="etappe"]', tools: ['etappe'], done: (a) => !!a.plans?.[a.side]?.etappe?.builds?.length,
+  },
+  {
+    id: 'runde2', von: 'Harms', title: 'Runde ausführen',
+    text: 'Bauen kostet Material und dauert Runden. Tipp „Runde ausführen“, dann geht es los.',
+    anchor: '.exec', done: (a, s) => a.state.turn > s.turn,
+  },
+  {
+    id: 'abloesen', von: 'Selin', title: 'Neuer Befehl: Ablösen',
+    text: 'Gruppe vorn wählen, „Ablösen“ (R), dann ein Feld hinten in der Etappe antippen: sie geht nach hinten und erholt sich.',
+    anchor: '[data-tool="relieve"]', tools: ['relieve'], place: 'right', done: (a) => listOrders(a.book, a.side).some((o) => o.type === 'relieve' || o.type === 'refill'),
+  },
+  {
+    id: 'pause', von: 'Harms', title: 'Nachschlagen',
+    text: 'Esc oder „Menü“ öffnet die Pause. Unter „Nachschlagen“ steht alles: Einheiten, Gelände, Gebäude, Artillerie.',
+    show: ['check', 'lehrling'], manual: true,
+  },
+  {
+    id: 'fertig2', von: 'Harms', title: 'Ausgebildet',
+    text: 'Jetzt hast du alle Grundbefehle. Wie ein Sturm hinter der Feuerwalze geht, zeigt Akt 1, Mission 4.',
     final: true,
   },
 ];
