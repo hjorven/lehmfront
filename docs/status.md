@@ -132,6 +132,24 @@ Jeder Thread traegt hier nach dem Merge ein, was fertig ist und was offen bleibt
   - Überraschung: Abgefangene Notizen von Lask. Nach jeder Runde rechnet das Spiel Lasks nächsten Zug schon voraus; mit etwas Glück (sicher nach Gefangenen oder einem Einbruch, öfter mit Beobachtern nah am Feind) fällt ein Zettel in die eigenen Hände: Bleistift, ausgerissen, teils verwischt, mit Vermerk der Übersetzerin de Groot. Er beschreibt den echten nächsten Zug (Ziel, Zahl der Rotten, Artillerie) und hinterlässt einen Kringel „L.?“ auf der Karte. Demo `demo=notiz&lage=sturm|vorbereiten|halten|gegenstoss`.
   - Nebenbei behoben: Absturz im Nahkampf, wenn der Verteidiger dabei aufgerieben wird (`js/phases/melee.js`).
 
+- P14 Kampagnenrahmen und Feldzugskarte (`?scene=feldzug`, Beispielstände `&demo=mitte|tief|hoch|ende`, Ablauf und Schnittstelle in `js/ui/campaign/README.md`):
+  - `js/campaign.js` (rein): Kampagnenzustand erweitert `createCampaign` (P15) um Mission, Zähler, Berichte, Stempel, Abrechnung, Verlauf, Front, Drohung, Ende. `finishMission` bucht alle Auslöser aus Plan 2.6 aus dem Protokoll (Stabsbefehl, Gegenstöße, Grabenfelder, Gefangene, Ablösung/zu lange vorn/Verwundete aus dem Zustand, Mahlzeiten, Post, geborgene Verwundete, billige Angriffe, hohe Verluste, blutige Stürme), jede Änderung mit deutscher Begründung und Kappung; Fraktionsfaktor `losses` (Kaldern 1,3) wirkt auf Verluste.
+  - Wirkungen: Nachschub je Runde 60 bis 140 Prozent, Ersatz vor dem Einsatz und Ersatzgeschwindigkeit nach Ansehen, Batteriemunition (unter 25 halb, ab 75 mehr), Berichte bleiben unter 25 beim Stab liegen. Vertrauen wirkt auf Moralerholung (zwischen 40 und 60 neutral, `moraleFactors`), Grabtempo (P04) und meldet `campaign.refuse` für Akt 4 (Regel P26).
+  - Unter 25 Ansehen droht der Stab (Telegramm und Ereignis `staff_threat` im Gefecht), unter 10 wird Brandt abgelöst; unter 10 Vertrauen Meuterei (Ereignis `mutiny`, `ctx.finish`, Mission verloren). Beides beendet den Feldzug mit `ende.vorzeitig.*` (T2).
+  - Stabsbefehl mit Stempel: befolgen, umdeuten (sofort −1/+2, danach halbe Folgen), verweigern (sofort Ansehen −(|verfehlt|+2), bei EILT −2 mehr, Vertrauen +4, danach keine Folgen). Verweigern zweimal tippen.
+  - 20 Erfahrungsberichte in `js/config/reports.js` mit Zählern aus echten Protokollereignissen (Schwellen aus `data/texts/berichte.json`), laufen über alle Missionen. Im Spielzustand `state.sides[s].reports`; `hasReport` (Bonus) und `reportOpen` (Sperre nur in der Kampagne). Wirksam: Faschinenbau (Grabenstufe 3), Lattenroste (Entwässern), Feuerwalze, Drahtscheren (Schützen schneiden), Stahlhelme, Grabenkeulen, Sanitätsloren.
+  - Feldzugskarte im Stil 09 (Kriegsraum, `WARROOM` in `js/theme.js`): Kartentisch mit Asse, Orten, Hügel 214, Stationen der 24 Missionen (gewonnen ausgemalt, verloren rot durchgestrichen), Achsen mit Verlauf, Schwellen und Wirkung, Abrechnung des letzten Einsatzes, Telegramme auf Papier (Stil 03), Karteikasten der Berichte mit Strichliste, Tagebuch (T), Zum Einsatz (Enter).
+  - Gefecht aus der Kampagne: `?scene=gefecht&campaign=1` (`js/ui/campaign/mission.js`), Knopf „Einsatz melden“ mit Wertung, Rückkehr über `localStorage` zur Zwischenszene der Erzählung und zur Karte. Missionen spielen bis P16 die freie Lage an der Asse („Übungslage“).
+  - Klang: Stempel, Fernschreiber (Länge nach Telegramm), Papier und Bleistift; Cues für `mutiny` und `staff_threat`; leises Grollen im Gefechtsstand.
+  - Überraschung: Der Stab antwortet auf jeden Einsatz, und je tiefer das Ansehen sinkt, desto knapper wird er. Bei hohem Ansehen ein langes, warmes Telegramm mit Unterschrift, dann sachlich, dann „ERHALTEN STOP WEITERMACHEN STOP“, und ganz unten nur noch ein leerer Streifen mit dem Stempel „Z. D. A.“ (zu den Akten). Der Papierstreifen wird schmaler, der Fernschreiber rattert kürzer. Dazu bleiben alte Frontlinien als Bleistiftringe auf dem Kartentisch stehen.
+
+### Für die nächsten Pakete (nach P14)
+
+- P16: Szenario je Mission in `js/config/missions.js` eintragen, Missionsziel mit `registerMissionJudge(mission, fn)` anmelden (`{ outcome, orderMet, why, flags }` oder `null`), Flags wie `harms_gefallen` im Ergebnis mitgeben. Lasks Doktrin je Akt: `state.sides.a.campaign.act`.
+- P26: Verweigerung liest `state.sides[s].campaign.refuse` (Vertrauen unter 25 in Akt 4). Schlusssequenz nach a4m6 und `ende.wahl` fehlen noch; die Feldzugskarte zeigt nach a4m6 „Alle Einsätze gespielt“.
+- Pakete mit Stollen, Sappen, Horchposten, Leuchtkugeln usw.: Berichte zählen schon (`tunnel_detected`, `sap` mit `cells`, `flood_drained`); Wirkung mit `hasReport(state, side, '<id>')` einbauen.
+- P18 Hauptmenü: Einstieg „Feldzug“ = `?scene=feldzug`.
+
 ### Für die nächsten Pakete (nach P13)
 
 - KI anderer Seite oder Missionen: `decide(viewFor(state, log, side, { map }), { map, seed, doctrine, difficulty, memory })`, Gedächtnis zwischen den Runden selbst aufheben. P14/P16: Lasks Doktrin je Akt mit `doctrineForAct(state.act)`. P17/P18: Schwierigkeit als Einstellung (`rekrut`, `veteran`, `lask`).
@@ -251,6 +269,8 @@ Jeder Thread traegt hier nach dem Merge ein, was fertig ist und was offen bleibt
 
 - P17: Asse-Nord ist nicht gespiegelt; spielt man dort Morrow, steht Morrow im Westen auf der Kaldern-Karte (Namen bleiben Kaldern). Die Tageslage lässt sich auf demselben Gerät neu beginnen, das Wachbuch nimmt jeden Versuch. Ohne Spielstand (P18) geht eine angefangene Tageslage beim Neuladen verloren. Kaldern gewinnt auf Zufallskarten gegen Morrow öfter (siehe P21-Hinweis).
 
+- P14: Der Meldedialog nach einer Meuterei erscheint schon während der Phasenfilm läuft. Der Kampagnenstand liegt nur in `localStorage` (Export/Import mit Prüfstempel aus `js/save.js` fehlt noch). Erfahrungsberichte ohne Mechanik (Traversen, Doppelleitung, Leichtes MG, Feldbahn, Kochkisten und Akt-2-Berichte) kommen an, wirken aber erst mit ihrem Paket.
+
 - P12: Ruhende Gruppen sieht der Gegner, wenn er so weit sieht (keine eigene Regel). Die KI (P13) löst noch nicht ab. Ersatz ganzer Gruppen (neue Gruppe statt Auffüllen) fehlt noch. Die Checkliste unten links scrollt auf dem Desktop, wenn sie länger wird.
 
 - P11: Nur Loren, Verpflegung, Material/Holz/Beton und Feldpost wirken direkt. Erholung, Moral (im Ruhelager), Trost und Ausbildung liest seit P12 `js/phases/morale.js`; Heilung wirkt über die Sanitätskette (P08), Offiziere sind offen. Batterieplätze, Leitung, Streuung: P09. Sicht und Ballon: P05 oder später. Werkstatt (Reparatur) hat noch keine Wirkung.
@@ -336,6 +356,8 @@ Stand 2026-11-08, von Jorven bestaetigt:
 ## Abweichungen vom Plan
 
 - P17: Zufallskarten und die drei neuen handgebauten Karten sind gespiegelt oder punktgespiegelt (Plan 9: Spiegelkarten zuerst), beide Seiten haben dasselbe Gelände und dieselbe Aufstellung; nur die Fraktionen unterscheiden sich. Die Spielerfraktion steht immer im Westen. Gefecht frei hat eine wählbare Dauer (8, 14, 24 Stellungsrunden oder offen) und endet mit einer Abschlussmeldung. Die Tageslage ist eine Woche aus 14 Stellungsrunden mit den Punkten aus Plan 8.3.
+
+- P14: Jeder Stabsbefehl lässt sich abstempeln (befolgen, umdeuten, verweigern), nicht nur an festen Entscheidungspunkten; die festen Entscheidungen der Texte bleiben zusätzlich. „Sturm trotz Vorschau-Warnung“ zählt als Sturm, der mehr als die Hälfte der Stürmenden gekostet hat (eine Verlustvorschau gibt es noch nicht). Ansehen unter 25 hält neue Erfahrungsberichte beim Stab zurück (Plan 2.6: Zugang zu Berichten). Die Feldzugskarte nutzt Stil 09 (Kriegsraum), wie in Plan 7.8 als Kandidat genannt.
 
 - P12: Ablösen bewegt beide Gruppen in einer Stellungsrunde ohne Weg (zwölf Stunden reichen für den Laufgraben); abgelöst wird nur aus der eigenen Stellung. Auffüllen ist kein eigenes Werkzeug, sondern Teil von Ablösen (die Werkzeugreihe wird sonst zu lang). Erfahrung beim Auffüllen wird kaufmännisch gerundet, damit ein einzelner Grüner keine ganze Stufe kostet.
 

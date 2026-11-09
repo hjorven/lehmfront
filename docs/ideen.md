@@ -26,3 +26,6 @@ Neue Ideen landen hier, nicht im Code (Plan 13). Mit Datum und Paket, aus dem si
 - 2026-11-09, P17: Auf Zufallskarten könnte ein Ort im Laufe der Partie umbenannt werden: nimmt eine Seite den umstrittenen Ort, streicht sie den gedruckten Namen durch und schreibt ihren eigenen darüber.
 - 2026-11-09, P17: Die Tageslage könnte am Ende eine Zeitungsnotiz beider Seiten zum selben Tag zeigen (T2-Zeitungen), die denselben Tag ganz verschieden beschreiben.
 - 2026-11-09, P17: Im Hotseat könnte die abgebende Seite auf dem Umschlag eine kurze Bleistiftnachricht an die andere hinterlassen (Grüße über das Niemandsland, Weihnachtsruhe).
+- 2026-11-09, P14: Die Antworten des Stabs könnten Tippfehler bekommen, je näher das Ende kommt (der Fernschreiber im Stab wird von immer jüngeren Leuten bedient).
+- 2026-11-09, P14: Auf dem Kartentisch könnten mit der Zeit Kaffeeränder und Brandlöcher von Zigaretten erscheinen, je mehr Missionen gespielt sind.
+- 2026-11-09, P14: Eine verweigerte Order könnte Wochen später als Randnotiz in einer Zeitung wieder auftauchen („Ein Abschnitt an der Asse soll ...“).
