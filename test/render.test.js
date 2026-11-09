@@ -201,3 +201,32 @@ test('P27: frameCells rueckt Felder ins Bild, ohne hineinzuzoomen', async () => 
   }
   assert.equal(frameCells(cam, []), false);
 });
+
+test('Kleine Schrift auf skalierter Karte wird in Gerätepixel umgerechnet, große bleibt', async () => {
+  const { scaledFont, installTextFix, SMALL_FONT } = await import('../js/render/text-fix.js');
+  const m = (k) => ({ a: k, b: 0, c: 0, d: k, e: 0, f: 0 });
+  assert.deepEqual(scaledFont('bold 0.765px Caveat, cursive', m(20)), { k: 20, font: 'bold 15.3px Caveat, cursive' });
+  assert.equal(scaledFont('700 12px "IBM Plex Mono"', m(20)), null, 'ab SMALL_FONT unverändert');
+  assert.equal(scaledFont('700 0.5px Caveat', m(1)), null, 'ohne Skalierung unverändert');
+  assert.ok(SMALL_FONT >= 2);
+  // Attrappe: zeichnet mit grosser Schrift ohne Skalierung, misst zurueck in Kartenmass
+  const calls = [];
+  const proto = {
+    font: '', lineWidth: 0.2, _m: m(25),
+    getTransform() { return this._m; }, setTransform(a, b, c, d, e, f) { this._m = { a, b, c, d, e, f }; },
+    save() { this._s = { m: this._m, font: this.font, lw: this.lineWidth }; }, restore() { this._m = this._s.m; this.font = this._s.font; this.lineWidth = this._s.lw; },
+    fillText(t, x, y) { calls.push({ t, x, y, font: this.font, m: this._m }); },
+    strokeText(t, x, y) { calls.push({ t, x, y, font: this.font, lw: this.lineWidth }); },
+    measureText(t) { const n = Number(/(\d*\.?\d+)px/.exec(this.font)[1]); return { width: t.length * n * 0.5 }; },
+  };
+  assert.equal(installTextFix(proto), true);
+  assert.equal(installTextFix(proto), false, 'nur einmal');
+  proto.font = '700 0.8px Caveat';
+  proto.fillText('MG', 2, 3);
+  assert.equal(calls[0].font, '700 20px Caveat');
+  assert.deepEqual([calls[0].x, calls[0].y, calls[0].m.e, calls[0].m.f, calls[0].m.a], [0, 0, 50, 75, 1]);
+  assert.equal(proto.font, '700 0.8px Caveat', 'Zustand danach wie vorher');
+  proto.strokeText('MG', 0, 0);
+  assert.equal(calls[1].lw, 0.2 * 25);
+  assert.equal(proto.measureText('MG').width, 0.8, 'Breite in Kartenmass');
+});

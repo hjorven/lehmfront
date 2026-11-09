@@ -295,3 +295,20 @@ test('Abloesung (P12): wer zu lange vorn liegt, wird aus der Reserve abgeloest',
   assert.deepEqual(o, { group: 'a01', type: 'relieve', by: 'a03' });
   assert.ok(!d.orders.some((x) => x.group === 'a03'), 'die Abloesung bekommt keinen zweiten Befehl');
 });
+
+test('Rotation ohne Reserve: die müdeste Gruppe ruht, wenn vor ihr Ruhe ist; Rekrut rotiert nicht', () => {
+  const s = fresh(6);
+  const front = s.groups.filter((g) => g.side === 'a' && g.type !== 'mg' && g.type !== 'observers').sort((p, q) => (p.id < q.id ? -1 : 1));
+  for (const g of s.groups.filter((x) => x.side === 'a')) { g.frontTurns = 8; g.fatigue = 70; }
+  const tired = front[front.length - 1];
+  tired.fatigue = 95;
+  // Feinde weit weg, sonst bleibt jeder auf dem Posten
+  for (const g of s.groups.filter((x) => x.side === 'b')) g.status = 'lost';
+  const d = decide(viewFor(s, [], 'a', env), { map: MAP, seed: 6, posture: 'halten', difficulty: 'veteran' });
+  const rel = d.orders.filter((x) => x.type === 'relieve');
+  assert.ok(s.groups.filter((g) => g.side === 'a').length >= 4, 'Szenario hat genug Gruppen');
+  assert.equal(rel.length, 1, JSON.stringify(d.orders));
+  assert.deepEqual(rel[0], { group: tired.id, type: 'relieve' });
+  const r = decide(viewFor(s, [], 'a', env), { map: MAP, seed: 6, posture: 'halten', difficulty: 'rekrut' });
+  assert.ok(!r.advice.some((a) => a.tag === 'Ablösen: ruht ohne Ablösung'));
+});

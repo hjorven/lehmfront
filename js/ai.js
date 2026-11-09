@@ -44,6 +44,8 @@ export const CREEP_LEAD = 5;
 export const ASSAULT_REACH = 30;
 
 const SIDES = ['a', 'b'];
+const ROTATE_FATIGUE = 60; // ab dieser Erschoepfung darf eine Gruppe ohne Abloesung ruhen
+const ROTATE_QUIET = 6;    // so weit darf kein bekannter Feind vor ihr stehen
 const foeOf = (s) => (s === 'a' ? 'b' : 'a');
 const mapSideOf = (s) => (s === 'a' ? 'own' : 'enemy');
 const compare = (p, q) => (p < q ? -1 : p > q ? 1 : 0);
@@ -575,6 +577,18 @@ export function decide(view, opts = {}) {
       }
       for (const g of sit.own.filter((x) => !taken.has(x.id) && postOf(map, x) !== 'front' && x.strength * 100 < x.size * 80).sort(byId)) {
         give(g, { group: g.id, type: 'refill' }, `${nameOf(g)} hat nur ${g.strength} von ${g.size} Mann und wird hinten mit Ersatz aufgefüllt.`, 'Auffüllen mit Ersatz');
+      }
+      // Rotation ohne Reserve (Veteran, Lask): stehen alle vorn, geht die müdeste Gruppe ins Ruhelager, wenn vor
+      // ihr Ruhe ist. Ausgeruht löst sie dann oben die nächste ab (siehe Schleife davor). Höchstens ein Viertel ruht.
+      if (diff.rotate && posture === 'halten') {
+        const resting = sit.own.filter((g) => postOf(map, g) !== 'front').length;
+        if (resting < Math.floor(sit.own.length / 4)) {
+          const cand = sit.own.filter((g) => !taken.has(g.id) && postOf(map, g) === 'front' && isTooLong(g) && (g.fatigue ?? 0) >= ROTATE_FATIGUE
+            && !unitType(g.type).sector && !sit.known.some((k) => distance(k.pos, g.pos) <= ROTATE_QUIET))
+            .sort((p, q) => (q.fatigue ?? 0) - (p.fatigue ?? 0) || byId(p, q));
+          const g = cand[0];
+          if (g) give(g, { group: g.id, type: 'relieve' }, `${nameOf(g)} liegt seit ${g.frontTurns} Runden vorn und ist erschöpft. Vor ihr ist es ruhig, sie geht ins Ruhelager und löst später die Nächste ab.`, 'Ablösen: ruht ohne Ablösung');
+        }
       }
     }
 

@@ -78,17 +78,17 @@ export function doctrineForAct(act) {
 export const DIFFICULTIES = {
   rekrut: {
     id: 'rekrut', label: 'Rekrut', ghostAge: 2, noise: 30, slip: 20,
-    mgAware: false, wireAware: false, flares: false, observers: false, rearrange: false, coordinate: false,
+    mgAware: false, wireAware: false, flares: false, observers: false, rearrange: false, coordinate: false, rotate: false,
     artillery: { barrage: true, harass: false, counter: false, prep: true, creep: false },
   },
   veteran: {
     id: 'veteran', label: 'Veteran', ghostAge: 5, noise: 10, slip: 5,
-    mgAware: true, wireAware: true, flares: true, observers: true, rearrange: true, coordinate: false,
+    mgAware: true, wireAware: true, flares: true, observers: true, rearrange: true, coordinate: false, rotate: true,
     artillery: { barrage: true, harass: true, counter: false, prep: true, creep: true },
   },
   lask: {
     id: 'lask', label: 'Lask', ghostAge: 8, noise: 0, slip: 0,
-    mgAware: true, wireAware: true, flares: true, observers: true, rearrange: true, coordinate: true,
+    mgAware: true, wireAware: true, flares: true, observers: true, rearrange: true, coordinate: true, rotate: true,
     artillery: { barrage: true, harass: true, counter: true, prep: true, creep: true },
   },
 };

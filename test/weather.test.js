@@ -323,3 +323,53 @@ test('Graben (P04) wird im Schlamm langsamer', async () => {
   assert.ok(wet.rate < dry, `${wet.rate} < ${dry}`);
   assert.ok(wet.factors.some((f) => f.label === 'Schlamm'));
 });
+
+// ---------- Schnee ----------
+
+test('Schnee: Winter macht aus Regen Schnee, die Decke wächst, klarer Tag und Regen tauen, Tauwasser macht nass', async () => {
+  const { stepSnow } = await import('../js/weather.js');
+  assert.deepEqual(stepSnow(0, 'snow'), { snow: 1, melt: 0 });
+  assert.deepEqual(stepSnow(3, 'snow'), { snow: 3, melt: 0 });
+  assert.deepEqual(stepSnow(2, 'clear', false), { snow: 1, melt: 1 });
+  assert.deepEqual(stepSnow(2, 'clear', true), { snow: 2, melt: 0 }, 'nachts taut nichts');
+  assert.deepEqual(stepSnow(3, 'rain'), { snow: 0, melt: 3 });
+  // im Winter faellt Schnee statt Regen, in anderen Jahreszeiten nie Schnee
+  let winter = 0, other = 0;
+  for (let i = 1; i <= 300; i++) {
+    const w = rollWeather(createRng(i), { kind: 'overcast', season: 'winter' });
+    const s = rollWeather(createRng(i), { kind: 'overcast', season: 'sommer' });
+    if (w.kind === 'snow') winter++;
+    assert.notEqual(w.kind, 'rain');
+    if (s.kind === 'snow') other++;
+  }
+  assert.ok(winter > 0);
+  assert.equal(other, 0);
+});
+
+test('Schnee im Spiel: legt zu, bremst ab Knöcheltiefe, nachts frieren Posten außerhalb des Unterstands', async () => {
+  const { snowMoveCost, SNOW_MOVE } = await import('../js/weather.js');
+  const map = makeMap();
+  let s = makeState(map, [{ type: 'rifles', pos: { x: 2, y: 3 }, morale: 70 }], [{ type: 'rifles', pos: { x: 17, y: 3 }, morale: 70 }],
+    { weather: { kind: 'snow', fixed: true, snow: 1 } });
+  const r = resolveTurn(s, [], [], 7, 1, { map });
+  assert.equal(r.state.weather.snow, 2);
+  assert.ok(r.log.some((e) => e.type === 'snow' && /Neuschnee/.test(e.reason)));
+  assert.equal(snowMoveCost(r.state, map, 4, 3), SNOW_MOVE[2]);
+  assert.ok(stepCost(map, { x: 3, y: 3 }, { x: 4, y: 3 }, r.state) > stepCost(map, { x: 3, y: 3 }, { x: 4, y: 3 }, s), 'Schnee kostet Bewegung');
+  // nach Runde 1 ist Nacht (startHour 12 + 12): Kaelte in der naechsten Stellungsrunde
+  const night = { ...r.state, night: true };
+  const r2 = resolveTurn(night, [], [], 7, 2, { map });
+  const cold = r2.log.find((e) => e.type === 'snow_cold' && e.group === 'a01');
+  assert.ok(cold, 'Kälte bei Nacht');
+  assert.match(cold.reason, /friert im Schnee/);
+});
+
+test('Tauwetter: Regen auf Schnee macht den Boden nass und meldet es', () => {
+  const map = makeMap();
+  const s = makeState(map, [{ type: 'rifles', pos: { x: 2, y: 3 } }], [{ type: 'rifles', pos: { x: 17, y: 3 } }],
+    { weather: { kind: 'rain', fixed: true, snow: 3, wet: 0 } });
+  const r = resolveTurn(s, [], [], 7, 1, { map });
+  assert.equal(r.state.weather.snow, 0);
+  assert.equal(r.state.weather.wet, 3, 'Regen +1, Tauwasser +2');
+  assert.ok(r.log.some((e) => e.type === 'snow' && /Tauwetter/.test(e.reason)));
+});

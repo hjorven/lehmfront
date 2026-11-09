@@ -1104,7 +1104,20 @@ export async function mount(root, params) {
         select(g.id);
         if (koop && g.side === side && !koop.owns(g)) flash(`Gehört zu ${koop.ownerName(g)}. Pfeile sehen, aber nicht ändern.`);
       }
-      else if (selectedId) select(null);
+      else if (selectedId) {
+        // Finger haben kein Hover: das erste Antippen eines leeren Feldes zeigt die Sichtlinie der gewählten Gruppe
+        // (wie die Maus beim Zeigen), ein zweites Antippen desselben Feldes hebt die Auswahl auf
+        const own = p.touch && !closedSomething ? selectedOwn() : null;
+        const same = hoverSight && cell && hoverSight.to.x === cell.x && hoverSight.to.y === cell.y;
+        if (own && cell && !same && (cell.x !== own.pos.x || cell.y !== own.pos.y)) {
+          hoverSight = sightLabel(sightLine(map, own, cell, darknessOf(state), state));
+          playSfx('pencil', { count: 1, intensity: 0.15 });
+          drawDyn();
+          return;
+        }
+        hoverSight = null;
+        select(null);
+      }
       else if (cell && !closedSomething && state.turnKind === 'position' && !book[side]?.sealed) {
         // P11: Antippen eines Gebaeudes oder vorgemerkten Baus der eigenen Etappe (ohne gewaehlte Gruppe)
         // oeffnet das Etappenfenster auf diesem Feld
@@ -1300,6 +1313,8 @@ export async function mount(root, params) {
     get state() { return state; }, get book() { return book; }, map, cam,
     select: (id) => select(id, { center: false }),
     order: (o) => placeOrder(o),
+    get sight() { return hoverSight ? { to: { ...hoverSight.to }, label: hoverSight.label } : null; },
+    get selected() { return selectedId; },
     get toolInfo() { return tool ? { id: tool.def.id, armed: tool.armed ?? null, preview: tool.preview, hover: tool.hoverCell, group: tool.group?.id ?? null } : null; },
     tool: (id, extra) => startTool(allTools().find((t) => t.id === id), selectedOwn(), extra),
     hover: (x, y) => { if (tool?.pick) { tool.hoverCell = cellAt(map, x, y); tool.preview = tool.pick.preview(tool.hoverCell); refresh(); } },

@@ -7,7 +7,7 @@
 // VERSION haengt an der Liste: neue oder entfernte Dateien ergeben einen neuen Cache und den Update-Hinweis.
 
 // precache:start
-const VERSION = '248f7185';
+const VERSION = 'b2e1693c';
 const FILES = [
   'assets/fonts/caveat-latin-400-normal.woff2',
   'assets/fonts/caveat-latin-700-normal.woff2',
@@ -263,6 +263,7 @@ const FILES = [
   'js/render/fire-layer.js',
   'js/render/geometry.js',
   'js/render/map-layer.js',
+  'js/render/text-fix.js',
   'js/render/units-layer.js',
   'js/render/weather-layer.js',
   'js/resolve.js',

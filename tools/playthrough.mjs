@@ -70,7 +70,7 @@ try {
       const did = await ev(page, () => {
         if (window.__gefecht) return null;
         const vis = [...document.querySelectorAll('button, a.btn')].filter((b) => b.offsetParent !== null && !b.disabled);
-        const pick = vis.filter((b) => /^\d?(Weiter|Zum Einsatz|Einsatz beginnen|Beginnen|Befolgen|Annehmen|Los|Zur Lage|Lesen beendet|Ablegen|Abschnitt übernehmen|Zur Woche)/i.test(b.textContent.trim())).pop(); // zuletzt eingefuegte zuerst (Blaetter liegen ueber dem Formular)
+        const pick = vis.filter((b) => /^\d?(Weiter|Zum Einsatz|Einsatz beginnen|Beginnen|Befolgen|Annehmen|Los|Zur Lage|Lesen beendet|Ablegen|Abschnitt übernehmen|Zum Wochentisch|Zur Woche)/i.test(b.textContent.trim())).pop(); // zuletzt eingefuegte zuerst (Blaetter liegen ueber dem Formular)
         if (!pick) return '';
         pick.click();
         return pick.textContent.trim().slice(0, 30);

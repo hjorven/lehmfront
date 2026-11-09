@@ -13,7 +13,7 @@
 // Bewegung nur ohne prefers-reduced-motion; Szenen fuer Screenshots schalten sie mit { still: true } ab.
 import { applyCameraTransform } from './camera.js';
 import { hashSeed } from './geometry.js';
-import { mudAt, waterAt, isDrained, trenchOf } from '../weather.js';
+import { mudAt, waterAt, isDrained, trenchOf, snowAt } from '../weather.js';
 import { sightRange, darknessOf } from '../sight.js';
 import { groupsOf } from '../state.js';
 
@@ -127,7 +127,7 @@ export function createWeatherLayer(canvas, { map, seed = 1, getCamera, getTheme,
   function animating() {
     if (still || !state) return false;
     const w = state.weather ?? {};
-    if (w.kind === 'rain' || w.kind === 'storm' || w.kind === 'fog') return true;
+    if (w.kind === 'rain' || w.kind === 'storm' || w.kind === 'fog' || w.kind === 'snow') return true;
     const now = performance.now();
     for (const t0 of flareAnim.values()) if (now - t0 < FLARE_LIFE.rise + FLARE_LIFE.burn + FLARE_LIFE.fade) return true;
     return drops.length > 0;
@@ -397,6 +397,63 @@ export function createWeatherLayer(canvas, { map, seed = 1, getCamera, getTheme,
     f.globalCompositeOperation = 'source-over';
   }
 
+  // Schneedecke: ein heller Hauch ueber dem Papier und feine Tupfen je Feld (deterministisch), dichter mit der Stufe.
+  // Felder ohne Schnee (Wasser) bleiben frei. Die Tinte darunter bleibt lesbar.
+  function drawSnowCover(cam, th, rect) {
+    const lvl = state.weather?.snow | 0;
+    if (!lvl || !th.snow) return;
+    const x0 = Math.max(0, Math.floor(rect.x0)), x1 = Math.min(map.width, Math.ceil(rect.x1));
+    const y0 = Math.max(0, Math.floor(rect.y0)), y1 = Math.min(map.height, Math.ceil(rect.y1));
+    ctx.save();
+    ctx.fillStyle = rgba(th.snow, (th.dark ? 0.04 : 0.1) * lvl);
+    ctx.beginPath();
+    for (let y = y0; y < y1; y++) for (let x = x0; x < x1; x++) if (snowAt(state, map, x, y)) ctx.rect(x, y, 1, 1);
+    ctx.fill();
+    ctx.fillStyle = rgba(th.snow, th.dark ? 0.3 : 0.85);
+    ctx.beginPath();
+    const dots = 2 + lvl * 2;
+    for (let y = y0; y < y1; y++) {
+      for (let x = x0; x < x1; x++) {
+        if (snowAt(state, map, x, y) === 0) continue;
+        const r = prng(hashSeed(seed, x * 977 + y * 131 + 7));
+        for (let k = 0; k < dots; k++) {
+          const cx = x + r(), cy = y + r(), rad = 0.035 + r() * 0.05;
+          ctx.moveTo(cx + rad, cy);
+          ctx.arc(cx, cy, rad, 0, TAU);
+        }
+      }
+    }
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // Fallende Flocken (Bildschirmkoordinaten), langsam und leicht nach dem Wind
+  function drawSnowfall(cam, th, now) {
+    if (state.weather?.kind !== 'snow') return;
+    const W = canvas.width, H = canvas.height;
+    const n = Math.round((W * H) / (dpr * dpr) / 7000);
+    const drift = (WIND_X[state.weather.wind?.dir] ?? 0.5) * 0.02;
+    const t = still ? 0 : now / 1000;
+    const r = prng(hashSeed(seed, 'schnee'));
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.fillStyle = rgba(th.dark ? th.ink : th.snow, th.dark ? 0.55 : 0.9);
+    ctx.strokeStyle = rgba(th.ink2, 0.35);
+    ctx.lineWidth = 0.6 * dpr;
+    ctx.beginPath();
+    for (let i = 0; i < n; i++) {
+      const sp = 18 + r() * 22;
+      const x = ((r() * W + (drift * sp * t * 60) * dpr) % W + W) % W;
+      const y = ((r() * H + sp * t * dpr) % H + H) % H;
+      const rad = (1.2 + r() * 1.6) * dpr;
+      ctx.moveTo(x + rad, y);
+      ctx.arc(x, y, rad, 0, TAU);
+    }
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+  }
+
   function drawRain(cam, th, now) {
     const w = state.weather;
     if (w?.kind !== 'rain' && w?.kind !== 'storm') return;
@@ -463,11 +520,13 @@ export function createWeatherLayer(canvas, { map, seed = 1, getCamera, getTheme,
     drawStains(cam, th, w.wet ?? 0, raining);
     applyCameraTransform(ctx, cam, dpr);
     drawMud(cam, th, visibleRect(cam));
+    drawSnowCover(cam, th, visibleRect(cam));
     drawWater(cam, th);
     drawFlares(cam, th, now);
     drawDrops(cam, th, now);
     drawFog(cam, th, now);
     drawRain(cam, th, now);
+    drawSnowfall(cam, th, now);
   }
 
   const layer = {

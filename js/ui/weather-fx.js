@@ -21,13 +21,17 @@ const ease = (t) => (t < 0.5 ? 2 * t * t : 1 - 2 * (1 - t) * (1 - t));
 /** Szenen-Parameter auf einen frischen Zustand anwenden (nur Demo und Screenshots) */
 export function applyWeatherParams(state, map, params) {
   const kind = params.get('weather');
-  if (WEATHER_KINDS.includes(kind)) {
+  if (WEATHER_KINDS.includes(kind) || kind === 'snow') {
     state.weather = {
       ...state.weather, kind, fixed: true,
       rain: kind === 'storm' ? 1 : kind === 'rain' ? 0.6 : 0,
       fog: kind === 'fog' ? 0.8 : 0,
       wind: kind === 'storm' ? { dir: 'w', speed: 3 } : state.weather.wind,
     };
+  }
+  if (params.has('snow') || kind === 'snow') {
+    const snow = Math.max(0, Math.min(3, Number(params.get('snow') ?? 2) | 0));
+    state.weather = { ...state.weather, snow, season: 'winter' };
   }
   if (params.has('wet')) {
     const wet = Math.max(0, Math.min(3, Number(params.get('wet')) | 0));

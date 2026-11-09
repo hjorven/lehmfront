@@ -1,5 +1,6 @@
 // Start jeder Seite (P18): Einstellungen anwenden, Service Worker anmelden, Hinweis auf neue Feldausgabe.
 // main.js importiert diese Datei zuerst; Szenen muessen nichts dafuer tun.
+import './render/text-fix.js'; // kleine Schrift auf der skalierten Karte (Chrome)
 import { applySettings } from './settings.js';
 import { ensureCss, esc } from './ui/dom.js';
 

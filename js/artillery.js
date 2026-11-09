@@ -102,6 +102,16 @@ export function initArtillery(map, spec, side, factionId) {
   };
 }
 
+/**
+ * Neue Batterie in eine Artillerie aufnehmen (Etappe: fertig gebaute Batteriestellung). Leer, die Munition kommt
+ * mit dem naechsten Nachschub aus dem Depot. Liefert die Batterie.
+ */
+export function addBattery(art, spec, factionId) {
+  const b = makeBattery({ ...spec, ammo: spec.ammo ?? 0 }, factionId);
+  art.batteries = [...art.batteries.filter((x) => x.id !== b.id), b].sort(byId);
+  return b;
+}
+
 /** Artillerie einer Seite (leer, falls das Szenario keine hat) */
 export function artilleryOf(state, side) {
   return state.sides[side]?.artillery ?? { batteries: [], exchange: null, lines: [], plans: [], pending: [], known: {} };
