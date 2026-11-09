@@ -7,7 +7,7 @@
 // Bricht es nach dem Weiterzaehlen ab, steht matches.turn eine Runde vor match_states; der naechste Aufruf
 // rechnet diese Runde nach 90 Sekunden neu (die Befehle dieser Runde sind dann eingefroren).
 import { serve, admin, json, fail } from '../_lib/http.ts';
-import { resolveMatch, deadlineMs, matchRecord } from '../_shared/js/online/match.js';
+import { resolveMatch, deadlineMs, matchRecord } from '../_lib/logic.ts';
 
 const STALE_MS = 90 * 1000;
 

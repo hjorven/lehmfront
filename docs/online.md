@@ -1,8 +1,9 @@
 # Lehmfront online (P20)
 
-Der Online-Teil ist fertig gebaut, aber erst aktiv, wenn ein Supabase-Projekt eingerichtet und in
-`js/config/online.js` eingetragen ist. Ohne Eintrag zeigt das Fernsprechamt "Leitung nicht geschaltet",
-alles Offline bleibt unverändert. Der Replay-Link braucht keinen Server und geht immer.
+Online ist seit 2026-11-09 geschaltet: Supabase-Projekt `lehmfront` (Ref `trxetnkronmurxqcrhit`,
+eu-central-1, Org "Jorven", Free-Tarif), eingetragen in `js/config/online.js`. Ohne Eintrag zeigt das
+Fernsprechamt "Leitung nicht geschaltet", alles Offline bleibt unverändert. Der Replay-Link braucht keinen
+Server und geht immer. Für das zweite freie Projekt wurde Flussreich pausiert.
 
 ## Teile
 
@@ -12,7 +13,8 @@ alles Offline bleibt unverändert. Der Replay-Link braucht keinen Server und geh
 | Beitreten per Code | `supabase/functions/join/index.ts` |
 | Runde rechnen (beide da oder Frist um) | `supabase/functions/resolve/index.ts` |
 | Tageslage nachrechnen und eintragen | `supabase/functions/submit-daily/index.ts` |
-| Spiellogik für die Functions (Kopie, nicht eingecheckt) | `supabase/functions/_shared/` aus `node tools/sync-functions.mjs` |
+| Gemeinsames der Functions (CORS, Anmeldung) | `supabase/functions/_lib/http.ts` |
+| Spiellogik für die Functions (auf einen Commit gepinnt) | `supabase/functions/_lib/logic.ts` |
 | Reine Logik (Server und Client) | `js/online/replay.js`, `js/online/match.js` |
 | Client | `js/net.js` (supabase-js als UMD aus `vendor/`), Szene `?scene=fernamt` |
 | Replay-Link | `js/online/link.js`, im Gefecht `wiedergabe=1` mit Protokoll im Anker `#w=` |
@@ -20,7 +22,7 @@ alles Offline bleibt unverändert. Der Replay-Link braucht keinen Server und geh
 ## Einrichten (einmal)
 
 1. Supabase-Projekt `lehmfront` anlegen (Region eu-central-1). Im Free-Tarif sind zwei aktive Projekte je
-   Besitzer erlaubt; am 2026-11-09 war das Limit erreicht (Flussreich, Poly-battle-web).
+   Besitzer erlaubt (erledigt, Ref `trxetnkronmurxqcrhit`).
 2. Migration anwenden: Inhalt von `supabase/migrations/0001_init.sql` (Supabase-MCP `apply_migration`
    oder SQL-Editor oder `supabase db push`).
 3. Authentication: anonyme Anmeldung einschalten (Dashboard, Authentication, Sign In / Providers,
@@ -28,11 +30,12 @@ alles Offline bleibt unverändert. Der Replay-Link braucht keinen Server und geh
    `https://hjorven.github.io/lehmfront/?scene=fernamt`.
 4. Functions deployen:
    ```bash
-   node tools/sync-functions.mjs
-   supabase functions deploy join resolve submit-daily --project-ref <ref>
+   supabase functions deploy join resolve submit-daily --project-ref trxetnkronmurxqcrhit --no-verify-jwt
    ```
-   Ohne CLI über den Supabase-MCP (`deploy_edge_function`, `verify_jwt: true`): die Dateiliste je Function
-   liefert `node tools/sync-functions.mjs --mcp join` (Einstieg `index.ts`).
+   Ohne CLI über den Supabase-MCP (`deploy_edge_function`, `verify_jwt: false`): die Dateiliste je Function
+   liefert `node tools/sync-functions.mjs --mcp join` (Einstieg `index.ts`, drei Dateien).
+   `verify_jwt` ist aus, weil die Functions die Anmeldung selbst prüfen (`auth.getUser` in `_lib/http.ts`)
+   und das Projekt ES256-Tokens ausgibt.
 5. `js/config/online.js`: `url` und den Publishable Key (`sb_publishable_...`) oder den alten anon Key
    eintragen. Nie den Service-Role- oder Secret-Key; ein Test prüft das.
 6. Advisors prüfen (Security und Performance).
@@ -56,8 +59,34 @@ Zum Ausprobieren mit einem eigenen Projekt ohne Commit im Browser:
 
 ## Nach Regeländerungen
 
-Die Functions rechnen mit ihrer eigenen Kopie der Spiellogik. GitHub Pages ist nach jedem Merge live, die
-Functions nicht: nach jeder Änderung an Regeln oder KI `node tools/sync-functions.mjs` und neu deployen.
+Die Functions laden die reinen Module des Spiels (`js/online/match.js`, `js/online/replay.js` und alles,
+was sie importieren) über jsDelivr von GitHub, fest auf einen Commit gepinnt; Supabase bündelt sie beim
+Deploy. GitHub Pages ist nach jedem Merge live, die Functions nicht. Nach einer Änderung an Regeln oder KI,
+die Online-Partien oder die Tageslage betrifft, nach dem Merge:
+
+```bash
+git fetch origin main
+node tools/sync-functions.mjs --pin "$(git rev-parse origin/main)"
+supabase functions deploy join resolve submit-daily --project-ref trxetnkronmurxqcrhit --no-verify-jwt
+```
+
+Den neuen Pin danach mit einem kleinen PR einchecken. Laufende Partien rechnen ab dann mit den neuen Regeln
+weiter; ihr Replay-Link nutzt die Regeln der Seite, kann also nach großen Regeländerungen abweichen.
+`node tools/sync-functions.mjs` ohne Argument zeigt den gepinnten Stand.
+
+## Geprüft am 2026-11-09
+
+Durchstich gegen das echte Projekt (zwei Probe-Konten): Partie anlegen (RLS), Beitreten per Code (`join`),
+`match_states` für Spieler gesperrt, eigene Sicht lesbar, Seed bis zum Ende leer, Befehle für eine falsche
+Runde abgewiesen, fremde Befehle nicht lesbar, `lf_turn_status` zeigt nur abgegeben ja/nein, `resolve`
+wartet bis beide da sind und rechnet dann genau einmal (zweiter Aufruf: wartet auf Runde 2),
+`submit-daily` weist eine unfertige Woche und einen abgelaufenen Tag mit deutscher Begründung ab.
+
+Security-Advisors: nur gewollte Hinweise (RLS ohne Policy auf `match_states` und `daily_orders`,
+`lf_open_invites` und `lf_turn_status` als security definer für angemeldete Spieler ausführbar).
+
+Die CI-Browserprüfung ruft Fernsprechamt und Tageslage mit `&online=aus` auf, damit sie nicht gegen den
+echten Dienst läuft.
 
 ## Fristen
 

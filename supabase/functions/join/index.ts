@@ -1,7 +1,7 @@
 // Edge Function join (P20, Plan 11.2): Partie per Einladungscode beitreten. Setzt player_b, wuerfelt den
 // geheimen Seed, legt den vollen Startzustand (match_states) und die Sicht beider Seiten (match_views) an.
 import { serve, admin, json, fail, secretSeed } from '../_lib/http.ts';
-import { startMatch, normalizeCode, deadlineMs, initSeedFor } from '../_shared/js/online/match.js';
+import { startMatch, normalizeCode, deadlineMs, initSeedFor } from '../_lib/logic.ts';
 
 serve(async (body, uid) => {
   const code = normalizeCode(body.code);

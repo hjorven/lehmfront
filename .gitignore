@@ -1,5 +1,4 @@
 node_modules/
 shots/
 .DS_Store
-supabase/functions/_shared/
 supabase/.temp/
