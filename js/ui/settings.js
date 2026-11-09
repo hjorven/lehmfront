@@ -9,7 +9,7 @@ import { getSettings, setSettings, resetSettings, onSettingsChange, SETTING_CHOI
 import { createSaveStore, exportSave, inspectSave } from '../save.js';
 import { SLOTS, AUTO_SLOT, freeSlot, exportName, slotTitle, loadHref } from '../savegame.js';
 import { playSfx } from '../audio/engine.js';
-import { packBackup, readBackup, collectLocal, restoreLocal } from '../backup.js';
+import { packBackup, readBackup, collectLocal, restoreLocal, BACKUP_MAX } from '../backup.js';
 
 export const TABS = [
   ['akten', 'Spielstände'],
@@ -242,15 +242,17 @@ export function openSettings({ tab = 'akten', game = null, container = document.
   async function inspectBackup(file) {
     if (!file) return;
     try {
+      if (file.size > BACKUP_MAX) throw new Error('die Datei ist zu groß für eine Sicherung');
       const info = readBackup(await file.text());
       pendingBackup = info;
       const what = [info.campaign ? 'Feldzug' : '', info.endless ? 'Frontabschnitt' : ''].filter(Boolean).join(' und ') || 'Einstellungen und Listen';
       const row = $('#set-panel-akten .set-restore') ?? Object.assign(document.createElement('div'), { className: 'set-row set-restore' });
       row.innerHTML = `<button type="button" class="btn" data-act="restore">Sicherung übernehmen (${esc(what)})</button>`;
       $('#set-panel-akten').append(row);
-      say(`${info.count} Einträge gelesen. ${info.stamp === 'ok' ? 'Zensurstempel unversehrt.' : 'Der Zensurstempel ist verletzt: die Datei wurde verändert.'} Übernehmen ersetzt Feldzug und Läufe in diesem Browser.`, info.stamp === 'ok' ? '' : 'warn');
+      say(`${info.count} Einträge gelesen. ${info.stamp === 'ok' ? 'Zensurstempel unversehrt.' : 'Der Zensurstempel ist verletzt: die Datei wurde verändert.'} Übernehmen ersetzt Feldzug und Läufe in diesem Browser und lädt das Titelblatt neu.`, info.stamp === 'ok' ? '' : 'warn');
     } catch (e) {
       pendingBackup = null;
+      $('#set-panel-akten .set-restore')?.remove();
       say('Nicht lesbar: ' + e.message, 'warn');
     }
   }
@@ -263,7 +265,9 @@ export function openSettings({ tab = 'akten', game = null, container = document.
       pendingBackup = null;
       btn.closest('.set-restore')?.remove();
       playSfx('paper', { intensity: 0.5 });
-      say('Sicherung übernommen. Neu laden, damit Einstellungen und Feldzug gelten.');
+      say('Sicherung übernommen. Das Blatt wird neu geladen.');
+      // Eine laufende Szene haelt Feldzug oder Lauf im Speicher und schriebe sie sonst gleich wieder zurueck
+      setTimeout(() => location.assign(location.pathname), 900);
     } catch (e) {
       say('Das hat nicht geklappt: ' + e.message, 'warn');
     }

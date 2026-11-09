@@ -421,7 +421,7 @@ export async function mount(root, params) {
           <div class="mb-seed"${choice.map === 'zufall' ? '' : ' hidden'}><input type="text" inputmode="numeric" maxlength="9" aria-label="Seed der Zufallskarte" value="${choice.mapSeed}"><button type="button" class="btn mb-roll">Neu würfeln</button></div>
         </fieldset>
         <fieldset class="mb-field"><legend>Du führst</legend><div class="mb-opts">${radio('fraktion', FACTION_IDS.map((id) => ({ id, label: FACTIONS[id].name, sub: id === 'kaldern' ? 'wenig Ersatz, präzise Artillerie' : 'viel Ersatz, zäh, Artillerie streut' })), choice.faction)}</div></fieldset>
-        <p class="fa-score-rule">Punkte: je Woche gehalten 100, je gewonnenes Grabenfeld 5, je geborgener Verwundeter 2, je Gefallener −3.</p>
+        <p class="fa-score-rule">Punkte: je Woche gehalten 100, je gewonnenes Grabenfeld 5, je geborgener Verwundeter 2, je Gefallener −3.</p>
         ${best.length ? `<div class="wachbuch"><b class="wb-title">Die längsten Abschnitte</b><ol>${best.slice(0, 5).map((e, i) => `<li><span class="wb-n">${i + 1}.</span><span class="wb-name">${esc(e.name)}</span><span class="wb-f">${e.weeks} W.</span><b>${e.points}</b></li>`).join('')}</ol></div>` : ''}
         <div class="mb-go">
           <button type="submit" class="btn mb-start">Abschnitt übernehmen</button>

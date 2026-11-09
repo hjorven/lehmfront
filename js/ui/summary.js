@@ -29,7 +29,7 @@ registerCheck('ohne-befehl', ({ state, side, orders, only = null }) => {
   // P27: viele Gruppen ohne Befehl in einer Zeile, sonst schiebt die Liste andere Pruefpunkte aus dem Kaertchen.
   // Antippen springt zur ersten, die Leertaste weiter zur naechsten.
   if (idle.length > 3) {
-    return [{ tone: 'warn', text: `${idle.length} Gruppen ohne Befehl (${idle.map((g) => groupName(state, g)).join(', ')}), sie halten`, group: idle[0].id, at: idle[0].pos }];
+    return [{ tone: 'warn', text: `${idle.length} Gruppen ohne Befehl, sie halten`, group: idle[0].id, at: idle[0].pos }];
   }
   return idle.map((g) => ({ tone: 'warn', text: `${groupName(state, g)} ohne Befehl`, group: g.id, at: g.pos }));
 });

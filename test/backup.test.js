@@ -40,3 +40,25 @@ test('P27: Einlesen ersetzt eigene Eintraege, laesst fremde stehen', () => {
   assert.equal(dst.getItem('lehmfront-endlos'), null);
   assert.equal(dst.getItem('other'), 'bleibt');
 });
+
+test('P27: Anmeldung, Serveradresse und Kartentaschen bleiben aussen vor', () => {
+  const src = new Mem({ 'lehmfront.auth': 'token', 'lehmfront.online': '{"url":"https://boese"}', 'lehmfront.save.slot1': 'x', 'lehmfront-campaign-start': 's', 'lehmfront-campaign': 'A' });
+  const r = readBackup(packBackup(collectLocal(src)));
+  assert.deepEqual(Object.keys(r.entries), ['lehmfront-campaign']);
+  // eine praeparierte Datei kann sie auch nicht setzen oder loeschen
+  const forged = JSON.stringify({ kind: 'lehmfront-dienstbuch', stamp: '', entries: { 'lehmfront.online': '{"url":"https://boese"}', 'lehmfront.auth': 'fremd' } });
+  const dst = new Mem({ 'lehmfront.auth': 'meins', 'lehmfront.save.slot1': 'stand' });
+  restoreLocal(readBackup(forged).entries, dst);
+  assert.equal(dst.getItem('lehmfront.auth'), 'meins');
+  assert.equal(dst.getItem('lehmfront.online'), null);
+  assert.equal(dst.getItem('lehmfront.save.slot1'), 'stand');
+});
+
+test('P27: scheitert das Einlesen, bleibt der alte Stand', () => {
+  const dst = new Mem({ 'lehmfront-campaign': 'alt', 'lehmfront-endlos': 'lauf' });
+  dst.setItem = function (k, v) { if (k === 'lehmfront.settings') throw new Error('voll'); this.m.set(k, String(v)); };
+  assert.throws(() => restoreLocal({ 'lehmfront-campaign': 'neu', 'lehmfront.settings': 'S' }, dst), /voll/);
+  assert.equal(dst.getItem('lehmfront-campaign'), 'alt');
+  assert.equal(dst.getItem('lehmfront-endlos'), 'lauf');
+  assert.throws(() => readBackup('x'.repeat(5_000_001)), /zu groß/);
+});

@@ -70,20 +70,33 @@ function drawBackground(canvas) {
   ctx.setLineDash([]);
   ctx.globalAlpha = 1;
   if (!after) return;
-  // Bleistiftvermerk neben dem eigenen Graben, leicht schief
-  // Breit: rechts neben dem eigenen Graben, frei vom Menue. Schmal: oben ueber dem Titel.
+  // Breit: zwischen dem alten Platz des eigenen Grabens und dem feindlichen, frei vom Menue. Schmal: oben ueber dem Titel.
+  // Die Schrift wird kleiner, bis der Vermerk in die Luecke passt, und bricht notfalls in zwei Zeilen.
   const wide = w >= 900;
-  const x = wide ? w * 0.58 + 24 : 22, y = wide ? h * 0.8 : 34;
+  // Schmal ist ueber dem Titel nur Platz fuer eine Zeile: dort steht nur der Vermerk
+  const x = wide ? w * 0.58 + 24 : 16, y = wide ? h * 0.78 : 15;
+  const room = wide ? w * (look.own === 'forward' ? 0.8 : 0.86) - x - 16 : w - x - 12;
+  const second = after.fallen ? `${after.fallen} ${after.fallen === 1 ? 'Name' : 'Namen'} auf der Liste.` : 'Kein Name auf der Liste.';
+  let size = wide ? 22 : 15;
+  let lines = wide ? [look.note, second] : [`${look.note} ${second}`];
+  const fit = () => { ctx.font = `${size}px Caveat, cursive`; return Math.max(...lines.map((l) => ctx.measureText(l).width)) <= room; };
+  while (!fit() && size > 14) size--;
+  if (!fit() && !wide) lines = [look.note];
+  while (!fit() && !wide && size > 11) size--;
+  if (!fit() && wide) {
+    // an einem Punkt oder Komma in der Mitte umbrechen
+    const cut = look.note.search(/[.,] /);
+    if (cut > 0) lines = [look.note.slice(0, cut + 1), look.note.slice(cut + 2), second];
+    size = 22;
+    while (!fit() && size > 13) size--;
+  }
   ctx.save();
   ctx.translate(x, y);
   ctx.rotate(-0.035);
   ctx.fillStyle = v('ink2') || v('ink');
   ctx.globalAlpha = 0.85;
   ctx.textAlign = 'left';
-  const size = Math.max(16, Math.min(22, w / 48));
-  ctx.font = `${size}px Caveat, cursive`;
-  ctx.fillText(look.note, 0, 0);
-  ctx.fillText(after.fallen ? `${after.fallen} ${after.fallen === 1 ? 'Name' : 'Namen'} auf der Liste.` : 'Kein Name auf der Liste.', 0, size * 1.15);
+  lines.forEach((l, i) => ctx.fillText(l, 0, i * size * 1.15));
   ctx.restore();
 }
 

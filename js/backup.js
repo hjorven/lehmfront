@@ -8,7 +8,13 @@ import { stampOf } from './save.js';
 export const BACKUP_KIND = 'lehmfront-dienstbuch';
 export const BACKUP_PREFIX = 'lehmfront';
 
-const ours = (k) => typeof k === 'string' && k.startsWith(BACKUP_PREFIX);
+// Nicht in die Sicherung: Anmeldung (Tokens), Serveradresse, Spielstaende der Kartentaschen (eigener Export) und
+// die Uebergabe einer gerade laufenden Mission. Sonst koennte eine fremde Datei die Online-Verbindung umbiegen.
+export const BACKUP_DENY = ['lehmfront.auth', 'lehmfront.online', 'lehmfront.save.', 'lehmfront-campaign-start', 'lehmfront-campaign-return'];
+/** Hoechstens so viele Zeichen liest das Dienstbuch ein */
+export const BACKUP_MAX = 5_000_000;
+
+const ours = (k) => typeof k === 'string' && k.startsWith(BACKUP_PREFIX) && !BACKUP_DENY.some((d) => k === d || (d.endsWith('.') && k.startsWith(d)));
 
 /** Eintraege { schluessel: Text } als Datei-Text, Schluessel sortiert (gleicher Inhalt, gleicher Text) */
 export function packBackup(entries, meta = {}) {
@@ -23,6 +29,7 @@ export function packBackup(entries, meta = {}) {
  * Wirft bei fremden Dateien. Schluessel ohne Praefix werden verworfen.
  */
 export function readBackup(text) {
+  if (typeof text !== 'string' || text.length > BACKUP_MAX) throw new Error('keine Sicherung aus dem Dienstbuch (zu groß)');
   let d;
   try { d = JSON.parse(text); } catch { throw new Error('keine Sicherung aus dem Dienstbuch (kein JSON)'); }
   if (!d || d.kind !== BACKUP_KIND || typeof d.entries !== 'object' || !d.entries) throw new Error('keine Sicherung aus dem Dienstbuch');
@@ -47,8 +54,18 @@ export function collectLocal(storage = globalThis.localStorage) {
   return out;
 }
 
-/** Eigene Eintraege ersetzen: was in der Sicherung fehlt, wird geloescht (sonst mischen sich zwei Feldzuege) */
+/**
+ * Eigene Eintraege ersetzen: was in der Sicherung fehlt, wird geloescht (sonst mischen sich zwei Feldzuege).
+ * Geht unterwegs etwas schief (Speicher voll), kommt der alte Stand zurueck und der Fehler wird weitergereicht.
+ */
 export function restoreLocal(entries, storage = globalThis.localStorage) {
-  for (const k of Object.keys(collectLocal(storage))) if (!(k in entries)) storage.removeItem(k);
-  for (const [k, v] of Object.entries(entries)) if (ours(k)) storage.setItem(k, v);
+  const before = collectLocal(storage);
+  try {
+    for (const k of Object.keys(before)) if (!(k in entries)) storage.removeItem(k);
+    for (const [k, v] of Object.entries(entries)) if (ours(k)) storage.setItem(k, v);
+  } catch (err) {
+    for (const k of Object.keys(collectLocal(storage))) if (!(k in before)) try { storage.removeItem(k); } catch { /* weiter */ }
+    for (const [k, v] of Object.entries(before)) try { storage.setItem(k, v); } catch { /* weiter */ }
+    throw err;
+  }
 }
