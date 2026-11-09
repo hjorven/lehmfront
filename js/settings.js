@@ -13,6 +13,7 @@ export const SETTING_CHOICES = {
   signs: [false, true],                 // Signaturen zusaetzlich zur Farbe (Doppelrahmen, Zeichen)
   contrast: [false, true],              // kraeftigere Linien und Hilfstexte
   tap: ['confirm', 'direct'],           // Ziel mit dem Finger: erst vormerken, dann setzen, oder sofort setzen
+  hud: ['auto', 'tidy', 'full'],        // Kaertchen im Gefecht: nach Geraet, aufgeraeumt (Kopfleiste) oder alle offen
 };
 
 export const DEFAULT_SETTINGS = Object.freeze(

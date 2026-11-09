@@ -45,6 +45,7 @@ import {
 import { darknessAt } from '../ui/daytime.js';
 import { esc, ensureCss, reducedMotion } from '../ui/dom.js';
 import { createHud } from '../ui/hud.js';
+import { attachTidy } from '../ui/tidy.js';
 import { clockModel, clockSvg, clockLabel } from '../ui/clock.js';
 import { isAttacker, BATTLE_ROUNDS, BATTLE_MINUTES } from '../phases/battle.js';
 import { createToolbar } from '../ui/toolbar.js';
@@ -92,6 +93,7 @@ export async function mount(root, params) {
     ensureCss('css/feuerplan.css'), // P09: Editor und Zittern der Karte bei Einschlaegen
     ensureCss('css/uhr.css'),
     ensureCss('css/motion.css'),
+    ensureCss('css/kartefrei.css'), // Tablet: aufgeraeumte Kaertchen und Karte frei
     Promise.all(['16px "Special Elite"', '16px "IBM Plex Mono"', '700 16px "IBM Plex Mono"', '16px "Caveat"', '700 16px "Caveat"', '16px "IBM Plex Sans"', '700 16px "IBM Plex Sans"']
       .map((f) => document.fonts.load(f))).catch(() => {}),
   ]);
@@ -171,6 +173,7 @@ export async function mount(root, params) {
   let helpShown = false;
   let suppressTap = false;
   let modalOpen = false;
+  let tidyUi = null;            // aufgeraeumte Kaertchen und Karte frei (js/ui/tidy.js)
   if (resumed) { archive = resumed.archive ?? archive; aiMemory = resumed.aiMemory; lastLog = resumed.lastLog; if (resumed.book) book = resumed.book; if (resumed.decor) burns = resumed.decor.burns; }
   if (online?.kind === 'match' && online.state) { lastLog = online.log; book = nextRound(book, { a: [], b: [], [online.side]: online.carry }); }
   const forcedDark = params.has('night') && !fixed ? Math.max(0, Math.min(1, num(params.get('night'), 0))) : null;
@@ -467,7 +470,7 @@ export async function mount(root, params) {
 
   function currentHint() {
     if (tool?.pick) return { title: tool.pick.title ?? tool.def.label, text: tool.pickHint, tone: 'tool' };
-    if (transient && performance.now() < transient.until) return { title: 'Hinweis', text: transient.text, tone: transient.tone };
+    if (transient && performance.now() < transient.until) return { title: 'Hinweis', text: transient.text, tone: transient.tone, id: transient.until };
     if (!helpShown && !ordersNow().length && state.turn === 1) {
       return { title: 'Hinweis', text: narrow()
         ? 'Gruppe antippen und Befehl wählen, oder lang drücken für Befehle im Kreis.'
@@ -536,6 +539,8 @@ export async function mount(root, params) {
   }
 
   function refresh() {
+    // Ein Dialog oder der Film holt die Kaertchen zurueck, damit nichts Unsichtbares offen bleibt
+    if (modalOpen && tidyUi?.bare) tidyUi.setBare(false);
     root.classList.toggle('picking', !!tool?.pick);
     hud.update(hudModel());
     const g = selectedOwn();
@@ -633,6 +638,7 @@ export async function mount(root, params) {
   }
 
   function startTool(def, g, extra = {}) {
+    if (tidyUi?.bare) tidyUi.setBare(false); // Befehle nur mit sichtbaren Kaertchen
     if (!def) return;
     if (book[side]?.sealed || modalOpen) return;
     const u = usable(def, g, state, env);
@@ -979,6 +985,7 @@ export async function mount(root, params) {
 
   // ---------- Radiales Menue ----------
   function openRadial(g, clientX, clientY) {
+    if (tidyUi?.bare) tidyUi.setBare(false);
     if (!g || g.side !== side || modalOpen || book[side]?.sealed || root.classList.contains('fp-open') || (koop && !koop.owns(g))) return false;
     cancelTool(false);
     selectedId = g.id;
@@ -1144,6 +1151,10 @@ export async function mount(root, params) {
     if (g) openRadial(g, e.clientX, e.clientY);
   });
 
+  // Tablet: aufgeraeumte Kaertchen und "Karte frei" (js/ui/tidy.js)
+  tidyUi = attachTidy({ root, ui, bar: ui.querySelector('.hud-right'), sheet: ui.querySelector('.hud-sheet'), onChange: () => { hud.setSheet(root.classList.contains('sheet-open')); refresh(); } });
+  tidyUi.stampWith(() => `${roundTitle(state)}, ${clockText(state.clock)} Uhr`);
+
   // ---------- Tastatur (Plan 7.6) ----------
   window.addEventListener('keydown', (e) => {
     if (modalOpen || e.defaultPrevented) return;
@@ -1156,8 +1167,11 @@ export async function mount(root, params) {
       return;
     }
     if (e.ctrlKey || e.metaKey || e.altKey) return;
+    // ^ links neben der 1 (auf dem Mac mit deutscher Tastatur meldet der Browser die Taste teils als IntlBackslash)
+    if ((e.key === '^' || e.code === 'Backquote' || (e.key === 'Dead' && e.code === 'IntlBackslash')) && !e.repeat) { e.preventDefault(); tidyUi.toggleBare(); return; }
     if (e.key === 'Escape') {
-      if (radial.open) { radial.hide(); refresh(); dynCv.focus({ preventScroll: true }); }
+      if (tidyUi.bare) tidyUi.setBare(false);
+      else if (radial.open) { radial.hide(); refresh(); dynCv.focus({ preventScroll: true }); }
       else if (tool) cancelTool();
       else if (laskNote.open) { laskNote.hide(); playSfx('paper', { intensity: 0.3 }); dynCv.focus({ preventScroll: true }); }
       else if (lehrling.open) lehrling.close();
@@ -1170,6 +1184,8 @@ export async function mount(root, params) {
     }
     // Feuerplan-Editor offen: keine Werkzeugtasten, sonst gingen die ungespeicherten Plaene verloren
     if (root.classList.contains('fp-open')) return;
+    // Karte frei: ein Befehl per Taste holt die Kaertchen zurueck, Verschieben und Zoomen nicht
+    if (tidyUi.bare && (e.key === 'Tab' || e.key === ' ' || e.key === 'Enter' || /^[ptoPTO]$/.test(e.key) || (e.key.length === 1 && toolByKey(e.key)))) tidyUi.setBare(false);
     if (e.key === 'Tab' && !e.shiftKey && (onMap || orderList.el.contains(t))) {
       // Tab auf der Karte oeffnet die Befehlsliste; in der Liste wird normal weitergesprungen
       if (onMap) { e.preventDefault(); toggleList(); }

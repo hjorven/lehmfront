@@ -8,7 +8,7 @@ export function createHud(root, { onToggleList, onToggleOverlay, onCheck, onTogg
   el.className = 'hud';
   el.innerHTML = `
     <button class="hud-strip card" type="button" aria-expanded="false" aria-controls="hud-sheet">
-      <span class="strip-vals"></span><span class="strip-clock" aria-hidden="true"></span><span class="strip-round"></span>
+      <span class="strip-vals"></span><span class="strip-clock" aria-hidden="true"></span><span class="strip-round"></span><span class="strip-warn" hidden></span>
     </button>
     <div class="hud-sheet" id="hud-sheet">
       <div class="res-row">
@@ -37,7 +37,8 @@ export function createHud(root, { onToggleList, onToggleOverlay, onCheck, onTogg
       <button class="btn ov-btn" type="button" aria-expanded="false" aria-haspopup="true">Overlays</button>
       <div class="card ov-pop" hidden><div class="ov-list"></div></div>
     </div>
-    <section class="card hint" role="status" aria-live="polite" hidden><b class="hint-title"></b><span class="hint-text"></span></section>`;
+    <section class="card hint" role="status" aria-live="polite" hidden><b class="hint-title"></b><span class="hint-text"></span>
+      <button type="button" class="hint-x" aria-label="Hinweis wegschieben">×</button></section>`;
   root.append(el);
   const $ = (s) => el.querySelector(s);
 
@@ -57,6 +58,11 @@ export function createHud(root, { onToggleList, onToggleOverlay, onCheck, onTogg
     const ck = e.target.closest('[data-check]');
     if (ck) onCheck(Number(ck.dataset.check));
   });
+
+  // Ein weggeschobener Hinweis kommt mit demselben Text nicht wieder (gilt fuer diese Sitzung)
+  const dismissed = new Set();
+  let hintKey = '';
+  $('.hint').addEventListener('click', () => { if (hintKey) dismissed.add(hintKey); $('.hint').hidden = true; });
 
   let lastChecks = [];
   let lastClock = null;
@@ -131,8 +137,15 @@ export function createHud(root, { onToggleList, onToggleOverlay, onCheck, onTogg
       lastChecks = m.checklist;
       $('.check-list').innerHTML = m.checklist.map((c, i) => `<li class="${c.tone}">${c.group || c.at
         ? `<button type="button" data-check="${i}">${esc(c.text)}</button>` : `<span>${esc(c.text)}</span>`}</li>`).join('');
+      // Aufgeraeumte Karte: offene Pruefpunkte als Zahl an der Kopfleiste, die Liste liegt in der Seitenleiste
+      const warns = m.checklist.filter((c) => c.tone === 'warn').length;
+      const sw = $('.strip-warn');
+      sw.hidden = !warns;
+      sw.textContent = warns ? `${warns} offen` : '';
       const hint = $('.hint');
-      hint.hidden = !m.hint;
+      // Kurze Meldungen tragen eine id: weggeschoben ist nur diese eine, die naechste gleiche erscheint wieder
+      hintKey = m.hint ? `${m.hint.title ?? ''}|${m.hint.text}|${m.hint.id ?? ''}` : '';
+      hint.hidden = !m.hint || dismissed.has(hintKey);
       if (m.hint) {
         hint.className = 'card hint' + (m.hint.tone ? ' t-' + m.hint.tone : '');
         $('.hint-title').textContent = m.hint.title ?? 'Hinweis';
