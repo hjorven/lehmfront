@@ -1,0 +1,37 @@
+/* Bewegung im Gefecht (P19 Feinschliff): Karten legen sich wie Papier auf den Tisch, statt aufzublitzen.
+   Nur translate/rotate/opacity (die Lage selbst setzen die Bausteine ueber left/top), keine Verlaeufe, kein Glow.
+   Eine Animation laeuft, wenn ein Element aus display:none sichtbar wird; bei reduzierter Bewegung gar nicht. */
+:root{
+  --dur-quick:.12s; --dur-sheet:.24s; --dur-slow:.42s;
+  --ease-paper:cubic-bezier(.2,.75,.25,1);
+}
+
+@keyframes lf-fade{from{opacity:0}}
+/* Blatt wird abgelegt: kommt leicht schraeg von oben und setzt sich */
+@keyframes lf-lay{from{opacity:0;translate:0 -8px;rotate:-.7deg}}
+/* Von unten nachgeschoben (Fernschreiberstreifen, Filmleiste) */
+@keyframes lf-feed{from{opacity:0;translate:0 14px}}
+/* Von rechts angelegt (Befehlsliste, Klappkarten der rechten Leiste) */
+@keyframes lf-slide{from{opacity:0;translate:10px 0}}
+/* Bleistiftkorrektur im Kaertchen: alter Wert durchgestrichen, dann verblasst */
+@keyframes lf-was{0%,70%{opacity:1}100%{opacity:0}}
+
+.gefecht .shield{animation:lf-lay var(--dur-sheet) var(--ease-paper)}
+.gefecht .hint{animation:lf-fade var(--dur-sheet) ease-out}
+.gefecht .orderlist,.gefecht .ov-pop,.gefecht .snd-pop{animation:lf-slide var(--dur-sheet) var(--ease-paper)}
+.gefecht .telegram,.gefecht .report,.gefecht .film{animation:lf-feed var(--dur-slow) var(--ease-paper)}
+.gefecht .archive{animation:lf-lay var(--dur-slow) var(--ease-paper)}
+.gefecht .modal-back{animation:lf-fade var(--dur-sheet) ease-out}
+.gefecht .modal-back > *{animation:lf-lay var(--dur-slow) var(--ease-paper)}
+
+/* Knoepfe geben unter dem Finger nach, wie ein Stempel */
+.gefecht .btn,.gefecht .tool,.gefecht .exec,.gefecht .film-tab{transition:background-color var(--dur-quick),color var(--dur-quick),border-color var(--dur-quick),translate var(--dur-quick)}
+.gefecht .btn:active,.gefecht .tool:active,.gefecht .exec:active{translate:0 1px}
+.gefecht .axis .fill{transition:width var(--dur-slow) var(--ease-paper)}
+
+.res .v .was,.strip-vals .was{display:inline-block;margin-right:4px;font-weight:400;color:var(--ink2);
+  text-decoration:line-through 2px var(--danger);animation:lf-was 2.6s linear both}
+
+@media (prefers-reduced-motion:reduce){
+  .gefecht *,.gefecht *::before,.gefecht *::after{animation:none !important;transition:none !important}
+}

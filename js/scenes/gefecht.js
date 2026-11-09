@@ -72,6 +72,7 @@ export async function mount(root, params) {
     ensureCss('css/film.css'),
     ensureCss('css/feuerplan.css'), // P09: Editor und Zittern der Karte bei Einschlaegen
     ensureCss('css/uhr.css'),
+    ensureCss('css/motion.css'),
     Promise.all(['16px "Special Elite"', '16px "IBM Plex Mono"', '700 16px "IBM Plex Mono"', '700 16px "Caveat"', '16px "IBM Plex Sans"', '700 16px "IBM Plex Sans"']
       .map((f) => document.fonts.load(f))).catch(() => {}),
   ]);
@@ -347,6 +348,7 @@ export async function mount(root, params) {
     const clk = clockModel(state);
     const attacking = isAttacker(state, side);
     return {
+      side,
       supplies: { ...s.supplies, carts: currentWagons(map, state, side, sidePlans[side]).length, cartsTotal: capacityOf(state, side) }, morale, reputation: s.reputation, trust: s.trust,
       roundTitle: roundTitle(state) + (mode === 'hotseat' ? ` · ${faction(s.faction).short}` : ''),
       roundSub: battleNow
