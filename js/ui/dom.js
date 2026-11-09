@@ -1,4 +1,5 @@
 // Kleine DOM-Helfer fuer die Kaertchen des Gefechtsbildschirms.
+import { getSetting } from '../settings.js';
 const ESC = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
 
 /** Text fuer innerHTML sicher machen (Namen kommen aus Daten) */
@@ -29,7 +30,13 @@ export function ensureCss(href) {
   });
 }
 
-/** Bevorzugt der Nutzer reduzierte Bewegung? */
+/** Bevorzugt der Nutzer reduzierte Bewegung? (Systemeinstellung oder Dienstbuch, P18) */
 export function reducedMotion() {
+  if (getSetting('motion') === 'reduce') return true;
   return typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
+/** Animationstempo aus dem Dienstbuch: 0,5 langsam bis 2 schnell (Phasenfilm, Fernschreiber) */
+export function animSpeed() {
+  return getSetting('speed') || 1;
 }

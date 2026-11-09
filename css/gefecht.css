@@ -92,6 +92,7 @@
 .shield .preview.bad{border-left-color:var(--danger)}
 .shield .preview{white-space:pre-line}
 .shield .rows .warn{color:var(--danger)}
+.shield.compact .rows,.shield.compact .type{display:none}
 
 /* ---------- Befehlsliste und Meldungen ---------- */
 .orderlist,.report{position:absolute;right:12px;width:340px;max-height:calc(100% - 200px);display:flex;flex-direction:column;font-size:13.5px;z-index:2}

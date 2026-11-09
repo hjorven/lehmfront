@@ -171,6 +171,13 @@ export function attachModeRules({ ui, info, map, start, scenario, humans, aiCfg,
     get ended() { return ended; },
     get report() { return report; },
     get tally() { return tally; },
+    /** Spielstand (P18): Zaehler sichern und wiederherstellen; ended ergibt sich beim Laden neu */
+    snapshot() { return { tally }; },
+    restore(snap, state) {
+      if (snap?.tally) tally = { ...emptyTally(), ...snap.tally };
+      last = state;
+      if (!ended && over(state)) { ended = true; report = finalReport({ start, end: state, map, tally }); }
+    },
     afterResolve(before, after, log) {
       tally = tallyLog(tally, log, { before: before.turnKind, after: after.turnKind });
       last = after;

@@ -7,7 +7,7 @@ import { replayTo, tracksBetween, trackPos, trackUpTo, sectionAt, transitionAt, 
 import { viewFor } from '../view.js';
 import { applyTheme, themeAt } from '../theme.js';
 import { clockText } from './labels.js';
-import { esc, reducedMotion } from './dom.js';
+import { esc, reducedMotion, animSpeed } from './dom.js';
 import { cueEvents, cueSection } from '../audio/director.js';
 
 /**
@@ -145,7 +145,7 @@ export function createFilmPlayer(root, { onFrame, onEnd, onLines }) {
     if (!playing) return;
     const dt = last ? Math.min(100, ts - last) : 16;
     last = ts;
-    t = Math.min(stopAt, t + dt);
+    t = Math.min(stopAt, t + dt * animSpeed());
     if (t >= stopAt) playing = false;
     // der Halte-Frame am Abschnittsende gehoert noch zum Abspielen (sonst tickt die Uhr nie)
     render(true);

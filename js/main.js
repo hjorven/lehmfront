@@ -1,4 +1,5 @@
 // Einstieg. Bis die Spielansichten stehen: Titelbild mit gezeichneter Lagekarte im Hintergrund.
+import './boot.js'; // P18: Einstellungen, Service Worker
 import { createRng } from './rng.js';
 import { audio, playSfx } from './audio/engine.js';
 import { dayKey, dayLabel } from './modes/skirmish.js';
@@ -87,6 +88,7 @@ if (scene) {
   document.getElementById('version').textContent = 'v' + VERSION;
   menuSound();
   menuToday();
+  import('./ui/menu-akte.js').then((m) => m.mountMenuAkte(params)).catch((e) => console.error(e));
 }
 
 // Klang im Hauptmenue (P17, Hinweis aus P19): ferne Front, Wind, karge Musik, sobald jemand tippt.

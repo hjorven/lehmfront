@@ -2,6 +2,7 @@
 // Zeichnet in Weltkoordinaten ueber der statischen Karte (applyCameraTransform). Reine Optik.
 // Befehlspfeile sehen aus wie mit Bleistift gezogen; ein frischer Pfeil wird sichtbar nachgezeichnet
 // (progress 0..1), die Bleistiftspitze faehrt dabei mit (Ueberraschung P03).
+import { getSetting } from '../settings.js';
 import { applyCameraTransform } from './camera.js';
 import { jitterPolyline, polyLength, hashSeed } from './geometry.js';
 import { FONTS } from './map-layer.js';
@@ -185,6 +186,16 @@ export function drawUnit(ctx, cam, th, g, mark, opts = {}) {
   ctx.lineWidth = 2 * px;
   if (opts.ghost) ctx.setLineDash([4 * px, 3 * px]);
   ctx.strokeRect(x, y, w, h);
+  // Farbunabhaengige Signatur (P18, Dienstbuch): Seite b mit Doppelrahmen und gefuellten Ecken
+  if (g.side === 'b' && getSetting('signs')) {
+    ctx.lineWidth = 1.2 * px;
+    ctx.strokeRect(x + 3 * px, y + 3 * px, w - 6 * px, h - 6 * px);
+    ctx.fillStyle = color;
+    const k = 5 * px;
+    for (const [cx0, cy0, dx, dy] of [[x, y, 1, 1], [x + w, y, -1, 1], [x, y + h, 1, -1], [x + w, y + h, -1, -1]]) {
+      ctx.beginPath(); ctx.moveTo(cx0, cy0); ctx.lineTo(cx0 + k * dx, cy0); ctx.lineTo(cx0, cy0 + k * dy); ctx.closePath(); ctx.fill();
+    }
+  }
   ctx.setLineDash([]);
   ctx.fillStyle = opts.ghost ? color : th.ink;
   ctx.font = `700 ${Math.min(h * 0.62, 13 * px)}px ${FONTS.num}`;

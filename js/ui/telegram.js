@@ -1,7 +1,7 @@
 // Telegramm nach der Runde (P07, Plan 3.4 Punkt 5, Stil 03 Feldtelegramm). Ein Fernschreiberstreifen:
 // jede Zeile kommt mit Zeitgruppe, Phase und Feld, darunter die Begruendung, wird Zeichen fuer Zeichen
 // getippt und endet mit STOP und Glocke. Klick auf eine Zeile springt zur Stelle auf der Karte.
-import { esc, reducedMotion } from './dom.js';
+import { esc, reducedMotion, animSpeed } from './dom.js';
 import { playSfx } from '../audio/engine.js';
 
 const CPS = 70; // Anschlaege pro Sekunde
@@ -62,9 +62,9 @@ export function createTelegram(root, { onJump, onFilm, onArchive }) {
     if (q.pos >= q.text.length) {
       q.span.parentElement.parentElement.classList.remove('cur');
       queue.shift();
-      timer = setTimeout(typeNext, 160);
+      timer = setTimeout(typeNext, 160 / animSpeed());
     } else {
-      timer = setTimeout(typeNext, 2000 / CPS);
+      timer = setTimeout(typeNext, 2000 / CPS / animSpeed());
     }
   }
 

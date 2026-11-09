@@ -64,6 +64,7 @@ import { createArchiveView } from '../ui/archive.js';
 import { drawFilmTrails } from '../render/film-layer.js';
 import { loadBattle } from '../modes/load.js';
 import { attachModeRules } from '../ui/result.js';
+import { attachGameMenu, resumeGame } from '../ui/gamemenu.js';
 import { campaignMission } from '../ui/campaign/mission.js';
 
 const num = (v, d) => (v === null || v === '' || !Number.isFinite(Number(v)) ? d : Number(v));
@@ -96,6 +97,10 @@ export async function mount(root, params) {
   if (campaignRun) state = campaignRun.prepare(state);
   if (!fixed && params.get('kind') === 'battle') { state.turnKind = 'battle'; state.battle = { round: 1 }; }
   if (!fixed) applyWeatherParams(state, map, params);
+  // P18: Spielstand aus ?slot= ersetzt den Startzustand; Archiv und KI-Gedaechtnis folgen weiter unten
+  const startState = structuredClone(state);
+  const resumed = await resumeGame(params);
+  if (resumed) state = resumed.state;
   const humans = mode === 'hotseat' ? ['a', 'b'] : ['a'];
   const env = { map };
   // KI-Kommandant (P13): Doktrin und Schwierigkeit aus dem Szenario (sides.b.ai), per URL &doktrin= &ki=.
@@ -138,6 +143,7 @@ export async function mount(root, params) {
   let helpShown = false;
   let suppressTap = false;
   let modalOpen = false;
+  if (resumed) { archive = resumed.archive ?? archive; aiMemory = resumed.aiMemory; lastLog = resumed.lastLog; if (resumed.book) book = resumed.book; }
   const forcedDark = params.has('night') ? Math.max(0, Math.min(1, num(params.get('night'), 0))) : null;
   // Erzwungene Nacht auch fuer die Regeln (Sichtweite, Trefferchance): Uhr auf 22 Uhr stellen
   if (forcedDark !== null && forcedDark >= 0.5 && !state.night) { state.clock = { ...state.clock, hour: 22, minute: 0 }; state.night = true; }
@@ -291,9 +297,20 @@ export async function mount(root, params) {
   mountSoundControls({ bar: ui.querySelector('.hud-right'), sheet: ui.querySelector('.hud-sheet') });
   // P17: Rundengrenze und Abschlussmeldung (Gefecht frei, Hotseat, Tageslage)
   const rules = attachModeRules({
-    ui, info: modeInfo, map, start: structuredClone(state), scenario, humans, aiCfg,
+    ui, info: modeInfo, map, start: startState, scenario, humans, aiCfg,
     onOpen: () => { modalOpen = true; cancelTool(false); radial.hide(); refresh(); },
     onClose: () => { modalOpen = false; refresh(); dynCv.focus({ preventScroll: true }); },
+  });
+  if (resumed) rules.restore(resumed.rules, state);
+  // P18: Dienstbuch (Einstellungen, Spielstaende, Klang, Tasten) und laufende Akte nach jeder Runde
+  const gameMenu = attachGameMenu({
+    ui, params,
+    snapshot: () => ({ state, map: liveMap, archive, aiMemory, lastLog, rules: rules.snapshot(), side, book }),
+    busy: () => (filmFrame || book.a?.sealed || book.b?.sealed ? 'Während der Ausführung oder Übergabe kann nicht abgelegt werden.' : rules.ended ? 'Die Partie ist beendet.' : null),
+    canOpen: () => !modalOpen && !filmFrame,
+    ended: () => rules.ended,
+    onOpen: () => { cancelTool(false); radial.hide(); modalOpen = true; refresh(); },
+    onClose: () => { modalOpen = false; refresh(); },
   });
   // Taktik-Lehrling (P13, Taste T) und abgefangene Notizen von Lask
   const lehrling = attachLehrling({
@@ -492,7 +509,10 @@ export async function mount(root, params) {
     const p = worldToScreen(cam, g.pos.x + 0.5, g.pos.y + 0.5);
     const b = unitBox(cam);
     const n = narrow();
-    return { x: p.x, y: p.y, h: b.h * cam.zoom + 8, safeTop: n ? 60 : 12, safeBottom: n ? 96 : 92 };
+    let safeBottom = n ? 96 : 92;
+    // P18: Auf dem Handy liegt das Telegramm unten quer; das Schild bleibt darueber statt es zu verdecken
+    if (n && report.open) safeBottom = Math.max(safeBottom, root.clientHeight - report.el.offsetTop + 8);
+    return { x: p.x, y: p.y, h: b.h * cam.zoom + 8, safeTop: n ? 60 : 12, safeBottom };
   }
   function updateShield() {
     const g = selectedId ? getGroup(state, selectedId) : null;
@@ -855,6 +875,7 @@ export async function mount(root, params) {
       }
     }
     book = nextRound(book, carry);
+    gameMenu.autosave(); // nach dem Weitertragen, damit laufende Wege und Graben mit in die Akte kommen
     sidePlans = { a: {}, b: {} }; // der Lorenplan steht danach im Zustand und gilt weiter
     side = humans[0];
     updateLiveMap();
@@ -1071,6 +1092,7 @@ export async function mount(root, params) {
     if (/^[1-4]$/.test(e.key)) { toggleOverlay(Number(e.key)); return; }
     if ((e.key === 'p' || e.key === 'P') && !toolByKey(e.key)) { e.preventDefault(); openArchive(); return; }
     if ((e.key === 't' || e.key === 'T') && !toolByKey(e.key)) { e.preventDefault(); lehrling.toggle(); return; }
+    if ((e.key === 'o' || e.key === 'O') && !toolByKey(e.key)) { e.preventDefault(); gameMenu.open(); return; }
     if (e.key.length === 1) {
       const def = toolByKey(e.key);
       if (!def) return;
@@ -1115,6 +1137,17 @@ export async function mount(root, params) {
   layer.drawNow();
   drawDynNow();
   dynCv.focus({ preventScroll: true });
+  // Geladener Slot wird zur laufenden Akte; ohne slot= in der Adresse nimmt ein Neuladen diese Akte wieder auf
+  // Neues Gefecht: gleich als laufende Akte ablegen, damit ein Neuladen nie eine fremde alte Akte aufnimmt
+  if (!resumed || !resumed.reload) {
+    gameMenu.autosave();
+  }
+  if (resumed && !resumed.reload) {
+    const u = new URL(location.href);
+    u.searchParams.delete('slot');
+    history.replaceState(history.state, '', u);
+  }
+  if (resumed) flash(resumed.reload ? `Akte wieder aufgenommen: ${roundTitle(state)}.` : `Spielstand geladen: ${roundTitle(state)}.`);
 
   // ---------- Demo-Zustaende fuer Screenshots und Tests ----------
   const api = {
