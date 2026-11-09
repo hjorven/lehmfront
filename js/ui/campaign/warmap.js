@@ -132,6 +132,10 @@ export function drawWarMap(canvas, { campaign, next = null, ended = null, highli
   ctx.save();
   ctx.translate(X(FRONT_X + cur * FRONT_STEP + LINE_GAP / 2) + 4, Y(0.98));
   ctx.rotate(-Math.PI / 2);
+  const nw = ctx.measureText('NIEMANDSLAND').width, nf = small ? 9 : 11;
+  ctx.fillStyle = C.board;
+  ctx.fillRect(-2, -nf, nw + 4, nf + 3);
+  ctx.fillStyle = C.ink2;
   ctx.fillText('NIEMANDSLAND', 0, 0);
   ctx.restore();
 
@@ -178,7 +182,12 @@ export function drawWarMap(canvas, { campaign, next = null, ended = null, highli
     if (!small || !['mark', 'house', 'hollow'].includes(p.kind)) {
       const tw = ctx.measureText(p.label).width;
       const lx = Math.max(4, Math.min(w - tw - 4, x - tw / 2));
-      ctx.fillText(p.label, lx, y - (small ? 12 : 16));
+      const ly = y - (small ? 12 : 16), fs = small ? 9 : 11;
+      // Schild in Brettfarbe, damit Linien und Draht die Namen nicht durchkreuzen
+      ctx.fillStyle = C.board;
+      ctx.fillRect(lx - 2, ly - fs, tw + 4, fs + 3);
+      ctx.fillStyle = C.ink2;
+      ctx.fillText(p.label, lx, ly);
     }
   }
 

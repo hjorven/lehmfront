@@ -5,13 +5,14 @@
 .fz-map{grid-area:map;width:100%;height:100%;min-height:0;display:block;touch-action:manipulation;border:1px solid var(--wr-faint);border-radius:3px}
 .fz .card{position:relative;background:var(--wr-board2);color:var(--wr-ink);border:1px solid var(--wr-line);border-radius:3px;box-shadow:0 2px 0 rgba(0,0,0,.35)}
 .fz .k{display:block;font:600 11px var(--font-num);letter-spacing:.12em;text-transform:uppercase;color:var(--wr-ink2)}
-.fz-head{grid-area:head;align-self:start;padding:10px 14px}
+.fz-head{grid-area:head;align-self:start;padding:10px 14px;min-width:0}
+.fz-head .k{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .fz-title{display:block;font:400 21px/1.15 var(--font-head);margin:4px 0 2px;color:var(--wr-ink)}
-.fz-sub{display:block;color:var(--wr-ink2);font-size:13px}
+.fz-sub{display:block;color:var(--wr-ink2);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .fz-sub i{font-style:normal;color:var(--wr-accent)}
 
 /* Achsen */
-.fz-axes{grid-area:axes;align-self:start;padding:12px 14px;max-height:100%;overflow:auto}
+.fz-axes{grid-area:axes;align-self:stretch;min-height:0;padding:12px 14px;overflow:auto;scrollbar-width:thin;scrollbar-color:var(--wr-line) transparent}
 .fz-axis{margin:2px 0 4px}
 .fz-axis-row{display:flex;justify-content:space-between;align-items:baseline}
 .fz-axis-row b{font:700 18px var(--font-num)}
@@ -83,6 +84,10 @@
 .fz-stamp-btn.armed{border:2px solid var(--wr-danger);background:var(--wr-grid)}
 .fz-armed{margin:0;min-height:1em;font-size:12px;color:var(--wr-danger)}
 .fz-armed:empty{display:none}
+.fz-armed.fatal{font-weight:700}
+/* Werte direkt ueber den Stempeln, damit man beim Stempeln sieht, wo man steht */
+.fz-axes-mini{display:flex;gap:16px;margin:0;font:12px var(--font-num);color:var(--wr-ink2)}
+.fz-axes-mini b{color:var(--wr-ink);font-weight:700}
 
 /* Karteikasten der Erfahrungsberichte */
 .fz-reports{grid-area:reports;align-self:end;padding:10px 12px 12px;min-width:0}
@@ -103,6 +108,7 @@
 .fz-card.fresh .fz-card-stamp{color:var(--wr-stamp-red)}
 .fz-card-stamp.held{color:var(--wr-ink2)}
 .fz-tally{stroke:var(--wr-ink);stroke-width:1.5;stroke-linecap:round;fill:none;margin-top:auto}
+.fz-tally-num{margin-top:auto;font:600 12px var(--font-num);color:var(--wr-ink)}
 .fz-tally-none{margin-top:auto;font:italic 12px var(--font-ui);color:var(--wr-faint)}
 
 /* Aufbruch */

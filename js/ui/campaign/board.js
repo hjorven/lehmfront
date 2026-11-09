@@ -30,9 +30,11 @@ function telegram({ cls = '', heading, nr = '', fields = [], lines = [], mark = 
   </article>`;
 }
 
-/** Strichliste fuer den Fortschritt eines Berichts: hoechstens 20 Striche, in Fuenfergruppen */
+/** Strichliste fuer den Fortschritt eines Berichts: echte Striche in Fuenfergruppen, nur bis 20 (darueber Zahlen) */
+export const TALLY_MAX = 20;
 export function tally(n, need) {
-  const strokes = Math.max(0, Math.min(20, Math.floor((Math.min(n, need) * 20) / need)));
+  if (need > TALLY_MAX) return null;
+  const strokes = Math.max(0, Math.min(need, n));
   const groups = [];
   for (let i = 0; i < strokes; i += 5) groups.push(Math.min(5, strokes - i));
   return groups;
@@ -40,6 +42,7 @@ export function tally(n, need) {
 
 function tallySvg(n, need) {
   const groups = tally(n, need);
+  if (!groups) return `<span class="fz-tally-num">${Math.min(n, need)} / ${need}</span>`;
   if (!groups.length) return '<span class="fz-tally-none">noch nichts</span>';
   const parts = groups.map((k, gi) => {
     const x0 = gi * 22;
@@ -68,7 +71,8 @@ function spark(history, key, w = 132, h = 26) {
 export function createBoard(root, opts) {
   const { index } = opts;
   let campaign = opts.campaign;
-  let armed = null; // Verweigern muss zweimal getippt werden
+  let armed = null; // Verweigern (und jeder Stempel, der zur Abloesung fuehrt) muss zweimal getippt werden
+  let armedAt = 0;
   const el = html(`<div class="fz" data-daytime="night">
     <canvas class="fz-map" aria-label="Feldzugskarte des Abschnitts Asse-Nord"></canvas>
     <div class="fz-tip" hidden></div>
@@ -149,7 +153,8 @@ export function createBoard(root, opts) {
       return `<button type="button" class="fz-stamp-btn s-${s}" data-stamp="${s}"><b>${STAMP_LABEL[s]}</b><small>${now ? esc(now) + ' sofort · ' : ''}${esc(later)}</small></button>`;
     };
     if (only) return `<div class="fz-stamps"><button type="button" class="fz-stamp-btn s-befolgen" data-stamp="befolgen"><b>Eingang bestätigen</b><small>Die Entscheidung zu diesem Befehl fällt im Einsatz.</small></button></div>`;
-    return `<div class="fz-stamps" role="group" aria-label="Stabsbefehl abstempeln">${['befolgen', 'umdeuten', 'verweigern'].map(opt).join('')}</div>
+    return `<p class="fz-axes-mini"><span>Ansehen <b>${campaign.ansehen}</b></span><span>Vertrauen <b>${campaign.vertrauen}</b></span></p>
+      <div class="fz-stamps" role="group" aria-label="Stabsbefehl abstempeln">${['befolgen', 'umdeuten', 'verweigern'].map(opt).join('')}</div>
       <p class="fz-armed" aria-live="polite"></p>`;
   }
 
@@ -263,13 +268,28 @@ export function createBoard(root, opts) {
     const s = ev.target.closest('[data-stamp]');
     if (s) {
       const stamp = s.dataset.stamp;
-      if (stamp === 'verweigern' && armed !== 'verweigern') {
-        armed = 'verweigern';
-        const note = el.querySelector('.fz-armed');
-        if (note) note.textContent = 'Noch einmal tippen, um den Befehl wirklich zu verweigern.';
-        s.classList.add('armed');
-        playSfx('pencil', { count: 1, intensity: 0.4 });
-        return;
+      const order = next() ? orderOf(next()) : null;
+      const after = campaign.ansehen + (order && !decidedElsewhere(next()) ? stampCost(order, stamp).ansehen : 0);
+      const fatal = after < LIMITS.RELIEF;
+      if (stamp === 'verweigern' || fatal) {
+        // Zweites Tippen zaehlt erst nach einer kurzen Pause (kein versehentlicher Doppeltipp)
+        if (armed !== stamp || performance.now() - armedAt < 300) {
+          if (armed !== stamp) {
+            armed = stamp;
+            armedAt = performance.now();
+            el.querySelectorAll('.fz-stamp-btn.armed').forEach((b) => b.classList.remove('armed'));
+            const note = el.querySelector('.fz-armed');
+            if (note) {
+              note.textContent = fatal
+                ? `Ansehen fiele auf ${Math.max(0, after)}: Damit werden Sie abgelöst. Noch einmal tippen, um trotzdem zu stempeln.`
+                : 'Noch einmal tippen, um den Befehl wirklich zu verweigern.';
+              note.classList.toggle('fatal', fatal);
+            }
+            s.classList.add('armed');
+            playSfx('pencil', { count: 1, intensity: 0.4 });
+          }
+          return;
+        }
       }
       armed = null;
       opts.onStamp?.(stamp);

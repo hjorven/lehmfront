@@ -328,7 +328,7 @@ export async function mount(root, params) {
     laskNote.show(note);
     playSfx('paper', { intensity: 0.7 });
   }
-  campaignRun?.mount(ui, { getState: () => state, getArchive: () => archive, isBusy: () => modalOpen });
+  campaignRun?.mount(ui, { getState: () => state, getArchive: () => archive, isBusy: () => modalOpen, setModal: (on) => { modalOpen = on; refresh(); } });
   const toolbar = createToolbar(ui, {
     onTool: (id, disabled) => {
       const def = allTools().find((t) => t.id === id);
@@ -766,6 +766,7 @@ export async function mount(root, params) {
       const end = lastLog.find((e) => e.type === 'battle_end' && e.side === side);
       if (end) flash(end.reason, end.outcome === 'taken' || end.outcome === 'defended' ? '' : 'warn');
       if (pendingNote) { showNote(pendingNote); pendingNote = null; }
+      campaignRun?.afterFilm(ui);
     }
     refresh();
     if (clockSnapDue && !filmReplay) snapClock();
@@ -836,7 +837,7 @@ export async function mount(root, params) {
     }
     lehrling.afterRound(humans);
     archive = archiveRound(archive, input, r);
-    campaignRun?.afterRound(state, archive, ui);
+    campaignRun?.afterRound(state, archive);
     // Unvollendete Wege laufen als Befehl weiter, solange die Rundenart passt
     const carry = { a: [], b: [] };
     for (const e of r.log) {

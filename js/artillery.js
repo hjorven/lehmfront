@@ -15,7 +15,7 @@ import {
   BATTERY_TYPES, PLAN_KINDS, LINK_DELAY, LINE_REACH, LINE_CUT, FLASH_SPOT, SILENCED_ROUNDS, CRATER_BIG, SHELLS_PER_AMMO,
 } from './config/artillery.js';
 import { faction } from './config/factions.js';
-import { hasReport, reportOpen } from './config/reports.js';
+import { hasReport, reportOpen, REPORT_EFFECTS } from './config/reports.js';
 import { unitType } from './config/units.js';
 import { DIR, DIRS, lineCells, distance, cellAt, cellLabel, enterCost } from './map.js';
 import { coverValue } from './rules.js';
@@ -545,8 +545,8 @@ export function applyImpacts(state, map, rng, impacts, { firing, emit, turn, wha
       }
     }
     losses = Math.min(g.strength, losses);
-    // Erfahrungsbericht Stahlhelme (P14): jeder vierte Splittertreffer geht am Helm vorbei
-    if (losses > 1 && hasReport(state, g.side, 'stahlhelme')) losses -= Math.floor((losses + 1) / 4);
+    // Erfahrungsbericht Stahlhelme (P14): Ausfaelle durch Splitter auf REPORT_EFFECTS.stahlhelme (drei Viertel, abgerundet zugunsten des Helms)
+    if (losses > 1 && hasReport(state, g.side, 'stahlhelme')) losses -= Math.floor((losses * (100 - REPORT_EFFECTS.stahlhelme.artilleryLossPct) + 99) / 100);
     const before = g.suppressed;
     const supp = (acc.direct * suppression) / 100 + (acc.near * suppression) / 400;
     g.suppressed = r2(Math.min(1, g.suppressed + (g.inDugout ? supp / 2 : supp)));

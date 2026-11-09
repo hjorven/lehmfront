@@ -169,8 +169,11 @@ export async function mount(root, params) {
       const seed = (Number(params.get('seed')) >>> 0) || ((Date.now() % 1000000007) >>> 0) || 1;
       campaign = newCampaign({ seed, side: 'a', faction: 'kaldern' });
       save(campaign);
+    }
+    // Prolog bis zum Ende: wer waehrenddessen neu laedt, bekommt ihn noch einmal (prologueDone erst danach)
+    if (!campaign.prologueDone && !campaign.ended && campaign.history.length <= 1) {
       const r = await playPrologue({ campaign, mission: campaign.mission });
-      campaign = afterInterlude({ ...normalizeCampaign(r.campaign), mission: campaign.mission });
+      campaign = { ...afterInterlude({ ...normalizeCampaign(r.campaign), mission: campaign.mission }), prologueDone: true };
       save(campaign);
     }
   }

@@ -320,7 +320,7 @@ test('applyCampaignToState: Werte, Berichte, Nachschub, Ersatz', () => {
   assert.deepEqual(s.sides.a.reports, ['drahtscheren', 'stahlhelme']);
   assert.equal(s.sides.a.supplies.income.food, Math.floor((12 * 140) / 100));
   assert.equal(s.sides.a.replacements.tenths, 110);
-  assert.equal(s.sides.a.campaign.replacementPct, 140);
+  assert.equal(s.sides.a.supplies.food, state.sides.a.supplies.food, 'Anfangsbestand bleibt, nur der Zufluss skaliert');
   assert.equal(state.sides.a.reports, undefined, 'Original unveraendert');
   assert.deepEqual(startAxes(s), { reputation: 100, trust: 70 });
   assert.equal(s.sides.b.campaign, undefined, 'der Gegner bleibt frei');
@@ -331,8 +331,10 @@ test('Vertrauen und Ansehen wirken im Zustand auf Erholung und Ersatz', () => {
   const neutral = moraleFactors(state, 'a');
   const low = moraleFactors({ ...state, sides: { ...state.sides, a: { ...state.sides.a, trust: 0 } } }, 'a');
   assert.ok(low.recovery < neutral.recovery);
-  const s = applyCampaignToState(state, newCampaign({ ansehen: 0, vertrauen: 50 }));
-  assert.ok(moraleFactors(s, 'a').replacements.speed < neutral.replacements.speed);
+  const s0 = applyCampaignToState(state, newCampaign({ ansehen: 0, vertrauen: 50 }));
+  const s9 = applyCampaignToState(state, newCampaign({ ansehen: 90, vertrauen: 50 }));
+  assert.ok(s0.sides.a.replacements.tenths < s9.sides.a.replacements.tenths, 'Ansehen bringt Ersatz vor der Mission');
+  assert.ok(s0.sides.a.supplies.income.ammo < s9.sides.a.supplies.income.ammo, 'und Nachschub je Runde');
 });
 
 test('Sperren nur in der Kampagne, Boni nur mit Bericht', () => {
@@ -394,7 +396,9 @@ test('Runde mit Kampagne laeuft durch und ist deterministisch', () => {
 
 test('Missionsziel: angemeldet, sonst Standard beim Beenden', () => {
   assert.equal(judgeMission('a9m9', { rounds: [], final: false }), null, 'ohne Ziel laeuft die Mission weiter');
-  assert.equal(judgeMission('a9m9', { rounds: [], final: true }).outcome, 'sieg', 'Linie gehalten');
+  assert.equal(judgeMission('a9m9', { rounds: [], final: true }).outcome, 'niederlage', 'zu frueh gemeldet zaehlt nicht');
+  const quiet = Array.from({ length: 6 }, () => round([]));
+  assert.equal(judgeMission('a9m9', { rounds: quiet, final: true }).outcome, 'sieg', 'Linie gehalten');
   assert.equal(judgeMission('a9m9', { rounds: [round([ev('breach', 'b')])], final: true }).outcome, 'niederlage');
   registerMissionJudge('a9m8', ({ counts }) => (counts.won >= 2 ? { outcome: 'sieg', orderMet: true } : null));
   assert.equal(judgeMission('a9m8', { rounds: [round([ev('breach', 'a'), ev('breach', 'a')])] }).outcome, 'sieg');

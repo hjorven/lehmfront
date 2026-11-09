@@ -360,7 +360,8 @@ export function replyBand(ansehen) {
 
 /**
  * Kampagne auf den Startzustand einer Mission legen (nach createInitialState und initEtappen):
- * Ansehen und Vertrauen, Berichte, Nachschub, Batteriemunition, Ersatz. Gibt einen neuen Zustand zurueck.
+ * Ansehen und Vertrauen, Berichte, Nachschub je Runde, Batteriemunition, Ersatz (einmal vor der Mission).
+ * Gibt einen neuen Zustand zurueck.
  */
 export function applyCampaignToState(state, campaign, side = campaign.side ?? 'a') {
   const s = structuredClone(state);
@@ -373,7 +374,6 @@ export function applyCampaignToState(state, campaign, side = campaign.side ?? 'a
   st.campaign = {
     mission: campaign.mission ?? null,
     supplyPct: fx.supplyPct,
-    replacementPct: fx.supplyPct,
     batteryPct: fx.batteryPct,
     act: actOf(campaign.mission ?? MISSIONS[0]),
     refuse: fx.refuse,
@@ -381,9 +381,7 @@ export function applyCampaignToState(state, campaign, side = campaign.side ?? 'a
   st.supplies = { ...(st.supplies ?? {}) };
   const income = { ...DEFAULT_INCOME, ...(st.supplies.income ?? {}) };
   st.supplies.income = Object.fromEntries(Object.keys(income).sort().map((k) => [k, Math.floor((income[k] * fx.supplyPct) / 100)]));
-  for (const k of ['ammo', 'food', 'material']) {
-    if (Number.isFinite(st.supplies[k])) st.supplies[k] = Math.floor((st.supplies[k] * fx.supplyPct) / 100);
-  }
+  // Nur der Zufluss je Runde haengt am Ansehen, der Anfangsbestand bleibt (sonst wirkte das Ansehen doppelt)
   for (const b of st.artillery?.batteries ?? []) {
     if (Number.isFinite(b.ammo)) b.ammo = Math.floor((b.ammo * fx.batteryPct) / 100);
   }
@@ -409,11 +407,16 @@ export function registerMissionJudge(mission, fn) {
   judges.set(mission, fn);
 }
 
-/** Standardwertung ohne eigenes Missionsziel: verloren bei Meuterei oder mehr verlorenem als gewonnenem Graben */
+/** Standardwertung ohne eigenes Missionsziel: verloren bei Meuterei, mehr verlorenem als gewonnenem Graben
+ * oder bei Meldung vor HOLD_ROUNDS Runden ohne Gelaendegewinn (sonst liesse sich Ansehen durch fruehes Melden sammeln) */
+export const HOLD_ROUNDS = 6;
+
 export function defaultJudge({ rounds, side }) {
   const c = missionCounts(rounds, side);
   if (c.mutiny) return { outcome: 'niederlage', orderMet: false, why: 'Meuterei' };
   if (c.lost > c.won) return { outcome: 'niederlage', orderMet: false, why: 'Gelände verloren' };
+  // Wer ohne Geländegewinn nach wenigen Runden meldet, hat nichts gehalten: der Stab wertet das nicht als Erfolg
+  if (!c.won && rounds.length < HOLD_ROUNDS) return { outcome: 'niederlage', orderMet: false, why: `Zu früh gemeldet: Halten zählt erst nach ${HOLD_ROUNDS} Runden` };
   return { outcome: 'sieg', orderMet: true, why: c.won ? 'Gelände gewonnen' : 'Linie gehalten' };
 }
 

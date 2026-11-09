@@ -8,12 +8,14 @@ Beispielstände ohne Speichern: `&demo=mitte|tief|hoch|ende`, dazu `&stempel=umd
 1. Neuer Feldzug: `newCampaign` (js/campaign.js), Prolog der Erzählung (P15), dann die Feldzugskarte.
 2. Auf der Karte liegt der Stabsbefehl der nächsten Mission. Stempel: **Befolgen** (volle Folgen), **Umdeuten**
    (sofort Ansehen −1, Vertrauen +2, danach halbe Folgen), **Verweigern** (sofort Ansehen −(|verfehlt|+2), bei EILT
-   noch −2, Vertrauen +4, danach keine Folgen). Verweigern muss zweimal getippt werden. Hat die Mission eine eigene
+   noch −2, Vertrauen +4, danach keine Folgen). Verweigern muss zweimal getippt werden, ebenso jeder Stempel, der das
+   Ansehen unter 10 drückt (der Hinweis sagt dann „Damit werden Sie abgelöst“). Hat die Mission eine eigene
    Entscheidung mit befolgen/umdeuten/verweigern (a3m4 ...), wird nur der Eingang bestätigt.
 3. „Zum Einsatz“ speichert die Kampagne und öffnet `?scene=gefecht&scenario=<id>&campaign=1&seed=<n>`.
    `js/ui/campaign/mission.js` legt Ansehen, Vertrauen, Berichte, Nachschub, Batteriemunition und Ersatz auf den
    Startzustand (`applyCampaignToState`) und zeigt „Einsatz melden“. Meuterei (Vertrauen unter 10, Phase `campaign`)
-   oder ein angemeldetes Missionsziel beenden den Einsatz von selbst.
+   oder ein angemeldetes Missionsziel beenden den Einsatz von selbst; der Dialog kommt erst nach dem Phasenfilm
+   (`afterRound` merkt vor, `afterFilm` zeigt). Ohne laufenden Einsatz leitet `campaign=1` zur Feldzugskarte um.
 4. Zurück auf der Feldzugskarte: `finishMission` bucht alle Auslöser, zählt die Erfahrungsberichte, verschiebt die
    Front, dann `playInterlude` (Gefallenenliste, Post, Entscheidungen, nächstes Briefing), dann `afterInterlude`.
 5. Unter 10 Ansehen: abgelöst, unter 10 Vertrauen: Meuterei. Beides beendet den Feldzug mit den Texten
@@ -31,7 +33,8 @@ registerMissionJudge('a1m1', ({ state, rounds, side, counts }) =>
   counts.lost === 0 && state.turn > 6 ? { outcome: 'sieg', orderMet: true, why: 'Linie steht' } : null); // null: läuft weiter
 ```
 
-Ohne Ziel gilt beim Melden: verloren bei Meuterei oder mehr verlorenem als gewonnenem Graben, sonst Sieg.
+Ohne Ziel gilt beim Melden: verloren bei Meuterei, mehr verlorenem als gewonnenem Graben oder Meldung vor
+`HOLD_ROUNDS` (6) Runden ohne Geländegewinn, sonst Sieg.
 `state.result` (P13, `ctx.finish`) wird übernommen. Flags einer Mission (`harms_gefallen`, `velde_verloren` ...)
 gibt das Missionsziel im Ergebnis mit (`{ outcome, orderMet, why, flags: ['harms_gefallen'] }`); `finishMission`
 setzt sie vor der Zwischenszene, damit Gefallenenliste, Tagebuch und Briefe sie lesen.
