@@ -18,6 +18,7 @@ import { registerPhase, ORDER } from './registry.js';
 import { registerOrderValidator } from '../orders.js';
 import { registerDigFactor } from './dig.js';
 import { registerLetterCategory } from '../letters.js';
+import { registerCasualtySource } from '../narrative/casualties.js';
 import { cellLabel, TERRAIN } from '../map.js';
 import { byId, compareId, newLeader, otherSide, SIDES } from '../state.js';
 import { PINNED } from '../sight.js';
@@ -27,6 +28,9 @@ import {
   leaderMorale, leaderChance, checkChance, checkOutcome, sectionMorale, sectionIdAt, freeRestCell, restCamps,
   replacementTenths, refillPreview, surname, digFatiguePct,
 } from '../morale.js';
+
+/** Befehle, mit denen eine Gruppe im Ruhelager bleibt */
+const REST_ORDERS = new Set(['hold', 'refill']);
 
 const name = (g) => 'Gruppe ' + surname(g.leader?.name);
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
@@ -42,10 +46,15 @@ function replacementsOf(state, side) {
   return s.replacements;
 }
 
-/** Ersatz, der gerade bereitsteht: { pool (gruen), veterans (Genesene aus dem Lazarett) } */
-export function replacementStock(state, side) {
+/**
+ * Ersatz, der bereitsteht: { pool (gruen), veterans (Genesene aus dem Lazarett) }.
+ * incoming: true rechnet den Ersatz dieser Runde mit ein (er kommt in der Moralphase vor dem Auffuellen an).
+ */
+export function replacementStock(state, side, { incoming = false } = {}) {
   const s = state.sides[side];
-  return { pool: Math.floor((s?.replacements?.tenths ?? 0) / 10), veterans: s?.supply?.reserveMen ?? 0 };
+  let tenths = s?.replacements?.tenths ?? 0;
+  if (incoming) tenths = Math.min(C.REPLACEMENTS_CAP * 10, tenths + replacementTenths(moraleFactors(state, side).replacements.speed ?? 1));
+  return { pool: Math.max(0, Math.floor(tenths / 10)), veterans: s?.supply?.reserveMen ?? 0 };
 }
 
 /** Erfahrung, mit der gruener Ersatz kommt (Ausbildungslager: 1 statt 0) */
@@ -94,7 +103,7 @@ function applyLosses(ctx) {
       g.leaderFell = { name: fell.name, home: fell.home, turns: C.LEADER_SHOCK };
       out.leader.add(id);
       ctx.emit('leader_fallen', {
-        side: g.side, group: g.id, secret: true, fallen: fell.name, successor: g.leader.name, amount: drop,
+        side: g.side, group: g.id, secret: true, fallen: fell.name, home: fell.home, successor: g.leader.name, amount: drop,
         reason: `${fell.name} aus ${fell.home} ist gefallen. ${g.leader.name} übernimmt die Gruppe. Die Leute sind wie gelähmt, Moral −${drop}.`,
         at: { ...g.pos },
       });
@@ -134,11 +143,17 @@ function storeSections(ctx) {
 
 function runRelieve(ctx) {
   const { state, map } = ctx;
-  // Ruhende Gruppen, die woandershin gegangen sind, ruhen nicht mehr
+  // Ruhende Gruppen, die woandershin gegangen sind oder arbeiten (Graben, Draht ...), ruhen nicht mehr
   for (const g of ctx.groups()) {
-    if (g.status === 'rest' && g.restAt && (g.pos.x !== g.restAt.x || g.pos.y !== g.restAt.y)) {
+    if (g.status !== 'rest') continue;
+    const o = ctx.orderFor(g.id);
+    const busy = o && !REST_ORDERS.has(o.type);
+    if (busy || !g.restAt || g.pos.x !== g.restAt.x || g.pos.y !== g.restAt.y) {
       g.status = 'front';
       delete g.restAt;
+      if (busy) ctx.emit('rest_ended', {
+        side: g.side, group: g.id, secret: true, minor: true, reason: `${name(g)} wird aus dem Ruhelager geholt.`, at: { ...g.pos },
+      });
     }
   }
   const orders = ctx.ordersOfType('relieve');
@@ -146,9 +161,14 @@ function runRelieve(ctx) {
   const taken = new Set();
   const usedRelief = new Set();
   const relieved = { a: 0, b: 0 };
+  const firstAt = {};
   for (const o of orders) {
     const g = ctx.group(o.group);
-    if (!g || postOf(map, g) !== 'front') continue;
+    if (!g || g.status === 'lost') continue;
+    if (postOf(map, g) !== 'front') {
+      ctx.emit('relieve_failed', { side: g.side, group: g.id, secret: true, reason: `${name(g)} steht nicht mehr vorn, Ablösen entfällt.`, at: { ...g.pos } });
+      continue;
+    }
     const at = { ...g.pos };
     let r = o.by ? ctx.group(o.by) : null;
     let note = '';
@@ -158,8 +178,9 @@ function runRelieve(ctx) {
       if (ro && ro.type !== 'hold') { note = ` ${name(r)} hat einen anderen Befehl.`; r = null; }
     }
     const from = r ? { ...r.pos } : null;
-    const spot = freeRestCell(map, state, g.side, from ?? at, taken);
-    const dest = spot?.cell ?? from;
+    // Ist das Ruhelager voll, nimmt die abgeloeste Gruppe den Platz ihrer Abloesung ein
+    const spot = freeRestCell(map, state, g.side, from ?? at, taken) ?? (from ? { cell: from, camp: postOf(map, r) === 'rest' } : null);
+    const dest = spot?.cell ?? null;
     if (!dest) {
       ctx.emit('relieve_failed', {
         side: g.side, group: g.id, secret: true,
@@ -167,7 +188,8 @@ function runRelieve(ctx) {
       });
       continue;
     }
-    const timely = (g.frontTurns ?? 0) >= 1 && (g.frontTurns ?? 0) <= C.TOO_LONG;
+    // Rechtzeitig: lange genug vorn gewesen (kein Hin- und Hertauschen fuer Vertrauen), aber noch nicht zu lange
+    const timely = (g.frontTurns ?? 0) >= C.RELIEF_MIN && (g.frontTurns ?? 0) < C.TOO_LONG;
     const turns = g.frontTurns ?? 0;
     if (r) {
       usedRelief.add(r.id);
@@ -182,18 +204,17 @@ function runRelieve(ctx) {
     g.inDugout = false;
     delete g.dugout;
     g.suppressed = 0;
-    if (spot) {
-      taken.add(dest.x + ',' + dest.y);
-      g.status = 'rest';
-      g.restAt = { x: dest.x, y: dest.y };
-    }
+    taken.add(dest.x + ',' + dest.y);
+    g.status = 'rest';
+    g.restAt = { x: dest.x, y: dest.y };
     g.frontTurns = 0;
-    if (timely) relieved[g.side]++;
+    if (timely) { relieved[g.side]++; firstAt[g.side] ??= at; }
     const where = cellLabel(at.x, at.y);
-    const camp = spot ? (spot.camp ? 'ins Ruhelager' : 'in die Scheunen hinter dem Depot') : 'in die Reserve';
+    const camp = spot.camp ? 'ins Ruhelager' : 'in die Scheunen hinter dem Depot';
+    const after = turns ? ` nach ${plural(turns, 'Runde', 'Runden')} vorn` : '';
     const reason = r
-      ? `${name(r)} löst ${name(g)} bei ${where} ab. ${name(g)} geht nach ${plural(turns, 'Runde', 'Runden')} vorn ${camp}.${note}`
-      : `${name(g)} verlässt nach ${plural(turns, 'Runde', 'Runden')} die Stellung bei ${where} und geht ${camp}. Das Feld bleibt leer.${note}`;
+      ? `${name(r)} löst ${name(g)} bei ${where} ab. ${name(g)} geht${after} ${camp}.${note}`
+      : `${name(g)} verlässt${turns ? ` nach ${plural(turns, 'Runde', 'Runden')}` : ''} die Stellung bei ${where} und geht ${camp}. Das Feld bleibt leer.${note}`;
     ctx.emit('relieved', {
       side: g.side, group: g.id, secret: true, by: r?.id ?? null, from: at, to: { ...g.pos }, turns, empty: !r,
       reason, at,
@@ -206,7 +227,7 @@ function runRelieve(ctx) {
     ctx.emit('trust_relief', {
       side, secret: true, minor: true, amount: n,
       reason: `Vertrauen +${n}: Die Truppe merkt, dass man sie nicht vergisst.`,
-      at: { x: 0, y: 0 },
+      at: firstAt[side],
     });
   }
 }
@@ -217,7 +238,11 @@ function runRefill(ctx) {
   const { state } = ctx;
   for (const o of ctx.ordersOfType('refill')) {
     const g = ctx.group(o.group);
-    if (!g || postOf(ctx.map, g) === 'front') continue;
+    if (!g || g.status === 'lost') continue;
+    if (postOf(ctx.map, g) === 'front') {
+      ctx.emit('refill_none', { side: g.side, group: g.id, secret: true, reason: `${name(g)} steht vorn, aufgefüllt wird nur hinten.`, at: { ...g.pos } });
+      continue;
+    }
     const rep = replacementsOf(state, g.side);
     const stock = replacementStock(state, g.side);
     const xpBefore = g.experience;
@@ -399,11 +424,13 @@ function runMoraleBattle(ctx) {
 function runMoraleEnd(ctx) {
   for (const e of ctx.log) {
     if (e.type !== 'battle_end' || !e.side) continue;
-    const won = e.outcome === 'taken' || e.outcome === 'defended';
-    const lost = e.outcome === 'broken' || e.outcome === 'lost';
+    // P06 meldet dem Verteidiger 'defended', sobald der Angreifer ein Ergebnis hat, auch wenn er das Ziel nahm
     const foe = ctx.log.find((x) => x.type === 'battle_end' && x.side === otherSide(e.side));
     const lostGround = foe?.outcome === 'taken';
-    const delta = won ? C.BATTLE_WON : lost || lostGround ? -C.BATTLE_LOST : 0;
+    const repelled = e.outcome === 'defended' && (foe?.outcome === 'stuck' || foe?.outcome === 'broken');
+    const won = !lostGround && (e.outcome === 'taken' || repelled);
+    const lost = lostGround || e.outcome === 'broken';
+    const delta = won ? C.BATTLE_WON : lost ? -C.BATTLE_LOST : 0;
     if (!delta) continue;
     const list = ctx.groups(e.side).filter((g) => postOf(ctx.map, g) === 'front').sort(byId);
     for (const g of list) g.morale = clamp(g.morale + delta, 0, 100);
@@ -422,6 +449,10 @@ function runMoraleEnd(ctx) {
 registerOrderValidator('relieve', (order, group, state, env) => {
   const map = env?.map;
   if (map && postOf(map, group) !== 'front') return 'die Gruppe steht nicht vorn';
+  if (map) {
+    const c = map.cells[group.pos.y * map.width + group.pos.x];
+    if (c && (c.zone !== 'stellung' || c.side !== (group.side === 'a' ? 'own' : 'enemy'))) return 'abgelöst wird nur in der eigenen Stellung, nicht im Niemandsland oder beim Gegner';
+  }
   if (order.by == null) return null;
   if (typeof order.by !== 'string') return 'Ablösung ist keine Gruppe';
   if (order.by === group.id) return 'eine Gruppe kann sich nicht selbst ablösen';
@@ -436,9 +467,8 @@ registerOrderValidator('refill', (order, group, state, env, side) => {
   const map = env?.map;
   if (map && postOf(map, group) === 'front') return 'aufgefüllt wird nur in Reserve oder Ruhe';
   if (group.strength >= group.size) return 'die Gruppe ist vollzählig';
-  const st = replacementStock(state, side);
-  const accrued = Math.floor(((state.sides[side]?.replacements?.tenths ?? 0) + replacementTenths(moraleFactors(state, side).replacements.speed ?? 1)) / 10);
-  if (!st.veterans && accrued <= 0) return 'kein Ersatz im Depot';
+  const st = replacementStock(state, side, { incoming: true });
+  if (!st.veterans && st.pool <= 0) return 'kein Ersatz im Depot';
   return null;
 });
 
@@ -454,6 +484,8 @@ registerDigFactor('erschoepfung', ({ group }) => {
 registerLetterCategory('relieved', 'abloesung');
 registerLetterCategory('too_long', 'abloesung');
 registerLetterCategory('leader_fallen', 'verluste');
+// Gefallenenliste (P15): der Gruppenfuehrer steht mit Namen darin, an Stelle eines namenlosen Verlusts derselben Runde
+registerCasualtySource('leader_fallen', (e) => (e.fallen ? [{ group: e.group, count: 1, cause: 'fire', kind: 'fallen', person: { name: e.fallen, home: e.home ?? '' }, replaces: true }] : []));
 
 registerPhase({ id: 'relieve', kind: 'position', order: ORDER.position.movement + 5, run: runRelieve });
 registerPhase({ id: 'morale', kind: 'both', order: { position: ORDER.position.morale, battle: ORDER.battle.morale }, run(ctx) {

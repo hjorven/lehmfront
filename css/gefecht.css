@@ -52,6 +52,8 @@
 
 /* ---------- Rundenende-Checkliste ---------- */
 .check{position:absolute;left:12px;bottom:12px;width:min(250px,22vw);padding:9px 12px 10px;font-size:13px}
+/* P12: die Liste waechst mit den Pruefpunkten; ueber der Werkzeugreihe enden und selbst scrollen */
+@media (min-width:701px){.check{bottom:100px;max-height:calc(100% - 590px);min-height:120px;overflow-y:auto}}
 .check-list{list-style:none;margin:6px 0 0;padding:0}
 .check-list li{display:flex;align-items:baseline;gap:8px;padding:2px 0}
 .check-list li::before{content:"";flex:none;width:8px;height:8px;border-radius:50%;background:var(--own);transform:translateY(-1px)}

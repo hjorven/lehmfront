@@ -136,17 +136,18 @@ test('Formeln: Moralprobe mit Erfahrung, Verlusten, Abschnitt und Fraktion', () 
 });
 
 test('Formeln: Ersatz fuellt auf und senkt die Erfahrung, Genesene behalten sie', () => {
-  const g = { strength: 5, size: 10, experience: 3, morale: 80 };
+  const g = { strength: 4, size: 10, experience: 3, morale: 80 };
   const p = refillPreview(g, { pool: 10 });
-  assert.equal(p.total, 5);
-  assert.equal(p.green, 5);
-  assert.equal(p.experience, 1); // (5*3 + 5*0) / 10 = 1,5 -> 1
-  assert.equal(p.morale, 68);    // (5*80 + 5*55) / 10 = 67,5 -> 68
-  assert.equal(refillPreview(g, { pool: 10, greenXp: 1 }).experience, 2);
+  assert.equal(p.total, 6);
+  assert.equal(p.green, 6);
+  assert.equal(p.experience, 1); // (4*3 + 6*0) / 10 = 1,2 -> 1
+  assert.equal(p.morale, 65);    // (4*80 + 6*55) / 10
+  assert.equal(refillPreview(g, { pool: 10, greenXp: 1 }).experience, 2); // 1,8
   const v = refillPreview(g, { pool: 10, veterans: 3 });
   assert.equal(v.veterans, 3);
-  assert.equal(v.green, 2);
-  assert.equal(v.experience, 2); // (8*3) / 10 = 2,4
+  assert.equal(v.green, 3);
+  assert.equal(v.experience, 2); // (7*3) / 10 = 2,1
+  assert.equal(refillPreview({ strength: 9, size: 10, experience: 3, morale: 70 }, { pool: 1 }).experience, 3, 'ein Gruener kostet keine ganze Stufe');
   assert.equal(refillPreview(g, { pool: 2 }).total, 2);
   assert.equal(refillPreview({ ...g, strength: 10 }, { pool: 5 }).total, 0);
   assert.equal(replacementTenths(0.6), 18);
@@ -299,9 +300,9 @@ test('Ruhelager: wer weggeht, ruht nicht mehr', () => {
 test('Ersatz: Auffüllen in Reserve senkt die Erfahrung, verbraucht das Ersatzdepot', () => {
   const { map, state } = setup();
   const g = getGroup(state, 'a02');
-  g.strength = 5;
+  g.strength = 4;
   g.experience = 3;
-  state.sides.a.replacements = { tenths: 50 };
+  state.sides.a.replacements = { tenths: 60 };
   assert.equal(validateOrder({ group: 'a02', type: 'refill' }, state, 'a', { map }), null);
   assert.match(validateOrder({ group: 'a01', type: 'refill' }, state, 'a', { map }), /Reserve oder Ruhe/);
   const r = turn(state, map, [{ group: 'a02', type: 'refill' }]);
@@ -309,7 +310,7 @@ test('Ersatz: Auffüllen in Reserve senkt die Erfahrung, verbraucht das Ersatzde
   assert.equal(a2.strength, 10);
   assert.equal(a2.experience, 1);
   assert.equal(a2.greenTurns, C.GREEN_TURNS - 1);
-  assert.equal(r.state.sides.a.replacements.tenths, 50 + 18 - 50);
+  assert.equal(r.state.sides.a.replacements.tenths, 60 + 18 - 60);
   assert.match(r.log.find((e) => e.type === 'refilled').reason, /Erfahrung 3 → 1/);
   // Vollzaehlig: nichts mehr zu tun
   assert.match(validateOrder({ group: 'a02', type: 'refill' }, r.state, 'a', { map }), /vollzählig/);
@@ -429,20 +430,62 @@ test('Gefechtsrunde: Rueckzugsfeld nur frei und begehbar', () => {
   assert.deepEqual(fallbackCell(map, state, b), { x: 18, y: 4 }, 'Seite b weicht nach Osten');
 });
 
-test('Gefechtsende: Moral nach abgewiesenem oder verlorenem Gefecht', () => {
+function endTurn(outA, outB) {
   const { map, state } = setup();
   state.turnKind = 'battle';
+  // Wie P06 (js/phases/battle.js): der Verteidiger bekommt 'defended', sobald der Angreifer ein Ergebnis hat
   const end = {
     id: 'end-test', kind: 'battle', order: 80,
     run(ctx) {
-      ctx.emit('battle_end', { side: 'a', outcome: 'defended', reason: 'Test', at: { x: 11, y: 1 } });
-      ctx.emit('battle_end', { side: 'b', outcome: 'broken', reason: 'Test', at: { x: 11, y: 1 } });
+      ctx.emit('battle_end', { side: 'a', outcome: outA, reason: 'Test', at: { x: 11, y: 1 } });
+      ctx.emit('battle_end', { side: 'b', outcome: outB, reason: 'Test', at: { x: 11, y: 1 } });
     },
   };
-  const r = turn(state, map, [], [], { phases: [end, ...only('battle', 'morale-end')] });
+  return { before: state, r: turn(state, map, [], [], { phases: [end, ...only('battle', 'morale-end')] }) };
+}
+
+test('Gefechtsende: Moral nach abgewiesenem oder verlorenem Gefecht', () => {
+  const { before, r } = endTurn('defended', 'broken');
   assert.equal(getGroup(r.state, 'a01').morale, 70 + C.BATTLE_WON);
   assert.equal(getGroup(r.state, 'a02').morale, 50, 'Reserve war nicht dabei');
-  assert.equal(getGroup(r.state, 'b01').morale, getGroup(state, 'b01').morale - C.BATTLE_LOST);
+  assert.equal(getGroup(r.state, 'b01').morale, getGroup(before, 'b01').morale - C.BATTLE_LOST);
+  // Graben verloren: 'defended' fuer den Verteidiger ist dann kein Sieg
+  const lost = endTurn('defended', 'taken');
+  assert.equal(getGroup(lost.r.state, 'a01').morale, 70 - C.BATTLE_LOST);
+  assert.equal(getGroup(lost.r.state, 'b01').morale, getGroup(lost.before, 'b01').morale + C.BATTLE_WON);
+  const time = endTurn('defended', 'time');
+  assert.equal(getGroup(time.r.state, 'a01').morale, 70, 'Zeit abgelaufen: keine Wirkung');
+});
+
+test('Ablösen: Hin- und Hertauschen bringt kein Vertrauen, zu spaet auch nicht', () => {
+  const { map, state } = setup();
+  let s = state;
+  for (let i = 0; i < 4; i++) {
+    const front = s.groups.find((g) => g.side === 'a' && postOf(map, g) === 'front');
+    const back = s.groups.find((g) => g.side === 'a' && g.id !== front.id);
+    s = turn(s, map, [{ group: front.id, type: 'relieve', by: back.id }]).state;
+  }
+  assert.equal(s.sides.a.trust, state.sides.a.trust);
+  const late = setup();
+  getGroup(late.state, 'a01').frontTurns = C.TOO_LONG;
+  assert.equal(turn(late.state, late.map, [{ group: 'a01', type: 'relieve', by: 'a02' }]).state.sides.a.trust, late.state.sides.a.trust);
+});
+
+test('Ruhe gilt nur auf dem Platz; Arbeit beendet die Ruhe', () => {
+  const { map, state } = setup();
+  const g = getGroup(state, 'a02');
+  Object.assign(g, { status: 'rest', restAt: { x: 1, y: 1 }, pos: { x: 1, y: 1 } });
+  assert.equal(postOf(map, g), 'rest');
+  assert.equal(postOf(map, { ...g, pos: { x: 11, y: 4 } }), 'front', 'im Gefecht nach vorn gelaufen');
+  const r = turn(state, map, [{ group: 'a02', type: 'observe', target: { x: 10, y: 2 } }]);
+  assert.equal(getGroup(r.state, 'a02').status, 'front');
+  assert.ok(r.log.some((e) => e.type === 'rest_ended'));
+});
+
+test('Ablösen nur aus der eigenen Stellung', () => {
+  const { map, state } = setup();
+  getGroup(state, 'a01').pos = { x: 14, y: 1 };
+  assert.match(validateOrder({ group: 'a01', type: 'relieve' }, state, 'a', { map }), /Niemandsland/);
 });
 
 test('Abschnittsmoral nach Staerke gewichtet, nur Gruppen vorn', () => {
@@ -495,5 +538,19 @@ test('Oberflaeche: Schild, Befehlsliste und Pruefpunkt "zu lange vorn"', async (
   const a2 = getGroup(state, 'a02');
   a2.strength = 6;
   state.sides.a.replacements = { tenths: 30 };
-  assert.deepEqual(refillInfo(state, a2), { veterans: 0, green: 3, total: 3, experience: 0, morale: 52 });
+  assert.deepEqual(refillInfo(state, a2), { veterans: 0, green: 4, total: 4, experience: 1, morale: 52 });
+});
+
+test('Gefallenenliste: der gefallene Gruppenfuehrer steht mit Namen an Stelle eines namenlosen Verlusts', async () => {
+  const { rollCasualties } = await import('../js/narrative/casualties.js');
+  const log = [
+    { type: 'losses', side: 'a', group: 'a01', amount: 3, cause: 'artillery', reason: 'x', at: { x: 1, y: 1 } },
+    { type: 'leader_fallen', side: 'a', group: 'a01', fallen: 'Otto Lenz', home: 'Moorhusen', reason: 'x', at: { x: 1, y: 1 } },
+  ];
+  const r = rollCasualties([{ turn: 2, log }], { side: 'a', faction: 'kaldern', seed: 1, mission: 'm', groups: { a01: { label: '1. Gruppe', leader: 'Karl Brehm', home: 'X' } } });
+  assert.equal(r.fallen.length, 3);
+  const lenz = r.fallen.find((f) => f.name === 'Otto Lenz');
+  assert.ok(lenz && lenz.leader);
+  assert.equal(lenz.home, 'Moorhusen');
+  assert.equal(lenz.cause, 'artillery');
 });

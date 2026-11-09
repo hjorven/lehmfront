@@ -89,6 +89,22 @@ Jeder Thread traegt hier nach dem Merge ein, was fertig ist und was offen bleibt
   - Demos: `?scene=gefecht&demo=sturmplan|draht|umschalten|gefechtsrunde|nahkampf|unterstand`.
   - Überraschung: Beim Umschalten auf Gefechtsrunden dreht die Scheibe zurück und rastet hörbar als Stoppuhr ein, das Kartenpapier ruckt kurz, als hätte jemand an den Tisch gestoßen.
 
+- P12 Moral, Erschöpfung, Ablösung, Ersatz:
+  - Formeln rein in `js/morale.js`, Zahlen in `js/config/morale.js`. Posten einer Gruppe (`postOf`): vorn, Reserve (eigene Etappe), Ruhe (`g.status = 'rest'` auf `g.restAt` im Ruhelager; wer weggeht oder arbeitet, ruht nicht mehr).
+  - `js/phases/morale.js`: Phase `relieve` (Stellungsrunde nach der Bewegung): Befehl `{ type: 'relieve', by? }` für eine Gruppe in der eigenen Stellung; die Ablösung aus Reserve oder Ruhe übernimmt das Feld, die Gruppe geht ins Ruhelager (ohne Ruhelager in die Scheunen ganz hinten). Rechtzeitig abgelöst (3 bis 5 Runden vorn): Vertrauen +1.
+  - Phase `morale` (Stellungsrunde): Erschöpfung vorn +8 je Runde (Graben kommt dazu), Erholung Reserve −10, Ruhelager −18 und −4 je Punkt `erholung` aus `etappe.yield`; Moral erholt sich in der Reserve bis 75, im Ruhelager ganz (plus `moral` aus dem Etappenertrag), mal Fraktionsfaktor (Kaldern 1,3, Morrow 0,75). Übermüdet (ab 70) kostet vorn Moral, ab 6 Runden vorn „zu lange vorn“: Moral und Vertrauen sinken. Abschnittsmoral (nach Stärke gewichtet) in `state.sides[s].morale = { sections, overall }`.
+  - Verluste (`losses`) drücken die Moral anteilig zur Sollstärke (Fraktion `breakFactor`, Trost aus Kapelle und Gedenkstätte mildert). Je Gruppe und Runde ein Wurf, ob der Gruppenführer darunter ist: dann Gefallenenliste, Nachfolger aus der Gruppe, Moral −15, zwei Runden keine Erholung. Gefangennahme in der Nähe (`group_captured`) kostet Moral, Gefechtsende (`battle_end`) bringt +5 bzw. −6.
+  - Gefechtsrunde: Erschöpfung +2 (+3 bei Bewegung oder Sturm), Moralproben nach Verlusten, gefallenem Gruppenführer oder Niederhalten (Erfahrung, Abschnittsmoral, Erschöpfung, Fraktion): bestanden, wirft sich hin (niedergehalten) oder weicht ein Feld zurück.
+  - Ersatz: sammelt sich je Stellungsrunde (Kaldern 1,8 Mann, Morrow 4,5; höchstens 24). Befehl `{ type: 'refill' }` hinter der Front füllt zuerst mit Genesenen aus `supply.reserveMen` (behalten die Erfahrung), dann mit grünem Ersatz (Erfahrung 0, mit Ausbildungslager 1): die Erfahrung wird gewichtet gemittelt. Unterbesetzt lassen hält sie.
+  - Grabfaktor Erschöpfung ersetzt den vorläufigen aus P04: bis 35 ungebremst, dann bis 68 Prozent.
+  - Werkzeug Ablösen (R, nur Stellungsrunden): Gruppe vorn wählen und die Ablösung antippen (oder ein Etappenfeld: ohne Ablösung), oder hinten wählen und die Gruppe vorn antippen; die Gruppe hinten selbst antippen füllt sie auf, mit Vorschau „+4 Mann (4 grün), Erfahrung 3 → 1“. Schild zeigt Posten und „zu lange vorn“, die Befehlsliste einen Bleistiftvermerk, die Checkliste „zu lange vorn, Ablösen mit R“. Ruhende Gruppen gelten nicht als „ohne Befehl“.
+  - Feldpost: `relieved` und `too_long` sind Kategorie Ablösung, `leader_fallen` Verluste; der gefallene Gruppenführer steht mit Namen in der Gefallenenliste (neu in `js/narrative/casualties.js`: Quelle mit `person` und `replaces`).
+  - Demos: `?scene=gefecht&demo=abloesung|abloesung-liste|ruhelager`.
+  - Überraschung: Neben den Einheiten stehen Bleistiftvermerke („seit 7 Runden vorn“ rot, „ruht, noch 1 Runde“, „Ersatz, grün“). Fällt ein Gruppenführer, wird sein Name durchgestrichen und darunter steht „Wendler übernimmt“.
+
+### Für die nächsten Pakete (nach P12)
+- P13 KI: Befehle `relieve` (mit `by`) und `refill`; `isTooLong(g)` und `state.sides[s].morale` helfen bei der Entscheidung. P14: Ereignisse `relieved`, `too_long`, `trust_front`, `trust_relief`, `leader_fallen`, `morale_check`, `morale_break`, `refilled` für Zähler und Berichte. Moralproben können Verweigerung (Plan 4.2 Nr. 23) und Harms (Plan 2.4) aufnehmen: `checkChance` in `js/morale.js`.
+
 ### Für die nächsten Pakete (nach P06)
 
 - P09 Artillerie: `g.shelled = true` in der Artilleriephase (vor `dugout`, Gefecht Schritt 2) treibt Gruppen in den Unterstand und hält sie dort (ist angeschlossen: `applyImpacts` setzt ihn, die Phase `shelled` löscht ihn nach der Bewegung). Draht zerstören: `state.cells[k].wire = null`. Feuerpläne laufen jetzt, sobald ein Angriff angesetzt ist (`state.battle.round` 1 bis 12, `battleMinute(state)`). `stormGhosts` liest weiter `assault`-Befehle; Feldkosten mit Feldzustand über `stepCost(map, a, b, state)`.
@@ -200,7 +216,9 @@ Jeder Thread traegt hier nach dem Merge ein, was fertig ist und was offen bleibt
 
 ## Offen und bekannte Macken
 
-- P11: Nur Loren, Verpflegung, Material/Holz/Beton und Feldpost wirken direkt. Moral (Küche wirkt schon über die Versorgung, P08 `warm_meal`), Erholung, Heilung, Trost, Ausbildung, Offiziere: P12 liest `etappe.yield`. Batterieplätze, Leitung, Streuung: P09. Sicht und Ballon: P05 oder später. Werkstatt (Reparatur) hat noch keine Wirkung.
+- P12: Ruhende Gruppen sieht der Gegner, wenn er so weit sieht (keine eigene Regel). Die KI (P13) löst noch nicht ab. Ersatz ganzer Gruppen (neue Gruppe statt Auffüllen) fehlt noch. Die Checkliste unten links scrollt auf dem Desktop, wenn sie länger wird.
+
+- P11: Nur Loren, Verpflegung, Material/Holz/Beton und Feldpost wirken direkt. Erholung, Moral (im Ruhelager), Trost und Ausbildung liest seit P12 `js/phases/morale.js`; Heilung wirkt über die Sanitätskette (P08), Offiziere sind offen. Batterieplätze, Leitung, Streuung: P09. Sicht und Ballon: P05 oder später. Werkstatt (Reparatur) hat noch keine Wirkung.
 - P11/P09: Eine zerschossene Batteriestellung der Etappe lässt die Batterie auf ihrer Parzelle schweigen, bis sie repariert ist. Offen: neu gebaute Batteriestellungen bringen noch keine neue Batterie in `artillery.batteries`, und die Fernmeldestelle der Etappe ersetzt noch nicht `artillery.exchange` (beide liest P09 beim Start aus der Karte).
 - P11: Artillerie (P09) soll Etappengebäude über `buildingDamaged` oder `damageBuildingAt` treffen; Gegenbatteriefeuer kann `state.sides[s].intel.buildings` lesen (Kartenrechteck, Typ, Runde). Hat eine Seite eine Etappe, setzt die Phase `etappe` jede Runde `supplies.cartsTotal` neu: zerschossene Feldbahn bitte als `supplies.cartsLost` (wird abgezogen) melden, nicht `cartsTotal` überschreiben. Getroffene Baustellen ruhen bis zur Reparatur. Das Etappenfenster öffnet beim Antippen eines Gebäudes der eigenen Etappe (ohne gewählte Gruppe) oder mit Taste M (P bleibt das Protokoll-Archiv aus P07, E ist „Feuer einstellen“ aus P09).
 - P11: Auf der Asse hat nur Seite a eine Etappe; Seite b (Morrow) bekommt keine, solange ihre Karte kein Depot hat. Pathfinding nutzt weiter die Grundkarte: neue Gebäude sperren keine Felder.
@@ -276,6 +294,8 @@ Stand 2026-11-08, von Jorven bestaetigt:
 - Bis zu 15 Threads gleichzeitig.
 
 ## Abweichungen vom Plan
+
+- P12: Ablösen bewegt beide Gruppen in einer Stellungsrunde ohne Weg (zwölf Stunden reichen für den Laufgraben); abgelöst wird nur aus der eigenen Stellung. Auffüllen ist kein eigenes Werkzeug, sondern Teil von Ablösen (die Werkzeugreihe wird sonst zu lang). Erfahrung beim Auffüllen wird kaufmännisch gerundet, damit ein einzelner Grüner keine ganze Stufe kostet.
 
 - P11: Etappenfelder sind Parzellen aus 3 x 3 Kartenfeldern statt einzelner Kartenfelder: so bleiben Nachbarboni lesbar, das Pappmodell bleibt klein genug für den Daumen, und die Gebäude der Asse-Karte (2 bis 3 Felder groß) passen hinein.
 - P11: Bauaufträge sind ein Befehl der ganzen Seite und wirken erst mit der Runde (WEGO), nicht sofort beim Antippen. Die Vorschau zeigt den Stand nach der Fertigstellung.

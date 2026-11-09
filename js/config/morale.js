@@ -10,8 +10,8 @@ export const FATIGUE_REST = 18;          // Erholung je Stellungsrunde im Ruhela
 export const FATIGUE_REST_PER_YIELD = 4; // je Punkt "erholung" aus dem Etappenertrag (Ruhelager, Kueche daneben)
 export const FATIGUE_REST_NO_CAMP = 12;  // Ruhe ohne Ruhelager (Scheune, Keller)
 export const FATIGUE_TIRED = 70;         // ab hier "erschoepft": Moral sinkt vorn
-export const RESTED = 15;
-export const FATIGUE_DIG_FREE = 35;      // bis hierhin graebt eine Gruppe ungebremst (Grabfaktor P04)                // ab hier gilt eine ruhende Gruppe als ausgeruht
+export const RESTED = 15;                // ab hier gilt eine ruhende Gruppe als ausgeruht
+export const FATIGUE_DIG_FREE = 35;      // bis hierhin graebt eine Gruppe ungebremst (Grabfaktor P04)
 
 // --- Moral ---
 export const MORALE_TIRED = 3;           // Moralverlust je Stellungsrunde vorn, wenn erschoepft
@@ -33,6 +33,7 @@ export const TOO_LONG_MORALE = 1;        // je Runde ueber TOO_LONG (hoechstens 
 export const TOO_LONG_MORALE_MAX = 4;
 export const TRUST_TOO_LONG = 1;         // Vertrauen je Gruppe, die zu lange vorn ist (hoechstens TRUST_TOO_LONG_MAX je Runde)
 export const TRUST_TOO_LONG_MAX = 3;
+export const RELIEF_MIN = 3;             // so lange muss eine Gruppe vorn gewesen sein, damit Abloesen Vertrauen bringt
 export const TRUST_RELIEF = 1;           // Vertrauen je rechtzeitig abgeloester Gruppe (hoechstens TRUST_RELIEF_MAX)
 export const TRUST_RELIEF_MAX = 2;
 export const FRONT_TURNS_RESERVE_DECAY = 2; // in der Reserve vergehen die Runden vorn langsam

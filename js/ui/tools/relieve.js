@@ -39,7 +39,7 @@ export function moraleRows(map, state, g) {
     if (warn) rows.push({ label: 'Ablösung', value: 'zu lange vorn', warn: true });
   } else if (post === 'rest') {
     const left = restRoundsLeft(g.fatigue ?? 0, restRate(state, g.side));
-    rows.push({ label: 'Posten', value: left ? `ruht, noch ${plural(left, 'Runde', 'Runden')}` : 'Ruhelager, ausgeruht' });
+    rows.push({ label: 'Posten', value: left ? `ruht, noch ${plural(left, 'Runde', 'Runden')}` : 'ruht, ausgeruht' });
   } else {
     rows.push({ label: 'Posten', value: 'Reserve' });
   }
@@ -71,7 +71,7 @@ function canRelieve(group, state, env) {
 
 /** Vorschau Auffüllen fuer eine Gruppe (rein) */
 export function refillInfo(state, g) {
-  return refillPreview(g, { ...replacementStock(state, g.side), greenXp: greenXp(state, g.side) });
+  return refillPreview(g, { ...replacementStock(state, g.side, { incoming: true }), greenXp: greenXp(state, g.side) });
 }
 
 function refillText(state, g, p) {
@@ -81,6 +81,7 @@ function refillText(state, g, p) {
 
 function relievePreview(map, state, group, cell) {
   if (!cell) return null;
+  const camp = restCamps(state, group.side).length ? 'ins Ruhelager' : 'in die Scheunen hinter dem Depot';
   const at = cellLabel(cell.x, cell.y);
   const post = postOf(map, group);
   const other = state.groups.find((g) => g.status !== 'lost' && g.side === group.side && g.id !== group.id && g.pos.x === cell.x && g.pos.y === cell.y);
@@ -91,7 +92,7 @@ function relievePreview(map, state, group, cell) {
       const tired = (other.fatigue ?? 0) >= 50 ? ', noch müde' : '';
       return {
         ok: true, path: [{ x: cell.x, y: cell.y }], reach: 1, order: { group: group.id, type: 'relieve', by: other.id },
-        text: `${groupName(state, other)} (${POST_WORDS[op]}${tired}) löst ${groupName(state, group)} ab · ins Ruhelager`,
+        text: `${groupName(state, other)} (${POST_WORDS[op]}${tired}) löst ${groupName(state, group)} ab · ${camp}`,
       };
     }
     const c = map.cells[cell.y * map.width + cell.x];
@@ -99,7 +100,7 @@ function relievePreview(map, state, group, cell) {
     if (!own) return { ok: false, text: `${at}: eine Gruppe aus Reserve oder Ruhelager antippen, oder ein Feld der Etappe (ohne Ablösung)` };
     return {
       ok: true, path: [{ x: cell.x, y: cell.y }], reach: 1, order: { group: group.id, type: 'relieve' },
-      text: `${groupName(state, group)} geht ohne Ablösung ins Ruhelager · das Feld bleibt leer`,
+      text: `${groupName(state, group)} geht ohne Ablösung ${camp} · das Feld bleibt leer`,
     };
   }
   if (cell.x === group.pos.x && cell.y === group.pos.y) {
@@ -140,8 +141,8 @@ registerTool({
     ctx.pickCell({
       title: 'Ablösen',
       hint: front
-        ? `Ablösen: Gruppe aus Reserve oder Ruhelager antippen, die ${groupName(state, group)} ablöst. Ein Feld der Etappe: ohne Ablösung.`
-        : `Ablösen: Gruppe vorn antippen, die ${groupName(state, group)} ablösen soll. ${groupName(state, group)} selbst antippen: auffüllen.`,
+        ? `Wer übernimmt das Feld der ${groupName(state, group)}? Eine Gruppe aus Reserve oder Ruhelager antippen. Ein Feld der Etappe: ohne Ablösung.`
+        : `Welche Gruppe vorn soll die ${groupName(state, group)} ablösen? Antippen. Die ${groupName(state, group)} selbst antippen: auffüllen.`,
       preview: (cell) => relievePreview(map, state, group, cell),
       pick(cell) {
         const p = relievePreview(map, state, group, cell);

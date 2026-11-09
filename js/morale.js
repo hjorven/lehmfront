@@ -21,7 +21,8 @@ function mapCell(map, x, y) {
 /** Posten einer Gruppe: 'front' | 'reserve' | 'rest' | 'lost' */
 export function postOf(map, g) {
   if (!g || g.status === 'lost') return 'lost';
-  if (g.status === 'rest') return 'rest';
+  // Ruhe gilt nur auf dem Platz im Ruhelager; wer weggeht (auch im Gefecht), steht wieder nach Ort
+  if (g.status === 'rest' && (!g.restAt || (g.restAt.x === g.pos.x && g.restAt.y === g.pos.y))) return 'rest';
   const c = mapCell(map, g.pos.x, g.pos.y);
   if (c && c.zone === 'etappe' && c.side === mapSide(g.side)) return 'reserve';
   return 'front';
@@ -237,7 +238,7 @@ export function replacementTenths(speed = 1) {
 
 /**
  * Vorschau Auffuellen. Zuerst Genesene (veterans, behalten ihre Erfahrung), dann gruener Ersatz mit greenXp.
- * Liefert { veterans, green, total, experience, morale } (experience gewichtet, abgerundet: Ersatz senkt sie).
+ * Liefert { veterans, green, total, experience, morale } (experience gewichtet und gerundet: Ersatz senkt sie).
  */
 export function refillPreview(g, { pool = 0, veterans = 0, greenXp = 0 } = {}) {
   const gap = Math.max(0, (g.size ?? g.strength) - g.strength);
@@ -245,7 +246,8 @@ export function refillPreview(g, { pool = 0, veterans = 0, greenXp = 0 } = {}) {
   const green = Math.min(gap - vet, Math.max(0, pool | 0));
   const total = vet + green;
   const men = g.strength + total;
-  const xp = men > 0 ? Math.floor(((g.strength + vet) * g.experience + green * greenXp) / men) : g.experience;
+  // Gewichtetes Mittel, kaufmaennisch gerundet: ein einzelner Gruener kostet keine ganze Stufe
+  const xp = men > 0 ? round(((g.strength + vet) * g.experience + green * greenXp) / men) : g.experience;
   const morale = men > 0 ? round(((g.strength + vet) * g.morale + green * C.GREEN_MORALE) / men) : g.morale;
   return { veterans: vet, green, total, experience: clamp(xp, 0, 4), morale: clamp(morale, 0, 100) };
 }

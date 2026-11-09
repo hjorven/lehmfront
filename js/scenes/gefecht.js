@@ -416,7 +416,7 @@ export async function mount(root, params) {
   function updateList() {
     const rows = groupsOf(state, side).map((g) => {
       const o = orderOf(book, side, g.id);
-      return { id: g.id, name: groupLabel(g), mark: groupMark(state, g), text: orderText(g, o), set: !!o, carried: !!o?.carried, note: o?.type === 'relieve' ? null : listNote(map, state, g) };
+      return { id: g.id, name: groupLabel(g), mark: groupMark(state, g), text: !o && g.status === 'rest' ? 'Ruht im Ruhelager' : orderText(g, o), set: !!o, resting: !o && g.status === 'rest', carried: !!o?.carried, note: o?.type === 'relieve' ? null : listNote(map, state, g) };
     });
     const n = rows.filter((r) => r.set).length;
     orderList.update(rows, `${n} von ${rows.length} mit Befehl`);
@@ -575,7 +575,7 @@ export async function mount(root, params) {
   }
 
   function nextIdle() {
-    const idle = groupsOf(state, side).filter((g) => !orderOf(book, side, g.id));
+    const idle = groupsOf(state, side).filter((g) => !orderOf(book, side, g.id) && g.status !== 'rest');
     if (!idle.length) { flash('Alle Gruppen haben einen Befehl. Enter führt die Runde aus.'); return; }
     const i = idle.findIndex((g) => g.id === selectedId);
     select(idle[(i + 1) % idle.length].id, { center: true });
