@@ -167,9 +167,10 @@ test('Entwaesserung: kostet Material, legt Lattenrost, Wasser laeuft ab, Graben 
   assert.equal(validateOrder({ group: 'a01', type: 'drain', target: { x: 0, y: 0 } }, s, 'a', { map }), 'Entwässern geht nur in einem Graben');
   assert.equal(validateOrder({ group: 'a01', type: 'drain', target: { x: 4, y: 2 } }, s, 'a', { map }), null);
   assert.deepEqual(drainCells(s, map, { x: 4, y: 2 }), [{ x: 4, y: 2 }, { x: 3, y: 2 }, { x: 5, y: 2 }]);
-  const mat = s.sides.a.supplies.material;
   const r = resolveTurn(s, [{ group: 'a01', type: 'drain', target: { x: 4, y: 2 } }], [], 7, 1, { map });
-  assert.equal(r.state.sides.a.supplies.material, mat - DRAIN_COST);
+  // Verglichen mit derselben Runde ohne Befehl (die Versorgung bucht selbst Material)
+  const idle = resolveTurn(s, [], [], 7, 1, { map });
+  assert.equal(r.state.sides.a.supplies.material, idle.state.sides.a.supplies.material - DRAIN_COST);
   assert.equal(getCell(r.state, 4, 2).drain, 1);
   assert.ok(getCell(r.state, 4, 2).water <= 1, 'Wasser sinkt');
   assert.ok(mudAt(r.state, map, 4, 2) <= 1, 'entwaesserter Graben bleibt fest');
@@ -310,4 +311,15 @@ test('Wetter der naechsten Runde steht schon beim Planen fest: Wetterphase am En
   assert.ok(ids.indexOf('weather') > ids.indexOf('move'), 'nach der Bewegung');
   assert.ok(ids.indexOf('weather') < ids.indexOf('clock'), 'vor der Uhr');
   assert.ok(!phasesFor('battle').some((p) => p.id === 'weather'), 'Gefechtsrunden erben das Wetter');
+});
+
+test('Graben (P04) wird im Schlamm langsamer', async () => {
+  const { digRate } = await import('../js/phases/dig.js');
+  const map = makeMap();
+  const s = makeState(map, [{ type: 'pioneers', pos: { x: 2, y: 3 } }], [{ type: 'rifles', pos: { x: 17, y: 3 } }]);
+  const dry = digRate(s, getGroup(s, 'a01'), map).rate;
+  s.weather = { kind: 'overcast', wet: 3, wind: { dir: 'w', speed: 1 } };
+  const wet = digRate(s, getGroup(s, 'a01'), map);
+  assert.ok(wet.rate < dry, `${wet.rate} < ${dry}`);
+  assert.ok(wet.factors.some((f) => f.label === 'Schlamm'));
 });
