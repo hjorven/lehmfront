@@ -14,6 +14,7 @@
 // - rally (vor der Moral): Unterdrueckung klingt ab. Wer in dieser Runde nicht beschossen wurde, faengt sich.
 //   Nach einer Stellungsrunde (12 Stunden) ist niemand mehr niedergehalten.
 import { registerPhase, ORDER } from './registry.js';
+import { bonusFor } from '../modifiers.js';
 import { registerOrderValidator } from '../orders.js';
 import { unitType } from '../config/units.js';
 import { resolveFire, hitChance, coverValue, visibilityFromDarkness } from '../rules.js';
@@ -106,7 +107,7 @@ export function fireOdds(state, map, shooter, targetPos, targetSide, { darkness 
   // Im Licht einer Leuchtkugel (P10) zielt es sich wie am Tag
   const p = hitChance({
     distance: d, range: t.range, cover, visibility: visibilityFromDarkness(darknessAtCell(state, targetPos, darkness)),
-    experience: shooter.experience, suppressed: shooter.suppressed, enfilade, reversed: cov.reversed,
+    experience: Math.min(4, (shooter.experience ?? 0) + bonusFor('fire_xp', { state, group: shooter })), suppressed: shooter.suppressed, enfilade, reversed: cov.reversed,
   });
   return { ...base, ok: true, why: '', p, expected: base.shots * p, los };
 }

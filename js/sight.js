@@ -93,6 +93,8 @@ export function coverAt(state, map, pos, side) {
     if (t && t.cover !== 'open') better(t.cover, { label: t.name });
   }
   if (craterAt(state, map, pos.x, pos.y)) better('crater');
+  // Minentrichter (P23): der aufgeworfene Rand eines Sprengtrichters deckt wie ein Schuetzenloch
+  if (state?.cells?.[pos.x + ',' + pos.y]?.trichter) better('foxhole', { label: 'Trichterrand' });
   const tr = trenchAt(state, map, pos.x, pos.y);
   if (tr) {
     // Stufen 1 bis 4 (P04: Schuetzenloch, Graben, ausgebaut, betoniert)

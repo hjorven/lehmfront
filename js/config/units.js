@@ -42,20 +42,20 @@ export const UNIT_TYPES = {
     size: [5, 6], range: 8, shots: 3, suppressionPerShot: 0.06, digRate: 0.5, speed: 2, carry: 0, indirect: true,
   },
 
-  // Ab hier nur als Daten vorbereitet (enabled: false), Werte sind Startpunkte fuer spaetere Pakete.
+  // Akt 2 (P23): Stosstrupp, Scharfschuetzen, Horchposten. Danach nur als Daten vorbereitet (enabled: false).
   stormtroops: {
     id: 'stormtroops', name: 'Stoßtrupp', short: 'Stoßtrupp', role: 'Nachtangriff, Infiltration, Gefangene',
-    release: '1.2', available: 'akt2', enabled: false,
+    release: '1.2', available: 'akt2', enabled: true,
     size: [8, 10], range: 4, shots: 8, suppressionPerShot: 0.02, digRate: 1, speed: 4, carry: 1,
   },
   snipers: {
     id: 'snipers', name: 'Scharfschützen', short: 'Scharfsch.', role: 'Beobachter und Offiziere ausschalten',
-    release: '1.2', available: 'akt2', enabled: false,
+    release: '1.2', available: 'akt2', enabled: true,
     size: [2, 3], range: 12, shots: 2, suppressionPerShot: 0.03, digRate: 0.5, speed: 3, carry: 0,
   },
   listeners: {
     id: 'listeners', name: 'Horchposten', short: 'Horchp.', role: 'Erkennt feindliche Stollen',
-    release: '1.2', available: 'akt2', enabled: false,
+    release: '1.2', available: 'akt2', enabled: true,
     size: [2, 3], range: 3, shots: 1, suppressionPerShot: 0.01, digRate: 1, speed: 3, carry: 0, listenRadius: 6,
   },
   flamethrowers: {

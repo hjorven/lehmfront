@@ -1,0 +1,327 @@
+{
+  "id": "akt2-m5",
+  "name": "Morgennebel",
+  "map": "huegel214",
+  "act": 2,
+  "features": [
+    "officers",
+    "sap",
+    "raid"
+  ],
+  "startHour": 6,
+  "turnKind": "position",
+  "weather": {
+    "kind": "fog",
+    "fog": 0.8,
+    "wet": 2
+  },
+  "cells": [
+    {
+      "x": 30,
+      "y": 21,
+      "trench": {
+        "side": "own",
+        "kind": "comm",
+        "level": 1,
+        "facing": "E",
+        "sap": true
+      }
+    },
+    {
+      "x": 31,
+      "y": 21,
+      "trench": {
+        "side": "own",
+        "kind": "comm",
+        "level": 1,
+        "facing": "E",
+        "sap": true
+      }
+    },
+    {
+      "x": 32,
+      "y": 21,
+      "trench": {
+        "side": "own",
+        "kind": "comm",
+        "level": 1,
+        "facing": "E",
+        "sap": true
+      }
+    },
+    {
+      "x": 33,
+      "y": 21,
+      "trench": {
+        "side": "enemy",
+        "kind": "comm",
+        "level": 1,
+        "facing": "E",
+        "sap": true,
+        "captured": true
+      }
+    },
+    {
+      "x": 34,
+      "y": 21,
+      "trench": {
+        "side": "enemy",
+        "kind": "comm",
+        "level": 1,
+        "facing": "E",
+        "sap": true,
+        "captured": true
+      }
+    },
+    {
+      "x": 35,
+      "y": 21,
+      "trench": {
+        "side": "enemy",
+        "kind": "comm",
+        "level": 1,
+        "facing": "E",
+        "sap": true,
+        "captured": true
+      }
+    }
+  ],
+  "sides": {
+    "a": {
+      "faction": "kaldern",
+      "supplies": {
+        "carts": 4,
+        "cartsTotal": 6
+      },
+      "artillery": {
+        "lines": [
+          {
+            "id": "k4",
+            "to": "batterie1",
+            "points": [
+              [
+                15,
+                12
+              ],
+              [
+                13,
+                20
+              ],
+              [
+                12,
+                28
+              ]
+            ]
+          },
+          {
+            "id": "k5",
+            "to": "B-Stelle Mitte",
+            "points": [
+              [
+                15,
+                12
+              ],
+              [
+                20,
+                15.5
+              ],
+              [
+                24,
+                15.5
+              ]
+            ]
+          }
+        ]
+      },
+      "ai": {
+        "goals": {
+          "attack": {
+            "x": 35,
+            "y": 21
+          }
+        }
+      },
+      "groups": [
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 30,
+            "y": 21
+          },
+          "morale": 70,
+          "officer": {
+            "id": "vell",
+            "name": "Jost Vell",
+            "rank": "Leutnant",
+            "home": "Haverstadt",
+            "skill": "sturm",
+            "protect": true
+          }
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 29,
+            "y": 19
+          },
+          "morale": 66
+        },
+        {
+          "type": "pioneers",
+          "pos": {
+            "x": 29,
+            "y": 23
+          },
+          "morale": 66,
+          "leader": {
+            "name": "Swantje Fedders",
+            "home": "Grauwarf"
+          }
+        },
+        {
+          "type": "mg",
+          "pos": {
+            "x": 30,
+            "y": 17
+          },
+          "morale": 64
+        },
+        {
+          "type": "medics",
+          "pos": {
+            "x": 28,
+            "y": 21
+          },
+          "morale": 70
+        },
+        {
+          "type": "stormtroops",
+          "pos": {
+            "x": 29,
+            "y": 22
+          },
+          "morale": 72,
+          "experience": 2
+        }
+      ]
+    },
+    "b": {
+      "faction": "morrow",
+      "control": "ai",
+      "ai": {
+        "doctrine": "nacht",
+        "difficulty": "veteran"
+      },
+      "supplies": {
+        "carts": 3,
+        "cartsTotal": 5
+      },
+      "artillery": {
+        "exchange": {
+          "x": 52,
+          "y": 19
+        },
+        "batteries": [
+          {
+            "id": "mb1",
+            "type": "feldhaubitzen",
+            "x": 54,
+            "y": 9,
+            "w": 2,
+            "h": 2,
+            "label": "Batterie Morrow 1"
+          },
+          {
+            "id": "mb2",
+            "type": "feldhaubitzen",
+            "x": 54,
+            "y": 27,
+            "w": 2,
+            "h": 2,
+            "label": "Batterie Morrow 2"
+          }
+        ],
+        "lines": [
+          {
+            "id": "m1",
+            "to": "Abschnitt Hügel",
+            "points": [
+              [
+                52,
+                19
+              ],
+              [
+                47,
+                18
+              ],
+              [
+                45,
+                18
+              ]
+            ]
+          },
+          {
+            "id": "m3",
+            "to": "mb1",
+            "points": [
+              [
+                52,
+                19
+              ],
+              [
+                54,
+                10
+              ]
+            ]
+          },
+          {
+            "id": "m4",
+            "to": "mb2",
+            "points": [
+              [
+                52,
+                19
+              ],
+              [
+                54,
+                27
+              ]
+            ]
+          }
+        ]
+      },
+      "groups": [
+        {
+          "type": "stormtroops",
+          "pos": {
+            "x": 35,
+            "y": 21
+          },
+          "strength": 6,
+          "morale": 60
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 40,
+            "y": 20
+          }
+        },
+        {
+          "type": "mg",
+          "pos": {
+            "x": 40,
+            "y": 23
+          }
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 41,
+            "y": 27
+          }
+        }
+      ]
+    }
+  }
+}

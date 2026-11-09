@@ -1,0 +1,324 @@
+{
+  "id": "akt2-m1",
+  "name": "Wasser im Graben",
+  "map": "huegel214",
+  "act": 2,
+  "features": [
+    "officers",
+    "sap"
+  ],
+  "startHour": 6,
+  "turnKind": "position",
+  "weather": {
+    "kind": "rain",
+    "rain": 0.7,
+    "wet": 3,
+    "fixed": true
+  },
+  "cells": [
+    {
+      "x": 24,
+      "y": 28,
+      "water": 2
+    },
+    {
+      "x": 24,
+      "y": 29,
+      "water": 2
+    },
+    {
+      "x": 24,
+      "y": 30,
+      "water": 2
+    },
+    {
+      "x": 24,
+      "y": 31,
+      "water": 2
+    },
+    {
+      "x": 24,
+      "y": 32,
+      "water": 2
+    },
+    {
+      "x": 24,
+      "y": 33,
+      "water": 2
+    },
+    {
+      "x": 28,
+      "y": 28,
+      "water": 2
+    },
+    {
+      "x": 28,
+      "y": 29,
+      "water": 2
+    },
+    {
+      "x": 28,
+      "y": 30,
+      "water": 2
+    },
+    {
+      "x": 28,
+      "y": 31,
+      "water": 2
+    },
+    {
+      "x": 28,
+      "y": 32,
+      "water": 2
+    },
+    {
+      "x": 28,
+      "y": 33,
+      "water": 2
+    }
+  ],
+  "sides": {
+    "a": {
+      "faction": "kaldern",
+      "supplies": {
+        "carts": 4,
+        "cartsTotal": 6
+      },
+      "artillery": {
+        "lines": [
+          {
+            "id": "k4",
+            "to": "batterie1",
+            "points": [
+              [
+                15,
+                12
+              ],
+              [
+                13,
+                20
+              ],
+              [
+                12,
+                28
+              ]
+            ]
+          },
+          {
+            "id": "k5",
+            "to": "B-Stelle Mitte",
+            "points": [
+              [
+                15,
+                12
+              ],
+              [
+                20,
+                15.5
+              ],
+              [
+                24,
+                15.5
+              ]
+            ]
+          }
+        ]
+      },
+      "ai": {
+        "goals": {
+          "sap": {
+            "x": 35,
+            "y": 21
+          },
+          "drain": true
+        }
+      },
+      "groups": [
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 29,
+            "y": 19
+          },
+          "morale": 70,
+          "officer": {
+            "id": "vell",
+            "name": "Jost Vell",
+            "rank": "Leutnant",
+            "home": "Haverstadt",
+            "skill": "sturm",
+            "protect": true
+          }
+        },
+        {
+          "type": "pioneers",
+          "pos": {
+            "x": 29,
+            "y": 21
+          },
+          "morale": 68,
+          "leader": {
+            "name": "Swantje Fedders",
+            "home": "Grauwarf"
+          }
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 28,
+            "y": 30
+          },
+          "morale": 60
+        },
+        {
+          "type": "mg",
+          "pos": {
+            "x": 30,
+            "y": 13
+          },
+          "morale": 64
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 24,
+            "y": 31
+          },
+          "morale": 58
+        },
+        {
+          "type": "observers",
+          "pos": {
+            "x": 24,
+            "y": 17
+          },
+          "morale": 66
+        },
+        {
+          "type": "medics",
+          "pos": {
+            "x": 24,
+            "y": 24
+          },
+          "morale": 70
+        }
+      ]
+    },
+    "b": {
+      "faction": "morrow",
+      "control": "ai",
+      "ai": {
+        "doctrine": "nacht",
+        "difficulty": "veteran"
+      },
+      "supplies": {
+        "carts": 3,
+        "cartsTotal": 5
+      },
+      "artillery": {
+        "exchange": {
+          "x": 52,
+          "y": 19
+        },
+        "batteries": [
+          {
+            "id": "mb1",
+            "type": "feldhaubitzen",
+            "x": 54,
+            "y": 9,
+            "w": 2,
+            "h": 2,
+            "label": "Batterie Morrow 1"
+          },
+          {
+            "id": "mb2",
+            "type": "feldhaubitzen",
+            "x": 54,
+            "y": 27,
+            "w": 2,
+            "h": 2,
+            "label": "Batterie Morrow 2"
+          }
+        ],
+        "lines": [
+          {
+            "id": "m1",
+            "to": "Abschnitt Hügel",
+            "points": [
+              [
+                52,
+                19
+              ],
+              [
+                47,
+                18
+              ],
+              [
+                45,
+                18
+              ]
+            ]
+          },
+          {
+            "id": "m3",
+            "to": "mb1",
+            "points": [
+              [
+                52,
+                19
+              ],
+              [
+                54,
+                10
+              ]
+            ]
+          },
+          {
+            "id": "m4",
+            "to": "mb2",
+            "points": [
+              [
+                52,
+                19
+              ],
+              [
+                54,
+                27
+              ]
+            ]
+          }
+        ]
+      },
+      "groups": [
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 41,
+            "y": 8
+          }
+        },
+        {
+          "type": "mg",
+          "pos": {
+            "x": 40,
+            "y": 20
+          }
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 41,
+            "y": 30
+          }
+        },
+        {
+          "type": "snipers",
+          "pos": {
+            "x": 40,
+            "y": 15
+          }
+        }
+      ]
+    }
+  }
+}

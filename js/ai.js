@@ -27,7 +27,9 @@ import { surname } from './phases/hold.js';
 import { timeDarkness } from './phases/weather.js';
 import { postOf, isTooLong } from './morale.js';
 import { POSTURES, DOCTRINES, DIFFICULTIES, DEFAULT_DIFFICULTY, DEFAULT_DOCTRINE } from './config/doctrines.js';
-import './phases/index.js'; // Befehlspruefungen der Mechaniken (die KI prueft ihre Befehle vor der Abgabe)
+import './phases/index.js';
+import { runAiBlocks } from './ai/blocks.js';
+import './ai/akt2.js'; // Befehlspruefungen der Mechaniken (die KI prueft ihre Befehle vor der Abgabe)
 
 export { POSTURES, DOCTRINES, DIFFICULTIES };
 
@@ -390,6 +392,9 @@ export function decide(view, opts = {}) {
     if (!c || !(c.zone === 'niemandsland' || (c.side !== null && c.side !== sit.ms))) return false;
     return liveCell(map, view.cells, g.pos.x, g.pos.y)?.trench?.side !== sit.ms;
   };
+
+  // Bausteine der Mechanik-Pakete (P23: Stollen, Stosstrupp, Sappe) bekommen ihre Gruppen zuerst
+  runAiBlocks({ view, map, side, sit, kind, isNight, doc, diff, rng, memory, opts, give, taken, outside, st });
 
   // ---------- Gefechtsrunde ----------
   if (kind === 'battle') {

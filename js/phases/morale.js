@@ -14,6 +14,7 @@
 //
 // Ereignisse: relieved, refilled, leader_fallen, morale_loss, morale_check, morale_break, too_long, trust_front,
 // trust_relief, morale_battle. Alle tragen side und sind geheim (der Gegner sieht nur, was er sieht).
+import { bonusFor } from '../modifiers.js';
 import { registerPhase, ORDER } from './registry.js';
 import { registerOrderValidator } from '../orders.js';
 import { registerDigFactor } from './dig.js';
@@ -383,9 +384,9 @@ function runMoraleBattle(ctx) {
     if (!losses && !leaderFell && !pinned) continue;
     const f = moraleFactors(state, g.side);
     const sec = map ? state.sides[g.side]?.morale?.sections?.[sectionIdAt(map, g.pos.y)] ?? 50 : 50;
-    const chance = checkChance({
+    const chance = Math.max(5, Math.min(95, checkChance({
       morale: g.morale, experience: g.experience, losses, leaderFell, pinned, fatigue: g.fatigue, section: sec, breakFactor: f.breakFactor,
-    });
+    }) + bonusFor('check', { state, map, group: g }))); // P23: Offiziere, Veteranen
     const roll = Math.floor(ctx.rng() * 100);
     let outcome = checkOutcome(roll, chance, g.morale);
     const at = { ...g.pos };

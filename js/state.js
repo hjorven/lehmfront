@@ -188,11 +188,16 @@ export function createInitialState(map, scenario, seed) {
     sides[side].intel = { lastSeen };
   }
 
-  return {
+  const out = {
     version: STATE_VERSION,
     seed: seed >>> 0,
     map: { id: map.id, width: map.width, height: map.height },
-    scenario: { id: scenario.id ?? 'frei', name: scenario.name ?? '' },
+    scenario: {
+      id: scenario.id ?? 'frei', name: scenario.name ?? '',
+      // P23: Akt und freigeschaltete Mechaniken (z. B. ['sap', 'tunnel', 'raid']) fuer Werkzeuge und Regeln
+      ...(Number.isInteger(scenario.act) ? { act: scenario.act } : {}),
+      ...(Array.isArray(scenario.features) ? { features: [...scenario.features].sort() } : {}),
+    },
     turn: 1,
     turnKind: scenario.turnKind ?? 'position',
     battle: null,
@@ -208,4 +213,17 @@ export function createInitialState(map, scenario, seed) {
     ...(scenario.reveal ? { reveal: true } : {}),
     ...(scenario.steady ? { steady: true } : {}),
   };
+  // Mechanik-Pakete ergaenzen den Anfangszustand aus eigenen Szenario-Feldern (registerScenarioSetup)
+  for (const id of [...setups.keys()].sort()) setups.get(id)(out, map, scenario);
+  return out;
+}
+
+const setups = new Map();
+
+/**
+ * Anfangszustand aus eigenen Szenario-Feldern ergaenzen (P23: Stollen, Offiziere, vorbereitete Graeben ...).
+ * fn(state, map, scenario) veraendert den neuen Zustand direkt; Reihenfolge nach id. Rein und deterministisch.
+ */
+export function registerScenarioSetup(id, fn) {
+  setups.set(id, fn);
 }

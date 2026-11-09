@@ -17,6 +17,9 @@
 //   --mirror               gespiegelte Karte mit identischen Armeen (Seite a des Szenarios fuer beide)
 //   --tournament           alle Lagen gegen alle (je --runs Partien)
 //   --json                 Ergebnis als JSON
+//   --mission <id>         Kampagnenmission (z. B. a2m3) mit Missionsziel; Karte und Szenario kommen aus der Mission.
+//                          Seite a spielt die Ziele des Szenarios, dazu ein Lauf mit passiver Seite a (P23).
+//   --flags <a,b>          Flags der Kampagne fuer Varianten (z. B. vell_angriff, stollen_frueh)
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -45,6 +48,32 @@ function fail(msg) {
 }
 
 const args = parseArgs(process.argv.slice(2));
+if (args.mission) {
+  const { scenarioForMission } = await import('../js/config/missions.js');
+  const { runMissionSeries } = await import('../js/ai/mission-match.js');
+  const flags = typeof args.flags === 'string' ? args.flags.split(',') : [];
+  const scenId = scenarioForMission(args.mission, { flags });
+  const scenario = JSON.parse(readFileSync(join(ROOT, 'data/scenarios', scenId + '.json'), 'utf8'));
+  const mapJson = JSON.parse(readFileSync(join(ROOT, 'data/maps', scenario.map + '.json'), 'utf8'));
+  const runs = Math.max(1, Number(args.runs ?? 20) | 0);
+  const seed = Number(args.seed ?? 1) >>> 0;
+  const out = {};
+  for (const passive of [false, true]) {
+    const sum = runMissionSeries({ mapJson, scenario, mission: args.mission, seed, flags, passive }, runs);
+    out[passive ? 'passiv' : 'aktiv'] = sum;
+  }
+  if (args.json) console.log(JSON.stringify(out, null, 2));
+  else {
+    console.log(`Mission ${args.mission}, Szenario ${scenId}, Seeds ${seed} bis ${seed + runs - 1}`);
+    for (const [k, sum] of Object.entries(out)) {
+      console.log(`\n${k === 'aktiv' ? 'Seite a spielt die Ziele' : 'Seite a hält nur'}: Erfolg ${sum.wins} von ${runs}, Befehl erfüllt ${sum.orderMet}, Runden im Mittel ${Math.round((sum.rounds * 10) / runs) / 10}`);
+      for (const [why, n] of Object.entries(sum.why).sort((p, q) => q[1] - p[1])) console.log(`  ${String(n).padStart(4)}  ${why}`);
+      const ev = Object.entries(sum.events).filter(([t]) => /sap|tunnel|mine|raid|prisoner|captured|officer|trait|drain/.test(t)).sort((p, q) => q[1] - p[1]);
+      if (ev.length) console.log('  Ereignisse: ' + ev.map(([t, n]) => `${t} ${n}`).join(', '));
+    }
+  }
+  process.exit(0);
+}
 if (args.help || !args.map) {
   console.log(readFileSync(fileURLToPath(import.meta.url), 'utf8').split('\n').filter((l) => l.startsWith('//')).map((l) => l.slice(3)).join('\n'));
   process.exit(args.help ? 0 : 1);
