@@ -2,6 +2,7 @@
 import './artillery.js';
 import './dig.js';
 import './drain.js';
+import './etappe.js';
 import './fire.js';
 import './flare.js';
 import './hold.js';

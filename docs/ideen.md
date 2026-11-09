@@ -16,3 +16,5 @@ Neue Ideen landen hier, nicht im Code (Plan 13). Mit Datum und Paket, aus dem si
 - 2026-11-09, P09: Der Feuerplan könnte als Durchschlag ins Protokoll wandern; nach dem Gefecht zeichnet ein Stabsoffizier mit Rotstift ein, wo die Walze wirklich lag und wo die Sturmgruppe war (Abstand in Metern als Randnotiz).
 - 2026-11-09, P09: Ein Beobachter mit zerschossener Leitung könnte Leuchtkugeln schießen (eine Farbe = Feuer vorverlegen); der Gegner sieht sie auch und kann sie nachahmen.
 - 2026-11-09, P09: Schwere Granaten, die nicht explodieren (Blindgänger), bleiben als Bleistiftkreuz auf der Karte und können Wochen später einen Graben sperren, bis ein Pionier sie räumt.
+- 2026-11-09, P11: Nachts könnte die Feldküche nur abgedunkelt kochen (weniger Moral, kein Rauch), am Tag mit voller Wirkung, aber sichtbar: eine Umschaltung im Etappenfenster "Essen bei Nacht".
+- 2026-11-09, P11: Aufgeklärte Gebäude des Gegners könnten auf der eigenen Lagekarte als Bleistiftskizze aus Luftbild oder Gefangenenaussage erscheinen, mit Datum der Meldung.

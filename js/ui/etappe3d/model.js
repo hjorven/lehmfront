@@ -112,6 +112,9 @@ export function createModel(stage, { onTap, onKeyMove }) {
       if (b.remaining > 0) { box.classList.add('bau'); label.textContent = b.remaining + ''; box.title = 'im Bau'; }
       else label.textContent = def.letter;
       if (b.damaged) box.classList.add('kaputt');
+      // P11: Bauauftrag dieser Runde (noch nicht begonnen) und vom Gegner aufgeklaerte Gebaeude
+      if (b.planned) { box.classList.add('plan'); box.title = b.planned === 'repair' ? 'Reparatur geplant' : 'Bauauftrag'; }
+      if (b.spotted) { el('e3-spot', box); box.title = (box.title ? box.title + ', ' : '') + 'vom Gegner aufgeklärt'; }
       roof.append(label);
       if (def.smoke && !(b.remaining > 0) && !b.damaged) {
         el('e3-chimney', box);

@@ -6,6 +6,7 @@
 // Pflicht: fields [{x,y,ground,height}], buildings [{id,type,x,y,remaining?,damaged?}],
 //          selected {x,y}|null, onSelect(x,y), onBuild(x,y,type)
 // Optional: rewards {level: id}, onChooseReward(level, id), onRepair(id), act (Standard 1), material (Zahl, sonst ungeprueft), night (bool)
+//           best (hoechste erreichte Stufe), onCancel(id) fuer Gebaeude mit planned ('build'|'repair'); spotted markiert Aufgeklaertes
 // Wichtig: Daten unveraenderlich uebergeben. Das Modell baut nur neu, wenn sich die Referenz von fields oder buildings aendert.
 import { createModel } from './model.js';
 import { createPanel } from './panel.js';
@@ -53,6 +54,7 @@ export function renderEtappe(root, initial) {
     onBuild: (x, y, type) => props.onBuild && props.onBuild(x, y, type),
     onChooseReward: (level, id) => props.onChooseReward && props.onChooseReward(level, id),
     onRepair: (id) => props.onRepair && props.onRepair(id),
+    onCancel: (id) => props.onCancel && props.onCancel(id),
   });
 
   function select(x, y) {
@@ -60,7 +62,7 @@ export function renderEtappe(root, initial) {
   }
 
   function etappe() {
-    return { fields: props.fields, buildings: props.buildings, rewards: props.rewards || {} };
+    return { fields: props.fields, buildings: props.buildings, rewards: props.rewards || {}, best: props.best || 1 };
   }
 
   function renderPanel() {

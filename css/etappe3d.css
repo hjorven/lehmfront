@@ -90,6 +90,13 @@
 .e3-box.bau .e3-f.top span{font-family:var(--font-num); font-weight:700; color:var(--ink)}
 .e3-box.kaputt .e3-f.top{background-image:repeating-linear-gradient(-35deg,transparent 0 5px,var(--e3-damage) 5px 7px)}
 .e3-box.kaputt .e3-f.front,.e3-box.kaputt .e3-f.right{background-image:linear-gradient(160deg,transparent 45%,var(--e3-damage) 46% 49%,transparent 50%)}
+/* P11: Bauauftrag dieser Runde: nur mit Bleistift vorgezeichnet */
+.e3-box.plan .e3-f{background:transparent; box-shadow:none; border:1.5px dashed var(--e3-bau-line)}
+.e3-box.plan .e3-f.top{background:var(--e3-bau)}
+/* P11: vom Gegner aufgeklaert: roter Bleistiftkringel auf dem Dach */
+.e3-spot{position:absolute; inset:-5px; border:2px solid var(--danger); border-radius:46% 54% 50% 48%; transform:translateZ(calc(var(--h) + 1px)) rotate(-8deg); pointer-events:none; opacity:.85}
+/* Rauch nur zur Essenszeit bei Tag; nachts bleibt der Schornstein kalt */
+.e3.night .e3-puff{display:none}
 
 /* Stehende Pappfiguren: drehen sich immer zum Betrachter */
 .e3-stand{position:absolute; transform-origin:50% 100%; transform:rotateZ(calc(var(--spin,-20deg) * -1)) rotateX(-90deg); pointer-events:none}

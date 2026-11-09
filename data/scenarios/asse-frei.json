@@ -9,6 +9,20 @@
     "a": {
       "faction": "kaldern",
       "supplies": { "carts": 4, "cartsTotal": 6 },
+      "etappe": {
+        "buildings": [
+          { "type": "depot", "at": "B6" },
+          { "type": "feldbahnhof", "at": "C6" },
+          { "type": "feldkueche", "at": "B4" },
+          { "type": "ruhelager", "at": "D4" },
+          { "type": "fernmeldestelle", "at": "F4" },
+          { "type": "beobachtungsturm", "at": "G3" },
+          { "type": "feldlazarett", "at": "B8" },
+          { "type": "werkstatt", "at": "D8" },
+          { "type": "batteriestellung", "at": "E10" },
+          { "type": "batteriestellung", "at": "F11" }
+        ]
+      },
       "reputation": 61,
       "trust": 48,
       "intel": [
