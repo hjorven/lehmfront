@@ -153,10 +153,13 @@ test('sectionAt, linesUntil, nextStop', () => {
   assert.equal(nextStop(film, film.total), film.total);
 });
 
-test('transitionAt: nur in der letzten Sekunde, t von 0 bis 1', () => {
-  assert.equal(transitionAt(5000, 3999), null);
-  assert.equal(transitionAt(5000, 4000), 0);
-  assert.equal(transitionAt(5000, 4500), 0.5);
+test('transitionAt: nur am Ende (TIMING.transition, etwa zwei Sekunden), t von 0 bis 1', () => {
+  const start = 5000 - TIMING.transition;
+  assert.ok(TIMING.transition >= 1800 && TIMING.transition <= 2200);
+  assert.ok(TIMING.last > TIMING.transition);
+  assert.equal(transitionAt(5000, start - 1), null);
+  assert.equal(transitionAt(5000, start), 0);
+  assert.equal(transitionAt(5000, start + TIMING.transition / 2), 0.5);
   assert.equal(transitionAt(5000, 5000), 1);
   assert.equal(transitionAt(5000, 9000), 1);
 });

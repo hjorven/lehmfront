@@ -131,7 +131,7 @@ test('Schlamm senkt Grabgeschwindigkeit und Moral', () => {
   assert.equal(r.state.weather.wet, 3);
   assert.ok(getGroup(r.state, 'a01').morale < 70);
   const e = r.log.find((x) => x.type === 'mud_morale' && x.group === 'a01');
-  assert.match(e.reason, /Moral sinkt um 4/);
+  assert.match(e.reason, /im tiefen Schlamm .*Moral sinkt um 2/);
   assert.deepEqual(e.at, { x: 2, y: 3 });
 });
 

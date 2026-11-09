@@ -31,8 +31,10 @@ export const WEATHER_SIGHT = { clear: 1, overcast: 1, rain: 0.85, storm: 0.7, fo
 export const MUD_MOVE = [0, 4, 9, 15];
 /** Grabgeschwindigkeit je Schlammstufe */
 export const MUD_DIG = [1, 0.85, 0.65, 0.45];
-/** Moral je Stellungsrunde in Schlamm oder Wasser (ab Stufe 2) */
-export const MUD_MORALE = [0, 0, 2, 4];
+/** Moral je Stellungsrunde im Schlamm (ab Stufe 2) */
+export const MUD_MORALE = [0, 0, 1, 2];
+/** Zusaetzlicher Moralverlust, wenn das Wasser im Graben knoechel- oder knietief steht */
+export const WATER_MORALE = [0, 0, 1, 2];
 /** Leuchtkugel: Radius des erhellten Kreises in Feldern, Reichweite beim Schiessen, Hoerweite der Posten */
 export const FLARE_RADIUS = 4;
 export const FLARE_RANGE = 8;
@@ -179,6 +181,8 @@ export function mudAt(state, map, x, y) {
 
 export const MUD_WORDS = ['fest', 'aufgeweicht', 'Schlamm', 'tiefer Schlamm'];
 export const WATER_WORDS = ['trocken', 'Pfützen', 'knöcheltief Wasser', 'knietief Wasser'];
+/** "liegt ..." */
+export const MUD_IN = ['auf festem Boden', 'auf aufgeweichtem Boden', 'im Schlamm', 'im tiefen Schlamm'];
 
 /** Zusaetzliche Bewegungskosten (Zehntel) durch Schlamm */
 export function mudMoveCost(state, map, x, y) {

@@ -20,8 +20,8 @@ export const TIMING = {
   base: 1500,       // ms je Abschnitt
   perEvent: 650,    // ms je sichtbarem Ereignis
   max: 5200,
-  last: 1600,       // letzter Abschnitt (Uhr), enthaelt den Uebergang
-  transition: 1000, // letzte Sekunde des Films: Tag-Nacht-Uebergang
+  last: 2600,       // letzter Abschnitt (Uhr), enthaelt den Uebergang
+  transition: 2000, // letzte zwei Sekunden des Films: Tag-Nacht-Uebergang (Plan 7.7, P10)
 };
 
 /** Deutsche Namen der Abteilungen fuer die Reiter */

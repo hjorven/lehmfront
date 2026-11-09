@@ -36,8 +36,13 @@ export function fatigueWord(f) {
 
 export const WEATHER = { clear: 'klar', rain: 'Regen', fog: 'Nebel', snow: 'Schnee', storm: 'Sturm', overcast: 'bedeckt' };
 
+const GROUND = ['', 'Boden weich', 'Schlamm', 'grundlos'];
+
+/** Wetter mit Boden (P10): "Regen, Schlamm" */
 export function weatherName(w) {
-  return WEATHER[w?.kind] ?? 'klar';
+  const name = WEATHER[w?.kind] ?? 'klar';
+  const g = GROUND[Math.max(0, Math.min(3, w?.wet | 0))];
+  return g ? `${name}, ${g}` : name;
 }
 
 export function clockText(clock) {

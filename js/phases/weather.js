@@ -15,7 +15,7 @@ import { surname } from './hold.js';
 import { addStepCostRule } from './move.js';
 import {
   rollWeather, stepWet, waterGain, waterLoss, mudAt, mudMoveCost, trenchOf, isSink, flareAt, flareProblem,
-  MAX_WATER, MUD_MORALE, FLARE_RADIUS, FLARE_HEAR, FLARE_DARKNESS, WEATHER_NAMES, MUD_WORDS, WATER_WORDS,
+  MAX_WATER, MUD_MORALE, WATER_MORALE, FLARE_RADIUS, FLARE_HEAR, FLARE_DARKNESS, WEATHER_NAMES, MUD_IN, WATER_WORDS,
 } from '../weather.js';
 
 /** Material fuer eine Entwaesserung (Lattenrost, Pumpe) */
@@ -105,11 +105,11 @@ function runWeather(ctx) {
   // Schlamm und Wasser druecken auf die Moral (nur wer drin steht, Unterstand schuetzt nicht vor Naesse)
   for (const g of ctx.groups()) {
     const m = mudAt(s, map, g.pos.x, g.pos.y);
-    const loss = MUD_MORALE[m] ?? 0;
+    const water = getCell(s, g.pos.x, g.pos.y)?.water ?? 0;
+    const loss = (MUD_MORALE[m] ?? 0) + (WATER_MORALE[water] ?? 0);
     if (!loss) continue;
     g.morale = Math.max(0, g.morale - loss);
-    const water = getCell(s, g.pos.x, g.pos.y)?.water ?? 0;
-    const what = water >= 2 ? `steht ${WATER_WORDS[water]}` : `liegt im ${MUD_WORDS[m]}`;
+    const what = water >= 2 ? `steht ${WATER_WORDS[water]}` : `liegt ${MUD_IN[m]}`;
     ctx.emit('mud_morale', {
       side: g.side, group: g.id, secret: true, minor: true, amount: loss,
       reason: `${name(g)} ${what} (${cellLabel(g.pos.x, g.pos.y)}): Moral sinkt um ${loss}.`,

@@ -13,7 +13,7 @@ export const CSS_KEYS = ['paper', 'card', 'ink', 'ink2', 'line', 'track', 'own',
  * Nachtfarbe auf dem dann gueltigen Papier besser lesbar wird als die Tagfarbe. So bleibt Tinte auf
  * Papier immer ueber 3 : 1. Im Zwei-Sekunden-Uebergang wirkt das wie Tinte, die aufleuchtet.
  */
-export const LATE_KEYS = ['ink', 'ink2', 'line', 'own', 'enemy', 'accent', 'danger', 'wire', 'rail', 'pencil', 'frame', 'village', 'forestLine', 'marsh', 'rock'];
+export const LATE_KEYS = ['ink', 'ink2', 'line', 'own', 'enemy', 'accent', 'danger', 'wire', 'rail', 'pencil', 'frame', 'village', 'forestLine', 'marsh', 'rock', 'mud'];
 /**
  * Kaertchen springen zusammen mit der Tinte (Review P02): ein Kaertchen in mittlerem Braun ist mit keiner
  * Tinte lesbar. Bis zum Sprung wird es nur leicht abgedunkelt und angewaermt, danach ist es Nachtkarte.
@@ -33,6 +33,8 @@ export const DAY = {
   faint: '#cbbf9f', contour: '#b79b6a', forest: '#7f8f5c', forestLine: '#46552c', water: '#7fa0b8', wire: '#4a4036', crater: '#a89470',
   rail: '#3a3128', marsh: '#3f6680', chalk: '#9a8e70', rock: '#5c5244', village: '#3b332c',
   pencil: '#4a4540', stain: '#8a5a2b', fold: '#a8987a', frame: '#3a3128', desk: '#3a3027', shade: '#000000',
+  // Wetter (P10): Schlammsignatur, Nebelgrau, Licht der Leuchtkugel, Wasser auf dem Papier
+  mud: '#6b4f30', fog: '#aaa69a', flareLight: '#f3c66a', wetPaper: '#d9ccab',
   jitter: 0.045, shadeAlpha: 0.22, foldAlpha: 0.35, stainAlpha: 0.22,
 };
 
@@ -42,6 +44,7 @@ export const NIGHT = {
   faint: '#1d2118', contour: '#3d4532', forest: '#4a6a3a', forestLine: '#8fb07a', water: '#2a4553', wire: '#8a826a', crater: '#2b2e24',
   rail: '#8a846f', marsh: '#7aa4bd', chalk: '#5a5c4c', rock: '#8a8270', village: '#a49e88',
   pencil: '#b3ae9a', stain: '#5a4630', fold: '#2a2e22', frame: '#a8a28c', desk: '#050605', shade: '#000000',
+  mud: '#9a8260', fog: '#4b4f47', flareLight: '#ffcf73', wetPaper: '#1a1d16',
   jitter: 0.03, shadeAlpha: 0.5, foldAlpha: 0.45, stainAlpha: 0.18,
 };
 
