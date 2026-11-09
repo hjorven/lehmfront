@@ -30,6 +30,9 @@ Der Kampagnenzustand ist reines JSON (`createCampaign` in `js/narrative/interlud
 `{ side, faction, ansehen, vertrauen, flags, outcomes, seed, book: { fallen, diary, letters, finds, decisions } }`.
 P14 setzt vor `playInterlude` die Flags der Mission (`harms_gefallen`, `velde_verloren`, ...), rechnet die Folgen des
 Stabsbefehls (`folgen.erfuellt/verfehlt`) und prüft die vorzeitigen Enden. Entscheidungen wendet `playInterlude` selbst an.
+Nach jeder Wahl löst `playInterlude` die restlichen Entscheidungen, Briefing und Befehl neu auf (`tailSteps`), weil eine
+Wahl sie umschalten kann (a2m5 `vell_angriff`, a4m6 `lask_gemeldet`). Nach a4m6 kommen keine Briefe und keine Feldpost:
+die Schlusssequenz (P26) zeigt `brief.24` selbst. Bricht P14 den Tisch mit `destroy()` ab, endet `done` mit `aborted: true`.
 
 ## Aufbau
 
