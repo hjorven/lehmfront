@@ -1,12 +1,16 @@
 // Alle Phasen-Module. Neue Mechanik: eine Zeile ergaenzen (alphabetisch, damit Rebases selten kollidieren).
 import './artillery.js';
+import './battle.js';
 import './build.js';
 import './clock.js';
 import './dig.js';
+import './dugout.js';
 import './fire.js';
 import './hold.js';
 import './intel.js';
+import './melee.js';
 import './move.js';
 import './rebuild.js';
 import './supply.js';
 import './weather.js';
+import './wire.js';
