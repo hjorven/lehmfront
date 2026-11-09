@@ -3,6 +3,7 @@
   "name": "Gewitter",
   "map": "akt1-m5",
   "startHour": 6,
+  "startDay": 19,
   "turnKind": "position",
   "weather": {
     "kind": "storm",

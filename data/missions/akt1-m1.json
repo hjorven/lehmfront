@@ -3,6 +3,7 @@
   "name": "Der erste Spatenstich",
   "map": "akt1-m1",
   "startHour": 6,
+  "startDay": 1,
   "turnKind": "position",
   "weather": { "kind": "clear", "fixed": true },
   "mission": {

@@ -3,6 +3,7 @@
   "name": "Der Turm von Ostervenn",
   "map": "akt1-m4",
   "startHour": 6,
+  "startDay": 14,
   "turnKind": "position",
   "weather": { "kind": "clear" },
   "mission": {

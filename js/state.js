@@ -196,7 +196,7 @@ export function createInitialState(map, scenario, seed) {
     turn: 1,
     turnKind: scenario.turnKind ?? 'position',
     battle: null,
-    clock: { day: 1, hour: startHour, minute: 0 },
+    clock: { day: Number.isInteger(scenario.startDay) && scenario.startDay > 0 ? scenario.startDay : 1, hour: startHour, minute: 0 },
     night: isNightHour(startHour),
     weather: { kind: 'clear', rain: 0, wind: { dir: 'w', speed: 1 }, ...(scenario.weather ?? {}) },
     sides,

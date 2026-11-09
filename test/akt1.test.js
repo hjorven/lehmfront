@@ -75,11 +75,13 @@ test('Ablaufplan: Lask-Lage, Feuerplaene und Wetter nach Stellungsrunde', () => 
   assert.equal(st.mission.id, 'a1m2');
   assert.equal(missionRound(st), 1);
   assert.deepEqual(missionAi(st), { posture: 'halten' });
-  st = { ...st, clock: { day: 2, hour: 6 } };
+  const d0 = st.clock.day;
+  assert.equal(d0, 4, 'Mission 2 beginnt an Tag 4');
+  st = { ...st, clock: { day: d0 + 1, hour: 6 } };
   assert.equal(missionRound(st), 3);
   assert.deepEqual(missionAi(st), { posture: 'sturm' });
   assert.deepEqual(missionAi({ ...st, turnKind: 'battle' }), {}, 'im Gefecht entscheidet die KI selbst');
-  assert.deepEqual(missionAi({ ...st, clock: { day: 3, hour: 6 } }), {}, 'auto: freie KI');
+  assert.deepEqual(missionAi({ ...st, clock: { day: d0 + 2, hour: 6 } }), {}, 'auto: freie KI');
   assert.equal(entryAt([{ from: 1, x: 1 }, { from: 3, x: 2 }], 2).x, 1);
   assert.equal(halfDay({ clock: { day: 1, hour: 18 } }), 2);
 
@@ -87,7 +89,7 @@ test('Ablaufplan: Lask-Lage, Feuerplaene und Wetter nach Stellungsrunde', () => 
   const st3 = prepareMission(createInitialState(loadMap(mapJson('akt1-m3')), s3, 1), s3);
   const out = withMissionOrders([{ type: 'fire_plan', plans: [{ id: 'eigen', kind: 'counter' }] }], st3);
   assert.deepEqual(out[0].plans.map((p) => p.id), ['eigen'], 'Runde 1: noch kein Stoerfeuer');
-  const r2 = { ...st3, clock: { day: 1, hour: 18 } };
+  const r2 = { ...st3, clock: { day: st3.clock.day, hour: 18 } };
   assert.deepEqual(withMissionOrders([{ type: 'fire_plan', plans: [{ id: 'eigen', kind: 'counter' }] }], r2)[0].plans.map((p) => p.id), ['eigen', 'gleis']);
   assert.deepEqual(withMissionOrders([], r2).map((o) => o.type), ['fire_plan']);
   // Szenario ohne Mission bleibt unberuehrt

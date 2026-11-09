@@ -3,6 +3,7 @@
   "name": "Zwölf Loren",
   "map": "akt1-m3",
   "startHour": 6,
+  "startDay": 9,
   "turnKind": "position",
   "weather": {
     "kind": "overcast"

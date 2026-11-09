@@ -17,9 +17,9 @@ export function positionRounds(rounds) {
  * Nummer der laufenden Stellungsrunde aus der Uhr: 1 ist die erste, jede Stellungsrunde dauert 12 Stunden.
  * Gefechtsrunden dauern Minuten und bleiben in der Stellungsrunde, an deren Ende sie begonnen haben.
  */
-export function halfDay(state, startHour = 6) {
-  const c = state.clock ?? { day: 1, hour: startHour };
-  const h = (c.day - 1) * 24 + c.hour - startHour;
+export function halfDay(state, startHour = 6, startDay = 1) {
+  const c = state.clock ?? { day: startDay, hour: startHour };
+  const h = (c.day - startDay) * 24 + c.hour - startHour;
   return Math.floor(h / 12) + 1;
 }
 

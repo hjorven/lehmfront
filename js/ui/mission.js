@@ -141,12 +141,23 @@ export function attachMissionUi({ ui, scenario, map, params, getArchive = () => 
   const round = ui.querySelector('.card.round');
   if (round?.parentNode === host) round.after(slip); else host.append(slip);
 
+  const chip = document.createElement('button');
+  chip.type = 'button';
+  chip.className = 'm-chip';
+  chip.title = 'Auftrag ansehen';
+  chip.addEventListener('click', () => ui.querySelector('.hud-strip')?.click());
+  ui.append(chip);
+
   function updateSlip(state) {
     const archive = getArchive();
     const rows = goalLines({ mission: m.id, state, rounds: archive.rounds ?? [], side: 'a', map });
     const k = JSON.stringify(rows);
     if (k === lineKey) return;
     lineKey = k;
+    // Handy: die erste offene Zeile als Streifen ueber der Werkzeugreihe, der ganze Zettel liegt in der Seitenleiste
+    const open = rows.find((r) => !r.done) ?? rows[0];
+    chip.textContent = open ? 'Auftrag: ' + open.text : '';
+    chip.classList.toggle('warn', !!open?.warn);
     slip.innerHTML = `<span class="m-slip-k">Auftrag · ${esc(scenario.name ?? '')}</span><ul>${rows.map((r) =>
       `<li class="${r.done ? 'done' : r.warn ? 'warn' : ''}"><span class="m-tick" aria-hidden="true">${r.done ? '✓' : ''}</span>${esc(r.text)}</li>`).join('')}</ul>`;
   }
@@ -170,6 +181,7 @@ export function attachMissionUi({ ui, scenario, map, params, getArchive = () => 
     seen.add(current.mechanik);
     current = null;
     note.hidden = true;
+    ui.classList.remove('m-noting');
     placeArrow();
     onChange();
     if (last.state) check({ ...last, after: false });
@@ -180,6 +192,7 @@ export function attachMissionUi({ ui, scenario, map, params, getArchive = () => 
     note.innerHTML = `<p class="m-text">${esc(h.text)}</p><span class="m-from">${esc(h.von === 'Selin' ? '' : '– ' + h.von)}</span>
       <button type="button" class="m-ok">Verstanden</button>`;
     note.hidden = false;
+    ui.classList.add('m-noting');
     note.classList.toggle('m-new', !reducedMotion());
     placeArrow();
     try { playSfx('pencil', { count: 3, intensity: 0.35 }); } catch { /* ohne Klang */ }
@@ -278,6 +291,7 @@ export function attachMissionUi({ ui, scenario, map, params, getArchive = () => 
     sync({ state, orders = [], selected = null, tool = null, busy = false }) {
       updateSlip(state);
       last = { state, log: last.log, orders, selected, tool, round: missionRound(state) };
+      ui.classList.toggle('m-busy', !!busy);
       if (!busy) check({ ...last, after: false });
       else placeArrow();
     },

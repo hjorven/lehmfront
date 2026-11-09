@@ -12,7 +12,8 @@ registerPhase({
   run(ctx) {
     const plan = ctx.state.mission?.weather;
     if (!plan?.length) return;
-    const e = entryAt(plan, missionRound(ctx.state));
+    // Am Ende von Runde n gilt schon das Wetter von Runde n + 1: die Uhr zeigt es beim Planen
+    const e = entryAt(plan, missionRound(ctx.state) + 1);
     if (!e || !WEATHER_KINDS.includes(e.kind)) return;
     const w = ctx.state.weather ?? {};
     // rain/fog neu berechnen lassen, wenn das Wetter wechselt

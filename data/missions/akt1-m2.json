@@ -3,6 +3,7 @@
   "name": "Die Weide",
   "map": "akt1-m2",
   "startHour": 6,
+  "startDay": 4,
   "turnKind": "position",
   "weather": { "kind": "clear" },
   "mission": {

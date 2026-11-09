@@ -18,7 +18,7 @@ export const AKT1 = {
   a1m3: { rounds: 5, ammoRounds: 6, depotEmpty: 2 },
   a1m4: { rounds: 4, target: 'nest', silent: 2 },
   a1m5: { rounds: 5, fit: 30, kuhle: [{ x: 24, y: 24 }, { x: 24, y: 25 }, { x: 24, y: 26 }, { x: 24, y: 27 }] },
-  a1m6: { rounds: 8, tolerate: 2, harms: 'Otto Harms' },
+  a1m6: { rounds: 8, tolerate: 0, harms: 'Otto Harms' },
 };
 
 const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
@@ -68,8 +68,8 @@ export function ammoStatus(map, state, side, ammoRounds = AKT1.a1m3.ammoRounds) 
   const rows = [];
   for (const sec of sectionsOf(map)) {
     const groups = frontGroups(map, state, side, sec).length;
-    if (!groups) continue;
-    const need = groups * UPKEEP.ammo * ammoRounds;
+    // Wer Gruppen nach hinten zieht, spart sich die Munition nicht: jeder Abschnitt braucht mindestens eine Gruppe
+    const need = Math.max(1, groups) * UPKEEP.ammo * ammoRounds;
     const ammo = supply?.sections?.[sec.id]?.ammo ?? 0;
     rows.push({ id: sec.id, label: sec.label ?? sec.id, ammo, need, ok: ammo >= need });
   }
@@ -116,7 +116,7 @@ registerMissionJudge('a1m4', (ctx) => {
 
 export function kuhleStatus(map, state, side, cfg = AKT1.a1m5) {
   const held = heldCells(map, state, side, cfg.kuhle).length;
-  const there = groupsAt(state, side, cfg.kuhle, 1);
+  const there = groupsAt(state, side, cfg.kuhle, 0);
   const men = there.filter((g) => g.morale >= cfg.fit).length;
   return { held, total: cfg.kuhle.length, men, worn: there.length - men, ok: held === cfg.kuhle.length && men > 0 };
 }
