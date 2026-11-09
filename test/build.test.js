@@ -320,3 +320,19 @@ test('Treffer auf leere Parzelle verfaellt; cartsLost zieht Loren ab', () => {
   assert.equal(r.state.cells[rect.x + ',' + rect.y].buildingDamaged, undefined);
   assert.equal(capacityOf(r.state, 'a'), 4);
 });
+
+test('P09: Batterie in zerschossener Stellung schweigt, nach der Reparatur nicht mehr', () => {
+  const s = start();
+  const art = s.sides.a.artillery;
+  assert.ok(art?.batteries?.length, 'Asse hat eigene Batterien');
+  const ab = art.batteries[0];
+  const p = plotAt(s.sides.a.etappe, ab.pos.x, ab.pos.y);
+  const eb = at(s.sides.a.etappe, p.x, p.y);
+  assert.equal(eb.type, 'batteriestellung');
+  eb.damaged = true;
+  let r = turn(s);
+  assert.ok(r.state.sides.a.artillery.batteries.find((b) => b.id === ab.id).silenced > 0);
+  r = turn(r.state, { repairs: [eb.id] });
+  r = turn(r.state);
+  assert.equal(r.state.sides.a.artillery.batteries.find((b) => b.id === ab.id).silenced, 0);
+});

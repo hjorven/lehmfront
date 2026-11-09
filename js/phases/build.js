@@ -25,6 +25,8 @@ import { sideSeesCell, darknessOf } from '../sight.js';
 
 /** Hoechstens so viele Bauauftraege je Stellungsrunde */
 export const MAX_BUILDS = 8;
+/** So viele Runden schweigt eine Batterie in zerschossener Stellung (bis zur naechsten Stellungsrunde) */
+export const SILENCED_WHILE_DAMAGED = 99;
 /** Rauch der Feldkueche ist am Tag bis so weit zu sehen (Kartenfelder, Schachbrett) */
 export const SMOKE_RANGE = 28;
 
@@ -166,6 +168,15 @@ export function runEtappeSide(state, side, ctx) {
     });
   }
   syncRails(state, side);
+
+  // P09: Eine zerschossene Batteriestellung schweigt, bis sie repariert ist (die Artillerie-Phase setzt
+  // silenced zu Beginn jeder Stellungsrunde zurueck, diese Phase setzt es danach wieder).
+  const art = state.sides[side].artillery;
+  for (const ab of [...(art?.batteries ?? [])].sort(byId)) {
+    const p = plotAt(et, ab.pos.x, ab.pos.y);
+    const eb = p && et.buildings.find((q) => q.x === p.x && q.y === p.y && q.type === 'batteriestellung');
+    if (eb?.damaged) ab.silenced = Math.max(ab.silenced | 0, SILENCED_WHILE_DAMAGED);
+  }
 
   // 6. Ertraege
   const y = etappeYield(et);
