@@ -1,0 +1,166 @@
+/* Feldzugskarte (P14): Stil 09 Kriegsraum. Farben nur ueber --wr-* (js/theme.js WARROOM, applyWarRoom). */
+.fz{position:fixed;inset:0;overflow:hidden;background:var(--wr-board);color:var(--wr-ink);font:14px/1.4 var(--font-ui);
+  display:grid;grid-template-columns:minmax(250px,300px) 1fr minmax(300px,380px);grid-template-rows:auto 1fr auto;
+  grid-template-areas:"head map desk" "axes map desk" "reports reports actions";gap:14px;padding:14px}
+.fz-map{grid-area:map;width:100%;height:100%;min-height:0;display:block;touch-action:manipulation;border:1px solid var(--wr-faint);border-radius:3px}
+.fz .card{position:relative;background:var(--wr-board2);color:var(--wr-ink);border:1px solid var(--wr-line);border-radius:3px;box-shadow:0 2px 0 rgba(0,0,0,.35)}
+.fz .k{display:block;font:600 11px var(--font-num);letter-spacing:.12em;text-transform:uppercase;color:var(--wr-ink2)}
+.fz-head{grid-area:head;align-self:start;padding:10px 14px}
+.fz-title{display:block;font:400 21px/1.15 var(--font-head);margin:4px 0 2px;color:var(--wr-ink)}
+.fz-sub{display:block;color:var(--wr-ink2);font-size:13px}
+.fz-sub i{font-style:normal;color:var(--wr-accent)}
+
+/* Achsen */
+.fz-axes{grid-area:axes;align-self:start;padding:12px 14px;max-height:100%;overflow:auto}
+.fz-axis{margin:2px 0 4px}
+.fz-axis-row{display:flex;justify-content:space-between;align-items:baseline}
+.fz-axis-row b{font:700 18px var(--font-num)}
+.fz-bar{position:relative;height:6px;background:var(--wr-faint);margin:4px 0 6px}
+.fz-bar i{position:absolute;left:0;top:0;bottom:0;background:var(--wr-line)}
+.fz-axis.tru .fz-bar i{background:var(--wr-accent)}
+.fz-axis.low .fz-bar i{background:var(--wr-danger)}
+.fz-axis.low .fz-axis-row b{color:var(--wr-danger)}
+.fz-bar s{position:absolute;top:-3px;bottom:-3px;width:1px;background:var(--wr-ink2);text-decoration:none}
+.fz-spark{display:block;overflow:visible}
+.fz-spark polyline{fill:none;stroke:var(--wr-ink);stroke-width:1.4;stroke-linejoin:round}
+.fz-axis.tru .fz-spark polyline{stroke:var(--wr-accent)}
+.fz-spark circle{fill:var(--wr-ink)}
+.fz-spark .lim{stroke:var(--wr-faint);stroke-dasharray:2 3;fill:none}
+.fz-spark .lim.hard{stroke:var(--wr-danger);opacity:.6}
+.fz-fx{list-style:none;margin:6px 0 12px;padding:0;font-size:12.5px}
+.fz-fx li{display:flex;justify-content:space-between;gap:10px;padding:2px 0;border-bottom:1px dotted var(--wr-faint)}
+.fz-fx li span{color:var(--wr-ink2)}
+.fz-fx li b{font:600 12.5px var(--font-num);text-align:right}
+.fz-fx li.warn b{color:var(--wr-danger)}
+.fz-ledger{margin:4px 0 6px;font-size:12.5px}
+.fz-ledger summary{cursor:pointer;color:var(--wr-ink2);font:600 11px var(--font-num);letter-spacing:.08em;text-transform:uppercase;padding:4px 0}
+.fz-ledger ul{list-style:none;margin:4px 0 0;padding:0}
+.fz-ledger li{display:grid;grid-template-columns:34px 1fr;gap:6px;padding:2px 0}
+.fz-ledger li b{font:700 12.5px var(--font-num);text-align:right}
+.fz-ledger b.pos{color:var(--wr-ink)}
+.fz-ledger b.neg{color:var(--wr-danger)}
+.fz-ledger li span{color:var(--wr-ink2)}
+.fz-limits{margin:6px 0 0;font-size:11.5px;color:var(--wr-ink2)}
+
+/* Schreibtisch mit Telegrammen (Stil 03 auf Papier) */
+.fz-desk{grid-area:desk;position:relative;z-index:1;display:flex;flex-direction:column;gap:12px;overflow:auto;padding:2px 4px 8px;align-self:stretch;
+  scrollbar-width:thin}
+.fz-tele{position:relative;background:var(--wr-paper);color:var(--wr-paper-ink);padding:12px 16px 12px;border-radius:1px;
+  box-shadow:0 3px 0 rgba(0,0,0,.35),0 0 0 1px rgba(0,0,0,.15);font:12.5px/1.4 var(--font-num);transform:rotate(-.4deg);flex:0 0 auto}
+.fz-tele:nth-child(2n){transform:rotate(.5deg)}
+.fz-tele header{display:flex;gap:10px;align-items:baseline;border-bottom:2px solid var(--wr-paper-ink);padding-bottom:4px;margin-bottom:6px}
+.fz-tele-h{font:400 15px var(--font-head);letter-spacing:.06em}
+.fz-tele-nr{margin-left:auto;font-size:12px;color:var(--wr-paper-ink2)}
+.fz-eilt{font:700 11px var(--font-num);color:var(--wr-stamp-red);border:1.5px solid var(--wr-stamp-red);padding:0 5px;letter-spacing:.1em}
+.fz-tele dl{display:grid;grid-template-columns:auto 1fr;gap:0 10px;margin:0 0 6px;font-size:12px}
+.fz-tele dt{color:var(--wr-paper-ink2)}
+.fz-tele dd{margin:0}
+.fz-tele-body p{margin:0 0 2px;text-transform:none}
+.fz-tele footer{margin-top:6px;text-align:right;font-family:var(--font-hand);font-size:19px;color:var(--wr-stamp-blue)}
+.fz-tele.t-threat{box-shadow:0 3px 0 rgba(0,0,0,.35),0 0 0 2px var(--wr-stamp-red)}
+.fz-tele.t-small{font-size:12px;padding:8px 12px}
+.fz-tele.t-small .fz-tele-h{font-size:13px}
+/* Ueberraschung: je knapper der Stab, desto kuerzer der Papierstreifen */
+.fz-tele.t-reply.band-knapp{max-width:260px}
+.fz-tele.t-reply.band-kalt{max-width:180px;min-height:84px}
+.fz-stamp{position:absolute;right:14px;bottom:10px;font:400 17px var(--font-head);letter-spacing:.08em;padding:2px 8px;border:2.5px solid currentColor;
+  transform:rotate(-8deg);opacity:.82;pointer-events:none;mix-blend-mode:multiply}
+.fz-stamp.red{color:var(--wr-stamp-red)}
+.fz-stamp.blue{color:var(--wr-stamp-blue)}
+.fz-stamp.ink{color:var(--wr-paper-ink)}
+.fz-tele.t-order .fz-stamp{font-size:22px;bottom:16px;right:18px}
+.fz-order{display:flex;flex-direction:column;gap:8px}
+.fz-stamps{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.fz-stamps:has(> :only-child){grid-template-columns:1fr}
+.fz-stamp-btn{display:flex;flex-direction:column;gap:2px;align-items:flex-start;text-align:left;padding:6px 9px;min-height:44px;cursor:pointer;
+  background:transparent;color:var(--wr-ink);border:1.5px dashed var(--wr-line);border-radius:2px;font:inherit}
+.fz-stamp-btn b{font:400 15px var(--font-head);letter-spacing:.04em}
+.fz-stamp-btn small{font:11px/1.3 var(--font-num);color:var(--wr-ink2)}
+.fz-stamp-btn:hover,.fz-stamp-btn:focus-visible{border-style:solid;outline:none;background:var(--wr-grid)}
+.fz-stamp-btn.s-befolgen b{color:var(--wr-ink)}
+.fz-stamp-btn.s-umdeuten b{color:var(--wr-accent)}
+.fz-stamp-btn.s-verweigern b{color:var(--wr-danger)}
+.fz-stamp-btn.armed{border:2px solid var(--wr-danger);background:var(--wr-grid)}
+.fz-armed{margin:0;min-height:1em;font-size:12px;color:var(--wr-danger)}
+.fz-armed:empty{display:none}
+
+/* Karteikasten der Erfahrungsberichte */
+.fz-reports{grid-area:reports;align-self:end;padding:10px 12px 12px;min-width:0}
+.fz-reports header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+.fz-count{font:12px var(--font-num);color:var(--wr-ink2)}
+.fz-cards{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 6px;scroll-snap-type:x proximity;scrollbar-width:thin}
+.fz-card{position:relative;flex:0 0 164px;min-height:96px;display:flex;flex-direction:column;gap:4px;text-align:left;padding:8px 10px;cursor:pointer;
+  background:var(--wr-board);color:var(--wr-ink2);border:1px dashed var(--wr-faint);border-radius:2px;font:inherit;scroll-snap-align:start}
+.fz-card b{font:600 13px var(--font-ui);color:var(--wr-ink)}
+.fz-card-trig{font-size:11.5px;line-height:1.3}
+.fz-card-fx{font-size:11.5px;line-height:1.3;color:var(--wr-paper-ink)}
+.fz-card-fx i{font-style:normal;color:var(--wr-paper-ink2)}
+.fz-card.got{background:var(--wr-paper);border:1px solid var(--wr-paper);color:var(--wr-paper-ink)}
+.fz-card.got b{color:var(--wr-paper-ink)}
+.fz-card.held{border-style:solid;border-color:var(--wr-ink2)}
+.fz-card:hover,.fz-card:focus-visible{outline:2px solid var(--wr-accent);outline-offset:1px}
+.fz-card-stamp{margin-top:auto;align-self:flex-end;font:400 11px var(--font-head);letter-spacing:.08em;color:var(--wr-stamp-blue);border:1.5px solid currentColor;padding:0 5px;transform:rotate(-5deg)}
+.fz-card.fresh .fz-card-stamp{color:var(--wr-stamp-red)}
+.fz-card-stamp.held{color:var(--wr-ink2)}
+.fz-tally{stroke:var(--wr-ink);stroke-width:1.5;stroke-linecap:round;fill:none;margin-top:auto}
+.fz-tally-none{margin-top:auto;font:italic 12px var(--font-ui);color:var(--wr-faint)}
+
+/* Aufbruch */
+.fz-actions{grid-area:actions;align-self:end;display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px}
+.fz-actions .btn{background:var(--wr-board2);color:var(--wr-ink);border:1px solid var(--wr-line);border-radius:3px;min-height:44px;font-weight:600;gap:10px;box-shadow:none}
+.fz-actions .btn:hover{border-color:var(--wr-ink)}
+.fz-actions .fz-go{background:var(--wr-accent);color:#1a1a12;border-color:var(--wr-accent);font-weight:700}
+.fz-actions .fz-new{color:var(--wr-ink2)}
+.fz-actions kbd{font:11px var(--font-num);opacity:.75;border:1px solid currentColor;border-radius:2px;padding:0 4px}
+
+/* Kurztext an der Station */
+.fz-tip{position:absolute;z-index:3;max-width:240px;padding:6px 10px;background:var(--wr-paper);color:var(--wr-paper-ink);border-radius:2px;
+  box-shadow:0 2px 0 rgba(0,0,0,.35);font-size:12.5px;pointer-events:none;display:flex;flex-direction:column;gap:1px}
+.fz-tip[hidden]{display:none}
+.fz-tip-nr{font:11px var(--font-num);color:var(--wr-paper-ink2)}
+
+/* Bericht aufgeschlagen */
+.fz-modal{position:fixed;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:16px;overflow:auto;background:rgba(10,20,16,.78)}
+.fz-modal > *{flex:0 0 auto}
+.fz-modal .fz-tele{width:min(460px,100%);transform:rotate(-.6deg)}
+.fz-modal .btn{background:var(--wr-board2);color:var(--wr-ink);border:1px solid var(--wr-line);min-height:44px}
+
+/* Dialog "Einsatz melden" im Gefecht */
+.fz-end .modal{position:relative;width:min(440px,100%);padding:22px 22px 18px}
+.fz-verdict{display:flex;gap:10px;align-items:baseline;font-family:var(--font-num)}
+.fz-verdict span{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink2)}
+.fz-end-actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.fz-end-actions .btn{min-height:44px;font-weight:700}
+
+/* Mittel: Karte oben, Spalten darunter */
+@media (max-width:1100px){
+  .fz{grid-template-columns:minmax(240px,300px) 1fr minmax(280px,340px)}
+}
+/* Handy hochkant: alles untereinander, die Karte als Band oben, Aufbruch unten fest */
+@media (max-width:760px){
+  .fz{position:fixed;display:flex;flex-direction:column;gap:0;overflow-y:auto;padding:0 12px 84px;-webkit-overflow-scrolling:touch}
+  .fz > *{flex:0 0 auto}
+  .fz-head{order:0}
+  .fz-map{order:1;height:300px;margin:0 -12px 12px;width:calc(100% + 24px);border-left:0;border-right:0;border-radius:0}
+  .fz-desk{order:2}
+  .fz-axes{order:3}
+  .fz-reports{order:4}
+  .fz-head{position:sticky;top:0;z-index:2;margin:0 -12px;border-left:0;border-right:0;border-top:0;border-radius:0;padding:8px 12px}
+  .fz-title{font-size:18px}
+  .fz-head + .fz-axes{margin-top:0}
+  .fz-axes,.fz-reports{margin-bottom:12px}
+  .fz-axes{max-height:none}
+  .fz-desk{overflow:visible;margin-bottom:12px;padding:0}
+  .fz-stamps{grid-template-columns:1fr}
+  .fz-stamp-btn{flex-direction:row;align-items:baseline;gap:10px}
+  .fz-stamp-btn b{min-width:96px}
+  .fz-actions{position:fixed;left:0;right:0;bottom:0;z-index:4;padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:var(--wr-board);
+    border-top:1px solid var(--wr-line);justify-content:space-between;flex-wrap:nowrap}
+  .fz-actions .btn{flex:1 1 auto;justify-content:center;padding:8px 8px;font-size:13px}
+  .fz-actions .fz-new{flex:0 1 auto}
+  .fz-actions kbd{display:none}
+  .fz-card{flex-basis:150px}
+}
+@media (prefers-reduced-motion:reduce){
+  .fz-tele,.fz-tele:nth-child(2n){transform:none}
+}

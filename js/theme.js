@@ -198,3 +198,19 @@ export const BLUEPRINT = {
 export function blueprintTheme(base = current) {
   return { ...BLUEPRINT, darkness: base?.darkness ?? 0, dark: true, flare: false, blueprint: true };
 }
+
+/**
+ * Kriegsraum (Stil 09, Plan 7.8) fuer die Feldzugskarte zwischen den Missionen (P14): dunkelgruener Kartentisch,
+ * cremefarbene Linien, Bernstein fuer das Naechste. Gedrucktes (Telegramme, Karteikarten) bleibt Stil 03 auf Papier.
+ */
+export const WARROOM = {
+  board: '#1c362d', board2: '#24443a', grid: '#2b4c41', faint: '#3e6155', line: '#e6dec6', ink: '#f1ebd8', ink2: '#b4c2b5',
+  accent: '#f2c14e', danger: '#ef8a72', own: '#e6dec6', enemy: '#ef8a72', water: '#5b8c96', forest: '#4f7b5f',
+  paper: '#f3ecd8', paperInk: '#2a2420', paperInk2: '#6e6253', stampRed: '#a3271f', stampBlue: '#1f4e9c', pencil: '#4a4540',
+};
+
+/** WARROOM als CSS-Variablen (--wr-<name>) auf ein Element legen */
+export function applyWarRoom(el) {
+  if (!el) return;
+  for (const [k, v] of Object.entries(WARROOM)) el.style.setProperty('--wr-' + k.replace(/[A-Z]/g, (c) => '-' + c.toLowerCase()), v);
+}

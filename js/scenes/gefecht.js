@@ -64,6 +64,7 @@ import { createArchiveView } from '../ui/archive.js';
 import { drawFilmTrails } from '../render/film-layer.js';
 import { loadBattle } from '../modes/load.js';
 import { attachModeRules } from '../ui/result.js';
+import { campaignMission } from '../ui/campaign/mission.js';
 
 const num = (v, d) => (v === null || v === '' || !Number.isFinite(Number(v)) ? d : Number(v));
 const LONG_PRESS_MS = 430;
@@ -90,6 +91,9 @@ export async function mount(root, params) {
   const seed = battle.seed ?? ((num(params.get('seed'), 1917) >>> 0) || 1);
   let state = createInitialState(map, scenario, seed);
   state = initEtappen(state, map, scenario); // P11: Etappe mit Grundausbau aus dem Szenario
+  // P14: Einsatz aus der Kampagne (Ansehen, Vertrauen, Berichte, Nachschub, Ersatz), sonst null
+  const campaignRun = campaignMission(params);
+  if (campaignRun) state = campaignRun.prepare(state);
   if (!fixed && params.get('kind') === 'battle') { state.turnKind = 'battle'; state.battle = { round: 1 }; }
   if (!fixed) applyWeatherParams(state, map, params);
   const humans = mode === 'hotseat' ? ['a', 'b'] : ['a'];
@@ -324,6 +328,7 @@ export async function mount(root, params) {
     laskNote.show(note);
     playSfx('paper', { intensity: 0.7 });
   }
+  campaignRun?.mount(ui, { getState: () => state, getArchive: () => archive, isBusy: () => modalOpen });
   const toolbar = createToolbar(ui, {
     onTool: (id, disabled) => {
       const def = allTools().find((t) => t.id === id);
@@ -831,6 +836,7 @@ export async function mount(root, params) {
     }
     lehrling.afterRound(humans);
     archive = archiveRound(archive, input, r);
+    campaignRun?.afterRound(state, archive, ui);
     // Unvollendete Wege laufen als Befehl weiter, solange die Rundenart passt
     const carry = { a: [], b: [] };
     for (const e of r.log) {
