@@ -321,7 +321,7 @@ export function createBoard(root, opts) {
   canvas.addEventListener('click', (e) => { const h = hitAt(e); showTip(h); if (h) playSfx('pencil', { count: 1, intensity: 0.3 }); });
 
   const onKey = (e) => {
-    if (e.target.closest?.('input, textarea') || el.querySelector('.fz-modal') || document.querySelector('.nr-reader, .nj-journal, .modal-back')) return;
+    if (e.target.closest?.('input, textarea') || el.querySelector('.fz-modal') || document.querySelector('.narr, .journal, .modal-back')) return;
     if (e.key === 't' || e.key === 'T') { e.preventDefault(); opts.onJournal?.(); }
     else if (e.key === 'Enter' && !e.target.closest?.('button')) { if (next()) { e.preventDefault(); opts.onStart?.(); } }
   };
