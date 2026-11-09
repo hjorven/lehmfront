@@ -50,12 +50,14 @@ Jeder Thread traegt hier nach dem Merge ein, was fertig ist und was offen bleibt
   - Oberfläche: `js/ui/film.js` (Filmleiste mit Phasenreitern, Weiter pro Phase, Durchlaufen, Überspringen, Zeitleiste, Tasten Enter/Leertaste, Esc, Pfeile), `js/ui/telegram.js` (Fernschreiberstreifen Stil 03, Klick springt zum Ort und im Film zum Zeitpunkt), `js/ui/archive.js` (Aktenordner „Protokoll“, Taste P), `js/render/film-layer.js` (Geist am Ausgangsort und Bleistiftspur). Ersetzt das Meldungen-Kärtchen aus P03.
   - Demo-Zustände: `?scene=gefecht&demo=film|telegramm|archiv`.
 
-- P19 Klang im Spiel (Teil 1, Feinschliff folgt):
+- P19 Klang im Spiel und Feinschliff:
   - `js/audio/cues.js` (rein): Ereignis-Haken `registerCue(type, fn)`, Vorbelegung fuer alle bisherigen Ereignisse (Schritte, Gewehr, MG, Leuchtkugel bei Einbruch der Nacht, Kraehe bei Tagesanbruch, Radieren beim Geist, Uhr in der Uhrphase) und fuer kommende (Sturm, Artillerie nah/fern nach Abstand zu eigenen Gruppen, Mine, Loren, Wetter). Grundton der Front `ambienceFor` aus Tageszeit, Wetter, Rundenart und dem, was die eigene Seite in der letzten Runde mitbekommen hat.
   - `js/audio/director.js` spielt ab; eingehaengt in Phasenfilm, Gefecht (Pfeife nach dem Halten-Ring beim Sturm, Musik), Papier, Etappe.
   - Regler: Knopf „Ton“ rechts im Gefecht mit Klappkarte, auf dem Handy als Karte „Klang“ in der Seitenleiste (`js/ui/sound.js`, auch fuer P18 nutzbar).
   - Ueberraschung: wird eine Gruppe aufgerieben, verstummt die ganze Front fuer drei Sekunden, dann schlaegt die Uhr einmal und das Grollen kommt langsam zurueck (`audio.hush`).
-  - Offen: Feinschliff der Ansichten (Uebergaenge, Mikroanimationen, Token-Konsistenz) als zweiter PR; Hauptmenue und Feldzugskarte bekommen ihren Klang, sobald es sie gibt.
+  - Feinschliff (Teil 2): `css/motion.css` mit Bewegungs-Token (`--dur-quick`, `--dur-sheet`, `--dur-slow`, `--ease-paper`). Karten im Gefecht legen sich wie Papier ab (Schild, Zusammenfassung, Protokoll), Telegramm und Filmleiste werden von unten nachgeschoben, Befehlsliste und Klappkarten von rechts; Knoepfe geben beim Druecken nach, Ansehen/Vertrauen-Balken gleiten. Bei reduzierter Bewegung ist alles aus. Abdunkelung der Dialoge als Token `--scrim`.
+  - Ueberraschung Teil 2: aendern sich Munition, Material oder Moral, steht der alte Wert kurz rot durchgestrichen davor, wie eine Bleistiftkorrektur des Schreibers (im Hotseat je Seite getrennt).
+  - Offen: Hauptmenue und Feldzugskarte bekommen ihren Klang, sobald es sie gibt. Bekannte Macke: auf dem Handy kann das Schild einer gewaehlten Gruppe das Telegramm ueberdecken.
 
 - P09 Artillerie und Feuerplan:
   - Daten `js/config/artillery.js` (Batteriearten Feldhaubitzen und schwere Haubitzen mit Granaten je Runde, Reichweite, Streuung, Lager, Nachschub; Planarten Vorbereitungsfeuer, Sperrfeuer, Feuerwalze, Störfeuer, Gegenbatteriefeuer; Verzögerung Telefon 1 / Melder 2 Runden).

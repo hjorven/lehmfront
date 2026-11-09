@@ -60,6 +60,9 @@ export function createHud(root, { onToggleList, onToggleOverlay, onCheck, onTogg
 
   let lastChecks = [];
   let lastClock = null;
+  const prev = {}, was = {}, wasTimer = {};
+  const WAS_MS = 2600;
+  let lastSide;
   return {
     el,
     closePopover() { pop.hidden = true; ovBtn.setAttribute('aria-expanded', 'false'); },
@@ -70,11 +73,24 @@ export function createHud(root, { onToggleList, onToggleOverlay, onCheck, onTogg
     },
     update(m) {
       const s = m.supplies;
-      const set = (k, v) => { el.querySelector(`.res[data-k="${k}"] .v`).innerHTML = v; };
+      // Hotseat: die andere Seite darf die Zahlen der ersten nicht durchgestrichen sehen
+      if (m.side !== lastSide) { lastSide = m.side; for (const k of Object.keys(prev)) delete prev[k]; for (const k of Object.keys(was)) delete was[k]; }
+      // Bleistiftkorrektur (P19): aendert sich ein Wert, steht der alte kurz durchgestrichen davor
+      const set = (k, v, num) => {
+        const now = performance.now();
+        if (num !== undefined && prev[k] !== undefined && prev[k] !== num) was[k] = { old: prev[k], t0: now };
+        prev[k] = num;
+        const w = was[k];
+        const age = w ? now - w.t0 : Infinity;
+        if (w && age >= WAS_MS) delete was[k];
+        const mark = age < WAS_MS ? `<s class="was" aria-hidden="true" style="animation-delay:-${Math.round(age)}ms">${esc(w.old)}</s>` : '';
+        el.querySelector(`.res[data-k="${k}"] .v`).innerHTML = mark + v;
+        if (mark) { clearTimeout(wasTimer[k]); wasTimer[k] = setTimeout(() => el.querySelector(`.res[data-k="${k}"] .was`)?.remove(), WAS_MS - age); }
+      };
       set('carts', `${esc(s.carts ?? 0)}<small>/${esc(s.cartsTotal ?? s.carts ?? 0)}</small>`);
-      set('ammo', esc(s.ammo ?? 0));
-      set('material', esc(s.material ?? 0));
-      set('morale', esc(m.morale));
+      set('ammo', esc(s.ammo ?? 0), s.ammo ?? 0);
+      set('material', esc(s.material ?? 0), s.material ?? 0);
+      set('morale', esc(m.morale), m.morale);
       $('.rep').textContent = m.reputation;
       $('.tru').textContent = m.trust;
       el.querySelectorAll('.axis .fill')[0].style.width = Math.max(0, Math.min(100, m.reputation)) + '%';
