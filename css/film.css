@@ -92,3 +92,18 @@
 }
 /* Kopf der laufenden Planung ausblenden: der Film zeigt seine eigene Runde */
 .gefecht.filming .round,.gefecht.filming .hud-right,.gefecht.filming .strip-round{visibility:hidden}
+/* Mittlere Breiten (Tablet, Handy quer): Filmleiste ueber die ganze Breite, Telegramm darueber */
+@media (min-width:700px) and (max-width:1099px){
+  .film{right:12px}
+  .telegram.in-film{bottom:calc(160px + env(safe-area-inset-bottom));max-height:calc(100% - 250px)}
+}
+@media (max-height:500px) and (min-width:700px){
+  .telegram.in-film{max-height:calc(100% - 150px);top:12px;bottom:auto}
+  .film{left:12px;right:384px;bottom:8px;gap:6px;padding:6px 8px 8px}
+  .film-ctrl .auto,.film-ctrl kbd{display:none}
+  .film-tab{min-height:32px}
+}
+/* Ohne Tastatur keine Tastenhinweise */
+@media (hover:none){
+  .tg-archive kbd,.film-ctrl .skip kbd{display:none}
+}

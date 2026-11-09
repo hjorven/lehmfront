@@ -40,8 +40,14 @@ export function createArchiveView(root, { onJump, onReplay, onClose }) {
     const b = e.target.closest('[data-i]');
     if (b) onJump(rounds[cur].lines[Number(b.dataset.i)]);
   });
+  // Esc und P schliessen, auch wenn der Fokus inzwischen auf der Karte liegt
+  const onWinKey = (e) => {
+    if (el.hidden || e.ctrlKey || e.metaKey || e.altKey) return;
+    if (e.key === 'Escape' || ((e.key === 'p' || e.key === 'P') && !/^(INPUT|TEXTAREA|SELECT)$/.test(e.target?.tagName))) {
+      e.preventDefault(); e.stopPropagation(); onClose();
+    }
+  };
   el.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); onClose(); return; }
     const tab = e.target.closest?.('.ar-tab');
     if (tab && (e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
       e.preventDefault(); e.stopPropagation();
@@ -60,8 +66,9 @@ export function createArchiveView(root, { onJump, onReplay, onClose }) {
       cur = Math.max(0, Math.min(rs.length - 1, pick));
       render();
       el.hidden = false;
+      window.addEventListener('keydown', onWinKey, true);
       (el.querySelector('.ar-tab.on') ?? el.querySelector('.x')).focus({ preventScroll: true });
     },
-    hide() { el.hidden = true; },
+    hide() { el.hidden = true; window.removeEventListener('keydown', onWinKey, true); },
   };
 }

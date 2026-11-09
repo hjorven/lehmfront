@@ -2,6 +2,7 @@
 // Phase, Durchlaufen, Ueberspringen und eine Zeitleiste zum Scrubbing. Die Zwischenstaende rechnet js/film.js
 // aus dem Startzustand neu; hier nur Abspielen, Darstellung und Tastatur.
 // requestAnimationFrame und performance.now dienen nur der Optik.
+import { phasesFor } from '../phases/registry.js';
 import { replayTo, tracksBetween, trackPos, trackUpTo, sectionAt, transitionAt, clockDuring, linesUntil, nextStop, TIMING } from '../film.js';
 import { viewFor } from '../view.js';
 import { applyTheme, themeAt } from '../theme.js';
@@ -49,15 +50,16 @@ export function createFilmPlayer(root, { onFrame, onEnd, onLines }) {
     if (!snaps.has(n)) snaps.set(n, replayTo(input, n).state);
     return snaps.get(n);
   }
+  // Ein Abschnitt beginnt dort, wo der vorige gezeigte endete: weggelassene Phasen ohne sichtbares
+  // Ereignis laufen im naechsten Abschnitt mit, damit nichts springt.
+  const startOf = (i) => (i === 0 ? 0 : film.sections[i - 1].upto);
   function sectionStates(i) {
-    const s = film.sections[i];
-    return { a: snap(s.upto - s.phaseIds.length), b: snap(s.upto) };
+    return { a: snap(startOf(i)), b: snap(film.sections[i].upto) };
   }
   function sectionTracks(i) {
     if (!tracks.has(i)) {
-      const s = film.sections[i];
       const { a, b } = sectionStates(i);
-      const ids = new Set(s.phaseIds);
+      const ids = new Set(phasesFor(input.state.turnKind, input.env?.phases).slice(startOf(i), film.sections[i].upto).map((p) => p.id));
       const events = result.log.filter((e) => ids.has(e.phase));
       tracks.set(i, tracksBetween(a, b, events, [...input.ordersA, ...input.ordersB]));
     }
@@ -72,15 +74,20 @@ export function createFilmPlayer(root, { onFrame, onEnd, onLines }) {
     const vis = viewFor(fm >= 0.5 ? b : a, [], side, input.env ?? {});
     const shownIds = new Set(vis.groups.map((g) => g.id));
     const cur = sectionTracks(index);
+    // Fremde Gruppen nur so viel wie in der normalen Sicht (viewFor): Ort und Art, keine Staerke
     const groups = base.groups.filter((g) => shownIds.has(g.id)).map((g) => {
       const tr = cur.get(g.id);
-      return tr ? { ...g, pos: trackPos(tr, fm) } : g;
+      const shown = g.side === side ? g
+        : { id: g.id, side: g.side, type: g.type, pos: g.pos, status: g.status, inDugout: g.inDugout, seen: true };
+      return tr ? { ...shown, pos: trackPos(tr, fm) } : shown;
     });
-    // Spuren: alle bisherigen Abschnitte ganz, der laufende bis jetzt
+    // Spuren nur der eigenen Gruppen (fremde Wege verraten, wo der Gegner ungesehen war):
+    // alle bisherigen Abschnitte ganz, der laufende bis jetzt
+    const own = new Set(base.groups.filter((g) => g.side === side).map((g) => g.id));
     const trails = new Map();
     for (let i = 0; i <= index; i++) {
       for (const [id, tr] of sectionTracks(i)) {
-        if (!shownIds.has(id)) continue;
+        if (!own.has(id)) continue;
         const part = i < index ? tr : trackUpTo(tr, fm);
         const g = base.groups.find((x) => x.id === id);
         const prev = trails.get(id);
@@ -201,11 +208,12 @@ export function createFilmPlayer(root, { onFrame, onEnd, onLines }) {
     if (!film || e.ctrlKey || e.metaKey || e.altKey) return;
     const tgt = e.target;
     if (tgt && /^(INPUT|TEXTAREA|SELECT)$/.test(tgt.tagName) && !tgt.classList.contains('scrub')) return;
-    const onButton = tgt && tgt.tagName === 'BUTTON' && el.contains(tgt);
+    // Fokussierte Knoepfe (Filmleiste, Telegrammzeilen) behalten Enter und Leertaste fuer sich
+    const onButton = tgt && tgt.tagName === 'BUTTON';
     if ((e.key === 'Enter' || e.key === ' ') && !onButton) {
       e.preventDefault(); e.stopPropagation();
       if (!e.repeat) next();
-    } else if (e.key === 'Escape') {
+    } else if (e.key === 'Escape' && !tgt?.closest?.('.telegram')) {
       e.preventDefault(); e.stopPropagation();
       skip();
     } else if ((e.key === 'ArrowRight' || e.key === 'ArrowLeft') && !tgt?.classList?.contains('scrub')) {
