@@ -1,0 +1,52 @@
+/* P06: Uhr fuer zwei Zeitmassstaebe (Plan 7.5) und Rucken des Papiers beim Umschalten. Farben nur ueber Variablen. */
+.round{display:flex;align-items:center;gap:12px}
+.round-clock{flex:none;width:58px;height:58px;color:var(--ink)}
+.round-text{min-width:0}
+.round-act[hidden]{display:none}
+.round-act{margin-top:6px;min-height:34px;padding:0 12px;background:var(--ink);color:var(--card);border:0;font:700 13px var(--font-ui)}
+.round.battle .round-sub{color:var(--ink)}
+.clock-svg{display:block;width:100%;height:100%;overflow:visible}
+.clock-svg .rim{fill:var(--card);stroke:currentColor;stroke-width:2.5}
+.clock-svg .day{fill:var(--paper)}
+.clock-svg .night{fill:var(--ink2);opacity:.55}
+.clock-svg .next{fill:var(--accent)}
+.clock-svg .tick{stroke:currentColor;stroke-width:1.6}
+.clock-svg .sun{fill:none;stroke:currentColor;stroke-width:2}
+.clock-svg .moon{fill:var(--card)}
+.clock-svg .seg{fill:var(--track)}
+.clock-svg .seg.on{fill:var(--accent)}
+.clock-svg .hand{stroke:currentColor;stroke-width:4;stroke-linecap:round}
+.clock-svg.battle .hand{stroke:var(--accent)}
+.clock-svg .pin{fill:currentColor}
+.clock-svg .num{font:600 8px var(--font-num);fill:var(--ink2);text-anchor:middle;dominant-baseline:central}
+.clock-svg .mid{font:700 15px var(--font-num);fill:currentColor;text-anchor:middle;dominant-baseline:central;paint-order:stroke;stroke:var(--card);stroke-width:4px}
+.strip-clock{display:none}
+
+/* Einrasten: die Scheibe dreht zurueck, schnappt ein, federt nach */
+.round-clock.snap .clock-svg,.strip-clock.snap .clock-svg{animation:clock-snap .75s cubic-bezier(.2,.8,.3,1.2)}
+@keyframes clock-snap{
+  0%{transform:rotate(0) scale(1)}
+  35%{transform:rotate(-38deg) scale(.92)}
+  55%{transform:rotate(9deg) scale(1.06)}
+  72%{transform:rotate(-3deg) scale(1)}
+  100%{transform:rotate(0) scale(1)}
+}
+/* Das Papier ruckt leicht, als haette jemand an den Tisch gestossen */
+.gefecht.jolt .g-static,.gefecht.jolt .g-dyn{animation:paper-jolt .42s steps(6,end)}
+@keyframes paper-jolt{
+  0%{transform:translate(0,0) rotate(0)}
+  20%{transform:translate(4px,-3px) rotate(.25deg)}
+  40%{transform:translate(-3px,2px) rotate(-.2deg)}
+  60%{transform:translate(2px,1px) rotate(.1deg)}
+  80%{transform:translate(-1px,0) rotate(0)}
+  100%{transform:translate(0,0) rotate(0)}
+}
+
+@media (max-width:699px){
+  .strip-clock{display:block;flex:none;width:30px;height:30px;color:var(--ink)}
+  .hud-strip.battle .strip-round{color:var(--ink);font-weight:700}
+  .round-clock{width:64px;height:64px}
+}
+@media (prefers-reduced-motion:reduce){
+  .round-clock.snap .clock-svg,.strip-clock.snap .clock-svg,.gefecht.jolt .g-static,.gefecht.jolt .g-dyn{animation:none}
+}

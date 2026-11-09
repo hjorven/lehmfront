@@ -31,6 +31,7 @@ import { overlaySlots } from '../ui/overlays.js';
 import '../ui/overlays/index.js';
 import { planMove, pathRounds } from '../ui/tools/move.js';
 import { currentWagons } from '../ui/tools/supply.js';
+import { planAssault } from '../ui/tools/assault.js';
 import { capacityOf, addWounded } from '../supply.js';
 import {
   groupName, groupMark, typeName, leaderShort, fatigueWord, weatherName, clockText, roundTitle, orderLabel, plural,
@@ -38,6 +39,8 @@ import {
 import { darknessAt } from '../ui/daytime.js';
 import { esc, ensureCss, reducedMotion } from '../ui/dom.js';
 import { createHud } from '../ui/hud.js';
+import { clockModel, clockSvg, clockLabel } from '../ui/clock.js';
+import { isAttacker, BATTLE_ROUNDS, BATTLE_MINUTES } from '../phases/battle.js';
 import { createToolbar } from '../ui/toolbar.js';
 import { createShield } from '../ui/shield.js';
 import { createRadial } from '../ui/radial.js';
@@ -68,6 +71,7 @@ export async function mount(root, params) {
     ensureCss('css/gefecht.css'),
     ensureCss('css/film.css'),
     ensureCss('css/feuerplan.css'), // P09: Editor und Zittern der Karte bei Einschlaegen
+    ensureCss('css/uhr.css'),
     Promise.all(['16px "Special Elite"', '16px "IBM Plex Mono"', '700 16px "IBM Plex Mono"', '700 16px "Caveat"', '16px "IBM Plex Sans"', '700 16px "IBM Plex Sans"']
       .map((f) => document.fonts.load(f))).catch(() => {}),
   ]);
@@ -254,6 +258,7 @@ export async function mount(root, params) {
     onToggleOverlay: (slot) => toggleOverlay(slot),
     onCheck: (i) => { const c = hud.checkAt(i); if (c?.group) select(c.group, { center: true }); else if (c?.at) centerOn(cam, c.at.x + 0.5, c.at.y + 0.5); refresh(); },
     onToggleSheet: () => { root.classList.toggle('sheet-open'); hud.setSheet(root.classList.contains('sheet-open')); },
+    onRoundAction: () => callOffAttack(),
   });
   // Klang (P19): Knopf rechts, auf dem Handy als Karte in der Seitenleiste
   mountSoundControls({ bar: ui.querySelector('.hud-right'), sheet: ui.querySelector('.hud-sheet') });
@@ -338,16 +343,53 @@ export async function mount(root, params) {
     const daytime = state.night ? 'Nacht' : 'Tag';
     const sector = map.sheet?.title?.replace(/^Lagekarte\s*/i, '') || map.name;
     const orders = ordersNow();
+    const battleNow = state.turnKind === 'battle';
+    const clk = clockModel(state);
+    const attacking = isAttacker(state, side);
     return {
       supplies: { ...s.supplies, carts: currentWagons(map, state, side, sidePlans[side]).length, cartsTotal: capacityOf(state, side) }, morale, reputation: s.reputation, trust: s.trust,
       roundTitle: roundTitle(state) + (mode === 'hotseat' ? ` · ${faction(s.faction).short}` : ''),
-      roundSub: `${daytime} · ${clockText(state.clock)} Uhr · ${weatherName(state.weather)} · Abschnitt ${sector}`,
-      stripRound: `R${state.turn} · ${daytime}`,
+      roundSub: battleNow
+        ? `Minute ${clk.minutes} von ${BATTLE_ROUNDS * BATTLE_MINUTES} · ${clockText(state.clock)} Uhr · ${attacking ? 'Sturm läuft' : 'Der Gegner greift an'}`
+        : `${daytime} · ${clockText(state.clock)} Uhr · ${weatherName(state.weather)} · Abschnitt ${sector}`,
+      stripRound: battleNow ? `G${clk.round} · ${clk.minutes}/${BATTLE_ROUNDS * BATTLE_MINUTES} Min` : `R${state.turn} · ${daytime}`,
+      clock: clockView(),
+      roundAction: battleNow && attacking && !book[side]?.sealed && assaultersOf(side).length ? 'Angriff abbrechen' : null,
       orderCount: orders.length,
       overlays: overlaySlots().map((o) => ({ slot: o.slot, label: o.label, empty: !!o.empty, active: overlaysOn.has(o.slot) })),
       checklist: checklist({ state, side, orders, map, plans: sidePlans[side] }),
       hint: currentHint(),
     };
+  }
+
+  // Uhr (P06): waehrend des Phasenfilms zeigt sie noch die alte Runde, danach rastet sie ein
+  function clockView() {
+    const st = player.open && lastRound ? lastRound.input.state : state;
+    const m = clockModel(st);
+    const label = clockLabel(m);
+    return { mode: m.mode, big: clockSvg(m, { title: label }), small: clockSvg(m, { title: label }) };
+  }
+  let clockSnapDue = false;
+  function snapClock() {
+    clockSnapDue = false;
+    hud.snapClock();
+    playSfx('clock-lock', { intensity: 1 });
+    if (reducedMotion()) return;
+    root.classList.remove('jolt');
+    void root.offsetWidth;
+    root.classList.add('jolt');
+    setTimeout(() => root.classList.remove('jolt'), 500);
+  }
+  /** Sturmgruppen der Seite, die noch angreifen */
+  function assaultersOf(s) {
+    return (state.battle?.assaulters?.[s] ?? []).map((id) => getGroup(state, id)).filter((g) => g && g.status !== 'lost');
+  }
+  /** "Angriff abbrechen": alle Sturmgruppen halten; ist die Runde ausgefuehrt, endet das Gefecht (Angriff steckt) */
+  function callOffAttack() {
+    if (book[side]?.sealed || modalOpen) return;
+    for (const g of assaultersOf(side)) book = setOrder(book, side, { group: g.id, type: 'hold' });
+    playSfx('pencil', { count: 2, intensity: 0.5 });
+    flash('Die Sturmgruppen bleiben liegen. Mit dieser Runde wird der Angriff abgebrochen.', 'warn');
   }
 
   function refresh() {
@@ -645,7 +687,13 @@ export async function mount(root, params) {
     // (nur was die eigene Seite mitbekommt: fremde, ungesehene Gefechte verraten sich nicht im Klang)
     frontAmbience({ state, darkness, log: viewFor(state, lastLog, side, env).log, side });
     if (state.result && !filmReplay) flash(state.result.reason);
+    else if (!filmReplay) {
+      // Ende des Gefechts: die eigene Begruendung als Hinweis
+      const end = lastLog.find((e) => e.type === 'battle_end' && e.side === side);
+      if (end) flash(end.reason, end.outcome === 'taken' || end.outcome === 'defended' ? '' : 'warn');
+    }
     refresh();
+    if (clockSnapDue && !filmReplay) snapClock();
     drawDynNow();
     dynCv.focus({ preventScroll: true });
   }
@@ -690,6 +738,7 @@ export async function mount(root, params) {
     const r = resolveTurn(state, ordersA, ordersB, seed, state.turn, env);
     const before = state;
     state = r.state;
+    if (before.turnKind !== state.turnKind) clockSnapDue = true;
     hoverSight = null;
     lastLog = r.log;
     lastRound = { input, result: r };
@@ -1106,6 +1155,42 @@ export async function mount(root, params) {
           centerOn(cam, 11, 15, Math.max(cam.zoom, narrow() ? 18 : 24));
         }
       }
+    } else if (demo === 'sturmplan') {
+      // P06: Angriff ansetzen in der Stellungsrunde, Vorschau mit Draht und Einbruch
+      api.select(own[0].id);
+      centerOn(cam, narrow() ? 40 : 39, 9, Math.max(cam.zoom, narrow() ? 22 : 24));
+      api.tool('assault');
+      api.hover(45, 10);
+    } else if (demo === 'draht') {
+      api.select(own[0].id);
+      centerOn(cam, 35, narrow() ? 7 : 8.5, Math.max(cam.zoom, narrow() ? 26 : 30));
+      api.tool('wire');
+      tool?.api?.draw([{ x: 34.5, y: 5.5 }, { x: 34.5, y: 11.5 }]);
+    } else if (demo === 'umschalten' || demo === 'gefechtsrunde' || demo === 'nahkampf' || demo === 'unterstand') {
+      // P06: Angriff ansetzen und ausfuehren; danach Gefechtsrunden mit Stoppuhr
+      const a = own[0];
+      const foe = groupsOf(state, otherSide(side)).find((g) => g.pos.x === 45 && g.pos.y === 9);
+      if (demo !== 'umschalten') { a.pos = { x: 43, y: 9 }; if (demo === 'unterstand' && foe) { foe.suppressed = 0.9; } }
+      const p = planAssault(map, state, a, { x: 46, y: 9 });
+      placeOrder({ group: a.id, type: state.turnKind === 'battle' ? 'assault' : 'attack', path: p.path });
+      anim = null;
+      commitSide();
+      player.seek(1e9); player.next();
+      report.finishTyping();
+      if (demo !== 'umschalten') {
+        // Zweite Runde: Gefechtsrunde, der Sturm laeuft auf den Graben
+        const o = orderOf(book, side, a.id);
+        if (demo === 'nahkampf' || demo === 'unterstand') {
+          if (!o) placeOrder({ group: a.id, type: 'assault', path: planAssault(map, state, getGroup(state, a.id), { x: 46, y: 9 })?.path ?? [] });
+          anim = null;
+          commitSide();
+          if (demo === 'nahkampf') { player.seek(1e9); player.next(); report.finishTyping(); }
+          else { const fl = planFilm(lastRound.input, lastRound.result, side); const sec = fl.sections.find((x) => x.key === 'dugout') ?? fl.sections[0]; player.seek(sec.start + sec.dur * 0.6); }
+        } else {
+          api.select(a.id);
+        }
+      }
+      centerOn(cam, narrow() ? 44 : 41, narrow() ? 8 : 10, Math.max(cam.zoom, narrow() ? 22 : 22));
     }
     else if (demo === 'feuerplan' || demo === 'walze' || demo === 'verlegen' || demo === 'einschlag') {
       // P09: Walze vor Abschnitt A, Vorbereitungsfeuer auf den Graben vor Abschnitt B
