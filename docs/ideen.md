@@ -40,3 +40,5 @@ Neue Ideen landen hier, nicht im Code (Plan 13). Mit Datum und Paket, aus dem si
 - 2026-11-09, P25: Im Koop könnten die Zettel zwischen Nord und Süd am Ende als kleiner Stapel in der Abschlussmeldung liegen.
 - 2026-11-09, P23: Albers könnte ein Horchbuch führen (Bleistifteinträge je Nacht: „Klopfen, 3 Schläge“, „Pfeifen, ein Lied“), das nach einer Sprengung mit „Kein Pfeifen mehr“ endet.
 - 2026-11-09, P23: Gefangene aus einem Stoßtrupp könnten im nächsten Akt als Namen in der Feldpost der Gegenseite auftauchen.
+- 2026-11-09, P24: Die Gasglocke könnte nach einem Angriff verbeult sein und dann schiefer klingen; wer sie verliert, hört nur noch Rufe.
+- 2026-11-09, P24: Der Flieger könnte Fotos mitbringen, die als Fundstück-Fotos in der Ablage landen, mit Bleistiftkreisen um die Batterien (und um die eigene Attrappe, die drüben jemand für echt hielt).

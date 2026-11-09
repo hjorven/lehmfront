@@ -1,0 +1,354 @@
+{
+  "id": "akt3-m5",
+  "name": "Die längste Nacht",
+  "map": "kroning",
+  "act": 3,
+  "features": [
+    "raid",
+    "truce"
+  ],
+  "startHour": 18,
+  "turnKind": "position",
+  "weather": {
+    "kind": "clear",
+    "season": "winter",
+    "wind": {
+      "dir": "w",
+      "speed": 0
+    }
+  },
+  "cells": [
+    {
+      "x": 33,
+      "y": 17,
+      "lying": {
+        "a": 3
+      }
+    },
+    {
+      "x": 35,
+      "y": 20,
+      "lying": {
+        "a": 2,
+        "b": 1
+      }
+    },
+    {
+      "x": 34,
+      "y": 15,
+      "lying": {
+        "a": 2
+      }
+    },
+    {
+      "x": 36,
+      "y": 22,
+      "lying": {
+        "a": 2
+      }
+    },
+    {
+      "x": 37,
+      "y": 18,
+      "lying": {
+        "b": 3
+      }
+    },
+    {
+      "x": 38,
+      "y": 21,
+      "lying": {
+        "b": 2
+      }
+    }
+  ],
+  "truce": {
+    "status": "tolerated",
+    "by": "b",
+    "rounds": 1
+  },
+  "sides": {
+    "a": {
+      "faction": "kaldern",
+      "supplies": {
+        "carts": 4,
+        "cartsTotal": 6
+      },
+      "artillery": {
+        "batteries": [
+          {
+            "id": "batterie1",
+            "type": "feldhaubitzen",
+            "x": 11,
+            "y": 26,
+            "w": 2,
+            "h": 2,
+            "label": "Batterie 1"
+          },
+          {
+            "id": "batterie2",
+            "type": "feldhaubitzen",
+            "x": 13,
+            "y": 33,
+            "w": 2,
+            "h": 2,
+            "label": "Batterie 2"
+          },
+          {
+            "id": "batterie3",
+            "type": "feldhaubitzen",
+            "x": 8,
+            "y": 21,
+            "w": 2,
+            "h": 2,
+            "label": "Batterie 3 (neu)"
+          },
+          {
+            "id": "batterie4",
+            "type": "schwere",
+            "x": 12,
+            "y": 37,
+            "w": 2,
+            "h": 2,
+            "label": "Schwere Batterie 4 (neu)"
+          }
+        ],
+        "exchange": {
+          "x": 14,
+          "y": 11
+        },
+        "lines": [
+          {
+            "id": "k8",
+            "to": "batterie3",
+            "points": [
+              [
+                15,
+                12
+              ],
+              [
+                9,
+                21
+              ]
+            ]
+          },
+          {
+            "id": "k9",
+            "to": "batterie4",
+            "points": [
+              [
+                15,
+                12
+              ],
+              [
+                13,
+                37
+              ]
+            ]
+          }
+        ]
+      },
+      "ai": {
+        "goals": {
+          "recover": true
+        }
+      },
+      "groups": [
+        {
+          "type": "medics",
+          "pos": {
+            "x": 30,
+            "y": 17
+          },
+          "morale": 72
+        },
+        {
+          "type": "medics",
+          "pos": {
+            "x": 30,
+            "y": 22
+          },
+          "morale": 70
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 29,
+            "y": 16
+          },
+          "morale": 62
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 30,
+            "y": 24
+          },
+          "morale": 60
+        },
+        {
+          "type": "mg",
+          "pos": {
+            "x": 30,
+            "y": 12
+          },
+          "morale": 64
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 30,
+            "y": 28
+          },
+          "morale": 60
+        }
+      ]
+    },
+    "b": {
+      "faction": "morrow",
+      "control": "ai",
+      "ai": {
+        "doctrine": "material",
+        "difficulty": "veteran"
+      },
+      "supplies": {
+        "carts": 3,
+        "cartsTotal": 5
+      },
+      "artillery": {
+        "exchange": {
+          "x": 51,
+          "y": 20
+        },
+        "batteries": [
+          {
+            "id": "mb1",
+            "type": "feldhaubitzen",
+            "x": 54,
+            "y": 27,
+            "w": 2,
+            "h": 2,
+            "label": "Batterie Zelva 1"
+          },
+          {
+            "id": "mb2",
+            "type": "feldhaubitzen",
+            "x": 56,
+            "y": 32,
+            "w": 2,
+            "h": 2,
+            "label": "Batterie Zelva 2"
+          },
+          {
+            "id": "mb3",
+            "type": "schwere",
+            "x": 52,
+            "y": 3,
+            "w": 2,
+            "h": 2,
+            "label": "Schwere Batterie Raudas"
+          }
+        ],
+        "lines": [
+          {
+            "id": "m1",
+            "to": "Abschnitt Mitte",
+            "points": [
+              [
+                51,
+                20
+              ],
+              [
+                47,
+                20
+              ],
+              [
+                46,
+                18
+              ]
+            ]
+          },
+          {
+            "id": "m2",
+            "to": "mb1",
+            "points": [
+              [
+                51,
+                20
+              ],
+              [
+                54,
+                27
+              ]
+            ]
+          },
+          {
+            "id": "m3",
+            "to": "mb2",
+            "points": [
+              [
+                51,
+                20
+              ],
+              [
+                56,
+                32
+              ]
+            ]
+          },
+          {
+            "id": "m4",
+            "to": "mb3",
+            "points": [
+              [
+                51,
+                20
+              ],
+              [
+                52,
+                4
+              ]
+            ]
+          }
+        ]
+      },
+      "groups": [
+        {
+          "type": "medics",
+          "pos": {
+            "x": 42,
+            "y": 19
+          }
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 42,
+            "y": 16
+          }
+        },
+        {
+          "type": "mg",
+          "pos": {
+            "x": 42,
+            "y": 21
+          }
+        },
+        {
+          "type": "stormtroops",
+          "pos": {
+            "x": 41,
+            "y": 25
+          }
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 41,
+            "y": 28
+          }
+        }
+      ]
+    }
+  }
+}

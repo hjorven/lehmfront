@@ -64,6 +64,8 @@ function runWeather(ctx) {
   const prevKind = prev.kind;
   let w = { ...prev, wind: { ...(prev.wind ?? { dir: 'w', speed: 1 }) } };
   if (!prev.fixed) w = { ...w, ...rollWeather(ctx.rng, prev) };
+  // P24: mit Windvorhersage (Gas) bestimmt die Gasphase den Wind, nicht der Wetterwurf
+  if (prev.windForecast) w.wind = { ...(prev.wind ?? { dir: 'w', speed: 1 }) };
   w.rain = w.rain ?? (w.kind === 'storm' ? 1 : w.kind === 'rain' ? 0.6 : 0);
   w.fog = w.fog ?? (w.kind === 'fog' ? 0.8 : 0);
   const prevWet = prev.wet ?? 0;

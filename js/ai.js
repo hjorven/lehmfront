@@ -29,7 +29,9 @@ import { postOf, isTooLong } from './morale.js';
 import { POSTURES, DOCTRINES, DIFFICULTIES, DEFAULT_DIFFICULTY, DEFAULT_DOCTRINE } from './config/doctrines.js';
 import './phases/index.js';
 import { runAiBlocks } from './ai/blocks.js';
+import { truceVeto } from './truce.js';
 import './ai/akt2.js'; // Befehlspruefungen der Mechaniken (die KI prueft ihre Befehle vor der Abgabe)
+import './ai/akt3.js'; // P24: Flieger, Gas, Flammenwerfer, Waffenruhe
 
 export { POSTURES, DOCTRINES, DIFFICULTIES };
 
@@ -68,7 +70,7 @@ export function viewState(view) {
   const sides = { [view.side]: view.own, [foeOf(view.side)]: { faction: view.enemy?.faction ?? null } };
   return {
     turn: view.turn, turnKind: view.turnKind, night: view.night, clock: view.clock, weather: view.weather,
-    battle: view.battle, map: view.map, cells: view.cells, groups: view.groups, sides, result: null,
+    battle: view.battle, map: view.map, cells: view.cells, groups: view.groups, sides, result: null, scenario: view.scenario ?? null,
   };
 }
 
@@ -377,6 +379,7 @@ export function decide(view, opts = {}) {
     if (g && taken.has(g.id)) return false;
     const why = validateOrder(order, st, side, env);
     if (why) return false;
+    if (truceVeto(view, order, map, side)) return false; // P24: in der Waffenruhe wird nicht geschossen
     if (g) taken.add(g.id);
     advice.push({ group: g ? g.id : null, order, reason, tag });
     return true;

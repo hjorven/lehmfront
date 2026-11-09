@@ -452,6 +452,59 @@ function tinnitus(ac, out, p, t) {
   return { end: tone(ac, out, t, { f0: 3900, attack: 0.08, peak: 0.03 * p.gain, hold: 0.5, release: 2.6 }) };
 }
 
+// Akt 3 (P24) -----------------------------------------------------------------------------
+
+// Gasglocke: eine leere Kartusche am Draht, mit dem Bajonett angeschlagen. Unharmonische Teiltoene, mehrmals.
+function gasbell(ac, out, p, t, rng) {
+  const count = Number.isFinite(p.count) ? Math.max(1, Math.min(8, Math.floor(p.count))) : 5;
+  const base = between(rng, 640, 720);
+  let end = t;
+  let at = t;
+  for (let i = 0; i < count; i++) {
+    for (const [ratio, amp] of [[1, 0.13], [2.32, 0.07], [4.07, 0.035]]) {
+      end = Math.max(end, tone(ac, out, at, { f0: base * ratio, attack: 0.003, peak: amp * p.gain, release: 0.9 - ratio * 0.12 }));
+    }
+    at += between(rng, 0.28, 0.36);
+  }
+  return { end };
+}
+
+// Flammenwerfer: Zischen des Drucks, dann das dumpfe Fauchen der Flamme
+function flame(ac, out, p, t, rng) {
+  const g = gainNode(ac, out);
+  const bp = filter(ac, 'bandpass', 2600, 1.2, g);
+  const e = envelope(g.gain, t, 0.03, 0.12 * p.gain, 0.15, 0.2);
+  noise(ac, 'white', bp, t, e + 0.02, rng);
+  const g2 = gainNode(ac, out);
+  const lp = filter(ac, 'lowpass', 700, 0.9, g2);
+  const roar = t + 0.12;
+  const e2 = envelope(g2.gain, roar, 0.08, 0.5 * p.gain, between(rng, 0.7, 1.0), 0.5);
+  noise(ac, 'brown', lp, roar, e2 + 0.02, rng);
+  lp.frequency.setValueAtTime(500, roar);
+  lp.frequency.linearRampToValueAtTime(900, roar + 0.4);
+  return { end: Math.max(e, e2) };
+}
+
+// Flieger: ferner Motor, der langsam ueber den Hoerer hinwegzieht
+function plane(ac, out, p, t, rng) {
+  const dur = between(rng, 4.5, 6);
+  const g = gainNode(ac, out);
+  const lp = filter(ac, 'lowpass', 420, 1.1, g);
+  const end = envelope(g.gain, t, dur * 0.45, 0.07 * p.gain, 0.2, dur * 0.45);
+  const f = between(rng, 78, 92);
+  const o = osc(ac, 'sawtooth', f, lp, t, end + 0.02);
+  o.frequency.setValueAtTime(f * 1.06, t);
+  o.frequency.linearRampToValueAtTime(f * 0.94, end);
+  const o2 = osc(ac, 'square', f * 2.01, lp, t, end + 0.02);
+  o2.frequency.setValueAtTime(f * 2.13, t);
+  o2.frequency.linearRampToValueAtTime(f * 1.88, end);
+  if (p.panParam) {
+    p.panParam.setValueAtTime(-0.8, t);
+    p.panParam.linearRampToValueAtTime(0.8, end);
+  }
+  return { end };
+}
+
 // Register: Name -> Funktion. Namen sind die API von playSfx.
 export const SOUNDS = {
   paper, pencil, stamp, teletype, tick,
@@ -461,6 +514,7 @@ export const SOUNDS = {
   'mg-far': mgFar,
   rifle, whistle, flare, rain, wind, lore, steps,
   crow, cricket, drip, tinnitus,
+  gasbell, flame, plane,
 };
 
 // Beschriftungen fuer Demo und spaetere Einstellungen. group ordnet die Knoepfe.
@@ -481,4 +535,7 @@ export const CATALOG = [
   { name: 'wind', label: 'Wind', group: 'Wetter' },
   { name: 'lore', label: 'Lore auf Schienen', group: 'Etappe' },
   { name: 'steps', label: 'Schlamm-Schritte', group: 'Etappe' },
+  { name: 'gasbell', label: 'Gasglocke', group: 'Front' },
+  { name: 'flame', label: 'Flammenwerfer', group: 'Front' },
+  { name: 'plane', label: 'Flieger', group: 'Front' },
 ];

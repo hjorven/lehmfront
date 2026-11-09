@@ -42,7 +42,9 @@ export const UNIT_TYPES = {
     size: [5, 6], range: 8, shots: 3, suppressionPerShot: 0.06, digRate: 0.5, speed: 2, carry: 0, indirect: true,
   },
 
-  // Akt 2 (P23): Stosstrupp, Scharfschuetzen, Horchposten. Danach nur als Daten vorbereitet (enabled: false).
+  // Akt 2 (P23): Stosstrupp, Scharfschuetzen, Horchposten. Akt 3 (P24): Flammenwerfer (schiesst nicht, sondern
+  // stoesst mit dem Befehl flame, js/phases/flame.js), Feldgeschuetz (Direktfeuer, pierce: Deckung hoechstens wie
+  // ein Trichter). Der Flieger ist keine Gruppe, sondern ein Mittel der Seite (state.sides[s].air, js/phases/air.js).
   stormtroops: {
     id: 'stormtroops', name: 'Stoßtrupp', short: 'Stoßtrupp', role: 'Nachtangriff, Infiltration, Gefangene',
     release: '1.2', available: 'akt2', enabled: true,
@@ -60,13 +62,13 @@ export const UNIT_TYPES = {
   },
   flamethrowers: {
     id: 'flamethrowers', name: 'Flammenwerfer-Trupp', short: 'Flammenw.', role: 'Säubert Unterstände, sehr gefährdet',
-    release: '1.3', available: 'akt3', enabled: false,
-    size: [3, 4], range: 2, shots: 4, suppressionPerShot: 0.08, digRate: 0, speed: 2, carry: 0, clearsDugouts: true,
+    release: '1.3', available: 'akt3', enabled: true,
+    size: [3, 4], range: 2, shots: 0, suppressionPerShot: 0.08, digRate: 0, speed: 2, carry: 0, clearsDugouts: true,
   },
   fieldgun: {
     id: 'fieldgun', name: 'Feldgeschütz', short: 'Feldgesch.', role: 'Direktfeuer, kann nach vorne gezogen werden',
-    release: '1.3', available: 'akt3', enabled: false,
-    size: [6, 8], range: 16, shots: 4, suppressionPerShot: 0.08, digRate: 0, speed: 1, carry: 0,
+    release: '1.3', available: 'akt3', enabled: true,
+    size: [6, 8], range: 16, shots: 5, suppressionPerShot: 0.08, digRate: 0, speed: 1, carry: 0, pierce: 'crater',
   },
   plane: {
     id: 'plane', name: 'Aufklärungsflugzeug', short: 'Flugzeug', role: 'Deckt Karte auf, lenkt Artillerie',

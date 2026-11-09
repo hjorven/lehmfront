@@ -178,7 +178,7 @@ export function createBoard(root, opts) {
         }
       }
     }
-    // P21: Ausgabe 1.0 enthaelt Akt 1 und 2. Danach geht es als Uebungslage weiter, das sagt ein Vermerk deutlich.
+    // P21/P24: die Ausgabe enthaelt Akt 1 bis 3. Danach geht es als Uebungslage weiter, das sagt ein Vermerk deutlich.
     if (m && !missionBuilt(m) && !campaign.ended) {
       out.push(telegram({
         cls: 't-reply t-small', heading: 'VERMERK DER SCHREIBSTUBE',
