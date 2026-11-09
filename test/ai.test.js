@@ -283,3 +283,15 @@ test('Notiz ohne Sturmgruppen spricht nicht von null Rotten', () => {
   assert.equal(n.posture, 'vorbereiten');
   assert.ok(!n.lines.join(' ').includes('0 Rotten'));
 });
+
+test('Abloesung (P12): wer zu lange vorn liegt, wird aus der Reserve abgeloest', () => {
+  const s = fresh(6);
+  const a01 = s.groups.find((g) => g.id === 'a01');
+  a01.frontTurns = 12;
+  const res = s.groups.find((g) => g.id === 'a03');
+  res.pos = { x: 10, y: 20 }; // Etappe, also Reserve
+  const d = decide(viewFor(s, [], 'a', env), { map: MAP, seed: 6, posture: 'halten' });
+  const o = d.orders.find((x) => x.group === 'a01');
+  assert.deepEqual(o, { group: 'a01', type: 'relieve', by: 'a03' });
+  assert.ok(!d.orders.some((x) => x.group === 'a03'), 'die Abloesung bekommt keinen zweiten Befehl');
+});

@@ -25,6 +25,7 @@ import { MAX_ASSAULT_CELLS, ASSAULT_TYPES, WIRE_CUTTERS, redeployCellOk } from '
 import { MAX_WIRE_CELLS, WIRE_REACH, WIRE_LAYERS, wireBlocker } from './phases/wire.js';
 import { surname } from './phases/hold.js';
 import { timeDarkness } from './phases/weather.js';
+import { postOf, isTooLong } from './morale.js';
 import { POSTURES, DOCTRINES, DIFFICULTIES, DEFAULT_DIFFICULTY, DEFAULT_DOCTRINE } from './config/doctrines.js';
 import './phases/index.js'; // Befehlspruefungen der Mechaniken (die KI prueft ihre Befehle vor der Abgabe)
 
@@ -554,11 +555,26 @@ export function decide(view, opts = {}) {
       if (path?.length && give(g, { group: g.id, type: 'redeploy', path }, `${nameOf(g)} liegt noch draußen und kriecht zurück in den Graben bei ${cellLabel(back.x, back.y)}.`, 'Zurück in den Graben')) reserved.add(key(back));
     }
 
+    // Abloesen und Auffuellen (P12): wer zu lange vorn liegt, wird von einer Gruppe aus Reserve oder Ruhe
+    // abgeloest; Gruppen hinten werden mit Ersatz aufgefuellt, bevor sie wieder nach vorn gehen.
+    if (posture !== 'sturm') {
+      const back = sit.own.filter((g) => !taken.has(g.id) && postOf(map, g) !== 'front' && healthy(g) && (g.fatigue ?? 0) < 50).sort(byId);
+      for (const g of sit.own.filter((x) => !taken.has(x.id) && postOf(map, x) === 'front' && isTooLong(x)).sort(byId)) {
+        const by = back.find((r) => !taken.has(r.id) && (ASSAULT_TYPES.has(r.type) === ASSAULT_TYPES.has(g.type)));
+        if (!by) continue;
+        if (give(g, { group: g.id, type: 'relieve', by: by.id }, `${nameOf(g)} liegt seit ${g.frontTurns} Runden vorn und wird von ${nameOf(by)} abgelöst.`, 'Ablösen: zu lange vorn')) taken.add(by.id);
+      }
+      for (const g of sit.own.filter((x) => !taken.has(x.id) && postOf(map, x) !== 'front' && x.strength * 100 < x.size * 80).sort(byId)) {
+        give(g, { group: g.id, type: 'refill' }, `${nameOf(g)} hat nur ${g.strength} von ${g.size} Mann und wird hinten mit Ersatz aufgefüllt.`, 'Auffüllen mit Ersatz');
+      }
+    }
+
     // Front besetzen (Veteran und Lask): Gruppen ohne Graben gehen in den naechsten freien Feuergraben
+    // (nicht aus dem Ruhelager: wer ruht, bleibt dort, bis er abloest)
     if (diff.rearrange) {
       const occupied = occupiedSet(sit, [...reserved].map((k) => { const [x, y] = k.split(',').map(Number); return { x, y }; }));
       for (const g of sit.own) {
-        if (taken.has(g.id) || g.type === 'observers' || g.type === 'runners' || g.type === 'medics') continue;
+        if (taken.has(g.id) || g.type === 'observers' || g.type === 'runners' || g.type === 'medics' || postOf(map, g) === 'rest') continue;
         const here = liveCell(map, view.cells, g.pos.x, g.pos.y);
         if (here?.trench && here.trench.side === sit.ms) continue;
         const free = sit.ownTrench.filter((c) => c.home && c.kind === 'fire' && !occupied.has(key(c)));
