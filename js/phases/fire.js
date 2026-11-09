@@ -25,7 +25,11 @@ import {
 import { surname } from './hold.js';
 
 /** Befehle, bei denen eine Gruppe nicht schiesst */
-export const NO_FIRE_ORDERS = new Set(['move', 'assault', 'redeploy', 'dugout', 'cease_fire']);
+export const NO_FIRE_ORDERS = new Set(['move', 'assault', 'redeploy', 'dugout', 'cease_fire', 'shift_fire']);
+/** Diese Gruppen schiessen nur auf Befehl, sonst verraten sie sich (Beobachter, Melder) */
+export const ORDER_ONLY = new Set(['observers', 'runners']);
+/** Feuer auf Verdacht (Ziel nicht zu sehen): Trefferchance mal diesem Faktor */
+export const BLIND = 0.4;
 /** Erholung je Gefechtsrunde ohne Beschuss */
 export const RALLY = 0.3;
 
@@ -131,13 +135,21 @@ function pickTarget(ctx, shooter, order, visible, darkness) {
     const cands = foes.filter((g) => distance(g.pos, order.target) <= 1)
       .map((g) => ({ g, d: distance(g.pos, order.target) }))
       .sort((a, b) => a.d - b.d || (a.g.id < b.g.id ? -1 : 1));
-    if (!cands.length) return { target: null, why: `bei ${cellLabel(order.target.x, order.target.y)} ist kein Feind zu sehen` };
+    if (!cands.length) {
+      // Feuer auf Verdacht: liegt dort tatsaechlich jemand verborgen, trifft es ihn schlechter
+      const hidden = ctx.groups(otherSide(shooter.side)).find((g) => g.pos.x === order.target.x && g.pos.y === order.target.y);
+      const o = fireOdds(ctx.state, map, shooter, order.target, otherSide(shooter.side), { darkness });
+      if (!o.ok) return { target: null, why: o.why };
+      if (hidden) return { target: hidden, odds: { ...o, p: o.p * BLIND, expected: o.expected * BLIND, blind: true } };
+      return { target: null, blindEmpty: true, odds: o, why: `Feuer auf Verdacht nach ${cellLabel(order.target.x, order.target.y)}, dort liegt niemand` };
+    }
     for (const { g } of cands) {
       const o = odds(g);
       if (o.ok) return { target: g, odds: o };
     }
     return { target: null, why: odds(cands[0].g).why };
   }
+  if (ORDER_ONLY.has(shooter.type)) return { target: null, why: 'schießt nur auf Befehl', quiet: true };
   if (shooter.suppressed >= PINNED) return { target: null, why: 'niedergehalten', quiet: true };
   let list = foes;
   if (t.sector) {
@@ -189,6 +201,16 @@ function runFire(ctx) {
     if (o && NO_FIRE_ORDERS.has(o.type)) continue;
     if (g.moved) continue;
     const pick = pickTarget(ctx, g, o, visible[g.side], darkness);
+    if (!pick.target && pick.blindEmpty) {
+      // Auf Verdacht ins Leere: Muendungsfeuer verraet trotzdem
+      g.fired = true;
+      ctx.emit('fire', {
+        side: g.side, group: g.id, secret: true, target: null, hits: 0, shots: pick.odds.shots, ammo: unitType(g.type).id === 'mg' ? 2 : 1, ordered: true, blind: true,
+        reason: `${name(g)} feuert auf Verdacht nach ${cellLabel(o.target.x, o.target.y)}: keine Wirkung zu erkennen.`,
+        at: { ...g.pos },
+      });
+      continue;
+    }
     if (!pick.target) {
       if (!pick.quiet || o?.type === 'fire') {
         ctx.emit('fire_none', {
@@ -208,20 +230,22 @@ function runFire(ctx) {
     const r = resolveFire(ctx.rng,
       { shots: odds.shots, range: t.range, experience: shooter.experience, suppressed: shooter.suppressed, suppressionPerShot: t.suppressionPerShot },
       { cover: odds.cover, suppressed: 0, reversed: odds.reversed, inDugout: target.inDugout },
-      { distance: odds.distance, visibility: visibilityFromDarkness(darkness), enfilade: odds.enfilade });
+      { distance: odds.distance, visibility: visibilityFromDarkness(darkness) * (odds.blind ? BLIND : 1), enfilade: odds.enfilade });
     shooter.fired = true;
     if (!hitsOn.has(target.id)) hitsOn.set(target.id, { hits: 0, supp: 0, from: [] });
     const acc = hitsOn.get(target.id);
     acc.hits += r.hits;
     acc.supp += r.suppression;
     acc.from.push({ group: shooter.id, type: shooter.type, dir: directionOf(target.pos, shooter.pos), enfilade: odds.enfilade, reversed: odds.reversed, hits: r.hits });
-    const seen = r.hits === 0 ? 'kein Treffer zu erkennen' : r.hits === 1 ? 'ein Treffer beobachtet' : `etwa ${r.hits} Treffer beobachtet`;
+    const seen = odds.blind ? 'Wirkung nicht zu erkennen' : r.hits === 0 ? 'kein Treffer zu erkennen' : r.hits === 1 ? 'ein Treffer beobachtet' : `etwa ${r.hits} Treffer beobachtet`;
     const where = odds.coverLabel === 'offenes Feld' ? 'im offenen Feld' : `in Deckung (${odds.coverLabel})`;
     const extra = odds.enfilade ? ', Längsfeuer in den Graben' : odds.indirect ? ', Steilfeuer' : '';
     ctx.emit('fire', {
-      side: shooter.side, group: shooter.id, secret: true, target: target.id, hits: r.hits, shots: odds.shots,
+      side: shooter.side, group: shooter.id, secret: true, target: target.id, hits: odds.blind ? null : r.hits, blind: !!odds.blind, shots: odds.shots,
       chance: r2(odds.p), ammo: t.id === 'mg' ? 2 : 1, ordered: s.ordered,
-      reason: `${name(shooter)} feuert (${weaponWord(shooter)}, ${odds.shots} Schuss) auf Feind bei ${cellLabel(target.pos.x, target.pos.y)} ${where}: ${seen}${extra}.`,
+      reason: odds.blind
+        ? `${name(shooter)} feuert (${weaponWord(shooter)}, ${odds.shots} Schuss) auf Verdacht nach ${cellLabel(target.pos.x, target.pos.y)}: ${seen}.`
+        : `${name(shooter)} feuert (${weaponWord(shooter)}, ${odds.shots} Schuss) auf Feind bei ${cellLabel(target.pos.x, target.pos.y)} ${where}: ${seen}${extra}.`,
       at: { ...shooter.pos },
     });
   }

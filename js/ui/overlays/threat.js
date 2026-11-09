@@ -22,10 +22,8 @@ registerOverlay({
   draw(ctx, { map, state, side, theme, px }) {
     const v = viewOf(state, map, side);
     const foeColor = side === 'a' ? theme.enemy : theme.own;
-    const known = [
-      ...v.groups.filter((g) => g.side !== side && g.sector).map((g) => ({ ...g, age: 0 })),
-      ...v.ghosts.filter((g) => g.sector),
-    ];
+    // Sichtbare MGs zeichnet die Einheitenebene schon; hier nur das Wissen ueber nicht sichtbare
+    const known = v.ghosts.filter((g) => g.sector);
     for (const g of known) {
       const t = unitType(g.type ?? 'mg');
       drawCone(ctx, g.pos, g.sector, t.sector ?? 60, t.range, {
@@ -33,21 +31,28 @@ registerOverlay({
       });
     }
     ctx.save();
-    ctx.font = `700 ${14 * px}px ${FONTS.hand}`;
+    ctx.font = `700 ${16 * px}px ${FONTS.hand}`;
     ctx.textBaseline = 'top';
     ctx.textAlign = 'left';
     for (const gh of v.ghosts) {
       const a = ghostAlpha(gh.age);
       drawGhostTrail(ctx, gh, { color: foeColor, px, alpha: a });
-      ctx.globalAlpha = a;
+      ctx.globalAlpha = Math.max(0.7, a);
       ctx.fillStyle = foeColor;
+      ctx.strokeStyle = theme.paper;
+      ctx.lineWidth = 3.5 * px;
+      ctx.lineJoin = 'round';
       const lines = [];
       if (gh.from) {
         const d = directionOf(gh.from, gh.pos);
         lines.push(`Bewegung ${d ? d.name : ''}, ${ageText(gh.age)}`);
       }
       if (gh.source) lines.push(gh.source);
-      lines.forEach((l, i) => ctx.fillText(l, gh.pos.x + 0.5 + 16 * px, gh.pos.y + 0.5 + 9 * px + i * 15 * px));
+      lines.forEach((l, i) => {
+        const lx = gh.pos.x + 0.5 + 18 * px, ly = gh.pos.y + 0.5 + 11 * px + i * 17 * px;
+        ctx.strokeText(l, lx, ly);
+        ctx.fillText(l, lx, ly);
+      });
     }
     ctx.restore();
   },

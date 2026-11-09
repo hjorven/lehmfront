@@ -296,3 +296,49 @@ test('Schusszahl folgt der Mannstaerke; Sicht-Overlay deckt sich mit der Regel',
   const v = viewFor(s, [], 'a', { map });
   assert.deepEqual(v.ghosts.map((x) => [x.id, x.age]), [['b02', 2], ['b03', 4]]);
 });
+
+test('Feuer auf Verdacht: trifft Verborgene schlechter, ins Leere verraet nur die eigene Stellung', () => {
+  const map = makeMap({ trenches: [{ x: 9, y: 3, side: 'enemy', kind: 'fire', level: 1, facing: 'W' }] });
+  // Nachts: der Graben bei 9 ist aus 6 Feldern nicht zu sehen
+  const mk = () => {
+    const st = battleState(map, [{ type: 'rifles', pos: { x: 3, y: 3 } }], [{ type: 'rifles', pos: { x: 9, y: 3 } }]);
+    st.clock = { ...st.clock, hour: 23 }; st.night = true;
+    return st;
+  };
+  const s = mk();
+  assert.deepEqual(visibleEnemies(s, map, 'a', darknessOf(s)), []);
+  const r = resolveTurn(s, [{ group: 'a01', type: 'fire', target: { x: 9, y: 3 } }], [{ group: 'b01', type: 'hold' }], 7, 1, { map });
+  const f = r.log.find((e) => e.type === 'fire' && e.group === 'a01');
+  assert.equal(f.blind, true);
+  assert.equal(f.hits, null);
+  assert.match(f.reason, /auf Verdacht/);
+  assert.ok(getGroup(r.state, 'b01').suppressed > 0);
+  const s2 = mk();
+  const r2 = resolveTurn(s2, [{ group: 'a01', type: 'fire', target: { x: 8, y: 1 } }], [{ group: 'b01', type: 'hold' }], 7, 1, { map });
+  const f2 = r2.log.find((e) => e.type === 'fire' && e.group === 'a01');
+  assert.equal(f2.target, null);
+  assert.equal(getGroup(r2.state, 'a01').fired, true);
+});
+
+test('Beobachter und Melder schiessen nicht von selbst; Kegel ist rund', () => {
+  const map = makeMap();
+  const s = battleState(map, [{ type: 'observers', pos: { x: 2, y: 3 } }], [{ type: 'rifles', pos: { x: 6, y: 3 } }]);
+  getGroup(s, 'b01').moved = true;
+  const r = resolveTurn(s, [], [{ group: 'b01', type: 'move', path: [{ x: 6, y: 4 }] }], 7, 1, { map });
+  assert.ok(!r.log.some((e) => e.type === 'fire' && e.group === 'a01'));
+  // Diagonal 8/8: Chebyshev 8 <= 10, aber euklidisch gut 11 > 10
+  assert.ok(!inCone({ x: 0, y: 0 }, { x: 10, y: 10 }, { x: 8, y: 8 }, 60, 10));
+  assert.ok(inCone({ x: 0, y: 0 }, { x: 10, y: 10 }, { x: 7, y: 7 }, 60, 10));
+});
+
+test('Aufgeriebene Gruppen verschwinden still aus der Aufklaerung', () => {
+  const map = makeMap({ w: 30 });
+  const s = battleState(map, [{ type: 'rifles', pos: { x: 2, y: 3 } }], [{ type: 'rifles', pos: { x: 25, y: 3 } }],
+    { a: { intel: [{ group: 'b01', turnsAgo: 1 }] } });
+  const b = getGroup(s, 'b01');
+  b.status = 'lost'; b.pos = { x: 9, y: 3 };
+  s.sides.a.intel.lastSeen.b01.pos = { x: 9, y: 3 };
+  const r = resolveTurn(s, [], [], 7, 1, { map });
+  assert.ok(!r.state.sides.a.intel.lastSeen.b01);
+  assert.ok(!r.log.some((e) => e.type === 'ghost_cleared'));
+});

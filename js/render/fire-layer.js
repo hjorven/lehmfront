@@ -105,6 +105,10 @@ export function drawSightLine(ctx, from, to, blockedAt, { th, px, label = '' }) 
     ctx.fillStyle = blockedAt ? th.danger : th.ink;
     ctx.textAlign = 'left';
     ctx.textBaseline = 'bottom';
+    ctx.strokeStyle = th.paper;
+    ctx.lineWidth = 4 * px;
+    ctx.lineJoin = 'round';
+    ctx.strokeText(label, bx + 18 * px, by - 9 * px);
     ctx.fillText(label, bx + 18 * px, by - 9 * px);
   }
   ctx.restore();
@@ -237,10 +241,15 @@ export function drawGhost(ctx, cam, th, gh, { color = th.enemy, label = true } =
   const mark = MARK[gh.type];
   ctx.font = `700 ${Math.min(h * 0.85, 17 * px)}px ${FONTS.hand}`;
   ctx.fillText(mark ? mark + '?' : '?', cx, cy + 0.5 * px);
-  if (label && px < 1 / 12) {
-    ctx.font = `700 ${13 * px}px ${FONTS.hand}`;
+  if (label && px < 1 / 9) {
+    ctx.globalAlpha = Math.max(0.7, ghostAlpha(age));
+    ctx.font = `700 ${15 * px}px ${FONTS.hand}`;
     ctx.textAlign = 'left';
-    ctx.fillText(ageText(age), x + w + 5 * px, cy);
+    ctx.strokeStyle = th.paper;
+    ctx.lineWidth = 3.5 * px;
+    ctx.lineJoin = 'round';
+    ctx.strokeText(ageText(age), x + w + 6 * px, cy);
+    ctx.fillText(ageText(age), x + w + 6 * px, cy);
   }
   ctx.restore();
 }

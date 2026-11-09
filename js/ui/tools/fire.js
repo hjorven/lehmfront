@@ -5,7 +5,7 @@ import { registerTool } from '../tools.js';
 import { cellLabel, distance } from '../../map.js';
 import { unitType } from '../../config/units.js';
 import { viewFor } from '../../view.js';
-import { fireOdds, canFire } from '../../phases/fire.js';
+import { fireOdds, canFire, BLIND } from '../../phases/fire.js';
 import { sectorOf, inCone, directionOf, darknessOf } from '../../sight.js';
 import { groupName } from '../labels.js';
 import { ageText } from '../../render/fire-layer.js';
@@ -40,10 +40,17 @@ export function firePreview(map, state, group, cell) {
     return { ok: false, text: `${where}: dort ist kein Feind zu sehen`, sight, fire: null, odds };
   }
   sight.label = `${pct(odds.p)}`;
-  const who = foe ? `Feind bei ${where}` : `Verdacht bei ${where} (${ageText(ghost.age)} gesehen)`;
+  if (!foe) {
+    const p = odds.p * BLIND;
+    return {
+      ok: true, sight: { ...sight, label: `${pct(p)}?` }, fire: { x: cell.x, y: cell.y }, odds, target: ghost,
+      text: `Feuer auf Verdacht nach ${where} (${ageText(ghost.age)} gesehen)\nOhne Sicht nur ${pct(p)} je Schuss, falls noch jemand dort liegt\n${odds.shots} Schuss · Wirkung nicht zu erkennen`,
+    };
+  }
+  const who = `Feind bei ${where}`;
   const extra = odds.enfilade ? ' · Längsfeuer!' : odds.indirect ? ' · Steilfeuer' : '';
   const text = `${who}\nTreffer je Schuss ${pct(odds.p)} · Deckung: ${odds.coverLabel}${extra}\n${odds.shots} Schuss · ${lossesText(odds.expected)}`;
-  return { ok: true, text, sight, fire: { x: cell.x, y: cell.y }, odds, target: foe ?? ghost };
+  return { ok: true, text, sight, fire: { x: cell.x, y: cell.y }, odds, target: foe };
 }
 
 /** Vorschau fuer einen MG-Sektor (rein): { ok, text, cone } */

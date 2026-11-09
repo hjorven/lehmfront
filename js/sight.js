@@ -182,9 +182,10 @@ export function directionOf(a, b) {
   if (!dx && !dy) return null;
   const ax = Math.abs(dx), ay = Math.abs(dy);
   let ix = 0, iy = 0;
-  if (ax > 2 * ay) ix = Math.sign(dx);
-  else if (ay > 2 * ax) iy = Math.sign(dy);
-  else { ix = Math.sign(dx); iy = Math.sign(dy); }
+  const sx = (dx > 0) - (dx < 0), sy = (dy > 0) - (dy < 0);
+  if (ax > 2 * ay) ix = sx;
+  else if (ay > 2 * ax) iy = sy;
+  else { ix = sx; iy = sy; }
   return DIRS.find((d) => d.dx === ix && d.dy === iy);
 }
 
@@ -213,7 +214,7 @@ export function inCone(from, aim, p, width, range = Infinity) {
   const vx = aim.x - from.x, vy = aim.y - from.y;
   const wx = p.x - from.x, wy = p.y - from.y;
   if (!wx && !wy) return false;
-  if (distance(from, p) > range) return false;
+  if (wx * wx + wy * wy > range * range) return false;
   const dot = vx * wx + vy * wy;
   if (dot <= 0) return false;
   const [n, m] = COS2_HALF[width / 2] ?? COS2_HALF[30];
@@ -225,5 +226,6 @@ export function sightLine(map, viewer, p, darkness) {
   const d = distance(viewer.pos, p);
   const range = sightRange(map, viewer, p, darkness);
   const los = hasTerrain(map) && d > 1 ? lineOfSight(map, viewer.pos, p, { eye: 1, target: 1 }) : { visible: true, blockedAt: null };
-  return { from: { ...viewer.pos }, to: { x: p.x, y: p.y }, blockedAt: los.blockedAt, d, range, visible: los.visible && d <= range };
+  const hidden = sightRange(map, viewer, p, darkness, { concealed: true });
+  return { from: { ...viewer.pos }, to: { x: p.x, y: p.y }, blockedAt: los.blockedAt, d, range, hidden, visible: los.visible && d <= range };
 }

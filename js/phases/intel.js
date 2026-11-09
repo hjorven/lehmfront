@@ -9,7 +9,8 @@
 import { registerPhase } from './registry.js';
 import { SIDES, getGroup } from '../state.js';
 import { cellLabel } from '../map.js';
-import { darknessOf, visibleEnemies, sideSeesCell, sectorOf } from '../sight.js';
+import { darknessOf, visibleEnemies, sideSeesCell, sectorOf, trenchAt } from '../sight.js';
+import { distance } from '../map.js';
 import { unitType } from '../config/units.js';
 import { MAX_GHOST_AGE } from '../view.js';
 
@@ -37,7 +38,14 @@ export function updateIntel(state, map, side, now, darkness = darknessOf(state))
     if (seenSet.has(id)) continue;
     const e = known[id];
     if (now - e.turn > MAX_GHOST_AGE) { delete known[id]; continue; }
-    if (sideSeesCell(state, map, side, e.pos, darkness, { concealed: true })) {
+    const g = getGroup(state, id);
+    // Aufgerieben und der Ort ist einsehbar: still streichen (die Meldung kam schon beim Feuer)
+    if ((!g || g.status === 'lost') && sideSeesCell(state, map, side, e.pos, darkness)) { delete known[id]; continue; }
+    // In einem Graben kann ein Unterstand eine ganze Gruppe verbergen: erst aus dem Nachbarfeld sicher
+    const deep = trenchAt(state, map, e.pos.x, e.pos.y)
+      ? state.groups.some((v) => v.side === side && v.status !== 'lost' && distance(v.pos, e.pos) <= 1)
+      : sideSeesCell(state, map, side, e.pos, darkness, { concealed: true });
+    if (deep) {
       delete known[id];
       gone.push({ id, pos: e.pos });
     }

@@ -45,6 +45,14 @@ Jeder Thread traegt hier nach dem Merge ein, was fertig ist und was offen bleibt
   - Dynamische Ebene `js/render/units-layer.js`: Gruppensymbole wie im Mockup, Bleistiftpfeile (diese Runde durchgezogen, Rest gestrichelt), Zielvorschau, Fragezeichen an Gruppen ohne Befehl.
   - Demo-Zustände für Screenshots: `&demo=befehle|liste|radial|zusammenfassung|sturm|bericht|uebergabe|zeichnen|overlays`, außerdem `&mode=hotseat`, `&kind=battle`, `&night=0..1`, `&seed=`.
 
+- P05 Feuer, Sicht, Nebel des Krieges:
+  - `js/sight.js` (rein): Sichtweite (Tag 12 Felder, Beobachter 14, Höhe +1 je Stufe, Beobachter +3), Dunkelheit über `visibilityFromDarkness`, Deckung verbirgt (zwei Drittel Sichtweite, solange die Gruppe sich nicht bewegt), Mündungsfeuer verrät auch nachts, Unterstand sieht und wird nur aus dem Nachbarfeld gesehen. `coverAt` (Graben aus `state.cells` vor der Karte, eroberter Graben halb), `sectorOf`/`inCone` (MG-Kegel ohne Winkelfunktionen), `visibleEnemies`, `visibleCells`, `sightLine`.
+  - `js/view.js`: Nebel des Krieges mit Sichtlinien. `viewFor(state, log, side, env)` nimmt jetzt optional `{ map, darkness }`; ohne Karte zählt nur die Entfernung. Geister mit `age`, `type`, `from` (Bewegung), `sector` (bekannter MG-Kegel), `source`.
+  - Phasen in `js/phases/fire.js`: `exposure` (wer sich bewegt hat), `sector` (MG richtet Sektor aus, Befehl `sector` in beiden Rundenarten), `fire` (Gefecht, nach der Bewegung, alle gleichzeitig; Feuerbefehl auf Feld, MG bestreicht Kegel, haltende Gruppen erwidern das Feuer; Mörser Steilfeuer ohne eigene Sichtlinie), `rally` (Unterdrückung klingt ab). Verluste, Unterdrückung pro Waffe, Längsfeuer (Regel tauschbar mit `setEnfiladeRule`), Begründungen mit Richtung („MG-Feuer aus Ost“). Aufgeriebene Gruppen landen mit ihrem Führer in `state.fallen`.
+  - `js/phases/intel.js`: Aufklärung je Seite in `state.sides[side].intel.lastSeen`; Geister werden ausradiert, wenn man ihr Feld genau sieht und niemand mehr dort ist, oder nach 8 Runden vergessen. Szenarien können Anfangswissen mitgeben (`sides.x.intel`, siehe `data/scenarios/asse-frei.json`).
+  - Werkzeug Feuern (F): Vorschau mit Sichtlinie, Trefferchance, Deckung, erwarteten Verlusten; bei MG-Trupps Feuersektor mit Kegel-Vorschau. Sichtlinie der gewählten Gruppe beim Zeigen mit der Maus. Bedrohungs-Overlay (Taste 2): bekannte MG-Kegel schraffiert, zuletzt gesehene Bewegung mit Richtung und Alter, Quelle (Luftbild, Grabenspiegel). Sicht-Overlay (3) nutzt jetzt dieselbe Regel.
+  - Demos: `?scene=gefecht&demo=feuer|sektor|feuerrunde|bedrohung|sichtlinie`.
+
 ### Für die nächsten Pakete (P03, P10)
 
 - Karte einbinden: `createMapLayer(canvas, map, { getCamera, getTheme })`, Kamera mit `createCamera({ bounds: sheetBounds(map) })` und `attachCameraControls(el, cam, { onChange, onTap, onHover })`. Muster: `js/scenes/karte.js`.
@@ -55,11 +63,19 @@ Jeder Thread traegt hier nach dem Merge ein, was fertig ist und was offen bleibt
 ### Für die nächsten Pakete (nach P03)
 
 - Werkzeug anmelden: Datei `js/ui/tools/<name>.js` mit `registerTool({ id, key, label, icon, order, canUse(group, state, env), begin(ctx) })`, eine Import-Zeile in `js/ui/tools/index.js`. `ctx` bietet `setOrder`, `pickCell({ hint, preview(cell), pick(cell) })`, `hint`, `cancel` (Beschreibung in `js/ui/tools.js`, Muster `js/ui/tools/move.js`). Tasten laut Plan 7.6: G Graben, U Umbauen, F Feuern, D Draht, L Lorenplan (B und H sind belegt).
-- Overlay anmelden: `registerOverlay({ slot: 1..4, id, label, draw(ctx, { cam, theme, map, state, side, px }) })` aus `js/ui/overlays.js`; Platz 1 Versorgung (P08) und 2 Bedrohung (P05) sind frei, 3 Sicht und 4 Höhe sind belegt und dürfen ersetzt werden.
+- Overlay anmelden: `registerOverlay({ slot: 1..4, id, label, draw(ctx, { cam, theme, map, state, side, px }) })` aus `js/ui/overlays.js`; Platz 1 Versorgung (P08) ist frei, 2 Bedrohung (P05), 3 Sicht und 4 Höhe sind belegt und dürfen ersetzt werden.
 - Pruefpunkt für „Vor der Runde“ und die Zusammenfassung: `registerCheck(id, ({ state, side, orders, map }) => [{ tone: 'warn'|'ok', text, group?, at? }])` aus `js/ui/summary.js`. Befehlsarten, die den Halten-Ring auslösen: `HOLD_TYPES` (bisher `assault`).
 - P06 erweitert `js/phases/move.js` (Draht, Begegnungen, Sturm). Ereignisse `move`/`redeploy` tragen `rest`; der Gefechtsbildschirm übernimmt den Rest als Befehl der nächsten Runde.
 - P07 ersetzt das Meldungen-Kärtchen (`createReport` in `js/ui/commit.js`) durch Phasenfilm und Telegramm. P13 ersetzt `js/ai/dummy.js` (`planOrders(view, { map, seed })`). P17 baut den Übergabebildschirm aus.
 - Gemeinsame Kärtchen-Klasse `.card` steht jetzt in `css/style.css` (vorher nur in `css/karte.css`).
+
+### Für die nächsten Pakete (nach P05)
+
+- Sicht immer über `js/sight.js`; `viewFor` mit `{ map }` aufrufen, sonst gibt es keine Sichtlinien.
+- P06: Unterstand (`inDugout`) wird von Feuer und Sicht schon beachtet. Niedergehaltene Gruppen (`suppressed >= PINNED`) kommen nur halb so weit (`moveBudget`). Sturm (`assault`) und Bewegen feuern nicht. Befehle `dugout`, `cease_fire` stoppen das Feuer.
+- P08/P09: Feuer-Ereignisse tragen `ammo` (MG 2, sonst 1) zum Abbuchen; Munition wird noch nicht verbraucht. Artilleriereichweiten gehören ins Bedrohungs-Overlay (`js/ui/overlays/threat.js`).
+- P04: Längsfeuer-Regel mit `setEnfiladeRule(fn)` aus `js/phases/fire.js` ersetzen; Traversen als `trench.traverse` werden schon erkannt.
+- P12: `losses`- und `suppressed`-Ereignisse und `g.underFire` sind die Haken für Moralproben.
 
 ## Offen und bekannte Macken
 
@@ -67,7 +83,6 @@ Jeder Thread traegt hier nach dem Merge ein, was fertig ist und was offen bleibt
 
 - `data/names.json` wird per Import-Attribut (`with { type: 'json' }`) geladen: braucht Chrome 123+, Safari 17.2+, Firefox 138+. Falls aeltere Geraete wichtig werden, nur `js/config/names.js` auf fetch umstellen.
 - `resolveTurn` wirft, wenn `seed` oder `turn` nicht zum Zustand passen. Die Karte (`env.map`) wird nicht kopiert: Phasen duerfen sie nur lesen, Veraenderungen gehoeren in `state.cells`.
-- Geister (zuletzt gesehene Feinde) reicht `viewFor` aus `state.sides[side].intel.lastSeen` durch; befuellen muss P05.
 - Gruppen-IDs sind `a01`, `b01` ... (Seite plus zwei Ziffern), sortiert wird ohne Locale.
 - K1: Klaenge sind noch nirgends im Spiel eingehaengt, das macht P19 (und P03/P06/P07 duerfen `playSfx` direkt aufrufen). Lautstaerke-Regler gehoeren spaeter in die Einstellungen aus P18 (`setVolume`, Werte werden schon in localStorage gespeichert).
 - K1: In Safari auf iOS vor 16.4 bleibt der Klang stumm, wenn der Stummschalter am Geraet aktiv ist (ab 16.4 setzt die Engine `navigator.audioSession.type = 'playback'`).
@@ -90,6 +105,10 @@ Jeder Thread traegt hier nach dem Merge ein, was fertig ist und was offen bleibt
 - P03: Im Hotseat bleiben die Kartenfarben fest (Kaldern blau, Morrow rot); die Seite b plant also mit roten Symbolen. Der Nebel gilt pro planender Seite.
 - P03: Die Bewegungsregeln sind eine erste Fassung (keine Begegnungen, kein Draht-Abbremsen außer über die Feldkosten); Verlegen in Stellungsrunden darf nicht ins Niemandsland.
 - P03: Die Szene nutzt `requestAnimationFrame` und `performance.now()` nur für Optik (Bleistift, Ring); die Spiellogik bleibt rein.
+
+- P05: Sichtweite ist Chebyshev-Abstand (Quadrat statt Kreis), passend zu Reichweiten. Der MG-Kegel rechnet mit echtem Winkel, deshalb kann ein Ziel in der Kegelecke außer Reichweite liegen, obwohl es innerhalb des gezeichneten Bogens ist (Bogen ist rund, Reichweite eckig).
+- P05: Feuer in Gefechtsrunden trifft nur Gruppen, die nach der Bewegung sichtbar sind; Feuer während der Bewegung (Sperrfeuer auf den Weg) gibt es noch nicht.
+- P05: Mit `night=` (ab 0,5) stellt die Szene die Uhr auf 22 Uhr, damit Regeln und Optik übereinstimmen.
 
 ## Freigaben und Entscheidungen von Jorven
 
@@ -127,3 +146,5 @@ Stand 2026-11-08, von Jorven bestaetigt:
 - P03: „Bewegen“ ist ein Werkzeug für beide Rundenarten: in Stellungsrunden wird daraus „Verlegen“ (redeploy), in Gefechtsrunden „Bewegen“ (move). Unfertige Wege laufen als Befehl weiter („läuft weiter“ in der Befehlsliste).
 - P03: Gruppen ohne Befehl tragen auf der Karte ein Bleistift-Fragezeichen; der Plan nennt das nur in der Checkliste.
 - P03: Nach der Runde zeigt ein schlichtes Meldungen-Kärtchen alle Begründungen (Klick springt zum Ort), bis P07 das Telegramm bringt.
+- P05: Der Nebel des Krieges braucht kein eigenes Grau: Feinde, die man nicht sieht, bleiben als Bleistiftskizze stehen, die jede Runde blasser und lückenhafter wird, als würde jemand radieren. Ist der Platz wieder einsehbar und leer, wird die Skizze ausradiert (Meldung im Protokoll).
+- P05: MG-Trupps bekommen statt „Feuern“ einen dauerhaften Feuersektor (Befehl `sector`, auch in Stellungsrunden), den sie im Gefecht selbst bestreichen. Mündungsfeuer verrät die Stellung auch nachts.

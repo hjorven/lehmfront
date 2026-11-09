@@ -6,7 +6,7 @@ import { loadMap, cellAt, cellLabel } from '../map.js';
 import { createInitialState, groupsOf, getGroup, otherSide } from '../state.js';
 import { resolveTurn } from '../resolve.js';
 import { viewFor } from '../view.js';
-import { sightLine, coverAt, PINNED } from '../sight.js';
+import { sightLine, coverAt, PINNED, darknessOf } from '../sight.js';
 import { faction } from '../config/factions.js';
 import { themeAt, applyTheme, currentTheme, onThemeChange, animateDarkness } from '../theme.js';
 import {
@@ -287,7 +287,8 @@ export async function mount(root, params) {
 
   // ---------- Auswahl und Werkzeuge ----------
   function sightLabel(sl) {
-    const label = sl.visible ? `${plural(sl.d, 'Feld', 'Felder')} · frei` : sl.blockedAt ? 'Sicht verdeckt' : `zu weit (Sicht ${sl.range})`;
+    const label = !sl.visible ? (sl.blockedAt ? 'Sicht verdeckt' : `zu weit (Sicht ${sl.range})`)
+      : sl.d > sl.hidden ? `${plural(sl.d, 'Feld', 'Felder')} · frei, Deckung erst ab ${sl.hidden}` : `${plural(sl.d, 'Feld', 'Felder')} · frei`;
     return { ...sl, blockedAt: sl.blockedAt, label };
   }
   function select(id, { center = false } = {}) {
@@ -420,6 +421,7 @@ export async function mount(root, params) {
     book = seal(book, side);
     playSfx('stamp');
     selectedId = null;
+    hoverSight = null;
     closeList();
     report.hide();
     overlaysOn = new Set();
@@ -463,6 +465,7 @@ export async function mount(root, params) {
     const r = resolveTurn(state, ordersA, ordersB, seed, state.turn, env);
     const before = state;
     state = r.state;
+    hoverSight = null;
     lastLog = r.log;
     // Unvollendete Wege laufen als Befehl weiter, solange die Rundenart passt
     const carry = { a: [], b: [] };
@@ -546,7 +549,7 @@ export async function mount(root, params) {
       if (!tool?.pick) {
         const g = selectedOwn();
         const cell = p && g && !modalOpen ? cellFromScreen(p).cell : null;
-        const next = cell && (cell.x !== g.pos.x || cell.y !== g.pos.y) ? sightLabel(sightLine(map, g, cell, darkness)) : null;
+        const next = cell && (cell.x !== g.pos.x || cell.y !== g.pos.y) ? sightLabel(sightLine(map, g, cell, darknessOf(state))) : null;
         const k = (s) => (s ? `${s.to.x},${s.to.y},${s.from.x},${s.from.y}` : '');
         if (k(next) !== k(hoverSight)) { hoverSight = next; drawDyn(); }
         return;
@@ -769,7 +772,7 @@ export async function mount(root, params) {
         commitSide();
       }
     } else if (demo === 'bedrohung') { api.overlay(2); }
-    else if (demo === 'sichtlinie') { api.select(own[0].id); hoverSight = sightLabel(sightLine(map, own[0], { x: 41, y: 12 }, darkness)); }
+    else if (demo === 'sichtlinie') { api.select(own[0].id); hoverSight = sightLabel(sightLine(map, own[0], { x: 41, y: 12 }, darknessOf(state))); }
     refresh();
     drawDynNow();
   }
