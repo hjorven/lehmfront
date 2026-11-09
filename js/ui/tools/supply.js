@@ -16,6 +16,7 @@ export function currentWagons(map, state, side, plans) {
 
 registerTool({
   id: 'supply',
+  shown: (state) => state.turnKind !== 'battle', // P06: nur in der passenden Rundenart in der Werkzeugreihe
   key: 'l',
   label: 'Lorenplan',
   order: 80,

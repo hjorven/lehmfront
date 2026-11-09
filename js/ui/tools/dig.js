@@ -295,6 +295,7 @@ export function judgeLine(map, state, group, cells) {
 
 registerTool({
   id: 'dig',
+  shown: (state) => state.turnKind !== 'battle', // P06: nur in der passenden Rundenart in der Werkzeugreihe
   key: 'g',
   label: 'Graben',
   order: 10,

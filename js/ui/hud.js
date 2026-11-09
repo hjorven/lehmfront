@@ -3,12 +3,12 @@
 // Seitenleiste wie Stil 07 aufklappt.
 import { esc } from './dom.js';
 
-export function createHud(root, { onToggleList, onToggleOverlay, onCheck, onToggleSheet }) {
+export function createHud(root, { onToggleList, onToggleOverlay, onCheck, onToggleSheet, onRoundAction = () => {} }) {
   const el = document.createElement('div');
   el.className = 'hud';
   el.innerHTML = `
     <button class="hud-strip card" type="button" aria-expanded="false" aria-controls="hud-sheet">
-      <span class="strip-vals"></span><span class="strip-round"></span>
+      <span class="strip-vals"></span><span class="strip-clock" aria-hidden="true"></span><span class="strip-round"></span>
     </button>
     <div class="hud-sheet" id="hud-sheet">
       <div class="res-row">
@@ -21,7 +21,8 @@ export function createHud(root, { onToggleList, onToggleOverlay, onCheck, onTogg
         <div class="axis"><span>Ansehen beim Stab</span><b class="rep"></b><i class="bar"><i class="fill own"></i></i></div>
         <div class="axis"><span>Vertrauen der Truppe</span><b class="tru"></b><i class="bar"><i class="fill accent"></i></i></div>
       </section>
-      <section class="card round" aria-live="polite"><b class="round-title"></b><span class="round-sub"></span></section>
+      <section class="card round" aria-live="polite"><span class="round-clock"></span><div class="round-text"><b class="round-title"></b><span class="round-sub"></span>
+        <button type="button" class="btn round-act" hidden></button></div></section>
       <section class="card overlays" aria-label="Overlays">
         <span class="k">Overlays</span>
         <div class="ov-list"></div>
@@ -43,6 +44,7 @@ export function createHud(root, { onToggleList, onToggleOverlay, onCheck, onTogg
   const strip = $('.hud-strip');
   strip.addEventListener('click', () => onToggleSheet());
   $('.list-btn').addEventListener('click', () => onToggleList());
+  $('.round-act').addEventListener('click', () => onRoundAction());
   const ovBtn = $('.ov-btn'), pop = $('.ov-pop');
   ovBtn.addEventListener('click', () => {
     pop.hidden = !pop.hidden;
@@ -57,6 +59,7 @@ export function createHud(root, { onToggleList, onToggleOverlay, onCheck, onTogg
   });
 
   let lastChecks = [];
+  let lastClock = null;
   return {
     el,
     closePopover() { pop.hidden = true; ovBtn.setAttribute('aria-expanded', 'false'); },
@@ -80,6 +83,17 @@ export function createHud(root, { onToggleList, onToggleOverlay, onCheck, onTogg
       $('.round-sub').textContent = m.roundSub;
       $('.strip-vals').innerHTML = `Loren <b>${esc(s.carts ?? 0)}/${esc(s.cartsTotal ?? s.carts ?? 0)}</b> · Mun <b>${esc(s.ammo ?? 0)}</b> · Mat <b>${esc(s.material ?? 0)}</b> · Moral <b>${esc(m.morale)}</b>`;
       $('.strip-round').textContent = m.stripRound;
+      // Uhr (P06): nur neu setzen, wenn sie sich aendert, sonst startet das Einrasten bei jedem Neuzeichnen neu
+      if (m.clock && m.clock.big !== lastClock) {
+        lastClock = m.clock.big;
+        $('.round-clock').innerHTML = m.clock.big;
+        $('.strip-clock').innerHTML = m.clock.small;
+        $('.round').classList.toggle('battle', m.clock.mode === 'battle');
+        strip.classList.toggle('battle', m.clock.mode === 'battle');
+      }
+      const act = $('.round-act');
+      act.hidden = !m.roundAction;
+      if (m.roundAction) act.textContent = m.roundAction;
       $('.list-btn .n').textContent = m.orderCount;
       $('.list-btn').setAttribute('aria-label', `Befehlsliste, ${m.orderCount} Befehle`);
       const ovHtml = m.overlays.map((o) => `<button type="button" class="ov${o.active ? ' on' : ''}" data-ov="${o.slot}" aria-pressed="${o.active}">
@@ -97,5 +111,13 @@ export function createHud(root, { onToggleList, onToggleOverlay, onCheck, onTogg
       }
     },
     checkAt(i) { return lastChecks[i]; },
+    /** Uhr einrasten lassen (Wechsel Stellungs- und Gefechtsrunde) */
+    snapClock() {
+      for (const c of el.querySelectorAll('.round-clock, .strip-clock')) {
+        c.classList.remove('snap');
+        void c.offsetWidth;
+        c.classList.add('snap');
+      }
+    },
   };
 }

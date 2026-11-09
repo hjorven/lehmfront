@@ -20,6 +20,7 @@ registerTool({
   key: 'p',
   label: 'Etappe',
   order: 85,
+  shown: (state) => state.turnKind !== 'battle',
   needsGroup: false,
   icon: ETAPPE_ICON,
   canUse(group, state) {

@@ -19,6 +19,7 @@ export const ORDER_TYPES = {
   harass:      { id: 'harass',      label: 'Störfeuer',       kind: 'position', target: 'cell' },
   tunnel:      { id: 'tunnel',      label: 'Stollen',         kind: 'position', target: 'path' },
   raid:        { id: 'raid',        label: 'Stoßtrupp',       kind: 'position', target: 'cell', night: true },
+  attack:      { id: 'attack',      label: 'Angriff ansetzen', kind: 'position', target: 'path' },
   observe:     { id: 'observe',     label: 'Beobachten',      kind: 'position', target: 'cell' },
   redeploy:    { id: 'redeploy',    label: 'Verlegen',        kind: 'position', target: 'path' },
   sector:      { id: 'sector',      label: 'Feuersektor',     kind: 'both',     target: 'cell' },
