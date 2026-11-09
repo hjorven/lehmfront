@@ -251,7 +251,7 @@ export function drawTargetCell(ctx, cell, color, px, ok = true) {
  * d = { state, map, side, groups (sichtbar, mit mark), ghosts, orders: Map(groupId -> order), selectedId,
  *       planning (true: Fragezeichen fuer Gruppen ohne Befehl), reach: Map(groupId -> Felder diese Runde),
  *       anim: { group, progress }, preview: { group, path, reach, cell, ok, sight?, fire?, cone? }, overlays: [overlay], hover,
- *       sightLine?: { from, to, blockedAt, label } }
+ *       sightLine?: { from, to, blockedAt, label }, armed?: Feld, das per Finger vorgemerkt ist }
  */
 export function drawBattle(ctx, cam, dpr, th, d) {
   ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -335,4 +335,25 @@ export function drawBattle(ctx, cam, dpr, th, d) {
     });
     if (g.side === d.side || g.suppressed !== undefined) drawSuppression(ctx, cam, g, th, px, g.suppressed >= PINNED);
   }
+  if (d.armed) drawArmed(ctx, d.armed, th, px);
+}
+
+/** Touch: vorgemerktes Ziel. Bleistiftkringel um das Feld, der Bleistift wartet darueber auf das zweite Antippen. */
+function drawArmed(ctx, cell, th, px) {
+  const cx = cell.x + 0.5, cy = cell.y + 0.5;
+  ctx.save();
+  ctx.strokeStyle = th.ink;
+  ctx.globalAlpha = 0.8;
+  ctx.lineWidth = 1.6 * px;
+  ctx.lineCap = 'round';
+  // zwei leicht versetzte Umlaeufe, wie schnell mit der Hand gezogen; der zweite schiesst ueber den Anfang hinaus
+  ctx.beginPath();
+  ctx.ellipse(cx, cy, 0.86, 0.74, -0.2, 0.3, 0.3 + Math.PI * 2);
+  ctx.stroke();
+  ctx.globalAlpha = 0.45;
+  ctx.beginPath();
+  ctx.ellipse(cx + 0.04, cy - 0.03, 0.8, 0.8, 0.15, 0.1, 0.1 + Math.PI * 1.25);
+  ctx.stroke();
+  ctx.restore();
+  pencil(ctx, cx + 0.75, cy - 0.75, px, th);
 }

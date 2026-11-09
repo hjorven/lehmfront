@@ -12,6 +12,7 @@ export const SETTING_CHOICES = {
   text: [1, 0.9, 1.15, 1.3],            // Groesse der Kaertchen-Texte
   signs: [false, true],                 // Signaturen zusaetzlich zur Farbe (Doppelrahmen, Zeichen)
   contrast: [false, true],              // kraeftigere Linien und Hilfstexte
+  tap: ['confirm', 'direct'],           // Ziel mit dem Finger: erst vormerken, dann setzen, oder sofort setzen
 };
 
 export const DEFAULT_SETTINGS = Object.freeze(
