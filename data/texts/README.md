@@ -90,6 +90,8 @@ Echte Umlaute in allen Texten. Keine Emojis. Keine realen Länder, Personen, Sym
 | `endlos-woche` | | Satz zum Wochenanfang, Slot `endlos.woche` |
 | `jahreszeit` | `jahreszeit`, `teil` (`wechsel` oder `wetter`) | Texte für die Jahreszeiten im Endlosmodus |
 | `endlos-ende` | `grund` | Ende des Endlosmodus: `abschnitt_gefallen`, `abgeloest`, `meuterei` |
+| `stab-antwort` | `band` | Antwort des Stabs auf der Feldzugskarte (P14), Slot `stab.antwort`, je tiefer das Ansehen, desto knapper (`data/texts/stab.json`) |
+| `stab-drohung`, `stab-stempel`, `stab-berichte` | | Drohung unter 25, Antwort auf Umdeuten/Verweigern, zurückgehaltene Berichte (P14) |
 
 T2 und spätere Pakete dürfen neue Arten einführen (`zeitung`, `fundstueck`, `ende`, `erfolg`,
 `endlos-befehl`, `jahreszeit` ...). Sie tragen sie hier in die Tabelle ein; der Test prüft

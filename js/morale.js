@@ -30,8 +30,18 @@ export function postOf(map, g) {
 
 /** Fraktionswerte (Plan 2.2): Kaldern bricht schneller ein und erholt sich schneller, Morrow umgekehrt */
 export function moraleFactors(state, side) {
-  const f = faction(state.sides[side]?.faction ?? 'kaldern');
-  return { breakFactor: f.morale?.breakFactor ?? 1, recovery: f.morale?.recovery ?? 1, replacements: f.replacements ?? { speed: 1, groupSize: 1 } };
+  const s = state.sides[side];
+  const f = faction(s?.faction ?? 'kaldern');
+  // P14 (Plan 2.6): Vertrauen wirkt auf die Moralerholung (zwischen 40 und 60 neutral).
+  // Das Ansehen wirkt auf den Ersatz nur einmal vor der Mission (js/campaign.js applyCampaignToState).
+  const trust = Math.max(0, Math.min(100, s?.trust ?? 50));
+  const trustPct = trust >= 40 && trust <= 60 ? 100 : 70 + Math.floor((trust * 3) / 5);
+  const rep = f.replacements ?? { speed: 1, groupSize: 1 };
+  return {
+    breakFactor: f.morale?.breakFactor ?? 1,
+    recovery: ((f.morale?.recovery ?? 1) * trustPct) / 100,
+    replacements: rep,
+  };
 }
 
 // ------------------------------------------------------------------ Erschoepfung

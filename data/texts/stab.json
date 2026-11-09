@@ -1,0 +1,121 @@
+{
+  "format": 1,
+  "beschreibung": "Antworten des Stabs auf der Feldzugskarte (P14). Je tiefer das Ansehen, desto knapper der Stab: herzlich ab 75, sachlich ab 50, knapp ab 25, kalt darunter. Dazu Drohung unter 25, Antwort auf einen Stempel (umdeuten, verweigern) und zurückgehaltene Erfahrungsberichte.",
+  "eintraege": [
+    {
+      "id": "stab.antwort.herzlich.sieg",
+      "art": "stab-antwort",
+      "slot": "stab.antwort",
+      "blatt": "telegramm",
+      "band": "herzlich",
+      "wann": { "ansehen": { "min": 75 }, "ausgang": "sieg" },
+      "text": "AN MAJOR BRANDT ABSCHNITT {abschnitt} STOP DER STAB HAT IHRE MELDUNG MIT GROSSER GENUGTUUNG ZUR KENNTNIS GENOMMEN STOP DIE HALTUNG DER TRUPPE WIRD IM TAGESBEFEHL DER DIVISION GENANNT STOP ZUSÄTZLICHE MUNITION UND ERSATZ SIND AUF DEM WEG STOP DER HERR GENERAL LÄSST GRÜSSEN STOP MACHEN SIE WEITER SO STOP GEZ VAN AURACH OBERST STOP"
+    },
+    {
+      "id": "stab.antwort.herzlich.niederlage",
+      "art": "stab-antwort",
+      "slot": "stab.antwort",
+      "blatt": "telegramm",
+      "band": "herzlich",
+      "wann": { "ansehen": { "min": 75 } },
+      "text": "AN MAJOR BRANDT ABSCHNITT {abschnitt} STOP RÜCKSCHLAG BEDAUERLICH ABER BEI DIESER WETTERLAGE VERSTÄNDLICH STOP DAS VERTRAUEN DES STABES IN IHRE FÜHRUNG IST UNVERÄNDERT STOP ERSATZ IST ANGEFORDERT STOP GEZ VAN AURACH OBERST STOP"
+    },
+    {
+      "id": "stab.antwort.sachlich.sieg",
+      "art": "stab-antwort",
+      "slot": "stab.antwort",
+      "blatt": "telegramm",
+      "band": "sachlich",
+      "wann": { "ansehen": { "min": 50 }, "ausgang": "sieg" },
+      "text": "MELDUNG ERHALTEN STOP ERFOLG IM ABSCHNITT {abschnitt} ZUR KENNTNIS GENOMMEN STOP NACHSCHUB WIE VORGESEHEN STOP WEITERMACHEN STOP VAN AURACH STOP"
+    },
+    {
+      "id": "stab.antwort.sachlich.niederlage",
+      "art": "stab-antwort",
+      "slot": "stab.antwort",
+      "blatt": "telegramm",
+      "band": "sachlich",
+      "wann": { "ansehen": { "min": 50 } },
+      "text": "MELDUNG ERHALTEN STOP VERLUST VON GELÄNDE NICHT HINNEHMBAR STOP BERICHT ÜBER DIE URSACHEN BIS 18 UHR STOP VAN AURACH STOP"
+    },
+    {
+      "id": "stab.antwort.knapp.sieg",
+      "art": "stab-antwort",
+      "slot": "stab.antwort",
+      "blatt": "telegramm",
+      "band": "knapp",
+      "wann": { "ansehen": { "min": 25 }, "ausgang": "sieg" },
+      "text": "ERHALTEN STOP WEITERMACHEN STOP"
+    },
+    {
+      "id": "stab.antwort.knapp.niederlage",
+      "art": "stab-antwort",
+      "slot": "stab.antwort",
+      "blatt": "telegramm",
+      "band": "knapp",
+      "wann": { "ansehen": { "min": 25 } },
+      "text": "UNGENÜGEND STOP"
+    },
+    {
+      "id": "stab.antwort.kalt.sieg",
+      "art": "stab-antwort",
+      "slot": "stab.antwort",
+      "blatt": "telegramm",
+      "band": "kalt",
+      "wann": { "ausgang": "sieg" },
+      "text": "STOP"
+    },
+    {
+      "id": "stab.antwort.kalt",
+      "art": "stab-antwort",
+      "slot": "stab.antwort",
+      "blatt": "telegramm",
+      "band": "kalt",
+      "text": "ABLÖSUNG WIRD GEPRÜFT STOP"
+    },
+    {
+      "id": "stab.drohung",
+      "art": "stab-drohung",
+      "slot": "stab.drohung",
+      "blatt": "telegramm",
+      "text": "AN MAJOR BRANDT PERSÖNLICH STOP DER STAB ZWEIFELT AN DER FÜHRUNG DES ABSCHNITTS {abschnitt} STOP EINE ABLÖSUNG WIRD VORBEREITET STOP SIE HABEN ES SELBST IN DER HAND STOP VAN AURACH STOP"
+    },
+    {
+      "id": "stab.stempel.umdeuten.gut",
+      "art": "stab-stempel",
+      "slot": "stab.stempel.umdeuten",
+      "blatt": "telegramm",
+      "wann": { "ansehen": { "min": 50 } },
+      "text": "RÜCKFRAGE ERHALTEN STOP AUSFÜHRUNG NACH EIGENEM ERMESSEN GENEHMIGT STOP ES ZÄHLT DAS ERGEBNIS STOP VAN AURACH STOP"
+    },
+    {
+      "id": "stab.stempel.umdeuten",
+      "art": "stab-stempel",
+      "slot": "stab.stempel.umdeuten",
+      "blatt": "telegramm",
+      "text": "RÜCKFRAGE UNERWÜNSCHT STOP BEFEHL IST KLAR STOP"
+    },
+    {
+      "id": "stab.stempel.verweigern.gut",
+      "art": "stab-stempel",
+      "slot": "stab.stempel.verweigern",
+      "blatt": "telegramm",
+      "wann": { "ansehen": { "min": 60 } },
+      "text": "IHRE BEDENKEN SIND NOTIERT STOP DER STAB SIEHT DIESMAL DARÜBER HINWEG STOP DIES BLEIBT EINE AUSNAHME STOP VAN AURACH STOP"
+    },
+    {
+      "id": "stab.stempel.verweigern",
+      "art": "stab-stempel",
+      "slot": "stab.stempel.verweigern",
+      "blatt": "telegramm",
+      "text": "VERWEIGERUNG ZUR KENNTNIS GENOMMEN STOP KONSEQUENZEN FOLGEN STOP"
+    },
+    {
+      "id": "stab.berichte.zurueck",
+      "art": "stab-berichte",
+      "slot": "stab.berichte",
+      "blatt": "telegramm",
+      "text": "IHRE ERFAHRUNGSBERICHTE LIEGEN HIER STOP SIE WERDEN BEARBEITET SOBALD DER ABSCHNITT WIEDER ERGEBNISSE MELDET STOP"
+    }
+  ]
+}

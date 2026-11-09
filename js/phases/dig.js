@@ -25,6 +25,7 @@ import {
 import { surname } from './hold.js';
 import { setEnfiladeRule } from './fire.js';
 import { enfiladeInState } from '../trench.js';
+import { reportOpen } from '../config/reports.js';
 
 // Laengsfeuer im Gefecht: gerade Abschnitte ab ENFILADE_RUN Feldern, Schuetze in der Verlaengerung (P04 ersetzt die Grundregel aus P05)
 setEnfiladeRule((state, map, shooterPos, targetPos) => !!(map && enfiladeInState(state, map, targetPos, shooterPos)));
@@ -168,6 +169,7 @@ function checkDig(order, group, state, env) {
   if (order.kind !== undefined && order.kind !== 'fire' && order.kind !== 'comm') return 'unbekannte Grabenart';
   if (order.facing !== undefined && (!Array.isArray(order.facing) || order.facing.length !== path.length || order.facing.some((f) => !DIR[f]))) return 'Feuerrichtung passt nicht zur Linie';
   if (level === 4 && !concreteAllowed(state, group.side)) return 'Beton gibt es erst später';
+  if (level >= 3 && !reportOpen(state, group.side, 'faschinenbau')) return 'Ausgebaute Gräben erst nach dem Erfahrungsbericht Faschinenbau';
   if (!(unitType(group.type).digRate > 0)) return `${unitType(group.type).name} gräbt nicht`;
   const seen = new Set();
   for (let i = 0; i < path.length; i++) {

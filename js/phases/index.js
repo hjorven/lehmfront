@@ -2,6 +2,7 @@
 import './artillery.js';
 import './battle.js';
 import './build.js';
+import './campaign.js';
 import './clock.js';
 import './dig.js';
 import './dugout.js';
