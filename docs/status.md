@@ -102,6 +102,24 @@ Jeder Thread traegt hier nach dem Merge ein, was fertig ist und was offen bleibt
   - Demos: `?scene=gefecht&demo=abloesung|abloesung-liste|ruhelager`.
   - Überraschung: Neben den Einheiten stehen Bleistiftvermerke („seit 7 Runden vorn“ rot, „ruht, noch 1 Runde“, „Ersatz, grün“). Fällt ein Gruppenführer, wird sein Name durchgestrichen und darunter steht „Wendler übernimmt“.
 
+- P17 Spielmodi: Gefecht frei, Zufallskarten, Hotseat, Tageslage (lokal):
+  - Hauptmenü: „Gefecht frei“ und „Hotseat“ öffnen den Marschbefehl (`?scene=gefecht-frei`, `&mode=hotseat`), „Tageslage“ zeigt das Datum und den besten Eintrag des Tages (`?scene=tageslage`, `&tag=JJJJMMTT`). Im Menü läuft nach dem ersten Tippen die ferne Front mit Wind und karger Musik, die Einträge rascheln, unten links „Ton: an/aus“ (P19-Hinweis erledigt).
+  - Kartenbau rein in `js/mapgen.js`: `buildMap(spec)` baut die westliche Hälfte aus einer Beschreibung (Zonenbreiten, Hügel, Senken, Wälder, Dörfer, Fluss, Frontausbuchtungen, Gassen, Laufgräben) und spiegelt sie (`spiegel`) oder dreht sie um den Mittelpunkt (`punkt`). `randomSpec(seed)`/`generateMap(seed, { langs })` für Zufallskarten (56 bis 64 x 36 bis 40). Ein umstrittener Ort liegt genau auf der Mittellinie (Höhe, Hof oder Mühle). Gebäude der Etappe, Feldbahn, Unterstände, Krater, Leitungen (`cables`, die Gegenseite bekommt sie über `mirroredLines` im Szenario).
+  - Karten: `js/config/battlemaps.js` mit Asse-Nord (Datei, festes Szenario `asse-frei`, Fraktion wird getauscht), Velder Mühle (Bachniederung mit Mühle im Sumpf), Krähenholz (Wald bis ins Niemandsland, Hof dazwischen), Schacht Drei (Abraumhalde auf der Mittellinie).
+  - `js/modes/skirmish.js` (rein): `skirmishScenario` (sechs Gruppen je Seite in den eigenen Gräben, gespiegelt; Stärke aus Mittelwert und Fraktion), `adaptFixedScenario`, Tageslage `dailySeed`/`dailyBrief`/`dailyMap` (14 Stellungsrunden, Veteran, Fraktion aus dem Seed), Wertung `tallyLog` + `finalReport` (Simulator-Wertung und Punkte nach Plan 8.3), `limitReached` (ein laufendes Gefecht wird noch zu Ende geführt).
+  - Gefecht lädt über `js/modes/load.js`: `?scene=gefecht&karte=zufall|asse|velde|kraehenholz|schacht&kseed=&fraktion=kaldern|morrow&ki=rekrut|veteran|lask&runden=0..60&mode=hotseat` oder `&tageslage=JJJJMMTT`. Ohne `karte`/`tageslage` alles wie vorher. Die Spielerfraktion steht immer im Westen (Seite a, blau).
+  - Abschlussmeldung `js/ui/result.js` (`attachModeRules`): nach der letzten Stellungsrunde oder wenn eine Seite keine Gruppe mehr hat; Stempel, Zahlen, Doktrin des Gegners „aus Gefangenenaussagen“, Tageslage mit Punktetabelle und Wachbuch (lokale Bestenliste `js/modes/board.js`, localStorage, 20 Einträge je Tag, 40 Tage). Demo `&demo=ende`.
+  - Hotseat: Übergabe als verschlossener Umschlag auf leerem Papier (Anschrift, Bleistiftvermerk, kein Hinweis auf Zahl oder Art der Befehle); das Siegel öffnet erst nach 0,7 Sekunden Gedrückthalten (Maus, Finger, Enter oder Leertaste), ein versehentliches Tippen zeigt nichts.
+  - Tests `test/mapgen.test.js`: Spiegelbarkeit (Boden, Höhe, Zonen, Gräben mit Feuerrichtung, Draht, Krater, Gleise, Gebäude) für 24 Seeds und alle handgebauten Karten in beiden Sprachen, Erreichbarkeit (alle begehbaren Felder hängen zusammen, Front zu Front, Depot zur Front), Spielbarkeit (KI gegen KI, keine Seite gewinnt alles), Namen, Tageslage, Wertung.
+  - Überraschung: Jede Kartenhälfte trägt Ortsnamen in der Namenssprache ihrer Fraktion (Kaldern: Brookdorp, Ellernbusch, Reetberg; Morrow: Zirlane, Varna-Wald, Lapvakalns). Wechselt man im Marschbefehl die Fraktion, schreiben sich die Namen der Vorschau um. Der umstrittene Ort in der Mitte trägt gedruckt den eigenen Namen und daneben in Bleistift „drüben: …“, wie ihn die andere Seite nennt.
+
+### Für die nächsten Pakete (nach P17)
+
+- P18: Spielstände müssen den Modus mitnehmen (`modeInfo` aus `loadBattle`, Zähler `rules.tally` aus `js/ui/result.js`), sonst zählt die Tageslage nach dem Laden wieder ab null. Schwierigkeit als Einstellung: `ki=` gibt es schon als URL-Parameter.
+- P20: Online-Bestenliste der Tageslage: Seed `dailySeed(key)`, Wertung `finalReport(...).points`; zum Nachrechnen braucht der Server Seed, Fraktion und das Befehlsprotokoll (`archive`). Lokales Wachbuch: `js/modes/board.js`.
+- P21: Balancing auf Zufallskarten: `generateMap(seed)` + `skirmishScenario(json, { faction })` + `runMatch` (Beispiel im Test „spielbar“). 39 Spiegelpartien gleicher Fraktion, 24 Runden: a 14, b 12, Remis 13; Kaldern gegen Morrow 29 Partien: 14 zu 8, Remis 7.
+- P22 (Endlos): eine Woche ist schon 14 Stellungsrunden mit Wertung nach 8.3; `finalReport` lässt sich je Woche aufrufen.
+
 ### Für die nächsten Pakete (nach P12)
 - P13 KI: Befehle `relieve` (mit `by`) und `refill`; `isTooLong(g)` und `state.sides[s].morale` helfen bei der Entscheidung. P14: Ereignisse `relieved`, `too_long`, `trust_front`, `trust_relief`, `leader_fallen`, `morale_check`, `morale_break`, `refilled` für Zähler und Berichte. Moralproben können Verweigerung (Plan 4.2 Nr. 23) und Harms (Plan 2.4) aufnehmen: `checkChance` in `js/morale.js`.
 - P13 KI-Kommandant, Taktik-Lehrling, Headless-Simulator:
@@ -231,6 +249,8 @@ Jeder Thread traegt hier nach dem Merge ein, was fertig ist und was offen bleibt
 
 ## Offen und bekannte Macken
 
+- P17: Asse-Nord ist nicht gespiegelt; spielt man dort Morrow, steht Morrow im Westen auf der Kaldern-Karte (Namen bleiben Kaldern). Die Tageslage lässt sich auf demselben Gerät neu beginnen, das Wachbuch nimmt jeden Versuch. Ohne Spielstand (P18) geht eine angefangene Tageslage beim Neuladen verloren. Kaldern gewinnt auf Zufallskarten gegen Morrow öfter (siehe P21-Hinweis).
+
 - P12: Ruhende Gruppen sieht der Gegner, wenn er so weit sieht (keine eigene Regel). Die KI (P13) löst noch nicht ab. Ersatz ganzer Gruppen (neue Gruppe statt Auffüllen) fehlt noch. Die Checkliste unten links scrollt auf dem Desktop, wenn sie länger wird.
 
 - P11: Nur Loren, Verpflegung, Material/Holz/Beton und Feldpost wirken direkt. Erholung, Moral (im Ruhelager), Trost und Ausbildung liest seit P12 `js/phases/morale.js`; Heilung wirkt über die Sanitätskette (P08), Offiziere sind offen. Batterieplätze, Leitung, Streuung: P09. Sicht und Ballon: P05 oder später. Werkstatt (Reparatur) hat noch keine Wirkung.
@@ -314,6 +334,8 @@ Stand 2026-11-08, von Jorven bestaetigt:
 - Bis zu 15 Threads gleichzeitig.
 
 ## Abweichungen vom Plan
+
+- P17: Zufallskarten und die drei neuen handgebauten Karten sind gespiegelt oder punktgespiegelt (Plan 9: Spiegelkarten zuerst), beide Seiten haben dasselbe Gelände und dieselbe Aufstellung; nur die Fraktionen unterscheiden sich. Die Spielerfraktion steht immer im Westen. Gefecht frei hat eine wählbare Dauer (8, 14, 24 Stellungsrunden oder offen) und endet mit einer Abschlussmeldung. Die Tageslage ist eine Woche aus 14 Stellungsrunden mit den Punkten aus Plan 8.3.
 
 - P12: Ablösen bewegt beide Gruppen in einer Stellungsrunde ohne Weg (zwölf Stunden reichen für den Laufgraben); abgelöst wird nur aus der eigenen Stellung. Auffüllen ist kein eigenes Werkzeug, sondern Teil von Ablösen (die Werkzeugreihe wird sonst zu lang). Erfahrung beim Auffüllen wird kaufmännisch gerundet, damit ein einzelner Grüner keine ganze Stufe kostet.
 
