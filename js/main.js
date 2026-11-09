@@ -6,7 +6,7 @@ import { dayKey, dayLabel } from './modes/skirmish.js';
 import { boardFor } from './modes/board.js';
 import { AFTERMATH, campaignAftermath } from './aftermath.js';
 
-export const VERSION = '1.5.0';
+export const VERSION = '1.6.0';
 const FIELD_DAY_KEY = 'lehmfront.berichtigt'; // Druckvermerk auf dem Titelblatt (P21)
 const MONTHS = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
 

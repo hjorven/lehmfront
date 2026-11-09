@@ -1,7 +1,7 @@
 // Szene "werkstatt": Missionseditor und Stellungsbau-Sandbox (P25, Plan 8 und 9).
 // Sandkasten: Graeben ohne Gegner zeichnen, der Ausbilder prueft auf Laengsfeuer und zeigt, wo ein MG stuende.
 // Missionseditor: Gelaende, Hoehen, Graeben, Draht, Truppen beider Seiten, Ziel und Frist; Probe spielen,
-// als Code oder Datei teilen, in der eigenen Mappe ablegen. Teilen uebers Netz kommt mit Supabase (P20).
+// als Code oder Datei teilen, in der eigenen Mappe ablegen, ins Netz stellen (Lageaustausch, Supabase-Tabelle lagen).
 // Parameter: tab=sand|mission, lage=<Code> (zum Bearbeiten laden), demo=sand|mission (fuer Screenshots).
 import { loadMap, lineCells } from '../map.js';
 import { createCamera, resizeCamera, centerOn, fitZoom, screenToWorld, zoomAt, panBy } from '../render/camera.js';
@@ -116,10 +116,19 @@ export async function mount(root, params = new URLSearchParams(location.search))
   if (params.get('lage')) {
     try { doc = usable(lageToDoc(await decodeLage(params.get('lage')))); note = doc ? 'Lage aus dem Code geladen.' : 'Die Karte im Code lässt sich nicht zeichnen.'; } catch (e) { note = e.message; }
   }
+  if (!doc && params.get('netz')) {
+    // Lage aus dem Netz (Lageaustausch): Kennung aus dem Link
+    try {
+      const net = await import('../net.js');
+      const r = await net.getLage(params.get('netz'));
+      if (!r.ok) note = r.why;
+      else { const lage = await decodeLage(r.lage.code); doc = lageProblems(lage).length ? null : usable(lageToDoc(lage)); note = doc ? `„${r.lage.title}“ aus dem Netz geladen.` : 'Diese Lage aus dem Netz ist kaputt.'; }
+    } catch (e) { note = e.message; }
+  }
   if (!doc && demo) doc = demoDoc(demo);
   if (!doc) { const saved = read(DRAFT_KEY, null); try { doc = saved ? usable(lageToDoc(saved)) : null; } catch { doc = null; } }
   if (!doc) doc = demoDoc('sand');
-  let tab = params.get('tab') === 'mission' || demo === 'mission' || params.get('lage') ? 'mission' : 'sand';
+  let tab = params.get('tab') === 'mission' || demo === 'mission' || params.get('lage') || params.get('netz') ? 'mission' : 'sand';
   let tool = 'fire', placeSide = 'a', placeType = 'rifles', autoTraverse = false;
   const undo = [];
 
@@ -438,7 +447,8 @@ export async function mount(root, params = new URLSearchParams(location.search))
         <div class="ws-row"><button type="button" class="btn" data-act="code">Code kopieren</button><button type="button" class="btn" data-act="link">Link kopieren</button><button type="button" class="btn" data-act="paste">Code einfügen</button></div>
         <div class="ws-row"><button type="button" class="btn" data-act="save">Als Datei sichern</button><button type="button" class="btn" data-act="load">Datei laden</button><input type="file" accept=".json,application/json" hidden></div>
         <pre class="ws-code" hidden></pre>
-        <p class="ws-status">Teilen über das Netz kommt mit dem Lageaustausch. Bis dahin reist eine Lage als Code oder Datei.</p>
+        <div class="ws-row"><button type="button" class="btn" data-act="net">Ins Netz stellen</button><button type="button" class="btn" data-act="netlist">Lagen aus dem Netz</button></div>
+        <ul class="ws-list ws-net" hidden></ul>
         <h2>Neues Blatt</h2>
         <div class="ws-row"><label>Größe<select data-opt="size">${opt(Object.values(SIZES).map((s) => [s.id, `${s.label} (${s.width} × ${s.height})`]), Object.values(SIZES).find((s) => s.width === doc.width)?.id ?? 'klein')}</select></label><button type="button" class="btn" data-act="new">Neues Blatt</button></div>
         <h2>Meine Lagen</h2><ul class="ws-list"></ul>
@@ -455,6 +465,21 @@ export async function mount(root, params = new URLSearchParams(location.search))
     const shelf = read(SHELF_KEY, []);
     ul.innerHTML = shelf.length ? shelf.map((s, i) => `<li><span class="grow">${esc(s.title)}<br><small>${esc(s.saved ?? '')}</small></span><button type="button" class="btn" data-open="${i}">Öffnen</button><button type="button" class="btn" data-del="${i}" aria-label="${esc(s.title)} löschen">Weg</button></li>`).join('')
       : '<li class="ws-status">Noch nichts abgelegt.</li>';
+  }
+
+  /** Neueste Lagen aus dem Netz in die Liste unter "Teilen" */
+  async function showNet() {
+    const ul = side.querySelector('.ws-net');
+    if (!ul) return;
+    ul.hidden = false;
+    const net = await import('../net.js');
+    if (!net.onlineEnabled()) { ul.innerHTML = '<li class="ws-status">Die Leitung zum Stab ist nicht geschaltet.</li>'; return; }
+    ul.innerHTML = '<li class="ws-status">Der Stab sucht ...</li>';
+    const r = await net.listLagen(20);
+    if (!r.ok) { ul.innerHTML = `<li class="ws-status">${esc(r.why)}</li>`; return; }
+    ul.innerHTML = r.list.length ? r.list.map((l) => `<li><span class="grow">${esc(l.title)}<br><small>${esc([l.author, 'Lage ' + l.id, l.mine ? 'von dir' : ''].filter(Boolean).join(' · '))}</small></span>
+        <button type="button" class="btn" data-netplay="${esc(l.id)}">Spielen</button><button type="button" class="btn" data-netopen="${esc(l.id)}">Öffnen</button>${l.mine ? `<button type="button" class="btn" data-netdel="${esc(l.id)}" aria-label="${esc(l.title)} aus dem Netz nehmen">Weg</button>` : ''}</li>`).join('')
+      : '<li class="ws-status">Noch keine Lage im Netz. Stell die erste hinein.</li>';
   }
 
   function updateHint() {
@@ -532,6 +557,35 @@ export async function mount(root, params = new URLSearchParams(location.search))
     } else if (act === 'link') {
       const code = await shareCode();
       if (code) copy(new URL('?scene=gefecht&lage=' + code, location.href).href, 'Der Link');
+    } else if (act === 'net') {
+      // Lageaustausch (Supabase): Code mit Titel und Verfasser ins Netz, die Kennung kommt zurueck
+      const code = await shareCode();
+      if (!code) return;
+      const net = await import('../net.js');
+      if (!net.onlineEnabled()) { flash('Die Leitung zum Stab ist nicht geschaltet. Code oder Link gehen immer.', true); return; }
+      flash('Lage geht an den Stab ...');
+      const r = await net.shareLage(code, doc.title || 'Eigene Lage', doc.author || '');
+      if (!r.ok) { flash(r.why, true); return; }
+      playSfx('stamp', { intensity: 0.5 });
+      copy(new URL('?scene=werkstatt&netz=' + r.id, location.href).href, `Im Netz als Lage ${r.id}. Der Link`);
+      if (!side.querySelector('.ws-net')?.hidden) showNet();
+    } else if (act === 'netlist') {
+      showNet();
+    } else if (b.dataset.netplay || b.dataset.netopen) {
+      const net = await import('../net.js');
+      const r = await net.getLage(b.dataset.netplay || b.dataset.netopen);
+      if (!r.ok) { flash(r.why, true); return; }
+      let lage;
+      try { lage = await decodeLage(r.lage.code); } catch (err) { flash(err.message, true); return; }
+      const bad = lageProblems(lage);
+      if (bad.length) { flash(`Diese Lage ist kaputt: ${bad[0]}`, true); return; }
+      if (b.dataset.netplay) location.href = '?scene=gefecht&lage=' + r.lage.code;
+      else adopt(lageToDoc(lage), `„${r.lage.title}“ aus dem Netz geöffnet.`);
+    } else if (b.dataset.netdel) {
+      const net = await import('../net.js');
+      const r = await net.deleteLage(b.dataset.netdel);
+      flash(r.ok ? 'Aus dem Netz genommen.' : r.why, !r.ok);
+      if (r.ok) showNet();
     } else if (act === 'paste') {
       const text = prompt('Lage-Code einfügen (beginnt mit L1.)');
       if (!text) return;

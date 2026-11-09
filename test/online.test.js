@@ -245,3 +245,16 @@ test('Edge Functions: logic.ts auf genau einen Commit gepinnt, exportiert nur Vo
     assert.ok(!idx.includes('_shared'), `${fn} importiert noch die alte Kopie`);
   }
 });
+
+test('Lageaustausch: RLS an, lesen für alle, anlegen und löschen nur eigene, ändern niemand, Grenze je Spieler', () => {
+  const sql = read('supabase/migrations/0002_lagen.sql');
+  assert.match(sql, /alter table public\.lagen enable row level security/);
+  assert.match(sql, /policy "lagen lesbar" on public\.lagen for select using \(true\)/);
+  assert.match(sql, /for insert to authenticated with check \(user_id = \(select auth\.uid\(\)\)\)/);
+  assert.match(sql, /for delete to authenticated using \(user_id = \(select auth\.uid\(\)\)\)/);
+  assert.ok(!/for update/.test(sql), 'keine Update-Policy');
+  assert.match(sql, /revoke update on public\.lagen from anon, authenticated/);
+  assert.match(sql, /code like 'L1\.%'/);
+  assert.match(sql, />= 20/);
+  assert.match(sql, /set search_path = ''/);
+});
