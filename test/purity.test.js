@@ -4,9 +4,10 @@ import assert from 'node:assert/strict';
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 
 const root = new URL('../js/', import.meta.url);
-const files = ['rules.js', 'resolve.js', 'state.js', 'orders.js', 'view.js', 'events.js', 'map.js', 'supply.js', 'artillery.js', 'etappe.js', 'sight.js', 'weather.js', 'ui/daytime.js', 'film.js', 'archive.js', 'trench.js', 'audio/cues.js']
+const files = ['rules.js', 'resolve.js', 'state.js', 'orders.js', 'view.js', 'events.js', 'map.js', 'supply.js', 'artillery.js', 'etappe.js', 'sight.js', 'weather.js', 'ui/daytime.js', 'film.js', 'archive.js', 'trench.js', 'audio/cues.js', 'letters.js']
   .filter((f) => existsSync(new URL(f, root)))
-  .concat(readdirSync(new URL('phases/', root)).filter((f) => f.endsWith('.js')).map((f) => 'phases/' + f));
+  .concat(readdirSync(new URL('phases/', root)).filter((f) => f.endsWith('.js')).map((f) => 'phases/' + f))
+  .concat(readdirSync(new URL('narrative/', root)).filter((f) => f.endsWith('.js')).map((f) => 'narrative/' + f));
 
 const FORBIDDEN = [
   [/Math\.random/, 'Math.random'],

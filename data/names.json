@@ -1,11 +1,12 @@
 {
   "version": 1,
-  "note": "Namenslisten pro Fraktion (Plan 2.3). Heimatorte aus data/texts/welt.md. 'reserved' sind Hauptfiguren und werden nie zufaellig vergeben.",
+  "note": "Namenslisten pro Fraktion (Plan 2.3). Heimatorte aus data/texts/welt.md. 'reserved' sind Hauptfiguren und werden nie zufaellig vergeben. 'soldierLast' sind zusaetzliche Nachnamen nur fuer Gefallenenliste und Feldpost (P15).",
   "kaldern": {
     "first": ["Ilse", "Otto", "Jost", "Hinrich", "Wiebke", "Arend", "Geske", "Tjark", "Maren", "Dirk", "Hilke", "Eilert", "Antje", "Folkert", "Swantje", "Remmer"],
     "last": ["Brandt", "Harms", "Vell", "Boysen", "Tiedemann", "de Groot", "Wessel", "Lohmann", "Fedders", "Albers", "Janssen", "Ubben", "ter Veen", "Dreesmann", "Kollmeyer", "Siebels"],
     "homes": ["Haverstadt", "Wessel", "Fennhusen", "Ostmoor", "Kelling", "Weddersiel", "Brookdorp", "Tjarksfehn", "Lüttmarsch", "Hollerbrügge", "Sandrup", "Grauwarf"],
     "reserved": ["Ilse Brandt", "Otto Harms", "Jost Vell"],
+    "soldierLast": ["Hinrichs", "Onken", "Behrens", "Garrelts", "Popken", "Meinders", "Eilers", "Thaden", "Rademacher", "Harders", "Gerdes", "Wübben", "Olthoff", "Bruns"],
     "women": true
   },
   "morrow": {
@@ -14,6 +15,7 @@
     "last": ["Lask", "Kalnis", "Ozols", "Vaitkus", "Mirek", "Dravin", "Berzin", "Sorek", "Lenart", "Vilks", "Pakaln", "Strazdin", "Rudovic", "Kovaar", "Melnis", "Zarenko"],
     "homes": ["Dravask", "Sarneva", "Velsk", "Kurmija", "Ravelsk", "Tolmena", "Zirgaly", "Ozolin", "Brasta", "Lenartovo", "Mirava", "Daugel"],
     "reserved": ["Teodor Lask"],
+    "soldierLast": ["Zarins", "Petrovs", "Liepa", "Krumins", "Balodis", "Danek", "Novak", "Rimkus", "Jankus", "Vasko"],
     "women": false
   }
 }

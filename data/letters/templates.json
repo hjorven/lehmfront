@@ -373,6 +373,76 @@
       "text": "Es war ruhig. Hier heißt das nur, dass die anderen auch warten."
     },
     {
+      "id": "ereignis.regen.2",
+      "art": "ereignis",
+      "kategorie": "regen",
+      "ton": "erschoepft",
+      "text": "Der Regen kommt waagerecht über die Weide. Im Unterstand tropft es auf die Decke, auf das Brot und auf diesen Brief."
+    },
+    {
+      "id": "ereignis.regen.3",
+      "art": "ereignis",
+      "kategorie": "regen",
+      "ton": "verbittert",
+      "text": "Es regnet. Hinten im Stab haben sie ein Dach, und morgen steht im Bericht, die Stimmung sei gut."
+    },
+    {
+      "id": "ereignis.post.2",
+      "art": "ereignis",
+      "kategorie": "post",
+      "ton": "erschoepft",
+      "text": "Die Post kam heute mit der Lore. Deinen Brief habe ich erst am Abend gelesen, weil ich ihn mir aufheben wollte wie ein Stück Kuchen."
+    },
+    {
+      "id": "ereignis.post.3",
+      "art": "ereignis",
+      "kategorie": "post",
+      "ton": "zuversichtlich",
+      "text": "Heute kam Post, und {kamerad_nachname} hat ein Paket mit Zwieback bekommen. Wir haben geteilt, gerecht, bis auf den letzten Krümel."
+    },
+    {
+      "id": "ereignis.nacht.3",
+      "art": "ereignis",
+      "kategorie": "nacht",
+      "ton": "verbittert",
+      "text": "Die Nacht war laut, {ort}. Am Morgen hieß es, es sei nichts gewesen."
+    },
+    {
+      "id": "ereignis.depot_leer.3",
+      "art": "ereignis",
+      "kategorie": "mangel",
+      "ton": "erschoepft",
+      "text": "Die Munition ist knapp. Abends zählen wir die Patronen wie Geld."
+    },
+    {
+      "id": "ereignis.lore.3",
+      "art": "ereignis",
+      "kategorie": "versorgung",
+      "ton": "zuversichtlich",
+      "text": "Die Lore kam pünktlich, mit Brot, Patronen und einem Sack Zwiebeln, den niemand bestellt hatte."
+    },
+    {
+      "id": "ereignis.abloesung.3",
+      "art": "ereignis",
+      "kategorie": "abloesung",
+      "ton": "zuversichtlich",
+      "text": "Morgen werden wir abgelöst. {kamerad_nachname} hat schon das Rasierzeug herausgelegt."
+    },
+    {
+      "id": "ereignis.essen.3",
+      "art": "ereignis",
+      "kategorie": "warme_mahlzeit",
+      "ton": "verbittert",
+      "text": "Heute gab es warmes Essen. Es hat für alle gereicht, weil nicht mehr alle da sind."
+    },
+    {
+      "id": "ereignis.verwundet.3",
+      "art": "ereignis",
+      "kategorie": "verwundet",
+      "ton": "erschoepft",
+      "text": "{kamerad} ist verwundet. Ich habe den Verband gehalten, bis die Lore kam, und jetzt kann ich die Hände nicht sauber waschen."
+    },
+    {
       "id": "feldpost.zuversichtlich.01",
       "art": "feldpost",
       "ton": "zuversichtlich",
