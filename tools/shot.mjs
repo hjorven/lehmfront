@@ -4,6 +4,7 @@
 //   node tools/shot.mjs --path "/?debug=1" --name gefecht
 //   node tools/shot.mjs --dark                   zusaetzlich mit prefers-color-scheme: dark
 //   node tools/shot.mjs --check                  nur pruefen: keine Konsolenfehler, keine 404 (fuer CI)
+//   node tools/shot.mjs --tablet                 zusaetzlich iPad hochkant (820 x 1180) und quer (1180 x 820), mit Touch
 // Playwright ist im Container vorinstalliert; lokal sonst: npm i -D playwright && npx playwright install chromium
 import { createRequire } from 'node:module';
 import { mkdirSync } from 'node:fs';
@@ -27,6 +28,10 @@ const viewports = [
   { label: 'desktop', viewport: { width: 1280, height: 800 } },
   { label: 'handy', viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true },
 ];
+if (args.includes('--tablet')) viewports.push(
+  { label: 'tablet-hoch', viewport: { width: 820, height: 1180 }, isMobile: true, hasTouch: true },
+  { label: 'tablet-quer', viewport: { width: 1180, height: 820 }, isMobile: true, hasTouch: true },
+);
 const schemes = dark ? ['light', 'dark'] : ['light'];
 mkdirSync('shots', { recursive: true });
 

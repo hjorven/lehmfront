@@ -51,7 +51,7 @@
 .hint-title{display:block;font:400 15px/1.2 var(--font-head);margin-bottom:3px}
 
 /* ---------- Rundenende-Checkliste ---------- */
-.check{position:absolute;left:12px;bottom:12px;width:min(250px,22vw);padding:9px 12px 10px;font-size:13px}
+.check{position:absolute;left:12px;bottom:12px;width:min(250px,max(22vw,220px));padding:9px 12px 10px;font-size:13px}
 /* P12: die Liste waechst mit den Pruefpunkten; ueber der Werkzeugreihe enden und selbst scrollen */
 @media (min-width:701px){.check{bottom:100px;max-height:calc(100% - 590px);min-height:120px;overflow-y:auto}}
 .check-list{list-style:none;margin:6px 0 0;padding:0}
@@ -101,6 +101,7 @@
 .shield .preview{margin-top:6px;padding:4px 6px;border-left:3px solid var(--accent);background:var(--track);font-size:12.5px}
 .shield .preview.bad{border-left-color:var(--danger)}
 .shield .preview{white-space:pre-line}
+.shield .armed{margin-top:5px;font:700 17px/1.1 var(--font-hand);color:var(--ink)}
 .shield .rows .warn{color:var(--danger)}
 .shield.compact .rows,.shield.compact .type{display:none}
 
@@ -189,6 +190,18 @@
 .stamp{display:inline-block;margin:0 0 12px;padding:2px 8px;border:2px solid var(--danger);color:var(--danger);font:400 14px var(--font-head);text-transform:uppercase;letter-spacing:.08em;transform:rotate(-8deg);opacity:.85}
 
 /* ---------- Handy hochkant (Plan 7.2: Kaertchen klappen zu einer Leiste, Stil 07 Seitenleiste) ---------- */
+/* Tablet und schmale Fenster: Werkzeuge etwas schmaler, Rundenkaertchen rutscht hochkant unter die Ressourcen */
+@media (min-width:700px) and (max-width:1399px){
+  .tool{width:64px;height:64px;font-size:12px}
+}
+@media (min-width:700px) and (max-width:899px){
+  .round{top:84px;left:244px;right:136px;max-width:none}
+}
+/* Finger statt Maus: Pruefpunkte und kleine Textknoepfe bekommen mehr Flaeche */
+@media (pointer:coarse){
+  .check-list li{padding:0}
+  .check-list button{padding:6px 0;min-height:32px}
+}
 @media (max-width:699px){
   .hud-strip{position:absolute;left:8px;right:126px;top:calc(8px + env(safe-area-inset-top));display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:44px;padding:6px 10px;font:12.5px/1.25 var(--font-ui);text-align:left}
   .strip-vals{display:block}
@@ -230,3 +243,4 @@
 /* Hotseat: bei der Uebergabe darf die naechste Person die Karte mit fremden Befehlen nicht sehen */
 .modal-back.handover{background:var(--paper)}
 .strip-vals .nw{white-space:nowrap}
+.gefecht.picking .shield{pointer-events:none}

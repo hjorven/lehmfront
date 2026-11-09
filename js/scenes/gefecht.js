@@ -17,6 +17,7 @@ import {
 import { createMapLayer, sheetBounds, FONTS } from '../render/map-layer.js';
 import { drawBattle, hitUnit, unitBox } from '../render/units-layer.js';
 import { playSfx, audio } from '../audio/engine.js';
+import { getSetting } from '../settings.js';
 import { frontAmbience } from '../audio/director.js';
 import { mountSoundControls } from '../ui/sound.js';
 import { decide } from '../ai.js';
@@ -77,6 +78,8 @@ import { createKoop } from '../ui/koop.js';
 const num = (v, d) => (v === null || v === '' || !Number.isFinite(Number(v)) ? d : Number(v));
 const LONG_PRESS_MS = 430;
 const NARROW = 700;
+// Finger als Hauptzeiger (Tablet, Handy): Hinweise sprechen von Antippen statt Klicken und Tasten
+const coarse = () => typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches;
 
 export async function mount(root, params) {
   const fetchJson = (url) => fetch(url).then((r) => { if (!r.ok) throw new Error('Datei fehlt: ' + url); return r.json(); });
@@ -195,6 +198,8 @@ export async function mount(root, params) {
     const cx = own.length ? own.reduce((s, g) => s + g.pos.x, 0) / own.length : map.width / 2;
     const vw = root.clientWidth, vh = root.clientHeight;
     if (vw < NARROW) centerOn(cam, side === 'a' ? cx + 4 : cx - 4, map.height * 0.42, Math.max(fitZoom(cam), vw / 20));
+    // Tablet hochkant: Karte fuellt die Hoehe, Ausschnitt um die eigene Stellung bis ins Niemandsland
+    else if (vh > vw * 1.15) centerOn(cam, side === 'a' ? cx + 5 : cx - 5, map.height * 0.5, Math.max(fitZoom(cam), Math.min(vw / 26, vh / 38)));
     else centerOn(cam, map.width * 0.5, map.height * 0.5 + 1, Math.max(fitZoom(cam), Math.min(vw / 50, vh / 34)));
   }
   homeView();
@@ -248,6 +253,7 @@ export async function mount(root, params) {
     drawBattle(dctx, cam, dpr, currentTheme(), {
       state, map: liveMap, cells: seenCells, side, groups, ghosts, orders, reach, selectedId, planning: !modalOpen, anim,
       hover: tool?.pick ? tool.hoverCell : null,
+      armed: tool?.pick ? tool.armed ?? null : null,
       preview: prev ? { ...prev, group: tool.group.id, cell: tool.hoverCell, ok: prev.ok ?? !!prev.path } : null,
       sightLine: !tool && hoverSight ? hoverSight : null,
       overlays: [artilleryOverlay(state), ...(decor ? [{ draw: decor }] : []), ...activeOverlays(),
@@ -462,7 +468,7 @@ export async function mount(root, params) {
     if (!helpShown && !ordersNow().length && state.turn === 1) {
       return { title: 'Hinweis', text: narrow()
         ? 'Gruppe antippen und Befehl wählen, oder lang drücken für Befehle im Kreis.'
-        : 'Gruppe anklicken, dann Bewegen (B) oder Halten (H). Lang drücken oder Rechtsklick öffnet die Befehle im Kreis.' };
+        : (coarse() ? 'Gruppe antippen, dann Bewegen oder Halten wählen. Lang drücken öffnet die Befehle im Kreis.' : 'Gruppe anklicken, dann Bewegen (B) oder Halten (H). Lang drücken oder Rechtsklick öffnet die Befehle im Kreis.') };
     }
     return null;
   }
@@ -586,7 +592,8 @@ export async function mount(root, params) {
         ${g.suppressed >= 0.3 ? `<div class="warn"><span>Unter Feuer</span><b>${g.suppressed >= PINNED ? 'niedergehalten' : 'geduckt'}</b></div>` : ''}
       </div>
       <footer><span>Befehl</span><b>${esc(orderText(g, o))}</b></footer>
-      ${prev?.text ? `<div class="preview${(prev.ok ?? !!prev.path) ? '' : ' bad'}">${esc(prev.text)}</div>` : ''}`, shieldAnchor(g));
+      ${prev?.text ? `<div class="preview${(prev.ok ?? !!prev.path) ? '' : ' bad'}">${esc(prev.text)}</div>` : ''}
+      ${prev && tool.armed ? '<div class="armed">Noch einmal antippen: Befehl setzen</div>' : ''}`, shieldAnchor(g));
   }
   // Boden unter der Gruppe (P10): Schlamm oder Wasser im Graben
   function groundRow(g) {
@@ -635,7 +642,7 @@ export async function mount(root, params) {
     def.begin({
       group: g, state, map: liveMap, side, cam,
       setOrder: (o) => placeOrder(o),
-      pickCell: (req) => { if (tool !== t) return; t.pick = req; t.pickHint = req.hint; refresh(); },
+      pickCell: (req) => { if (tool !== t) return; t.pick = req; t.armed = null; t.pickHint = req.hint; refresh(); },
       hint: (text) => flash(text, 'warn'),
       cancel: () => { if (tool === t) cancelTool(); },
       ui,
@@ -1016,6 +1023,7 @@ export async function mount(root, params) {
       const cell = p ? cellFromScreen(p).cell : null;
       if (cell === tool.hoverCell) return;
       tool.hoverCell = cell;
+      if (tool.armed && cell !== tool.armed) tool.armed = null; // Maus nach Finger (Tablet mit Maus): Vormerkung verfaellt
       tool.preview = cell ? tool.pick.preview(cell) : null;
       updateShield();
       drawDyn();
@@ -1033,6 +1041,15 @@ export async function mount(root, params) {
         if (!cell) return;
         tool.hoverCell = cell;
         tool.preview = tool.pick.preview(cell);
+        // Finger haben kein Hover: das erste Antippen merkt das Ziel mit Bleistift vor und zeigt Weg und Kosten,
+        // das zweite auf dasselbe Feld setzt den Befehl (Dienstbuch: "Ziel antippen")
+        if (p.touch && tool.preview && (tool.preview.ok ?? !!tool.preview.path) && tool.pick.confirm !== false && getSetting('tap') === 'confirm' && tool.armed !== cell) {
+          tool.armed = cell;
+          playSfx('pencil', { count: 1, intensity: 0.2 });
+          refresh();
+          return;
+        }
+        tool.armed = null;
         const t = tool;
         if (t.pick.pick(cell)) { if (tool === t) cancelTool(); }
         else refresh();
@@ -1172,7 +1189,7 @@ export async function mount(root, params) {
       e.preventDefault();
       e.stopPropagation();
       const cell = cellAt(map, Math.floor(cam.x), Math.floor(cam.y));
-      if (cell) { const t = tool; if (t.pick.pick(cell)) { if (tool === t) cancelTool(); } }
+      if (cell) { const t = tool; t.armed = null; if (t.pick.pick(cell)) { if (tool === t) cancelTool(); } else refresh(); }
     }
   });
 
@@ -1230,6 +1247,7 @@ export async function mount(root, params) {
     get state() { return state; }, get book() { return book; }, map, cam,
     select: (id) => select(id, { center: false }),
     order: (o) => placeOrder(o),
+    get toolInfo() { return tool ? { id: tool.def.id, armed: tool.armed ?? null, preview: tool.preview, hover: tool.hoverCell, group: tool.group?.id ?? null } : null; },
     tool: (id, extra) => startTool(allTools().find((t) => t.id === id), selectedOwn(), extra),
     hover: (x, y) => { if (tool?.pick) { tool.hoverCell = cellAt(map, x, y); tool.preview = tool.pick.preview(tool.hoverCell); refresh(); } },
     radial: (id) => { const g = getGroup(state, id); const p = worldToScreen(cam, g.pos.x + 0.5, g.pos.y + 0.5); const r = root.getBoundingClientRect(); openRadial(g, p.x + r.left, p.y + r.top); },

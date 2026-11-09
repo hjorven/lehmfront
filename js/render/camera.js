@@ -103,13 +103,15 @@ export function applyCameraTransform(ctx, cam, dpr = 1) {
 
 /**
  * Bedienung: Ziehen (Maus, Finger), Pinch mit zwei Fingern, Mausrad und Trackpad-Pinch (ctrlKey),
- * Pfeiltasten und + / - (am Element oder am Fenster), Doppelklick zoomt hinein. Nach dem Loslassen gleitet die Karte kurz nach.
- * onChange() wird nach jeder Kamerabewegung gerufen, onTap({x,y}) bei Antippen ohne Ziehen (Bildschirmkoordinaten),
+ * Pfeiltasten und + / - (am Element oder am Fenster), Doppelklick zoomt hinein (mit der Maus; mit dem Finger nicht). Nach dem Loslassen gleitet die Karte kurz nach.
+ * onChange() wird nach jeder Kamerabewegung gerufen, onTap({x,y,touch}) bei Antippen ohne Ziehen (Bildschirmkoordinaten,
+ * touch = mit dem Finger, also ohne vorheriges Hover),
  * onHover({x,y}|null) bei Mausbewegung.
  */
 export function attachCameraControls(el, cam, { onChange = () => {}, onTap = () => {}, onHover = () => {}, keyTarget = window } = {}) {
   const pointers = new Map();
   let pinch = null, dragMoved = 0, last = null, vel = { x: 0, y: 0 }, glide = 0, downAt = null;
+  let lastType = 'mouse';
   const local = (e) => {
     const r = el.getBoundingClientRect();
     return { x: e.clientX - r.left, y: e.clientY - r.top };
@@ -123,10 +125,11 @@ export function attachCameraControls(el, cam, { onChange = () => {}, onTap = () 
   const down = (e) => {
     if (e.button !== undefined && e.button > 0 && e.pointerType === 'mouse') return;
     stopGlide();
+    lastType = e.pointerType;
     el.setPointerCapture?.(e.pointerId);
     const p = local(e);
     pointers.set(e.pointerId, p);
-    if (pointers.size === 1) { dragMoved = 0; last = { ...p, t: e.timeStamp }; vel = { x: 0, y: 0 }; downAt = p; }
+    if (pointers.size === 1) { dragMoved = 0; last = { ...p, t: e.timeStamp }; vel = { x: 0, y: 0 }; downAt = { ...p, touch: e.pointerType === 'touch' || e.pointerType === 'pen' }; }
     if (pointers.size === 2) { pinch = pinchState(); dragMoved = 99; vel = { x: 0, y: 0 }; }
   };
   const move = (e) => {
@@ -198,6 +201,8 @@ export function attachCameraControls(el, cam, { onChange = () => {}, onTap = () 
     onChange();
   };
   const dbl = (e) => {
+    // Mit dem Finger heisst zweimal Tippen "Ziel bestaetigen" (Gefecht), gezoomt wird dort mit zwei Fingern
+    if (lastType === 'touch' || lastType === 'pen') return;
     const p = local(e);
     zoomAt(cam, e.shiftKey ? 0.5 : 2, p.x, p.y);
     onChange();
@@ -219,7 +224,7 @@ export function attachCameraControls(el, cam, { onChange = () => {}, onTap = () 
     e.preventDefault();
     onChange();
   };
-  const leave = () => onHover(null);
+  const leave = (e) => { if (e.pointerType === 'mouse') onHover(null); }; // ein abgehobener Finger 'verlaesst' das Element, ohne zu hovern
 
   el.style.touchAction = 'none';
   el.addEventListener('pointerdown', down);

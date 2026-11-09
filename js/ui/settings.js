@@ -23,6 +23,7 @@ const LABELS = {
   text: ['Textgröße', { 0.9: 'klein', 1: 'normal', 1.15: 'groß', 1.3: 'sehr groß' }, 'Kärtchen, Telegramm, Protokoll und Menüs.'],
   signs: ['Signaturen', { false: 'nur Farbe', true: 'Farbe und Form' }, 'Gegner mit Doppelrahmen, Warnzeilen mit Zeichen. Hilft bei Farbsehschwäche.'],
   contrast: ['Kontrast', { false: 'normal', true: 'hoch' }, 'Kräftigere Linien und Hilfstexte, auch in der Dämmerung.'],
+  tap: ['Ziel antippen', { confirm: 'vormerken, dann setzen', direct: 'sofort setzen' }, 'Nur mit dem Finger: Das erste Antippen zeichnet das Ziel mit Bleistift vor und zeigt Weg und Kosten, das zweite setzt den Befehl.'],
 };
 
 // Feste Tasten (Plan 7.6); die Werkzeuge melden ihre Tasten selbst im Register an
@@ -44,6 +45,17 @@ const FIXED_KEYS = [
     ['Pfeil links und rechts', 'Phase zurück oder vor'],
     ['Esc', 'Film überspringen'],
   ]],
+];
+
+// Gegenstuecke der Tasten fuer Touch (Handy, Tablet)
+const TOUCH = [
+  ['Gruppe antippen', 'wählen; Befehl unten in der Werkzeugreihe'],
+  ['Lang drücken', 'Befehle der Gruppe im Kreis'],
+  ['Ziel antippen', 'vormerken (Bleistift), noch einmal antippen setzt den Befehl'],
+  ['Ziehen, zwei Finger', 'Karte schieben und zoomen'],
+  ['Lasche an der Werkzeugreihe', 'weitere Befehle; die Zahl sagt, wie viele noch verdeckt sind'],
+  ['„Vor der Runde“', 'Prüfpunkt antippen springt zur Gruppe (wie Leertaste)'],
+  ['Befehle, Overlays, Lehrling, Menü', 'Knöpfe oben rechts (wie Tab, 1 bis 4, T, O)'],
 ];
 
 let open = null;
@@ -239,7 +251,7 @@ export function openSettings({ tab = 'akten', game = null, container = document.
     const block = (title, rows) => `<section class="set-keys"><h3>${esc(title)}</h3><dl>${rows.map(([k, v]) =>
       `<div><dt>${k.split(' ').map((p) => (/^(oder|bis|und|\+)$/.test(p) ? esc(p) : `<kbd>${esc(p)}</kbd>`)).join(' ')}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl></section>`;
     panel.innerHTML = block('Befehle', tools) + FIXED_KEYS.map(([t, rows]) => block(t, rows)).join('')
-      + '<p class="set-help">Auf dem Handy: Gruppe antippen und Befehl wählen, lang drücken öffnet die Befehle im Kreis.</p>';
+      + `<section class="set-keys"><h3>Mit dem Finger</h3><dl>${TOUCH.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl></section>`;
   }
 
   // ---------- Ereignisse ----------
