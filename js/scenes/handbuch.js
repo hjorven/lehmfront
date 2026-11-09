@@ -6,6 +6,9 @@ import { HANDBOOK_INTRO, HANDBOOK_ROUND, HANDBOOK_VALUES, HANDBOOK_TERMS, HANDBO
 import { FIXED_KEYS, TOUCH } from '../ui/settings.js';
 import { DRILL_PATH, readDrill } from '../config/drill.js';
 
+/** Ausfuehrliche Anleitung mit Bildern (docs/tutorial.md im Repository) */
+export const TUTORIAL_URL = 'https://github.com/hjorven/lehmfront/blob/main/docs/tutorial.md';
+
 const PARTS = [
   ['runde', 'Eine Runde'],
   ['werte', 'Die Werte'],
@@ -34,6 +37,7 @@ export async function mount(root, params) {
       <p class="hb-intro">${esc(HANDBOOK_INTRO)}</p>
       <nav class="hb-toc" aria-label="Abschnitte">${PARTS.map(([id, t]) => `<a href="#hb-${id}">${esc(t)}</a>`).join('')}</nav>
       <p class="hb-actions"><a class="btn hb-go" href="${DRILL_PATH}">${drilled ? 'Grundausbildung wiederholen' : 'Grundausbildung beginnen'}</a>
+        <a class="btn" href="${TUTORIAL_URL}" target="_blank" rel="noopener">Anleitung mit Bildern</a>
         <a class="btn" href="./">Hauptmenü</a></p>
     </header>
     <section id="hb-runde" class="hb-part"><h2>Eine Runde in fünf Schritten</h2>
