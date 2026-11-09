@@ -21,6 +21,7 @@
   body.menu{
     --paper:#0b0d0a; --card:#15180f; --ink:#d8d2b8; --ink2:#8f8a73; --line:#3a3f2c; --track:#262a1e;
     --own:#7fa4e6; --enemy:#e2645a; --accent:#ffbf47; --danger:#e2645a; --shadow:0 2px 6px rgba(0,0,0,.6);
+    --scrim:rgba(0,0,0,.55);
   }
 }
 

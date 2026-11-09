@@ -29,10 +29,9 @@
 .gefecht .btn:active,.gefecht .tool:active,.gefecht .exec:active{translate:0 1px}
 .gefecht .axis .fill{transition:width var(--dur-slow) var(--ease-paper)}
 
-.res .v .was{display:inline-block;margin-right:6px;font-weight:400;color:var(--ink2);
+.res .v .was,.strip-vals .was{display:inline-block;margin-right:4px;font-weight:400;color:var(--ink2);
   text-decoration:line-through 2px var(--danger);animation:lf-was 2.6s linear both}
 
 @media (prefers-reduced-motion:reduce){
   .gefecht *,.gefecht *::before,.gefecht *::after{animation:none !important;transition:none !important}
-  .res .v .was{display:none}
 }

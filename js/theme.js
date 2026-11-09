@@ -150,6 +150,7 @@ export function applyTheme(theme, el = typeof document !== 'undefined' ? documen
   if (el) {
     for (const k of CSS_KEYS) el.style.setProperty('--' + k, theme[k]);
     el.style.setProperty('--shadow', theme.dark ? '0 2px 6px rgba(0,0,0,.6)' : '0 1px 2px rgba(40,30,10,.18)');
+    el.style.setProperty('--scrim', theme.dark ? 'rgba(0,0,0,.55)' : 'rgba(20,16,10,.45)');
     el.dataset.daytime = theme.darkness >= NIGHT_FROM ? 'nacht' : theme.darkness > 0.15 ? 'daemmerung' : 'tag';
   }
   for (const fn of listeners) fn(theme);

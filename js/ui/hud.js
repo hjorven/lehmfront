@@ -60,7 +60,7 @@ export function createHud(root, { onToggleList, onToggleOverlay, onCheck, onTogg
 
   let lastChecks = [];
   let lastClock = null;
-  const prev = {}, was = {}, wasTimer = {};
+  const prevBySide = {}, wasBySide = {}, wasTimer = {};
   const WAS_MS = 2600;
   let lastSide;
   return {
@@ -73,19 +73,31 @@ export function createHud(root, { onToggleList, onToggleOverlay, onCheck, onTogg
     },
     update(m) {
       const s = m.supplies;
-      // Hotseat: die andere Seite darf die Zahlen der ersten nicht durchgestrichen sehen
-      if (m.side !== lastSide) { lastSide = m.side; for (const k of Object.keys(prev)) delete prev[k]; for (const k of Object.keys(was)) delete was[k]; }
-      // Bleistiftkorrektur (P19): aendert sich ein Wert, steht der alte kurz durchgestrichen davor
+      // Bleistiftkorrektur (P19): aendert sich ein Wert, steht der alte kurz durchgestrichen davor.
+      // Je Seite getrennt (Hotseat: keine fremden Zahlen); waehrend des Phasenfilms wartet sie auf die Karte.
+      const side = m.side ?? 'a';
+      const prev = prevBySide[side] ??= {};
+      const was = wasBySide[side] ??= {};
+      if (side !== lastSide) { lastSide = side; for (const k of Object.keys(was)) delete was[k]; }
+      const filming = !!el.closest('.filming');
+      const marks = {};
       const set = (k, v, num) => {
         const now = performance.now();
         if (num !== undefined && prev[k] !== undefined && prev[k] !== num) was[k] = { old: prev[k], t0: now };
-        prev[k] = num;
+        if (num !== undefined) prev[k] = num;
         const w = was[k];
+        // waehrend des Films festhalten; die 2,6 s beginnen erst, wenn die Karte wieder frei ist
+        if (w && filming) { w.t0 = now; w.held = true; } else if (w?.held) { w.t0 = now; w.held = false; }
         const age = w ? now - w.t0 : Infinity;
         if (w && age >= WAS_MS) delete was[k];
         const mark = age < WAS_MS ? `<s class="was" aria-hidden="true" style="animation-delay:-${Math.round(age)}ms">${esc(w.old)}</s>` : '';
+        marks[k] = mark;
+        if (filming) clearTimeout(wasTimer[k]);
         el.querySelector(`.res[data-k="${k}"] .v`).innerHTML = mark + v;
-        if (mark) { clearTimeout(wasTimer[k]); wasTimer[k] = setTimeout(() => el.querySelector(`.res[data-k="${k}"] .was`)?.remove(), WAS_MS - age); }
+        if (mark && !filming) {
+          clearTimeout(wasTimer[k]);
+          wasTimer[k] = setTimeout(() => el.querySelectorAll(`.res[data-k="${k}"] .was, .strip-vals .was[data-k="${k}"]`).forEach((n) => n.remove()), WAS_MS - age);
+        }
       };
       set('carts', `${esc(s.carts ?? 0)}<small>/${esc(s.cartsTotal ?? s.carts ?? 0)}</small>`);
       set('ammo', esc(s.ammo ?? 0), s.ammo ?? 0);
@@ -97,7 +109,8 @@ export function createHud(root, { onToggleList, onToggleOverlay, onCheck, onTogg
       el.querySelectorAll('.axis .fill')[1].style.width = Math.max(0, Math.min(100, m.trust)) + '%';
       $('.round-title').textContent = m.roundTitle;
       $('.round-sub').textContent = m.roundSub;
-      $('.strip-vals').innerHTML = `Loren <b>${esc(s.carts ?? 0)}/${esc(s.cartsTotal ?? s.carts ?? 0)}</b> · Mun <b>${esc(s.ammo ?? 0)}</b> · Mat <b>${esc(s.material ?? 0)}</b> · Moral <b>${esc(m.morale)}</b>`;
+      const sm = (k) => (marks[k] ? marks[k].replace('<s class="was"', `<s class="was" data-k="${k}"`) : '');
+      $('.strip-vals').innerHTML = `Loren <b>${esc(s.carts ?? 0)}/${esc(s.cartsTotal ?? s.carts ?? 0)}</b> · Mun ${sm('ammo')}<b>${esc(s.ammo ?? 0)}</b> · Mat ${sm('material')}<b>${esc(s.material ?? 0)}</b> · Moral ${sm('morale')}<b>${esc(m.morale)}</b>`;
       $('.strip-round').textContent = m.stripRound;
       // Uhr (P06): nur neu setzen, wenn sie sich aendert, sonst startet das Einrasten bei jedem Neuzeichnen neu
       if (m.clock && m.clock.big !== lastClock) {
