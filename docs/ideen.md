@@ -38,3 +38,5 @@ Neue Ideen landen hier, nicht im Code (Plan 13). Mit Datum und Paket, aus dem si
 - 2026-11-09, P25: Der Ausbilder im Sandkasten könnte sich an frühere Stellungen erinnern („Letzte Woche war das besser.“) und nach drei sauberen Stellungen eine eigene Puzzle-Lage aus der Stellung des Spielers machen.
 - 2026-11-09, P25: Geteilte Lagen könnten den Namen des Verfassers als Bleistiftunterschrift unten auf dem Blatt tragen, und wer sie löst, setzt sein Kürzel daneben (Umlaufmappe).
 - 2026-11-09, P25: Im Koop könnten die Zettel zwischen Nord und Süd am Ende als kleiner Stapel in der Abschlussmeldung liegen.
+- 2026-11-09, P23: Albers könnte ein Horchbuch führen (Bleistifteinträge je Nacht: „Klopfen, 3 Schläge“, „Pfeifen, ein Lied“), das nach einer Sprengung mit „Kein Pfeifen mehr“ endet.
+- 2026-11-09, P23: Gefangene aus einem Stoßtrupp könnten im nächsten Akt als Namen in der Feldpost der Gegenseite auftauchen.
