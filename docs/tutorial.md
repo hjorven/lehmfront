@@ -47,7 +47,25 @@ Beim ersten Besuch steht neben **Grundausbildung** mit Bleistift „Neu hier? Hi
 
 ![Der Zettel der Grundausbildung](bilder/tutorial/02-grundausbildung.jpg)
 
-Du kannst jederzeit **Zurück** gehen, einen Schritt **überspringen** oder den Zettel mit **×** schließen. Der Fortschritt bleibt im Browser gespeichert. Danach empfiehlt das Spiel:
+In der Grundausbildung gibt es am Anfang **keinen einzigen Befehl**. Jeder Befehl erscheint erst, wenn der Zettel ihn vorstellt: zuerst Bewegen und Halten, dann Graben, Feuern und am Ende der Lorenplan. Auch „Vor der Runde“ und der Lehrling kommen erst, wenn sie dran sind.
+
+Du kannst jederzeit einen **Vorigen Schritt** zurückgehen, einen Schritt **überspringen** oder den Zettel mit **×** schließen. Der Fortschritt bleibt im Browser gespeichert. ### Befehle kommen Schritt für Schritt
+
+![Deine ersten Befehle](bilder/tutorial/25-erste-befehle.jpg)
+
+Wer neu ist, bekommt nicht gleich alle 16 Befehle. Neue Befehle stellt jeweils ein Zettel mit einem Satz vor:
+
+| Stufe | Befehle | Kommt mit |
+|---|---|---|
+| 1 | Bewegen, Halten, Graben | Grundausbildung, Akt 1 Mission 1 |
+| 2 | Feuern, Deckung, Draht | Grundausbildung, Mission 2 (in Gefecht frei von Anfang an) |
+| 3 | Lorenplan, Ablösen | Ende der Grundausbildung, Mission 3 |
+| 4 | Sturm, Feuerplan, Feuer verlegen und einstellen | Mission 4 |
+| 5 | Umbauen, Entwässern, Leuchtkugel, Etappe | Mission 5 |
+
+Solange Befehle fehlen, bleiben auch Overlays, Ton und „Karte frei“ weg, und „Vor der Runde“ meldet nichts zu Befehlen, die es noch nicht gibt. Ansehen und Vertrauen stehen nur in der Kampagne. Tageslage, Lehrgang, eigene Lagen, Online und Akt 2 bis 4 zeigen immer alles. Wer schon Erfahrung hat: **Dienstbuch** (Menü), Reiter **Darstellung**, „Befehle im Gefecht: alle von Anfang an“.
+
+Danach empfiehlt das Spiel:
 
 | Wenn du ... | dann |
 |---|---|
@@ -211,7 +229,9 @@ Stellungsrunden wechseln zwischen Tag und Nacht. Nachts sieht niemand weit; **Le
 
 ![Schnee im Winter](bilder/tutorial/21-schnee.jpg)
 
-**Regen** macht den Lehm weich, Gräben laufen voll, zuerst in Senken; **Schlamm** kostet Bewegung, Grabtempo und Moral. Krater machen jedes Feld zu Schlamm: wer am meisten schießt, kommt am schlechtesten nach. Im Winter fällt **Schnee** statt Regen: ab Knöcheltiefe dauern Wege länger, nachts frieren Posten ohne Unterstand, und Tauwetter macht alles zu Schlamm. **Nebel** schluckt fast alle Sicht.
+![Akt 3 im Schnee](bilder/tutorial/26-schnee-akt3.jpg)
+
+**Regen** macht den Lehm weich, Gräben laufen voll, zuerst in Senken; **Schlamm** kostet Bewegung, Grabtempo und Moral. Krater machen jedes Feld zu Schlamm: wer am meisten schießt, kommt am schlechtesten nach. Im Winter (Akt 3, Frontabschnitt, Werkstatt) liegt **Schnee**, und statt Regen schneit es: ab Knöcheltiefe dauern Wege länger, nachts frieren Posten ohne Unterstand, und Tauwetter macht alles zu Schlamm. **Nebel** schluckt fast alle Sicht.
 
 ## 9. Wenn du nicht weiterweißt
 
@@ -271,9 +291,11 @@ Die **Kampagne** führt in vier Akten zu je sechs Missionen durch den Krieg. Zwi
 | Esc | schließen, abbrechen |
 | Pfeile, Mausrad, Ziehen | Karte bewegen und zoomen |
 
-Die vollständige Liste mit allen Befehlen späterer Akte steht im Handbuch und im Dienstbuch (Reiter Tasten).
+Gesperrte Befehle reagieren nicht auf ihre Taste. Die vollständige Liste mit allen Befehlen späterer Akte steht im Handbuch und im Dienstbuch (Reiter Tasten).
 
 ## 13. Häufige Fragen
+
+**Wo sind die anderen Befehle?** Am Anfang gibt es nur wenige. Weitere kommen mit der Grundausbildung und Akt 1 dazu (siehe Abschnitt 2). Alle sofort: Dienstbuch, Darstellung, „Befehle im Gefecht“.
 
 **Muss ich jeder Gruppe einen Befehl geben?** Nein. Ohne Befehl hält die Gruppe und schießt auf alles, was sie sieht.
 

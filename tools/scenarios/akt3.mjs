@@ -60,7 +60,7 @@ const OWN_ART = (extra = true) => ({
   ],
 });
 
-const WINTER = (o = {}) => ({ kind: 'clear', season: 'winter', wind: { dir: 'w', speed: 1 }, ...o });
+const WINTER = (o = {}) => ({ kind: 'clear', season: 'winter', snow: 1, wind: { dir: 'w', speed: 1 }, ...o });
 
 function base(id, name, { features = [], startHour = 6, weather = WINTER(), cells = [], a, b, goals = {}, bAi = {}, mission, truce, art = true }) {
   return {

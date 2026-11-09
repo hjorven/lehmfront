@@ -1,5 +1,16 @@
 # Änderungen
 
+## 1.7.0 (2026-11-09)
+
+Übersichtlicher für Einsteiger: nicht mehr alles auf einmal.
+
+- **Befehle Schritt für Schritt** (`js/unlocks.js`): Neue beginnen mit Bewegen, Halten und Graben. Weitere Befehle kommen in fünf Stufen mit der Grundausbildung und den Missionen von Akt 1 dazu. In Gefecht frei, Hotseat, Koop und Frontabschnitt gilt die erreichte Stufe, mindestens Stufe 2. Tageslage, Lehrgang, eigene Lagen, Online und Akt 2 bis 4 zeigen alles. Wer vor 1.7.0 schon gespielt hat, bekommt alles sofort. Dienstbuch, Darstellung: „Befehle im Gefecht: alle von Anfang an“.
+- **Neue Befehle mit einem Satz Erklärung**: Ein Zettel stellt jeden Befehl einmal vor, wenn er dazukommt. Der Tooltip jedes Werkzeugs erklärt ihn ebenfalls.
+- **Weniger auf dem Schirm**: Solange Befehle gestuft sind, fehlen Overlays, Ton und „Karte frei“ bis Stufe 4. Ansehen und Vertrauen stehen nur in der Kampagne. „Vor der Runde“ und die Zusammenfassung melden nichts zu gesperrten Befehlen, und der Lehrling schlägt sie nicht vor.
+- **Grundausbildung neu**: 13 kurze Schritte, ein Gedanke je Zettel. Am Anfang gibt es keinen Befehl, jeder erscheint mit seinem Schritt. „Vor der Runde“ und der Lehrling kommen erst, wenn sie dran sind.
+- **Schnee in Akt 3**: Alle Winter-Missionen beginnen mit einer Schneedecke, Schneefall statt Regen. Die Werkstatt kennt Schnee als Wetter. Das Turnier über Akt 3 zeigt unveränderte Siegquoten.
+- Supabase: alter Testhelfer (`public._probe` mit zwei Probe-Tokens, `public._call`) entfernt.
+
 ## 1.6.0 (2026-11-09)
 
 Besser für Einsteiger, offene Macken geschlossen, Lagen online teilen.

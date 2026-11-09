@@ -11,6 +11,7 @@
   "weather": {
     "kind": "overcast",
     "season": "winter",
+    "snow": 1,
     "wind": {
       "dir": "w",
       "speed": 1

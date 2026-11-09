@@ -216,6 +216,8 @@ export function attachLehrling(api) {
     decision = api.decide(api.viewFor(state, log, side, api.env), {
       map: api.map, seed: api.seed, doctrine: api.cfg.doctrine, difficulty: 'lask', advisor: true, memory: memory[side],
     });
+    // Einsteiger: nur Vorschlaege mit Befehlen, die es schon gibt (js/unlocks.js)
+    if (api.allows) decision = { ...decision, advice: decision.advice.filter((a) => api.allows(a.order)) };
   }
 
   function isAdopted(a) {

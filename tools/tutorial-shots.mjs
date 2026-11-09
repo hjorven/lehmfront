@@ -43,6 +43,8 @@ const SHOTS = [
   ['22-feldzug', '/?scene=feldzug&demo=mitte', DESK],
   ['23-handbuch', '/?scene=handbuch', DESK],
   ['24-handy-gefecht', '/?scene=gefecht&demo=befehle', HANDY],
+  ['25-erste-befehle', '/?scene=gefecht&karte=velde&ki=rekrut', DESK],
+  ['26-schnee-akt3', '/?scene=gefecht&scenario=akt3-m1&seed=5', DESK],
 ];
 
 mkdirSync(OUT, { recursive: true });

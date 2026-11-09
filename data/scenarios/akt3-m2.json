@@ -13,6 +13,7 @@
   "weather": {
     "kind": "overcast",
     "season": "winter",
+    "snow": 1,
     "wind": {
       "dir": "e",
       "speed": 1

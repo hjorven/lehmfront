@@ -78,6 +78,8 @@ import { attachLageRules } from '../ui/lage-rules.js';
 import { createKoop } from '../ui/koop.js';
 import { marginNotes, marginOverlay } from '../ui/margin-notes.js';
 import { attachDrill } from '../ui/drill.js';
+import { allowedTools, offered, readLevel, raiseLevel, akt1Level, takeNewTools, hiddenChecks, orderAllowed } from '../unlocks.js';
+import { showUnlocked } from '../ui/unlock-note.js';
 
 const num = (v, d) => (v === null || v === '' || !Number.isFinite(Number(v)) ? d : Number(v));
 const LONG_PRESS_MS = 430;
@@ -96,6 +98,7 @@ export async function mount(root, params) {
     ensureCss('css/uhr.css'),
     ensureCss('css/motion.css'),
     ensureCss('css/kartefrei.css'), // Tablet: aufgeraeumte Kaertchen und Karte frei
+    ensureCss('css/unlock.css'), // Einsteiger: neue Befehle, weniger Knoepfe
     Promise.all(['16px "Special Elite"', '16px "IBM Plex Mono"', '700 16px "IBM Plex Mono"', '16px "Caveat"', '700 16px "Caveat"', '16px "IBM Plex Sans"', '700 16px "IBM Plex Sans"']
       .map((f) => document.fonts.load(f))).catch(() => {}),
   ]);
@@ -179,6 +182,23 @@ export async function mount(root, params) {
   let filmFrame = null;         // Bild des laufenden Phasenfilms, sonst null
   let pendingDark = null;       // { from, to }: Tag-Nacht-Uebergang, den der naechste Film zeigt
   let helpShown = params.has('ausbildung'); // Grundausbildung: der Zettel ersetzt den Starthinweis
+  // Befehle Schritt fuer Schritt (js/unlocks.js): null = alle Befehle
+  const missionLevel = akt1Level(scenId);
+  if (missionLevel && !params.has('demo')) raiseLevel(missionLevel);
+  let level = readLevel();
+  let allowed = allowedTools({
+    setting: getSetting('orders'), level, scenId, mode: modeInfo?.kind, campaign: !!campaignRun && !modeInfo?.kind,
+    online: !!params.get('match'), demo: params.has('demo') || params.has('wiedergabe'), drill: params.has('ausbildung'),
+    lage: !!battle.lage, act: scenario?.act,
+  });
+  const offeredTools = () => shownTools(state).filter((t) => offered(allowed, t.id));
+  function applyNovice() {
+    // Einsteiger-Ansicht: solange Befehle gestuft sind, bleiben Overlays, Ton und Karte frei weg, bis Stufe 4
+    // erreicht ist; Ansehen und Vertrauen gibt es nur in der Kampagne
+    root.classList.toggle('novice', !!allowed);
+    root.classList.toggle('novice-early', !!allowed && !allowed.has('fireplan'));
+    root.classList.toggle('no-axes', !!allowed && !campaignRun);
+  }
   let suppressTap = false;
   let modalOpen = false;
   let tidyUi = null;            // aufgeraeumte Kaertchen und Karte frei (js/ui/tidy.js)
@@ -190,6 +210,7 @@ export async function mount(root, params) {
   let hoverSight = null;       // Sichtlinie der gewaehlten Gruppe zum Feld unter der Maus (P05)
 
   root.className = 'gefecht';
+  applyNovice();
   root.innerHTML = `
     <canvas class="g-static" aria-hidden="true"></canvas>
     <canvas class="g-dyn" tabindex="0" aria-label="Lagekarte ${esc(map.name)}. Leertaste wählt die nächste Gruppe ohne Befehl."></canvas>
@@ -378,6 +399,7 @@ export async function mount(root, params) {
   const missionUi = attachMissionUi({ ui, scenario, map, params, getArchive: () => archive, onChange: () => refresh() });
   const lehrling = attachLehrling({
     ui, bar: ui.querySelector('.hud-right'), sheet: ui.querySelector('.hud-sheet'), decide, viewFor, map, env, seed, cfg: aiCfg,
+    allows: (o) => orderAllowed(allowed, o.type),
     now: () => ({ state, side, log: lastLog, orderOf: (id) => orderOf(book, side, id), plans: sidePlans[side] }),
     canOpen: () => { if (book[side]?.sealed || filmFrame) { flash('Der Lehrling hilft beim Planen, nicht jetzt.'); return false; } return true; },
     adopt: (o) => { if (book[side]?.sealed) return; book = setOrder(book, side, o); helpShown = true; playSfx('pencil', { count: 2, intensity: 0.5 }); },
@@ -420,6 +442,16 @@ export async function mount(root, params) {
     onExec: () => openSummary(),
   });
   const shield = createShield(ui);
+  // Neu freigeschaltete Befehle einmal mit einem Satz vorstellen (nicht in der Grundausbildung, die erklaert selbst)
+  // Erst wenn das Gefecht steht (die Kampagne leitet ohne Feldzug sofort weiter): sonst gaelten sie als gesehen
+  if (allowed && !params.has('ausbildung')) {
+    setTimeout(() => {
+      if (!root.isConnected || window.__gefecht?.state !== state && window.__gefecht?.map !== map) return;
+      const here = new Set(shownTools(state).map((t) => t.id));
+      const fresh = takeNewTools(new Set([...allowed].filter((id) => here.has(id))));
+      if (fresh.length) showUnlocked(ui, fresh.map((id) => allTools().find((t) => t.id === id)).filter(Boolean), { first: level < 2 });
+    }, 700);
+  }
   const orderList = createOrderList(ui, {
     onJump: (id) => { select(id, { center: true }); if (narrow()) closeList(); },
     onClear: (id) => {
@@ -511,7 +543,7 @@ export async function mount(root, params) {
       roundAction: battleNow && attacking && !state.battle?.outcome?.[side] && !book[side]?.sealed && assaultersOf(side).length ? 'Angriff abbrechen' : null,
       orderCount: orders.length,
       overlays: overlaySlots().map((o) => ({ slot: o.slot, label: o.label, empty: !!o.empty, active: overlaysOn.has(o.slot) })),
-      checklist: checklist({ state, side, orders, map, plans: sidePlans[side], only: koop ? koop.owns : null }),
+      checklist: checklist({ state, side, orders, map, plans: sidePlans[side], only: koop ? koop.owns : null, skip: hiddenChecks(allowed) }),
       hint: currentHint(),
     };
   }
@@ -553,7 +585,7 @@ export async function mount(root, params) {
     hud.update(hudModel());
     const g = selectedOwn();
     toolbar.update({
-      tools: shownTools(state).map((t) => ({ tool: t, ...usable(t, g, state, env) })),
+      tools: offeredTools().map((t) => ({ tool: t, ...usable(t, g, state, env) })),
       active: tool?.def.id ?? null,
       canUndo: canUndo(book, side),
       count: ordersNow().length,
@@ -673,7 +705,7 @@ export async function mount(root, params) {
 
   function startTool(def, g, extra = {}) {
     if (tidyUi?.bare) tidyUi.setBare(false); // Befehle nur mit sichtbaren Kaertchen
-    if (!def) return;
+    if (!def || !offered(allowed, def.id)) return;
     if (book[side]?.sealed || modalOpen) return;
     const u = usable(def, g, state, env);
     if (!u.ok) { flash(u.why, 'warn'); return; }
@@ -809,7 +841,7 @@ export async function mount(root, params) {
     cancelTool(false);
     radial.hide();
     const orders = ordersNow();
-    const s = summarize({ state, side, orders, map, plans: sidePlans[side], only: koop ? koop.owns : null });
+    const s = summarize({ state, side, orders, map, plans: sidePlans[side], only: koop ? koop.owns : null, skip: hiddenChecks(allowed) });
     modalOpen = true;
     refresh();
     showSummary(ui, s, {
@@ -1025,7 +1057,7 @@ export async function mount(root, params) {
     cancelTool(false);
     selectedId = g.id;
     const r = root.getBoundingClientRect();
-    const items = shownTools(state).map((t) => ({ id: t.id, def: t, label: t.label, icon: t.icon, group: g.id, ...usable(t, g, state, env) }));
+    const items = offeredTools().map((t) => ({ id: t.id, def: t, label: t.label, icon: t.icon, group: g.id, ...usable(t, g, state, env) }));
     if (orderOf(book, side, g.id)) {
       items.push({ id: '__clear', label: 'Löschen', icon: '<path d="M6 6 L18 18"/><path d="M18 6 L6 18"/>', group: g.id, ok: true, why: '' });
     }
@@ -1250,7 +1282,7 @@ export async function mount(root, params) {
     if ((e.key === 'o' || e.key === 'O') && !toolByKey(e.key)) { e.preventDefault(); gameMenu.open(); return; }
     if (e.key.length === 1) {
       const def = toolByKey(e.key);
-      if (!def) return;
+      if (!def || !offered(allowed, def.id)) return;
       e.preventDefault();
       const g = selectedOwn();
       if (!g && def.needsGroup !== false) { flash(`${def.label}: erst eine Gruppe wählen (Leertaste).`, 'warn'); return; }
@@ -1338,6 +1370,9 @@ export async function mount(root, params) {
     finishAnim: () => { anim = null; drawDynNow(); },
     get plans() { return sidePlans; },
     get plannerWindow() { return plannerWindow; },
+    get allowed() { return allowed ? [...allowed] : null; },
+    /** Grundausbildung: Befehle freischalten (Liste der ids, kumulativ) */
+    allowTools: (ids) => { if (!allowed) return; allowed = new Set([...allowed, ...ids]); applyNovice(); refresh(); },
   };
   window.__gefecht = api;
   // Grundausbildung: Zettel mit Schritten fuer Anfaenger (js/ui/drill.js, Schritte in js/config/drill.js)

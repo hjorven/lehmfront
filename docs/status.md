@@ -4,6 +4,14 @@ Jeder Thread traegt hier nach dem Merge ein, was fertig ist und was offen bleibt
 
 ## Fertig
 
+- 1.7.0 Einsteiger: Befehle Schritt für Schritt (`CHANGELOG.md`):
+  - `js/unlocks.js` (rein bis auf den Stand im Browser): Stufen `STAGES`, `allowedTools(ctx)` je Modus, `offered`, `hiddenChecks` (Prüfpunkte zu gesperrten Befehlen), `orderAllowed` (Lehrling), `TOOL_HELP`. Stand in `localStorage` `lehmfront.freigabe` (Startwert beim ersten Laden in `js/boot.js`: Neue 0, wer schon Spielstände hat 5), vorgestellte Befehle in `lehmfront.freigabe.gesehen`. Einstellung `orders` (`auto`/`all`) im Dienstbuch.
+  - Gefecht: Werkzeugreihe, Befehlskreis und Tasten nur mit erlaubten Befehlen; Akt-1-Mission n hebt auf Stufe n; Zettel „Neu freigeschaltet“ (`js/ui/unlock-note.js`, `css/unlock.css`) erst, wenn das Gefecht steht; Klassen `novice`, `novice-early`, `no-axes` am Gefecht. `window.__gefecht.allowed` und `allowTools(ids)` für die Grundausbildung.
+  - Grundausbildung: Schritte mit `tools` und `show` (`drillUnlocks`), Ende hebt auf Stufe 3 (`DRILL_LEVEL`).
+  - Schnee: `snow: 1` in allen Akt-3-Szenarien (Generator `tools/scenarios/akt3.mjs`), Werkstatt-Wetter „Schnee“ (Winter, knöcheltief).
+  - Supabase: `public._probe` und `public._call` gelöscht. Die Erweiterung `http`, die nur dieser Helfer brauchte, ist noch installiert.
+  - Bekannte Macken: Wer vor 1.7.0 nur Gefecht frei gespielt hat (ohne Feldzug, Hinweise, Lehrgang, Werkstatt oder gespeicherte Akte), gilt als neu und beginnt gestuft. Die Akt-1-Hinweise der Figuren und die Stufen sind unabhängig: eine Mission kann einen Befehl haben, den die Figur erst später erklärt.
+
 - 1.6.0 Einsteiger, Macken, Lageaustausch (`CHANGELOG.md`):
   - Grundausbildung: `js/config/drill.js` (14 Schritte mit Text, Anker und Bedingung auf `window.__gefecht`), `js/ui/drill.js` (Zettel, Bleistiftkringel, Abhaken, auf dem Handy über dem Schild), `css/drill.css`. Start `?scene=gefecht&karte=asse&ki=rekrut&runden=0&seed=1917&ausbildung=1`, `ausbildung=<n>` beginnt bei Schritt n (Bilder). Fortschritt in `localStorage` `lehmfront.ausbildung`. Die Schnittstelle des Gefechts kennt jetzt `selected` und `sight`.
   - Handbuch `?scene=handbuch` (`js/scenes/handbuch.js`, Inhalte `js/config/handbook.js`, `&teil=runde|werte|begriffe|tasten|rat`), Tasten aus `FIXED_KEYS`/`TOUCH` in `js/ui/settings.js` (jetzt exportiert). Anleitung mit Bildern `docs/tutorial.md`, Bilder aus `node tools/tutorial-shots.mjs` (JPEG nach `docs/bilder/tutorial/`).

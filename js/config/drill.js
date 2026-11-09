@@ -15,78 +15,84 @@ const selectedOwn = (a) => {
   return !!g && g.side === a.side;
 };
 
+// Kurz halten: ein Gedanke je Schritt. tools: Befehle, die mit diesem Schritt dazukommen (vorher gibt es keine).
+// show: Kaertchen, die ab hier sichtbar sind (check = "Vor der Runde", lehrling = Knopf Lehrling).
 export const DRILL_STEPS = [
   {
-    id: 'karte', von: 'Harms', title: 'Die Lagekarte',
-    text: 'Das ist unser Abschnitt an der Asse. Blau sind unsere Gräben und Gruppen, rot die von drüben. Schieb die Karte mit Maus oder Finger, zoom mit dem Mausrad oder mit zwei Fingern.',
+    id: 'karte', von: 'Harms', title: 'Deine Front',
+    text: 'Blau bist du, rot ist der Gegner. Zum Verschieben die Karte ziehen, zum Zoomen Mausrad oder zwei Finger.',
     manual: true,
   },
   {
-    id: 'waehlen', von: 'Harms', title: 'Eine Gruppe wählen',
-    text: 'Tipp auf ein blaues Kästchen, zum Beispiel die „1“. Jede Gruppe hat acht bis zwölf Mann und einen Gruppenführer mit Namen.',
+    id: 'waehlen', von: 'Harms', title: 'Gruppe wählen',
+    text: 'Tipp auf ein blaues Kästchen, zum Beispiel die „1“. Das ist eine Gruppe von etwa zehn Mann.',
     done: (a) => selectedOwn(a),
   },
   {
-    id: 'schild', von: 'Harms', title: 'Das Schild',
-    text: 'Am Schild steht alles über die Gruppe: Stärke, Moral, Erschöpfung, Erfahrung und der Befehl. Ohne Befehl hält sie. Das ist erlaubt und oft richtig.',
+    id: 'schild', von: 'Harms', title: 'Die Karte der Gruppe',
+    text: 'Hier steht, wie es der Gruppe geht. Ohne Befehl bleibt sie einfach stehen. Das ist in Ordnung.',
     anchor: '.shield', manual: true,
   },
   {
-    id: 'bewegen', von: 'Harms', title: 'Bewegen',
-    text: 'Wähl eine Gruppe, dann „Bewegen“ (Taste B), und tipp ein Ziel an. Mit dem Finger merkt das erste Tippen das Ziel vor, das zweite setzt es. Der Pfeil zeigt, wie weit sie in dieser Runde kommt.',
-    anchor: '[data-tool="move"]', done: (a) => hasOrder(a, ['move', 'redeploy']),
+    id: 'bewegen', von: 'Harms', title: 'Erster Befehl: Bewegen',
+    text: 'Unten ist jetzt „Bewegen“ (B). Gruppe wählen, Bewegen antippen, dann ein Feld hinter dem blauen Graben.',
+    anchor: '[data-tool="move"]', tools: ['move', 'hold'], done: (a) => hasOrder(a, ['move', 'redeploy']),
   },
   {
-    id: 'zurueck', von: 'Harms', title: 'Nichts ist endgültig',
-    text: 'Bis zum Ausführen lässt sich alles ändern. „Zurück“ (Strg+Z) nimmt den letzten Befehl zurück, die Befehlsliste (Tab) zeigt alle Befehle auf einen Blick.',
+    id: 'zurueck', von: 'Harms', title: 'Vertippt?',
+    text: '„Zurück“ nimmt den letzten Befehl zurück. Bis du die Runde startest, kannst du alles ändern.',
     anchor: '[data-undo]', manual: true,
   },
   {
-    id: 'graben', von: 'Selin', title: 'Graben',
-    text: 'Wähl eine Gruppe und „Graben“ (G), dann zieh eine Linie. Lange gerade Stücke kann ein MG von der Seite bestreichen. Das Kärtchen bietet dann „Traversen einfügen“ an: fast immer eine gute Idee.',
-    anchor: '[data-tool="dig"]', done: (a) => hasOrder(a, ['dig']),
+    id: 'graben', von: 'Selin', title: 'Neuer Befehl: Graben',
+    text: 'Gruppe wählen, „Graben“ (G) antippen und eine Linie ziehen. Bietet das Kärtchen „Traversen einfügen“ an: ja.',
+    anchor: '[data-tool="dig"]', tools: ['dig'], done: (a) => hasOrder(a, ['dig']),
   },
   {
-    id: 'mg', von: 'Harms', title: 'Das MG',
-    text: 'Wähl den MG-Trupp (Kästchen „MG“) und „Feuern“ (F). Beim MG legst du einen Feuerkegel: Wer dort durchläuft, wird niedergehalten, auch wenn niemand fällt.',
-    anchor: '[data-tool="fire"]', done: (a) => hasOrder(a, ['sector', 'fire']),
+    id: 'mg', von: 'Harms', title: 'Neuer Befehl: Feuern',
+    text: 'Wähl das Kästchen „MG“, dann „Feuern“ (F), dann ein Feld vor dem Graben. Das MG hält dort jeden nieder.',
+    anchor: '[data-tool="fire"]', tools: ['fire'], done: (a) => hasOrder(a, ['sector', 'fire']),
   },
   {
-    id: 'liste', von: 'Harms', title: 'Vor der Runde',
-    text: 'Das Kärtchen „Vor der Runde“ sammelt, was noch offen ist: Gruppen ohne Befehl, Versorgung, Leitungen. Antippen springt zur Stelle. Nichts davon ist Pflicht.',
-    anchor: '.check', manual: true,
-  },
-  {
-    id: 'runde', von: 'Harms', title: 'Runde ausführen',
-    text: 'Steht der Plan, tipp „Runde ausführen“ (Enter). Drüben plant Hauptmann Lask zur selben Zeit. Dann laufen beide Befehlslisten gleichzeitig ab: zwölf Stunden in einer Stellungsrunde.',
+    id: 'runde', von: 'Harms', title: 'Los geht es',
+    text: 'Tipp „Runde ausführen“. Der Gegner plant gleichzeitig, dann passiert alles auf einmal.',
     anchor: '.exec', done: (a, s) => a.state.turn > s.turn,
   },
   {
-    id: 'film', von: 'Harms', title: 'Film und Telegramm',
-    text: 'Die Runde läuft als Film in Phasen. „Weiter“ zeigt die nächste Phase, „Überspringen“ springt ans Ende. Im Telegramm steht jede Meldung mit Begründung; antippen springt zur Stelle.',
+    id: 'film', von: 'Harms', title: 'Was passiert ist',
+    text: 'Die Runde lief als kurzer Film. Im Telegramm steht jede Meldung mit Grund. Antippen zeigt die Stelle.',
     manual: true,
   },
   {
-    id: 'loren', von: 'Selin', title: 'Die Loren',
-    text: 'Alles muss mit der Feldbahn nach vorn. „Lorenplan“ (L) zeigt den Zug: tipp einen Wagen an, um die Ladung zu wechseln. Verwundete fahren auf denselben Wagen zurück, sonst bleiben sie liegen.',
-    anchor: '[data-tool="supply"]', done: (a) => a.toolInfo?.id === 'supply' || !!a.plans?.[a.side]?.supply_plan,
+    id: 'liste', von: 'Harms', title: 'Was noch offen ist',
+    text: '„Vor der Runde“ zeigt, was du noch tun könntest. Nichts davon ist Pflicht. Auf dem Handy: oben auf die Leiste tippen.',
+    anchor: '.check', show: ['check'], manual: true,
   },
   {
-    id: 'lehrling', von: 'Harms', title: 'Der Taktik-Lehrling',
-    text: 'Unsicher? Der „Lehrling“ (T) rechnet, was Lask an deiner Stelle täte, und schreibt dazu, warum. Einzelne Vorschläge oder alle übernehmen, wie du magst.',
-    anchor: '.lr-btn', manual: true,
+    id: 'loren', von: 'Selin', title: 'Neuer Befehl: Lorenplan',
+    text: 'Die Feldbahn bringt Munition und Essen nach vorn. Öffne „Lorenplan“ (L) und sieh ihn dir an.',
+    anchor: '[data-tool="supply"]', tools: ['supply'], done: (a) => a.toolInfo?.id === 'supply' || !!a.plans?.[a.side]?.supply_plan,
   },
   {
-    id: 'bleistift', von: 'Selin', title: 'Bleistift auf der Karte',
-    text: 'Geht etwas schief, steht es mit Bleistift an der Stelle: „Traverse fehlt!“, „Draht!“, „Lorenplan prüfen“. Und wenn du eine Gruppe gewählt hast, zeigt die Karte beim Zeigen oder Antippen, wie weit sie sieht.',
-    manual: true,
+    id: 'lehrling', von: 'Harms', title: 'Hilfe holen',
+    text: 'Nicht sicher? Der „Lehrling“ (T) schlägt vor, was du tun könntest. Auf dem Handy steht er in der Leiste oben.',
+    anchor: '.lr-btn', show: ['lehrling'], manual: true,
   },
   {
-    id: 'fertig', von: 'Harms', title: 'Ausgebildet',
-    text: 'Das reicht für den Anfang, Frau Major. Spiel hier weiter, solange du magst. Akt 1 der Kampagne bringt jede Mechanik einzeln, das Handbuch erklärt alle Begriffe.',
+    id: 'fertig', von: 'Harms', title: 'Geschafft',
+    text: 'Spiel ruhig weiter. Die Kampagne bringt die übrigen Befehle nach und nach, jeden mit einer kurzen Erklärung.',
     final: true,
   },
 ];
+
+/** Stufe nach der Grundausbildung (js/unlocks.js): Bewegen, Graben, Feuer, Draht, Deckung, Versorgung */
+export const DRILL_LEVEL = 3;
+
+/** Befehle und Kaertchen bis einschliesslich Schritt i */
+export function drillUnlocks(steps, i) {
+  const upto = steps.slice(0, Math.max(0, i) + 1);
+  return { tools: upto.flatMap((s) => s.tools ?? []), show: upto.flatMap((s) => s.show ?? []) };
+}
 
 /** Index des ersten Schritts, der noch nicht geschafft ist (ab from) */
 export function nextStep(steps, a, start, from = 0) {

@@ -3,7 +3,8 @@
 // Bedienelement und das Weiterschalten, sobald der Schritt auf der Karte geschafft ist.
 import { ensureCss, esc } from './dom.js';
 import { playSfx } from '../audio/engine.js';
-import { DRILL_STEPS, readDrill, writeDrill } from '../config/drill.js';
+import { DRILL_STEPS, DRILL_LEVEL, drillUnlocks, readDrill, writeDrill } from '../config/drill.js';
+import { raiseLevel, UNLOCK_SEEN_KEY } from '../unlocks.js';
 
 const TICK_MS = 350;
 
@@ -42,8 +43,21 @@ export function attachDrill({ ui, root, api, steps = DRILL_STEPS, startAt = null
     if (el && el.getClientRects().length) { el.classList.add('dr-target'); marked = el; }
   }
 
+  // Befehle und Kaertchen erscheinen erst, wenn der Zettel sie vorstellt
+  function unlock() {
+    const u = drillUnlocks(steps, index);
+    api.allowTools?.(u.tools);
+    for (const k of ['check', 'lehrling']) root.classList.toggle('dr-show-' + k, u.show.includes(k));
+    try {
+      const seen = JSON.parse(localStorage.getItem(UNLOCK_SEEN_KEY) ?? '[]');
+      localStorage.setItem(UNLOCK_SEEN_KEY, JSON.stringify([...new Set([...(Array.isArray(seen) ? seen : []), ...u.tools])]));
+    } catch { /* ohne Speicher */ }
+    if (steps[index].final) raiseLevel(DRILL_LEVEL);
+  }
+
   function render() {
     const s = steps[index];
+    unlock();
     const auto = !s.manual && !s.final && s.done;
     card.innerHTML = `<header><span class="dr-k">Grundausbildung · ${index + 1} von ${steps.length}</span>
         <button type="button" class="dr-mini" aria-label="Zettel ein- oder ausklappen" aria-expanded="${!card.classList.contains('dr-min')}">${card.classList.contains('dr-min') ? '+' : '–'}</button>
