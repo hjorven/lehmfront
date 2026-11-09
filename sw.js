@@ -7,7 +7,7 @@
 // VERSION haengt an der Liste: neue oder entfernte Dateien ergeben einen neuen Cache und den Update-Hinweis.
 
 // precache:start
-const VERSION = 'b694fecf';
+const VERSION = 'a7d2a1a2';
 const FILES = [
   'assets/fonts/caveat-latin-400-normal.woff2',
   'assets/fonts/caveat-latin-700-normal.woff2',
@@ -24,6 +24,7 @@ const FILES = [
   'css/etappe-window.css',
   'css/etappe3d.css',
   'css/feldzug.css',
+  'css/fernamt.css',
   'css/feuerplan.css',
   'css/film.css',
   'css/frontabschnitt.css',
@@ -98,6 +99,7 @@ const FILES = [
   'js/config/missions.js',
   'js/config/morale.js',
   'js/config/names.js',
+  'js/config/online.js',
   'js/config/orders.js',
   'js/config/reports.js',
   'js/config/seasons.js',
@@ -128,6 +130,14 @@ const FILES = [
   'js/narrative/sheets.js',
   'js/narrative/stats.js',
   'js/narrative/texts.js',
+  'js/net.js',
+  'js/online/demo.js',
+  'js/online/front-board.js',
+  'js/online/link.js',
+  'js/online/match.js',
+  'js/online/replay.js',
+  'js/online/report.js',
+  'js/online/session.js',
   'js/orders.js',
   'js/phases/artillery.js',
   'js/phases/battle.js',
@@ -170,6 +180,7 @@ const FILES = [
   'js/scenes/erzaehlung.js',
   'js/scenes/etappe.js',
   'js/scenes/feldzug.js',
+  'js/scenes/fernamt.js',
   'js/scenes/frontabschnitt.js',
   'js/scenes/gefecht-frei.js',
   'js/scenes/gefecht.js',
@@ -188,6 +199,7 @@ const FILES = [
   'js/ui/campaign/mission.js',
   'js/ui/campaign/store.js',
   'js/ui/campaign/warmap.js',
+  'js/ui/candle.js',
   'js/ui/clock.js',
   'js/ui/commit.js',
   'js/ui/daytime.js',
@@ -255,6 +267,7 @@ const FILES = [
   'js/view.js',
   'js/weather.js',
   'manifest.webmanifest',
+  'vendor/supabase-2.118.0.js',
 ];
 // precache:end
 

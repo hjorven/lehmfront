@@ -110,6 +110,8 @@ export function attachGameMenu({ ui, params, snapshot, busy, canOpen = () => tru
     /** Nach jeder Runde: laufende Akte schreiben. Fehler (Speicher voll, privat) nur melden, nie stoeren. */
     async autosave() {
       if (params.has('demo')) return false; // Screenshot-Zustaende ueberschreiben keine echte Akte
+      // P20: Wiedergabe und Online-Gefecht beruehren die laufende Akte nicht (der Stand liegt im Link bzw. beim Stab)
+      if (params.has('wiedergabe') || params.has('match')) return false;
       // Beendete Partie: keine laufende Akte mehr (sonst boete das Hauptmenue "Weiterspielen" an)
       if (ended()) { try { await store.remove(AUTO_SLOT); } catch { /* egal */ } return false; }
       try { await save(AUTO_SLOT, 'auto'); return true; } catch (e) { console.warn('Automatisch speichern ging nicht:', e.message); return false; }

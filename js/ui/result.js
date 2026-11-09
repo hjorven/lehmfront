@@ -28,10 +28,11 @@ const HELD = {
 };
 
 /**
- * opts: { ui, info: { kind, limit, key?, label, map?, mapSeed? }, map, start, scenario, humans, aiCfg, params }
+ * opts: { ui, info: { kind, limit, key?, label, map?, mapSeed? }, map, start, scenario, humans, aiCfg, params,
+ *   record?: () => Befehlsprotokoll (P20, Wiedergabe-Link und Nachrechnen) }
  * Rueckgabe: { ended, afterResolve(before, after, log), afterFilm(state), suffix(state), show() }
  */
-export function attachModeRules({ ui, info, map, start, scenario, humans, aiCfg, onOpen = () => {}, onClose = () => {} }) {
+export function attachModeRules({ ui, info, map, start, scenario, humans, aiCfg, record = null, onOpen = () => {}, onClose = () => {} }) {
   let tally = emptyTally();
   let ended = false;
   let report = null;
@@ -106,6 +107,8 @@ export function attachModeRules({ ui, info, map, start, scenario, humans, aiCfg,
       </footer>
     </section>`;
     sheet.querySelector('.rm-look').addEventListener('click', close);
+    // P20: Wiedergabe-Link und Meldung an den Stab (Tageslage online)
+    import('../online/report.js').then((m) => sheet && m.decorateReport(sheet.querySelector('.rm'), { info, report, record })).catch((e) => console.warn(e));
     const form = sheet.querySelector('.rm-sign');
     if (form) {
       form.addEventListener('submit', (e) => {

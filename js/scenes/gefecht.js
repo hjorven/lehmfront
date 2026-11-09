@@ -3,7 +3,6 @@
 // Parameter: scenario=asse-frei, mode=frei|hotseat, seed=<Zahl>, night=0..1 (erzwingt Dunkelheit),
 //   kind=battle (Gefechtsrunde testen), x, y, zoom (Kamera), demo=<Zustand fuer Screenshots>.
 import { loadMap, cellAt, cellLabel, applyCellState } from '../map.js';
-import { ORDER_TYPES } from '../config/orders.js';
 import { captureTrench } from '../trench.js';
 import { initEtappen, withEtappe, etappeOf, plotAt } from '../etappe-map.js';
 import { createInitialState, groupsOf, getGroup, otherSide } from '../state.js';
@@ -65,10 +64,13 @@ import { drawFilmTrails } from '../render/film-layer.js';
 import { loadBattle } from '../modes/load.js';
 import { attachModeRules } from '../ui/result.js';
 import { attachGameMenu, resumeGame } from '../ui/gamemenu.js';
+import { saveQuery } from '../savegame.js';
 import { campaignMission } from '../ui/campaign/mission.js';
 import { endlessWeek } from '../ui/endless/week.js';
 import { prepareMission, missionAi, withMissionOrders } from '../missions/script.js';
 import { attachMissionUi } from '../ui/mission.js';
+import { carryOrders, recordFrom } from '../online/replay.js';
+import { setupOnline, attachMatch, brokenText, blockMatch, telegramLines } from '../online/session.js';
 
 const num = (v, d) => (v === null || v === '' || !Number.isFinite(Number(v)) ? d : Number(v));
 const LONG_PRESS_MS = 430;
@@ -93,7 +95,9 @@ export async function mount(root, params) {
   // Tageslage: fuer alle dieselbe Lage, darum keine URL-Eingriffe in Wetter, Rundenart oder Gegner
   const fixed = modeInfo?.kind === 'tageslage' || modeInfo?.kind === 'endlos';
   const seed = battle.seed ?? ((num(params.get('seed'), 1917) >>> 0) || 1);
-  let state = createInitialState(map, scenario, seed);
+  // P20: Wiedergabe eines Online-Gefechts: Startzustand aus dem oeffentlichen Seed (iseed), Wuerfe aus seed
+  let state = createInitialState(map, scenario, params.has('iseed') ? (num(params.get('iseed'), seed) >>> 0) : seed);
+  state.seed = seed;
   state = initEtappen(state, map, scenario); // P11: Etappe mit Grundausbau aus dem Szenario
   state = prepareMission(state, scenario); // P16: Ablaufplan einer Kampagnenmission (Lask, Wetter), sonst unveraendert
   // P14: Einsatz aus der Kampagne (Ansehen, Vertrauen, Berichte, Nachschub, Ersatz), sonst null
@@ -104,9 +108,14 @@ export async function mount(root, params) {
   if (!fixed) applyWeatherParams(state, map, params);
   // P18: Spielstand aus ?slot= ersetzt den Startzustand; Archiv und KI-Gedaechtnis folgen weiter unten
   const startState = structuredClone(state);
-  const resumed = await resumeGame(params);
+  let resumed = await resumeGame(params);
+  // P20: Wiedergabe-Link (wiedergabe=1, Protokoll im Anker) oder Online-Gefecht (match=<id>)
+  const online = await setupOnline(params, { map, start: startState, seed, info: modeInfo });
+  if (online?.resumed) resumed = online.resumed;
+  if (online?.kind === 'match') resumed = null; // Online gilt nur die Sicht vom Stab, nie ein lokaler Stand
+  if (online?.state) state = online.state;
   if (resumed) state = resumed.state;
-  const humans = mode === 'hotseat' ? ['a', 'b'] : ['a'];
+  const humans = online?.side ? [online.side] : mode === 'hotseat' ? ['a', 'b'] : ['a'];
   const env = { map };
   // KI-Kommandant (P13): Doktrin und Schwierigkeit aus dem Szenario (sides.b.ai), per URL &doktrin= &ki=.
   // Mit Marschbefehl (karte=) steckt die Wahl schon im Szenario; die Tageslage nimmt gar keine URL-Eingriffe an.
@@ -122,13 +131,13 @@ export async function mount(root, params) {
   let noteMark = null;          // Bleistiftkringel der letzten Notiz auf der Karte
   // Karte mit Graeben, Kratern usw. aus dem Spielzustand (Anzeige und Werkzeuge); env.map bleibt die Grundkarte
   // Nur Felder, die die planende Seite kennt (Nebel des Krieges fuer Graeben, Aufwurf usw.)
-  let seenCells = viewFor(state, [], 'a', env).cells; // Seite a plant zuerst
+  let seenCells = viewFor(state, [], humans[0], env).cells; // Seite a plant zuerst (online: die eigene Seite)
   // P11: Etappengebaeude aus dem Spielzustand ersetzen die Kartengebaeude der Etappe (withEtappe)
-  let liveMap = withEtappe(applyCellState(map, seenCells), state, 'a');
+  let liveMap = withEtappe(applyCellState(map, seenCells), state, humans[0]);
   const updateLiveMap = () => { seenCells = viewFor(state, [], side, env).cells; liveMap = withEtappe(applyCellState(map, seenCells), state, side); layer.setMap(liveMap); };
 
   // Planungszustand
-  let side = 'a';
+  let side = humans[0];
   let book = createOrderBook();
   let decor = null;            // Zeichnung eines offenen Editors (Feuerplan, P09), unter den Gruppen
   let burns = [];              // Brandloecher am Kartenrand nach Einschlaegen (P09, nur Optik)
@@ -149,7 +158,8 @@ export async function mount(root, params) {
   let suppressTap = false;
   let modalOpen = false;
   if (resumed) { archive = resumed.archive ?? archive; aiMemory = resumed.aiMemory; lastLog = resumed.lastLog; if (resumed.book) book = resumed.book; }
-  const forcedDark = params.has('night') ? Math.max(0, Math.min(1, num(params.get('night'), 0))) : null;
+  if (online?.kind === 'match' && online.state) { lastLog = online.log; book = nextRound(book, { a: [], b: [], [online.side]: online.carry }); }
+  const forcedDark = params.has('night') && !fixed ? Math.max(0, Math.min(1, num(params.get('night'), 0))) : null;
   // Erzwungene Nacht auch fuer die Regeln (Sichtweite, Trefferchance): Uhr auf 22 Uhr stellen
   if (forcedDark !== null && forcedDark >= 0.5 && !state.night) { state.clock = { ...state.clock, hour: 22, minute: 0 }; state.night = true; }
   let hoverSight = null;       // Sichtlinie der gewaehlten Gruppe zum Feld unter der Maus (P05)
@@ -301,8 +311,17 @@ export async function mount(root, params) {
   // Klang (P19): Knopf rechts, auf dem Handy als Karte in der Seitenleiste
   mountSoundControls({ bar: ui.querySelector('.hud-right'), sheet: ui.querySelector('.hud-sheet') });
   // P17: Rundengrenze und Abschlussmeldung (Gefecht frei, Hotseat, Tageslage)
+  const matchLink = online?.kind === 'match' && online.state
+    ? attachMatch(ui, online, {
+      onBlock: () => { cancelTool(false); radial.hide(); modalOpen = true; refresh(); },
+      onUnblock: () => { modalOpen = false; refresh(); dynCv.focus({ preventScroll: true }); },
+    }) : null;
   const rules = attachModeRules({
     ui, info: modeInfo, map, start: startState, scenario, humans, aiCfg,
+    // P20: Befehlsprotokoll fuer Wiedergabe-Link und Nachrechnen der Tageslage (nicht fuer Kampagne und Online)
+    // Mit erzwungener Nacht (night=, nur Ansicht) liesse sich die Partie nicht genau nachrechnen
+    record: () => (campaignRun || online?.kind === 'match' || params.has('night') ? null
+      : recordFrom(archive, { query: saveQuery(params), seed, title: map.name })),
     onOpen: () => { modalOpen = true; cancelTool(false); radial.hide(); refresh(); },
     onClose: () => { modalOpen = false; refresh(); dynCv.focus({ preventScroll: true }); },
   });
@@ -311,7 +330,9 @@ export async function mount(root, params) {
   const gameMenu = attachGameMenu({
     ui, params,
     snapshot: () => ({ state, map: liveMap, archive, aiMemory, lastLog, rules: rules.snapshot(), side, book }),
-    busy: () => (filmFrame || book.a?.sealed || book.b?.sealed ? 'Während der Ausführung oder Übergabe kann nicht abgelegt werden.' : rules.ended ? 'Die Partie ist beendet.' : null),
+    busy: () => (online?.kind === 'match' ? 'Online-Gefechte liegen beim Stab, nicht in der Kartentasche.'
+      : online?.kind === 'replay' ? 'Eine Wiedergabe steckt im Link, nicht in der Kartentasche.'
+      : filmFrame || book.a?.sealed || book.b?.sealed ? 'Während der Ausführung oder Übergabe kann nicht abgelegt werden.' : rules.ended ? 'Die Partie ist beendet.' : null),
     canOpen: () => !modalOpen && !filmFrame,
     ended: () => rules.ended,
     onOpen: () => { cancelTool(false); radial.hide(); modalOpen = true; refresh(); },
@@ -731,6 +752,11 @@ export async function mount(root, params) {
     report.hide();
     overlaysOn = new Set();
     transient = null;
+    // P20: Online-Gefecht: Befehle gehen an den Stab, gerechnet wird dort
+    if (matchLink) {
+      matchLink.submit([...listOrders(book, side), ...Object.keys(sidePlans[side]).sort().map((k) => sidePlans[side][k])]);
+      return;
+    }
     const waiting = humans.find((s) => !book[s].sealed);
     if (waiting) {
       modalOpen = true;
@@ -867,22 +893,8 @@ export async function mount(root, params) {
     lehrling.afterRound(humans);
     archive = archiveRound(archive, input, r);
     campaignRun?.afterRound(state, archive);
-    // Unvollendete Wege laufen als Befehl weiter, solange die Rundenart passt
-    const carry = { a: [], b: [] };
-    for (const e of r.log) {
-      // Mechaniken mit eigenem Weitertragen (Graben, Umbauen) melden den Restbefehl als carry
-      if (e.carry && e.carry.group === e.group) {
-        const g = getGroup(state, e.group);
-        const kind = ORDER_TYPES[e.carry.type]?.kind;
-        if (g && g.status !== 'lost' && (kind === 'both' || kind === state.turnKind)) carry[g.side].push({ ...e.carry, carried: true });
-        continue;
-      }
-      if ((e.type === 'move' || e.type === 'redeploy') && e.rest?.length && !e.blocked) {
-        const g = getGroup(state, e.group);
-        const type = state.turnKind === 'battle' ? 'move' : 'redeploy';
-        if (g && g.status !== 'lost' && e.type === type) carry[g.side].push({ group: g.id, type, path: e.rest, carried: true });
-      }
-    }
+    // Unvollendete Wege laufen als Befehl weiter, solange die Rundenart passt (P20: rein in js/online/replay.js)
+    const carry = carryOrders(state, r.log);
     book = nextRound(book, carry);
     gameMenu.autosave(); // nach dem Weitertragen, damit laufende Wege und Graben mit in die Akte kommen
     sidePlans = { a: {}, b: {} }; // der Lorenplan steht danach im Zustand und gilt weiter
@@ -1156,7 +1168,20 @@ export async function mount(root, params) {
     u.searchParams.delete('slot');
     history.replaceState(history.state, '', u);
   }
-  if (resumed) flash(resumed.reload ? `Akte wieder aufgenommen: ${roundTitle(state)}.` : `Spielstand geladen: ${roundTitle(state)}.`);
+  if (online?.broken && online.kind === 'match') blockMatch(ui, brokenText(online), () => { cancelTool(false); modalOpen = true; refresh(); });
+  else if (online?.broken) flash(brokenText(online), 'warn');
+  else if (online?.kind === 'replay') {
+    flash(`Wiedergabe: ${online.rounds} Runden nachgerechnet. Das Protokoll (P) zeigt jede Runde als Film.`);
+    if (!params.has('demo')) setTimeout(() => { if (!modalOpen) openArchive(); }, 600);
+  } else if (matchLink?.finished) matchLink.showEnd();
+  else if (matchLink?.waiting) matchLink.wait();
+  else if (online?.kind === 'match') {
+    flash(`Zweikampf, ${roundTitle(state)}: deine Befehle.`);
+    // Telegramm der letzten Runde aus der eigenen Sicht (ein Film geht nicht: der volle Zustand bleibt beim Stab)
+    const tl = telegramLines(online.log);
+    if (tl.length) { report.show({ title: `Telegramm · vor ${roundTitle(state)}`, sub: `${tl.length} ${tl.length === 1 ? 'Zeile' : 'Zeilen'}`, lines: tl, actions: false }); report.setCount(tl.length, false); }
+  }
+  else if (resumed) flash(resumed.reload ? `Akte wieder aufgenommen: ${roundTitle(state)}.` : `Spielstand geladen: ${roundTitle(state)}.`);
 
   // ---------- Demo-Zustaende fuer Screenshots und Tests ----------
   const api = {

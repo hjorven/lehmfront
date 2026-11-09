@@ -1,0 +1,17 @@
+# Lehmfront (P20). Fuer die Supabase-CLI; das Projekt selbst wird im Dashboard angelegt (siehe docs/online.md).
+project_id = "lehmfront"
+
+[auth]
+enable_signup = true
+enable_anonymous_sign_ins = true
+site_url = "https://hjorven.github.io/lehmfront/"
+additional_redirect_urls = ["https://hjorven.github.io/lehmfront/?scene=fernamt", "http://localhost:8080/", "http://localhost:8080/?scene=fernamt"]
+
+[functions.join]
+verify_jwt = true
+
+[functions.resolve]
+verify_jwt = true
+
+[functions.submit-daily]
+verify_jwt = true

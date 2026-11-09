@@ -37,6 +37,8 @@ jobs:
           node tools/shot.mjs --check --path "/?scene=gefecht"
           node tools/shot.mjs --check --path "/?akte=ansicht"
           node tools/shot.mjs --check --path "/?scene=gefecht&demo=bericht"
+          node tools/shot.mjs --check --path "/?scene=fernamt"
+          node tools/shot.mjs --check --path "/?scene=fernamt&demo=an"
           node tools/shot.mjs --check --path "/?scene=gefecht&mode=hotseat&demo=uebergabe&night=1"
           node tools/shot.mjs --check --path "/?scene=gefecht-frei"
           node tools/shot.mjs --check --path "/?scene=tageslage&tag=20261109"
