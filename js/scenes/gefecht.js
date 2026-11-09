@@ -1238,6 +1238,7 @@ export async function mount(root, params) {
     overlay: (slot) => toggleOverlay(slot),
     commit: () => commitSide(),
     get player() { return player; },
+    get side() { return side; },
     archive: () => openArchive(),
     finishAnim: () => { anim = null; drawDynNow(); },
     get plans() { return sidePlans; },
