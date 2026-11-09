@@ -21,10 +21,10 @@ export function unregisterCheck(id) {
 export const LOW_MORALE = 35;
 export const LOW_AMMO = 25;
 
-registerCheck('ohne-befehl', ({ state, side, orders }) => {
+registerCheck('ohne-befehl', ({ state, side, orders, only = null }) => {
   const has = new Set(orders.map((o) => o.group));
   // P12: Gruppen im Ruhelager ruhen mit Absicht und brauchen keinen Befehl
-  const idle = groupsOf(state, side).filter((g) => !has.has(g.id) && g.status !== 'rest');
+  const idle = groupsOf(state, side).filter((g) => (!only || only(g)) && !has.has(g.id) && g.status !== 'rest');
   if (!idle.length) return [{ tone: 'ok', text: 'Alle Gruppen haben einen Befehl' }];
   return idle.map((g) => ({ tone: 'warn', text: `${groupName(state, g)} ohne Befehl`, group: g.id, at: g.pos }));
 });
@@ -67,7 +67,7 @@ export const HOLD_TYPES = new Set(['assault']);
  * Zusammenfassung fuer den Commit.
  * Liefert { lines: [{ tone, count, text }], needsHold, count, warnings }.
  */
-export function summarize({ state, side, orders, map = null, plans = {} }) {
+export function summarize({ state, side, orders, map = null, plans = {}, only = null }) {
   const byType = new Map();
   for (const o of orders) {
     if (!byType.has(o.type)) byType.set(o.type, []);
@@ -87,11 +87,11 @@ export function summarize({ state, side, orders, map = null, plans = {} }) {
     lines.push({ tone: 'own', count: String(list.length), text: `${head}: ${who.join(', ')}`, type: t });
   }
   const has = new Set(orders.map((o) => o.group));
-  const idle = groupsOf(state, side).filter((g) => !has.has(g.id) && g.status !== 'rest');
+  const idle = groupsOf(state, side).filter((g) => (!only || only(g)) && !has.has(g.id) && g.status !== 'rest');
   if (idle.length) {
     lines.push({ tone: 'warn', count: String(idle.length), text: `${idle.length === 1 ? 'Gruppe' : 'Gruppen'} ohne Befehl (${idle.map((g) => groupName(state, g)).join(', ')}), ${idle.length === 1 ? 'hält' : 'halten'}` });
   }
-  const checks = checklist({ state, side, orders, map, plans });
+  const checks = checklist({ state, side, orders, map, plans, only });
   for (const c of checks) if (c.summary && c.tone !== 'warn') lines.push({ tone: 'own', count: '·', text: c.text });
   const warnings = checks.filter((c) => c.tone === 'warn' && c.check !== 'ohne-befehl');
   for (const w of warnings) lines.push({ tone: 'warn', count: '!', text: w.text });

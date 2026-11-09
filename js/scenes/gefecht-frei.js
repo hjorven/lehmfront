@@ -30,6 +30,7 @@ const newSeed = () => 1 + Math.floor(Math.random() * 99999); // nur Vorschlag im
 
 export async function mount(root, params) {
   const hotseat = params.get('mode') === 'hotseat';
+  const koop = !hotseat && params.get('mode') === 'koop'; // P25: zwei Kommandos teilen Seite a gegen die KI
   await Promise.all([
     ensureCss('css/modi.css'),
     Promise.all(['16px "Special Elite"', '16px "IBM Plex Mono"', '700 16px "Caveat"', '16px "IBM Plex Sans"', '700 16px "IBM Plex Sans"']
@@ -60,7 +61,7 @@ export async function mount(root, params) {
     </div>
     <form class="mb-form card" aria-label="${hotseat ? 'Hotseat einrichten' : 'Gefecht frei einrichten'}">
       <h1>Marschbefehl</h1>
-      <p class="mb-sub">${hotseat ? 'Hotseat: zwei Kommandos an einem Gerät. Wer gerade nicht dran ist, schaut weg.' : 'Gefecht frei gegen das Kommando von drüben.'}</p>
+      <p class="mb-sub">${hotseat ? 'Hotseat: zwei Kommandos an einem Gerät. Wer gerade nicht dran ist, schaut weg.' : koop ? 'Koop: Kommando Nord und Kommando Süd teilen Abschnitt, Depot und Loren gegen die KI. Nord plant zuerst und schreibt Süd einen Zettel.' : 'Gefecht frei gegen das Kommando von drüben.'}</p>
       <fieldset class="mb-field"><legend>Abschnitt</legend><div class="mb-opts">${radio('karte', mapOpts, choice.map)}</div>
         <div class="mb-seed"${choice.map === 'zufall' ? '' : ' hidden'}><input type="text" inputmode="numeric" maxlength="9" aria-label="Seed der Zufallskarte" value="${choice.mapSeed}"><button type="button" class="btn mb-roll">Neu würfeln</button></div>
       </fieldset>
@@ -150,9 +151,10 @@ export async function mount(root, params) {
     if (choice.map === 'zufall') q.set('kseed', String(choice.mapSeed));
     if (hotseat) q.set('mode', 'hotseat');
     else q.set('ki', choice.difficulty);
+    if (koop) q.set('mode', 'koop');
     // Unterschrift mit Bleistift, dann geht es los
     const sig = $('.mb-sig');
-    sig.textContent = hotseat ? 'beide Kommandos' : FACTIONS[choice.faction].short + ', Abschnittsführung';
+    sig.textContent = hotseat ? 'beide Kommandos' : koop ? 'Nord und Süd' : FACTIONS[choice.faction].short + ', Abschnittsführung';
     playSfx('pencil', { count: 6, intensity: 0.6 });
     playSfx('stamp', { delay: 0.5 });
     $('.mb-start').disabled = true;

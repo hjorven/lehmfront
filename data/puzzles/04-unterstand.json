@@ -1,0 +1,263 @@
+{
+ "id": "unterstand",
+ "num": 4,
+ "title": "Die Stufen hinauf",
+ "lesson": "Unterstand",
+ "kind": "battle",
+ "brief": "Ein feindliches MG streicht seit dem Morgen über deinen Graben. Gefangene sagen, dass drüben gleich gestürmt wird. Die Gruppe muss {ziel} halten, und sie muss dabei leben.",
+ "hints": [
+  "Wer unter MG-Feuer an der Brustwehr steht, wird weniger. Im Unterstand trifft kein Schuss.",
+  "Die Stufen hinauf dauern eine ganze Runde. Wer zu spät hinaufsteigt, wird unten überrascht.",
+  "Der Feind läuft los, sobald er glaubt, dein Graben sei leer. Rechne nach, wann er ankommt."
+ ],
+ "solutionText": "Drei Runden Deckung im Unterstand. In der vierten Runde ohne Befehl: die Gruppe steigt hinauf und steht in der fünften an der Brustwehr, genau als der Sturm ankommt.",
+ "wonText": "Sie waren oben, als der Sturm kam. Keine Minute früher, keine später.",
+ "goal": {
+  "type": "hold",
+  "cells": [
+   [
+    6,
+    6
+   ]
+  ]
+ },
+ "limit": 7,
+ "par": {
+  "rounds": 7,
+  "losses": 4
+ },
+ "width": 18,
+ "height": 12,
+ "zoneCols": [
+  8,
+  12
+ ],
+ "trenchLevel": 3,
+ "plan": [
+  "..................",
+  "......=.......#...",
+  "......=.......#...",
+  "......=.......#...",
+  "......=.......#...",
+  "......=.......#...",
+  "......=.......#...",
+  "......=.......#...",
+  "......=.......#...",
+  "......=.......#...",
+  "......=.......#...",
+  ".................."
+ ],
+ "groups": {
+  "a": [
+   {
+    "type": "rifles",
+    "at": [
+     6,
+     6
+    ],
+    "strength": 10,
+    "morale": 70
+   }
+  ],
+  "b": [
+   {
+    "type": "mg",
+    "at": [
+     14,
+     6
+    ],
+    "strength": 7,
+    "morale": 70
+   },
+   {
+    "type": "rifles",
+    "at": [
+     14,
+     5
+    ],
+    "strength": 11,
+    "morale": 72
+   }
+  ]
+ },
+ "script": {
+  "3": [
+   {
+    "group": "b02",
+    "type": "assault",
+    "path": [
+     [
+      13,
+      5
+     ],
+     [
+      12,
+      5
+     ],
+     [
+      11,
+      5
+     ],
+     [
+      10,
+      6
+     ],
+     [
+      9,
+      6
+     ],
+     [
+      8,
+      6
+     ],
+     [
+      7,
+      6
+     ],
+     [
+      6,
+      6
+     ]
+    ]
+   }
+  ]
+ },
+ "solution": {
+  "1": [
+   {
+    "group": "a01",
+    "type": "dugout"
+   }
+  ],
+  "2": [
+   {
+    "group": "a01",
+    "type": "dugout"
+   }
+  ],
+  "3": [
+   {
+    "group": "a01",
+    "type": "dugout"
+   }
+  ]
+ },
+ "tests": {
+  "oben-bleiben": {
+   "1": [
+    {
+     "group": "a01",
+     "type": "sector",
+     "target": [
+      14,
+      6
+     ]
+    }
+   ],
+   "2": [
+    {
+     "group": "a01",
+     "type": "sector",
+     "target": [
+      14,
+      6
+     ]
+    }
+   ],
+   "3": [
+    {
+     "group": "a01",
+     "type": "sector",
+     "target": [
+      14,
+      6
+     ]
+    }
+   ],
+   "4": [
+    {
+     "group": "a01",
+     "type": "sector",
+     "target": [
+      14,
+      6
+     ]
+    }
+   ],
+   "5": [
+    {
+     "group": "a01",
+     "type": "sector",
+     "target": [
+      14,
+      6
+     ]
+    }
+   ],
+   "6": [
+    {
+     "group": "a01",
+     "type": "sector",
+     "target": [
+      14,
+      6
+     ]
+    }
+   ],
+   "7": [
+    {
+     "group": "a01",
+     "type": "sector",
+     "target": [
+      14,
+      6
+     ]
+    }
+   ]
+  },
+  "unten-bleiben": {
+   "1": [
+    {
+     "group": "a01",
+     "type": "dugout"
+    }
+   ],
+   "2": [
+    {
+     "group": "a01",
+     "type": "dugout"
+    }
+   ],
+   "3": [
+    {
+     "group": "a01",
+     "type": "dugout"
+    }
+   ],
+   "4": [
+    {
+     "group": "a01",
+     "type": "dugout"
+    }
+   ],
+   "5": [
+    {
+     "group": "a01",
+     "type": "dugout"
+    }
+   ],
+   "6": [
+    {
+     "group": "a01",
+     "type": "dugout"
+    }
+   ],
+   "7": [
+    {
+     "group": "a01",
+     "type": "dugout"
+    }
+   ]
+  }
+ }
+}

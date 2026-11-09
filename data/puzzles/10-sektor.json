@@ -1,0 +1,228 @@
+{
+ "id": "sektor",
+ "num": 10,
+ "title": "Der tote Winkel",
+ "lesson": "Feuersektor",
+ "kind": "battle",
+ "brief": "Der Gegner kommt, und er kommt nicht von vorn. Zwei Gruppen laufen im Norden um den Sumpf herum auf {ziel} zu. Dein MG steht gut, aber es schaut nach Osten.",
+ "hints": [
+  "Ein MG bestreicht einen Kegel, nicht die ganze Karte.",
+  "Der Sumpf zwingt den Gegner an den Rand. Dort muss der Kegel liegen.",
+  "Ein Feuersektor gilt, bis man ihn ändert."
+ ],
+ "solutionText": "Das MG richtet den Feuersektor auf 10/3. Beide Gruppen laufen hinein.",
+ "wonText": "Der tote Winkel war keiner mehr. Der Angriff ist abgewiesen.",
+ "goal": {
+  "type": "hold",
+  "cells": [
+   [
+    4,
+    3
+   ],
+   [
+    4,
+    4
+   ]
+  ]
+ },
+ "limit": 6,
+ "par": {
+  "rounds": 6,
+  "losses": 2
+ },
+ "width": 18,
+ "height": 12,
+ "zoneCols": [
+  6,
+  13
+ ],
+ "terrain": [
+  "..................",
+  "..................",
+  "..................",
+  "..................",
+  "..................",
+  ".......ssssss.....",
+  ".......ssssss.....",
+  ".......ssssss.....",
+  ".......ssssss.....",
+  ".......ssssss.....",
+  "..................",
+  ".................."
+ ],
+ "plan": [
+  "..................",
+  "..................",
+  "....=..........#..",
+  "....=..........#..",
+  "....=..........#..",
+  "....=..........#..",
+  "....=..........#..",
+  "....=..........#..",
+  "....=..........#..",
+  "....=..........#..",
+  "....=..........#..",
+  ".................."
+ ],
+ "groups": {
+  "a": [
+   {
+    "type": "mg",
+    "at": [
+     4,
+     8
+    ],
+    "strength": 7,
+    "morale": 70
+   },
+   {
+    "type": "rifles",
+    "at": [
+     4,
+     3
+    ],
+    "strength": 8,
+    "morale": 66
+   }
+  ],
+  "b": [
+   {
+    "type": "rifles",
+    "at": [
+     15,
+     2
+    ],
+    "strength": 12,
+    "morale": 74
+   },
+   {
+    "type": "rifles",
+    "at": [
+     15,
+     3
+    ],
+    "strength": 12,
+    "morale": 74
+   }
+  ]
+ },
+ "script": {
+  "1": [
+   {
+    "group": "b01",
+    "type": "assault",
+    "path": [
+     [
+      14,
+      1
+     ],
+     [
+      13,
+      1
+     ],
+     [
+      12,
+      1
+     ],
+     [
+      11,
+      1
+     ],
+     [
+      10,
+      1
+     ],
+     [
+      9,
+      1
+     ],
+     [
+      8,
+      1
+     ],
+     [
+      7,
+      2
+     ],
+     [
+      6,
+      2
+     ],
+     [
+      5,
+      3
+     ],
+     [
+      4,
+      3
+     ]
+    ]
+   },
+   {
+    "group": "b02",
+    "type": "assault",
+    "path": [
+     [
+      14,
+      2
+     ],
+     [
+      13,
+      2
+     ],
+     [
+      12,
+      2
+     ],
+     [
+      11,
+      2
+     ],
+     [
+      10,
+      2
+     ],
+     [
+      9,
+      2
+     ],
+     [
+      8,
+      2
+     ],
+     [
+      7,
+      3
+     ],
+     [
+      6,
+      3
+     ],
+     [
+      5,
+      4
+     ],
+     [
+      4,
+      4
+     ]
+    ]
+   }
+  ]
+ },
+ "solution": {
+  "1": [
+   {
+    "group": "a01",
+    "type": "sector",
+    "target": [
+     9,
+     2
+    ]
+   }
+  ]
+ },
+ "tests": {
+  "nichts": {}
+ }
+}

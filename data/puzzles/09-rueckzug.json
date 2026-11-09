@@ -1,0 +1,202 @@
+{
+ "id": "rueckzug",
+ "num": 9,
+ "title": "Zurück in den Graben",
+ "lesson": "Laufgraben",
+ "kind": "battle",
+ "brief": "Eine Gruppe liegt vorn in einem Trichter, viel zu nah am Feind. Sie muss zurück in den eigenen Graben, und zwar ganz. Das offene Feld dazwischen ist ein Schießstand.",
+ "hints": [
+  "Ein Laufgraben gibt Deckung, auch wenn er Umwege macht.",
+  "Wer läuft, schießt nicht, aber das eigene MG kann den Kopf des Feindes unten halten.",
+  "Der kürzeste Weg ist hier der teuerste."
+ ],
+ "solutionText": "Die Gruppe geht den Laufgraben im Zickzack zurück bis 5/9. Das MG hält dabei das feindliche MG nieder.",
+ "wonText": "Alle, die noch laufen konnten, sind im Graben.",
+ "goal": {
+  "type": "reach",
+  "group": "a01",
+  "cells": [
+   [
+    4,
+    7
+   ],
+   [
+    4,
+    8
+   ],
+   [
+    4,
+    9
+   ],
+   [
+    4,
+    6
+   ],
+   [
+    4,
+    5
+   ]
+  ]
+ },
+ "limit": 6,
+ "maxLosses": 4,
+ "keep": [
+  "a01"
+ ],
+ "par": {
+  "rounds": 5,
+  "losses": 3
+ },
+ "width": 18,
+ "height": 12,
+ "zoneCols": [
+  6,
+  13
+ ],
+ "plan": [
+  "..................",
+  "....=.........#...",
+  "....=.........#...",
+  "....=.........#...",
+  "....=.........#...",
+  "....=.........#...",
+  "....=.........#...",
+  "....=......o..#...",
+  "....=:..:..:..#...",
+  "....=.::.::...#...",
+  "....=.........#...",
+  ".................."
+ ],
+ "groups": {
+  "a": [
+   {
+    "type": "rifles",
+    "at": [
+     11,
+     7
+    ],
+    "strength": 8,
+    "morale": 62
+   },
+   {
+    "type": "mg",
+    "at": [
+     4,
+     6
+    ],
+    "strength": 7,
+    "morale": 70
+   }
+  ],
+  "b": [
+   {
+    "type": "mg",
+    "at": [
+     14,
+     6
+    ],
+    "strength": 7,
+    "morale": 70
+   },
+   {
+    "type": "rifles",
+    "at": [
+     14,
+     9
+    ],
+    "strength": 10,
+    "morale": 70
+   }
+  ]
+ },
+ "solution": {
+  "1": [
+   {
+    "group": "a02",
+    "type": "sector",
+    "target": [
+     14,
+     6
+    ]
+   },
+   {
+    "group": "a01",
+    "type": "move",
+    "path": [
+     [
+      11,
+      8
+     ],
+     [
+      10,
+      9
+     ],
+     [
+      9,
+      9
+     ],
+     [
+      8,
+      8
+     ],
+     [
+      7,
+      9
+     ],
+     [
+      6,
+      9
+     ],
+     [
+      5,
+      8
+     ],
+     [
+      4,
+      8
+     ]
+    ]
+   }
+  ]
+ },
+ "tests": {
+  "geradeaus": {
+   "1": [
+    {
+     "group": "a01",
+     "type": "move",
+     "path": [
+      [
+       10,
+       7
+      ],
+      [
+       9,
+       7
+      ],
+      [
+       8,
+       7
+      ],
+      [
+       7,
+       7
+      ],
+      [
+       6,
+       7
+      ],
+      [
+       5,
+       7
+      ],
+      [
+       4,
+       7
+      ]
+     ]
+    }
+   ]
+  }
+ }
+}

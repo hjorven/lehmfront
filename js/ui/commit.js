@@ -37,7 +37,7 @@ function modal(root, cls, label, onClose) {
  * Zusammenfassung zeigen. s = summarize(...) Ergebnis, title, onCommit, onCancel.
  * needsHold: Ring fuellt sich nur, solange Maus, Finger, Enter oder Leertaste gehalten werden.
  */
-export function showSummary(root, s, { title, sub, onCommit, onCancel, preset = 0 }) {
+export function showSummary(root, s, { title, sub, onCommit, onCancel, preset = 0, action = 'Runde ausführen' }) {
   let done = false;
   const m = modal(root, 'summary', 'Zusammenfassung vor der Ausführung', () => { if (!done) { m.close(); onCancel(); } });
   const hold = s.needsHold;
@@ -48,7 +48,7 @@ export function showSummary(root, s, { title, sub, onCommit, onCancel, preset = 
       <button type="button" class="ring${hold ? ' hold' : ''}" aria-describedby="ring-how">
         <svg viewBox="0 0 170 170" aria-hidden="true"><circle class="trk" cx="85" cy="85" r="${R}"/><circle class="val" cx="85" cy="85" r="${R}"
           stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${C.toFixed(1)}" transform="rotate(-90 85 85)"/></svg>
-        <span class="ring-face"><b>Runde ausführen</b><small id="ring-how">${hold ? 'halten' : 'klicken'} · ${s.count} ${s.count === 1 ? 'Befehl' : 'Befehle'}</small></span>
+        <span class="ring-face"><b>${esc(action)}</b><small id="ring-how">${hold ? 'halten' : 'klicken'} · ${s.count} ${s.count === 1 ? 'Befehl' : 'Befehle'}</small></span>
       </button>
     </div>
     <footer><button type="button" class="btn back">Zurück zur Karte <small>Esc</small></button></footer>`;

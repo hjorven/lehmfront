@@ -1,0 +1,172 @@
+{
+ "id": "draht",
+ "num": 3,
+ "title": "Gasse im Draht",
+ "lesson": "Draht",
+ "kind": "battle",
+ "brief": "Ein Drahtgürtel liegt vor dem feindlichen Graben, dicht und ohne Gasse. Die Schützen sind bereit, der Graben bei {ziel} ist schwach besetzt. Aber wer im Draht hängt, ist eine Scheibe.",
+ "hints": [
+  "Schützen schneiden keinen Draht. Pioniere schon.",
+  "Eine Gasse genügt. Wer hinter den Pionieren bleibt, kommt durch.",
+  "Erst schneiden, dann stürmen. Beides zugleich verstopft die Gasse."
+ ],
+ "solutionText": "Die Pioniere rücken in den Draht bei 12/8 und schneiden eine Gasse. In der zweiten Runde stürmen sie weiter nach 14/9, die Schützen laufen durch die Gasse auf 14/8.",
+ "wonText": "Durch die Gasse ging es schneller als gedacht. Der Graben ist in eigener Hand.",
+ "goal": {
+  "type": "take",
+  "cells": [
+   [
+    13,
+    7
+   ]
+  ]
+ },
+ "limit": 6,
+ "par": {
+  "rounds": 3,
+  "losses": 4
+ },
+ "width": 18,
+ "height": 12,
+ "zoneCols": [
+  6,
+  11
+ ],
+ "plan": [
+  "..................",
+  "....=......X.#....",
+  "....=......X.#....",
+  "....=......X.#....",
+  "....=......X.#....",
+  "....=......X.#....",
+  "....=...o..X.#....",
+  "....=......X.#....",
+  "....=.....oX.#....",
+  "....=......X.#....",
+  "....=......X.#....",
+  ".................."
+ ],
+ "groups": {
+  "a": [
+   {
+    "type": "rifles",
+    "at": [
+     8,
+     6
+    ],
+    "strength": 12,
+    "morale": 72,
+    "experience": 2
+   },
+   {
+    "type": "pioneers",
+    "at": [
+     10,
+     8
+    ],
+    "strength": 9,
+    "morale": 72
+   }
+  ],
+  "b": [
+   {
+    "type": "rifles",
+    "at": [
+     13,
+     7
+    ],
+    "strength": 6,
+    "morale": 58,
+    "experience": 0
+   }
+  ]
+ },
+ "solution": {
+  "1": [
+   {
+    "group": "a02",
+    "type": "move",
+    "path": [
+     [
+      11,
+      7
+     ]
+    ]
+   }
+  ],
+  "2": [
+   {
+    "group": "a02",
+    "type": "assault",
+    "path": [
+     [
+      12,
+      8
+     ],
+     [
+      13,
+      8
+     ]
+    ]
+   },
+   {
+    "group": "a01",
+    "type": "assault",
+    "path": [
+     [
+      9,
+      7
+     ],
+     [
+      10,
+      7
+     ],
+     [
+      11,
+      7
+     ],
+     [
+      12,
+      7
+     ],
+     [
+      13,
+      7
+     ]
+    ]
+   }
+  ]
+ },
+ "tests": {
+  "schuetzen-allein": {
+   "1": [
+    {
+     "group": "a01",
+     "type": "assault",
+     "path": [
+      [
+       9,
+       7
+      ],
+      [
+       10,
+       7
+      ],
+      [
+       11,
+       7
+      ],
+      [
+       12,
+       7
+      ],
+      [
+       13,
+       7
+      ]
+     ]
+    }
+   ]
+  }
+ }
+}

@@ -204,5 +204,8 @@ export function createInitialState(map, scenario, seed) {
     cells: {},
     fallen: [],
     result: null,
+    // P25: Puzzle-Lagen zeigen alle Gruppen (reveal) und wuerfeln nicht (steady, js/rng.js createSteadyRng)
+    ...(scenario.reveal ? { reveal: true } : {}),
+    ...(scenario.steady ? { steady: true } : {}),
   };
 }

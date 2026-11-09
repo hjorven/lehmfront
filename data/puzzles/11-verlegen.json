@@ -1,0 +1,254 @@
+{
+ "id": "verlegen",
+ "num": 11,
+ "title": "Die Reserve",
+ "lesson": "Verlegen",
+ "kind": "position",
+ "brief": "Der Süden deines Abschnitts hält nur eine halbe Gruppe. Drüben, das weißt du, greift man ihn in der zweiten Nacht an. Die Reserve liegt im Norden, hinter der Linie.",
+ "hints": [
+  "Hinter der eigenen Linie geht es viermal so schnell wie im Gefecht.",
+  "Der Laufgraben verbindet Norden und Süden.",
+  "Die Reserve muss da sein, bevor der Angriff angesetzt wird."
+ ],
+ "solutionText": "Die Reserve verlegt in der ersten Stellungsrunde durch den Laufgraben nach 5/11. Als der Angriff kommt, stehen zwei Gruppen im Süden.",
+ "wonText": "Der Angriff trifft auf eine volle Gruppe statt auf eine halbe.",
+ "goal": {
+  "type": "hold",
+  "cells": [
+   [
+    4,
+    9
+   ],
+   [
+    4,
+    10
+   ]
+  ]
+ },
+ "limit": 8,
+ "par": {
+  "rounds": 8,
+  "losses": 3
+ },
+ "startHour": 6,
+ "width": 18,
+ "height": 12,
+ "zoneCols": [
+  6,
+  13
+ ],
+ "plan": [
+  "..................",
+  "....=..........#..",
+  "...:=..........#..",
+  "..:.=..........#..",
+  "..:.=..........#..",
+  "...:=..........#..",
+  "..:.=..........#..",
+  "..:.=..........#..",
+  "...:=..........#..",
+  "...:=..........#..",
+  "....=..........#..",
+  ".................."
+ ],
+ "groups": {
+  "a": [
+   {
+    "type": "mg",
+    "at": [
+     4,
+     3
+    ],
+    "strength": 7,
+    "morale": 70
+   },
+   {
+    "type": "rifles",
+    "at": [
+     4,
+     9
+    ],
+    "strength": 5,
+    "morale": 60
+   },
+   {
+    "type": "rifles",
+    "at": [
+     3,
+     2
+    ],
+    "strength": 11,
+    "morale": 72
+   }
+  ],
+  "b": [
+   {
+    "type": "rifles",
+    "at": [
+     15,
+     9
+    ],
+    "strength": 11,
+    "morale": 74
+   },
+   {
+    "type": "rifles",
+    "at": [
+     15,
+     10
+    ],
+    "strength": 11,
+    "morale": 74
+   }
+  ]
+ },
+ "script": {
+  "2": [
+   {
+    "group": "b01",
+    "type": "attack",
+    "path": [
+     [
+      14,
+      9
+     ],
+     [
+      13,
+      9
+     ],
+     [
+      12,
+      9
+     ],
+     [
+      11,
+      9
+     ],
+     [
+      10,
+      9
+     ],
+     [
+      9,
+      9
+     ],
+     [
+      8,
+      9
+     ],
+     [
+      7,
+      9
+     ],
+     [
+      6,
+      9
+     ],
+     [
+      5,
+      9
+     ],
+     [
+      4,
+      9
+     ]
+    ]
+   },
+   {
+    "group": "b02",
+    "type": "attack",
+    "path": [
+     [
+      14,
+      10
+     ],
+     [
+      13,
+      10
+     ],
+     [
+      12,
+      10
+     ],
+     [
+      11,
+      10
+     ],
+     [
+      10,
+      10
+     ],
+     [
+      9,
+      10
+     ],
+     [
+      8,
+      10
+     ],
+     [
+      7,
+      10
+     ],
+     [
+      6,
+      10
+     ],
+     [
+      5,
+      10
+     ],
+     [
+      4,
+      10
+     ]
+    ]
+   }
+  ]
+ },
+ "solution": {
+  "1": [
+   {
+    "group": "a03",
+    "type": "redeploy",
+    "path": [
+     [
+      2,
+      3
+     ],
+     [
+      2,
+      4
+     ],
+     [
+      3,
+      5
+     ],
+     [
+      2,
+      6
+     ],
+     [
+      2,
+      7
+     ],
+     [
+      3,
+      8
+     ],
+     [
+      3,
+      9
+     ],
+     [
+      4,
+      10
+     ]
+    ]
+   }
+  ]
+ },
+ "tests": {
+  "nichts": {}
+ }
+}
