@@ -32,7 +32,7 @@ export function createLaskNote(root, { onJump, onClose }) {
       el.innerHTML = `
         <div class="ln-stamp">Abgefangen · ${esc(note.found ?? 'am Draht gefunden')}</div>
         <div class="ln-paper"><p class="ln-text">${lines}<span class="ln-sig">${esc(note.signature ?? 'L.')}</span></p></div>
-        <p class="ln-vermerk">Übersetzt: Lt. de Groot, Fernmeldestelle Ostervenn. Klartext: ${esc(note.hint)}</p>
+        <p class="ln-vermerk">Übersetzt: Lt. de Groot, Fernmeldestelle Ostervenn. Verwischte Stellen nicht zu entziffern.<span class="ln-sr"> Sinngemäß: ${esc(note.hint)}</span></p>
         <div class="ln-actions"><button type="button" class="btn ln-jump" data-at='${esc(JSON.stringify(note.at))}'>Zur Stelle ${esc(cellLabel(note.at.x, note.at.y))}</button><button type="button" class="btn ln-close">Ablegen</button></div>`;
       el.hidden = false;
       el.querySelector('.ln-close').focus({ preventScroll: true });

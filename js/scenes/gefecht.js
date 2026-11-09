@@ -277,10 +277,23 @@ export async function mount(root, params) {
   const lehrling = attachLehrling({
     ui, bar: ui.querySelector('.hud-right'), sheet: ui.querySelector('.hud-sheet'), decide, viewFor, map, env, seed, cfg: aiCfg,
     now: () => ({ state, side, log: lastLog, orderOf: (id) => orderOf(book, side, id), plans: sidePlans[side] }),
-    adopt: (o) => { book = setOrder(book, side, o); helpShown = true; playSfx('pencil', { count: 2, intensity: 0.5 }); },
-    adoptPlan: (o) => { sidePlans[side] = { ...sidePlans[side], [o.type]: o }; },
+    canOpen: () => { if (book[side]?.sealed || filmFrame) { flash('Der Lehrling hilft beim Planen, nicht jetzt.'); return false; } return true; },
+    adopt: (o) => { if (book[side]?.sealed) return; book = setOrder(book, side, o); helpShown = true; playSfx('pencil', { count: 2, intensity: 0.5 }); },
+    adoptPlan: (o) => {
+      if (book[side]?.sealed) return;
+      // Feuerplaene nach ID zusammenfuehren, damit eigene Plaene des Spielers bleiben
+      const have = sidePlans[side][o.type]?.plans ?? [];
+      const plans = [...have.filter((p) => !o.plans.some((q) => q.id === p.id)), ...o.plans];
+      sidePlans[side] = { ...sidePlans[side], [o.type]: { ...o, plans } };
+      flash(have.length ? 'Feuerplan des Lehrlings zu den eigenen Plänen gelegt.' : 'Feuerplan des Lehrlings übernommen.');
+    },
     label: (g) => groupLabel(g), mark: (g) => groupMark(state, g), describe: (g, o) => orderText(g, o),
-    focus: ({ group, at }) => { if (group) select(group, { center: true }); else if (at) { centerOn(cam, at.x + 0.5, at.y + 0.5); onCamera(); } },
+    focus: ({ group, at }) => {
+      const p = group ? getGroup(state, group)?.pos : at;
+      if (group) select(group);
+      // Auf dem Handy liegt das Kaertchen unten: das Ziel ins obere Drittel holen
+      if (p) { centerOn(cam, p.x + 0.5, p.y + 0.5 + (narrow() ? (root.clientHeight * 0.2) / cam.zoom : 0)); onCamera(); refresh(); }
+    },
     beforeOpen: () => { cancelTool(false); if (orderList.open) closeList(); report.hide(); playSfx('paper', { intensity: 0.4 }); },
     changed: () => refresh(),
   });
@@ -774,7 +787,8 @@ export async function mount(root, params) {
     else {
       const d = aiNext?.turn === state.turn ? aiNext.decision : decide(viewFor(state, lastLog, 'b', env), { map, seed, ...aiCfg, memory: aiMemory });
       aiMemory = d.memory;
-      ordersB = d.orders;
+      const fresh = new Set(d.orders.map((o) => o.group).filter(Boolean));
+      ordersB = [...d.orders, ...listOrders(book, 'b').filter((o) => o.carried && !fresh.has(o.group))];
     }
     const input = { state, ordersA, ordersB, seed, turn: state.turn, env };
     const r = resolveTurn(state, ordersA, ordersB, seed, state.turn, env);
@@ -1002,7 +1016,7 @@ export async function mount(root, params) {
     if (e.key === 'Escape') {
       if (radial.open) { radial.hide(); refresh(); dynCv.focus({ preventScroll: true }); }
       else if (tool) cancelTool();
-      else if (laskNote.open) laskNote.hide();
+      else if (laskNote.open) { laskNote.hide(); playSfx('paper', { intensity: 0.3 }); dynCv.focus({ preventScroll: true }); }
       else if (lehrling.open) lehrling.close();
       else if (hud.popoverOpen) hud.closePopover();
       else if (orderList.open) closeList();

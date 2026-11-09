@@ -89,6 +89,22 @@ Jeder Thread traegt hier nach dem Merge ein, was fertig ist und was offen bleibt
   - Demos: `?scene=gefecht&demo=sturmplan|draht|umschalten|gefechtsrunde|nahkampf|unterstand`.
   - Überraschung: Beim Umschalten auf Gefechtsrunden dreht die Scheibe zurück und rastet hörbar als Stoppuhr ein, das Kartenpapier ruckt kurz, als hätte jemand an den Tisch gestoßen.
 
+- P13 KI-Kommandant, Taktik-Lehrling, Headless-Simulator:
+  - `js/ai.js` (rein): `decide(view, { map, seed, posture?, doctrine?, difficulty?, memory?, advisor? })` liefert Befehle mit deutscher Begründung je Befehl (`advice`), Lage, Absicht (`intent`) und Gedächtnis für die nächste Runde; `planOrders` gibt nur die Befehle. Arbeitet nur auf `viewFor` und der Grundkarte (Test: ungesehene Feinde ändern nichts), prüft jeden Befehl mit `validateOrder` vor der Abgabe.
+  - Lagen Halten, Vorbereiten, Sturm, Gegenstoß; Wahl aus Kräfteverhältnis (eigene Kampfkraft zu geschätzter feindlicher aus Sicht, Geistern und Gedächtnis), Vorbereitungsrunden, Ruhe nach dem Gefecht, Stabsbefehl zum Gegenstoß. Nutzt Angriff ansetzen mit Sturmweg (A* um Draht und bekannte MG-Kegel), Sprungstellung, Beobachter auf Höhe, Graben beziehen, Draht vor die Linie, MG-Sektoren, Leuchtkugeln, Feuer auf die nächste Bedrohung, raus aus dem Unterstand, Feuerplan (Sperrfeuer, Störfeuer, Gegenbatterie, Vorbereitungsfeuer, Walze mit 5 Feldern Abstand).
+  - Doktrinen in `js/config/doctrines.js` (ausgewogen, masse, nacht, material, tiefe; `doctrineForAct(akt)`), Schwierigkeiten rekrut, veteran, lask (Geisteralter, Schätzfehler, verschlafene Befehle, Draht-/MG-Bewusstsein, Walze).
+  - Gefecht: Seite b plant mit der KI. Szenario `sides.b.ai = { doctrine, difficulty }` (Asse frei: masse, veteran), URL `&doktrin=` und `&ki=`. Weitergetragene Wege der KI-Seite laufen weiter, wenn die KI nichts Neues befiehlt.
+  - Taktik-Lehrling (Taste T, Knopf „Lehrling“, auf dem Handy Karte in der Seitenleiste): dieselbe KI (Stufe lask, `advisor: true`) plant für die eigene Seite; Kärtchen mit nummerierten Vorschlägen und Begründung in Handschrift, Bleistiftnummern auf der Karte, „nehmen“ einzeln oder „Alle übernehmen“ (überschreibt keine eigenen Befehle; Feuerpläne werden nach ID zusammengelegt). Demo `?scene=gefecht&demo=lehrling` und `demo=lehrling-nimm`.
+  - `tools/sim.js` (Kern `js/ai/match.js`): `node tools/sim.js --map data/maps/asse.json --seed 42 --a halten --b sturm --runs 200` gibt Siegquote, Verluste, genommene Grabenfelder, Runden, Angriffe, Top-10-Entscheidungen je Seite und Top-10-Begründungen im Protokoll. `--mirror` (Spiegelkarte um die Mitte des Niemandslands, identische Armeen), `--tournament`, `--doctrine(-a/-b)`, `--difficulty(-a/-b)`, `--turns`, `--json`. Wertung: feindliche Verluste plus 3 je gehaltenes feindliches Grabenfeld; unter 3 Punkten Abstand Remis.
+  - Überraschung: Abgefangene Notizen von Lask. Nach jeder Runde rechnet das Spiel Lasks nächsten Zug schon voraus; mit etwas Glück (sicher nach Gefangenen oder einem Einbruch, öfter mit Beobachtern nah am Feind) fällt ein Zettel in die eigenen Hände: Bleistift, ausgerissen, teils verwischt, mit Vermerk der Übersetzerin de Groot. Er beschreibt den echten nächsten Zug (Ziel, Zahl der Rotten, Artillerie) und hinterlässt einen Kringel „L.?“ auf der Karte. Demo `demo=notiz&lage=sturm|vorbereiten|halten|gegenstoss`.
+  - Nebenbei behoben: Absturz im Nahkampf, wenn der Verteidiger dabei aufgerieben wird (`js/phases/melee.js`).
+
+### Für die nächsten Pakete (nach P13)
+
+- KI anderer Seite oder Missionen: `decide(viewFor(state, log, side, { map }), { map, seed, doctrine, difficulty, memory })`, Gedächtnis zwischen den Runden selbst aufheben. P14/P16: Lasks Doktrin je Akt mit `doctrineForAct(state.act)`. P17/P18: Schwierigkeit als Einstellung (`rekrut`, `veteran`, `lask`).
+- P21 Balancing: vor jeder Änderung `node tools/sim.js --map data/maps/asse.json --tournament --runs 20` und `--mirror --runs 1000`.
+- Neue Befehlsarten (Stollen, Stoßtrupp, Ablösung) kennt die KI noch nicht; neue Mechaniken bitte in `decide` als eigenen Baustein ergänzen.
+
 ### Für die nächsten Pakete (nach P06)
 
 - P09 Artillerie: `g.shelled = true` in der Artilleriephase (vor `dugout`, Gefecht Schritt 2) treibt Gruppen in den Unterstand und hält sie dort (ist angeschlossen: `applyImpacts` setzt ihn, die Phase `shelled` löscht ihn nach der Bewegung). Draht zerstören: `state.cells[k].wire = null`. Feuerpläne laufen jetzt, sobald ein Angriff angesetzt ist (`state.battle.round` 1 bis 12, `battleMinute(state)`). `stormGhosts` liest weiter `assault`-Befehle; Feldkosten mit Feldzustand über `stepCost(map, a, b, state)`.
@@ -199,6 +215,10 @@ Jeder Thread traegt hier nach dem Merge ein, was fertig ist und was offen bleibt
 - P14: Erfahrungsbericht „Feuerwalze“ schaltet die Walze noch nicht frei; die Planart `creep` ist immer verfügbar.
 
 ## Offen und bekannte Macken
+
+- P13: Symmetrie auf der Spiegelkarte: Sturm gegen Sturm liegt nahe 50 Prozent (200 Läufe: a 38, b 45, Remis 17). Mit Lage auto gewinnt Seite a etwas häufiger (200 Läufe: 43,5 zu 30,5, Remis 26); Sichtlinien sind spiegelgleich, die Ursache liegt vermutlich in einer Phase, die Seite a zuerst behandelt. Für P21.
+- P13: Angriffe der KI kommen selten durch (genommene Grabenfelder im Mittel unter 1 bei Lage auto); Verteidigung mit Sperrfeuer und Unterstand ist stark. Kräfteschätzung und Schwellen in `js/config/doctrines.js` sind erste Werte.
+- P13: Ein Sperrfeuer wird neu angelegt (volle Runden), wenn die KI in einer Stellungsrunde einen weiteren Feuerplan schickt.
 
 - P11: Nur Loren, Verpflegung, Material/Holz/Beton und Feldpost wirken direkt. Moral (Küche wirkt schon über die Versorgung, P08 `warm_meal`), Erholung, Heilung, Trost, Ausbildung, Offiziere: P12 liest `etappe.yield`. Batterieplätze, Leitung, Streuung: P09. Sicht und Ballon: P05 oder später. Werkstatt (Reparatur) hat noch keine Wirkung.
 - P11/P09: Eine zerschossene Batteriestellung der Etappe lässt die Batterie auf ihrer Parzelle schweigen, bis sie repariert ist. Offen: neu gebaute Batteriestellungen bringen noch keine neue Batterie in `artillery.batteries`, und die Fernmeldestelle der Etappe ersetzt noch nicht `artillery.exchange` (beide liest P09 beim Start aus der Karte).

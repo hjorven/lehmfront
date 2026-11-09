@@ -45,6 +45,8 @@ const byId = (p, q) => compare(p.id, q.id);
 const key = (p) => p.x + ',' + p.y;
 const nameOf = (g) => 'Gruppe ' + surname(g.leader?.name ?? g.id);
 const pct = (n) => Math.round(n) + ' %';
+/** Runden spiegelgleich um null (Spiegelkarte: Seite b sieht dieselben Abstaende mit umgekehrtem Vorzeichen) */
+const roundSym = (v) => (v < 0 ? -Math.round(-v) : Math.round(v));
 
 /** FNV-1a fuer den Zufallsstrom der KI (Seite und Runde mischen) */
 function hash(str) {
@@ -198,7 +200,7 @@ function choosePosture(view, sit, memory, doc, diff, forced, rng) {
       if (doc.nightOnly && !view.night) return r('vorbereiten', `Angriff bereit, aber die Doktrin wartet auf die Nacht (Kräfte ${pct(ratio)}).`);
       return r('sturm', `Kräfte ${pct(ratio)} der geschätzten feindlichen, ${memory.prep} ${memory.prep === 1 ? 'Runde' : 'Runden'} vorbereitet: Angriff.`);
     }
-    return r('vorbereiten', `Kräfte ${pct(ratio)}: genug für einen Angriff, aber erst vorbereiten (${memory.prep} von ${doc.prepTurns}).`);
+    return r('vorbereiten', `Kräfte ${pct(ratio)}: genug für einen Angriff, aber erst vorbereiten (${memory.prep} von ${doc.prepTurns} ${doc.prepTurns === 1 ? 'Runde' : 'Runden'}).`);
   }
   if (ratio >= doc.prepareRatio && rested) return r('vorbereiten', `Kräfte ${pct(ratio)}: noch nicht genug, wir bereiten vor.`);
   if (!rested) return r('halten', `Nach dem letzten Gefecht braucht die Truppe Ruhe.`);
@@ -237,11 +239,19 @@ function redeployPath(map, g, to, side) {
   return r ? r.path.slice(1) : null;
 }
 
-function nearest(list, p) {
+/**
+ * Gleichstand zwischen zwei Feldern aufloesen: erst nach Zeile, dann das Feld naeher an der eigenen Etappe.
+ * Seitengleich (ex = Richtung zum Feind), damit Seite a und b auf einer Spiegelkarte gleich entscheiden.
+ */
+function tie(p, q, ex) {
+  return p.y - q.y || (p.x - q.x) * ex;
+}
+
+function nearest(list, p, ex) {
   let best = null, bd = Infinity;
   for (const q of list) {
     const d = distance(q, p);
-    if (d < bd || (d === bd && best && (q.y < best.y || (q.y === best.y && q.x < best.x)))) { best = q; bd = d; }
+    if (d < bd || (d === bd && best && tie(q, best, ex) < 0)) { best = q; bd = d; }
   }
   return best;
 }
@@ -273,13 +283,13 @@ export function pickObjective(view, map, sit, diff, rng, from) {
       // Draht auf der geraden Linie vom Ausgangspunkt
       const steps = Math.max(1, d);
       for (let i = 1; i < steps; i++) {
-        const x = from.x + Math.round(((t.x - from.x) * i) / steps), y = from.y + Math.round(((t.y - from.y) * i) / steps);
+        const x = from.x + roundSym(((t.x - from.x) * i) / steps), y = from.y + Math.round(((t.y - from.y) * i) / steps);
         const c = liveCell(map, view.cells, x, y);
         if (c?.wire && c.wire.side !== sit.ms) score += 6;
       }
     }
     if (diff.noise) score += Math.floor(rng() * diff.noise);
-    if (!best || score < best.score || (score === best.score && (t.y < best.y || (t.y === best.y && t.x < best.x)))) best = { x: t.x, y: t.y, score };
+    if (!best || score < best.score || (score === best.score && tie(t, best, sit.ex) < 0)) best = { x: t.x, y: t.y, score };
   }
   return best;
 }
@@ -288,7 +298,7 @@ export function pickObjective(view, map, sit, diff, rng, from) {
 function objectiveCells(sit, obj, n) {
   return sit.foeTrench
     .filter((t) => distance(t, obj) <= 3)
-    .sort((p, q) => distance(p, obj) - distance(q, obj) || p.y - q.y || p.x - q.x)
+    .sort((p, q) => distance(p, obj) - distance(q, obj) || tie(p, q, sit.ex))
     .slice(0, Math.max(1, n));
 }
 
@@ -373,7 +383,12 @@ export function decide(view, opts = {}) {
   const kind = view.turnKind;
   const healthy = (g) => (g.strength ?? 1) * 100 >= (g.size ?? 1) * 40 && (g.morale ?? 70) >= 30 && (g.suppressed ?? 0) < PINNED;
   const zoneOf = (p) => cellAt(map, p.x, p.y);
-  const outside = (g) => { const c = zoneOf(g.pos); return !!c && (c.zone === 'niemandsland' || (c.side !== null && c.side !== sit.ms)); };
+  // Draussen: Niemandsland oder Feindseite, aber nicht in einem genommenen (jetzt eigenen) Graben
+  const outside = (g) => {
+    const c = zoneOf(g.pos);
+    if (!c || !(c.zone === 'niemandsland' || (c.side !== null && c.side !== sit.ms))) return false;
+    return liveCell(map, view.cells, g.pos.x, g.pos.y)?.trench?.side !== sit.ms;
+  };
 
   // ---------- Gefechtsrunde ----------
   if (kind === 'battle') {
@@ -424,7 +439,7 @@ export function decide(view, opts = {}) {
         .sort((p, q) => distance(p.pos, g.pos) - distance(q.pos, g.pos) || compare(p.id, q.id));
       const t = unitType(g.type);
       if (outside(g) && !(battle?.assaulters ?? []).includes(g.id)) {
-        const back = nearest(sit.ownTrench.filter((c) => c.home), g.pos);
+        const back = nearest(sit.ownTrench.filter((c) => c.home), g.pos, sit.ex);
         const path = back ? pathTo(map, g.pos, back, (c) => enterCost(c)) : null;
         if (path?.length && give(g, { group: g.id, type: 'move', path }, `${nameOf(g)} steht draußen und geht zurück in den Graben bei ${cellLabel(back.x, back.y)}.`, 'Zurück in den Graben')) continue;
       }
@@ -448,7 +463,7 @@ export function decide(view, opts = {}) {
   // ---------- Stellungsrunde ----------
   if (kind === 'position') {
     const assaultable = sit.own.filter((g) => ASSAULT_TYPES.has(g.type) && healthy(g));
-    const center = sit.own.length ? { x: Math.round(sit.own.reduce((s, g) => s + g.pos.x, 0) / sit.own.length), y: Math.round(sit.own.reduce((s, g) => s + g.pos.y, 0) / sit.own.length) } : { x: 0, y: 0 };
+    const center = sit.own.length ? { x: sit.ex > 0 ? Math.round(sit.own.reduce((s, g) => s + g.pos.x, 0) / sit.own.length) : -Math.round(-sit.own.reduce((s, g) => s + g.pos.x, 0) / sit.own.length), y: Math.round(sit.own.reduce((s, g) => s + g.pos.y, 0) / sit.own.length) } : { x: 0, y: 0 };
     let objective = null;
     if (posture === 'sturm' || posture === 'vorbereiten') {
       const from = assaultable.length ? assaultable.reduce((b, g) => (b && byId(b, g) <= 0 ? b : g), null).pos : center;
@@ -456,7 +471,7 @@ export function decide(view, opts = {}) {
       objective = pickObjective(view, map, sit, diff, rng, fx !== null ? { x: fx, y: from.y } : from);
       if (!objective && memory.objective) objective = memory.objective;
     }
-    if (posture === 'gegenstoss') objective = nearest(sit.lostCells, center);
+    if (posture === 'gegenstoss') objective = nearest(sit.lostCells, center, sit.ex);
     if (objective) intent.objective = { x: objective.x, y: objective.y };
 
     // Sturm ansetzen
@@ -495,7 +510,7 @@ export function decide(view, opts = {}) {
       const ranked = assaultable.slice().sort((p, q) => distance(p.pos, objective) - distance(q.pos, objective) || byId(p, q)).slice(0, count);
       const occupied = occupiedSet(sit);
       const jump = sit.ownTrench.filter((c) => c.home && !occupied.has(key(c)))
-        .sort((p, q) => distance(p, objective) - distance(q, objective) || p.y - q.y || p.x - q.x);
+        .sort((p, q) => distance(p, objective) - distance(q, objective) || tie(p, q, sit.ex));
       for (const g of ranked.sort(byId)) {
         intent.groups.push(g.id);
         if (distance(g.pos, objective) <= ASSAULT_REACH - 6 && !outside(g)) continue;
@@ -519,7 +534,7 @@ export function decide(view, opts = {}) {
             const d = distance(c, objective);
             if (d > 14 || d < 4) continue;
             const s = c.height * 10 - d - distance(c, g.pos) / 4;
-            if (best && s <= best.s) continue;
+            if (best && (s < best.s || (s === best.s && tie(c, best, sit.ex) >= 0))) continue;
             if (!lineOfSight(map, c, objective).visible) continue;
             best = { x, y, s };
           }
@@ -533,10 +548,10 @@ export function decide(view, opts = {}) {
     // Rueckzug aus dem Niemandsland nach einem Gefecht
     for (const g of sit.own) {
       if (taken.has(g.id) || !outside(g)) continue;
-      const back = nearest(sit.ownTrench.filter((c) => c.home && !reserved.has(key(c))), g.pos);
+      const back = nearest(sit.ownTrench.filter((c) => c.home && !reserved.has(key(c))), g.pos, sit.ex);
       if (!back) continue;
       const path = redeployPath(map, g, back, side);
-      if (path?.length && give(g, { group: g.id, type: 'redeploy', path }, `${nameOf(g)} liegt noch draußen und kommt im Schutz der Stunden zurück in den Graben bei ${cellLabel(back.x, back.y)}.`, 'Zurück in den Graben')) reserved.add(key(back));
+      if (path?.length && give(g, { group: g.id, type: 'redeploy', path }, `${nameOf(g)} liegt noch draußen und kriecht zurück in den Graben bei ${cellLabel(back.x, back.y)}.`, 'Zurück in den Graben')) reserved.add(key(back));
     }
 
     // Front besetzen (Veteran und Lask): Gruppen ohne Graben gehen in den naechsten freien Feuergraben
@@ -547,11 +562,11 @@ export function decide(view, opts = {}) {
         const here = liveCell(map, view.cells, g.pos.x, g.pos.y);
         if (here?.trench && here.trench.side === sit.ms) continue;
         const free = sit.ownTrench.filter((c) => c.home && c.kind === 'fire' && !occupied.has(key(c)));
-        let target = nearest(free, g.pos);
+        let target = nearest(free, g.pos, sit.ex);
         if (doc.depth && g.type !== 'mg' && target) {
           // Tiefe Verteidigung: Reserven bleiben einige Felder hinter der vordersten Linie
           const deep = free.filter((c) => { const fx = frontX(sit, c.y); return fx !== null && Math.abs(fx - c.x) >= 3; });
-          target = nearest(deep, g.pos) ?? target;
+          target = nearest(deep, g.pos, sit.ex) ?? target;
         }
         if (!target || distance(target, g.pos) > 14) continue;
         const path = redeployPath(map, g, target, side);
@@ -629,7 +644,8 @@ export function decide(view, opts = {}) {
           reasons.push(`Sperrfeuer auf Abruf vor der eigenen Linie bei ${cellLabel(bar.a.x, centerY)}`);
           intent.fire.push('barrage');
         } else if (bar && has) {
-          // vorhandenes Sperrfeuer bleibt stehen; ein neuer Plan wuerde es ersetzen
+          // vorhandenes Sperrfeuer bleibt stehen. Kommt ein weiterer Plan dazu, wird es mitgeschickt und neu angelegt
+          // (volle Runden fuer das naechste Gefecht); ohne neuen Plan geht gar kein Feuerplan raus.
           plans.push(...(art.plans ?? []).filter((p) => p.kind === 'barrage').map((p) => normalizePlan(p)));
         }
       }
@@ -680,7 +696,7 @@ export function decide(view, opts = {}) {
       const here = liveCell(map, view.cells, g.pos.x, g.pos.y);
       const at = cellLabel(g.pos.x, g.pos.y);
       let why;
-      if (kind === 'battle') why = `${nameOf(g)} hält bei ${at} und schießt auf alles, was über die Weide kommt.`;
+      if (kind === 'battle') why = `${nameOf(g)} hält bei ${at} und schießt auf alles, was durchs Vorfeld kommt.`;
       else if (g.type === 'observers') why = `${nameOf(g)} beobachtet weiter von ${at}; jede Meldung von dort ist mehr wert als ein Gang.`;
       else if (here?.trench && here.trench.side === sit.ms) why = `${nameOf(g)} bleibt im Graben bei ${at}. Hier gibt es nichts zu verbessern.`;
       else why = `${nameOf(g)} bleibt bei ${at}; ein Weg nach vorn wäre jetzt zu teuer.`;

@@ -44,10 +44,10 @@ export function createLehrling(root, { onAdopt, onAdoptAll, onJump, onClose }) {
           <button type="button" class="lr-row" data-jump="${i}"><span class="lr-n" aria-hidden="true">${i + 1}</span>
             <span class="lr-who">${esc(it.name)}${it.mark ? ` <small>${esc(it.mark)}</small>` : ''}</span>
             <span class="lr-what">${esc(it.what)}</span><span class="lr-why">${esc(it.why)}</span></button>
-          <button type="button" class="lr-take" data-adopt="${i}" ${it.adopted ? 'disabled' : ''} aria-label="${it.adopted ? 'übernommen' : `Vorschlag ${i + 1} übernehmen`}">${it.adopted ? 'drin' : 'nehmen'}</button>
+          <button type="button" class="lr-take" data-adopt="${i}" ${it.adopted ? 'disabled' : ''} aria-label="${it.adopted ? 'übernommen' : `Vorschlag ${i + 1} übernehmen`}">${it.adopted ? '✓' : 'nehmen'}</button>
         </li>`).join('')
       : '<li class="lr-empty">Nichts zu ändern. Der Lehrling würde alle Gruppen halten lassen.</li>';
-    const open = m.items.filter((it) => !it.adopted).length;
+    const open = m.items.filter((it) => !it.adopted && !it.taken).length;
     const all = el.querySelector('.lr-all');
     all.disabled = open === 0;
     all.textContent = open ? `Alle übernehmen (${open})` : 'Alles übernommen';
@@ -220,8 +220,12 @@ export function attachLehrling(api) {
 
   function isAdopted(a) {
     const n = api.now();
-    if (!a.group) return sameOrder(n.plans?.[a.order.type], a.order);
-    return sameOrder(n.orderOf(a.group), a.order);
+    if (!a.group) {
+      const have = n.plans?.[a.order.type]?.plans ?? [];
+      return (a.order.plans ?? []).every((p) => have.some((q) => sameOrder(p, q)));
+    }
+    const cur = n.orderOf(a.group);
+    return sameOrder(cur, a.order);
   }
 
   function model() {
@@ -235,6 +239,7 @@ export function attachLehrling(api) {
         // Der Name steht schon in der Zeile darueber: "Gruppe Janssen richtet ..." wird zu "richtet ..."
         why: g ? a.reason.replace(/^Gruppe \S+ /, '') : a.reason.replace(/^Artillerie: /, ''),
         adopted: isAdopted(a),
+        taken: !!a.group && !isAdopted(a) && !!api.now().orderOf(a.group), // Spieler hat schon anders befohlen
       };
     });
     return { posture: decision.postureLabel, reason: decision.postureReason, doctrine: null, items };
@@ -242,9 +247,13 @@ export function attachLehrling(api) {
 
   function adopt(list) {
     if (!decision) return;
+    const all = list.length > 1;
+    const { orderOf } = api.now();
     for (const i of list) {
       const a = decision.advice[i];
       if (!a || isAdopted(a)) continue;
+      // "Alle uebernehmen" ueberschreibt keine Befehle, die der Spieler schon gegeben hat
+      if (all && a.group && orderOf(a.group)) continue;
       if (a.group) api.adopt(structuredClone(a.order)); else api.adoptPlan(structuredClone(a.order));
     }
     panel.update(model());
@@ -252,6 +261,7 @@ export function attachLehrling(api) {
   }
 
   function open() {
+    if (api.canOpen && !api.canOpen()) return;
     api.beforeOpen();
     compute();
     panel.show(model());

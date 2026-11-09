@@ -61,7 +61,10 @@ export function noteFromDecision(decision, view, { seed = 1, difficulty = 'veter
   const when = timeWord(view);
   const lines = [];
   let hint;
-  switch (decision.posture) {
+  // Ohne gueltigen Sturmweg ist ein "Sturm" in Wahrheit noch Vorbereitung
+  const posture = decision.posture === 'sturm' && n === 0 ? 'vorbereiten' : decision.posture;
+  const foes = view.enemy?.faction === 'kaldern' ? 'Die Krämer' : 'Die drüben';
+  switch (posture) {
     case 'sturm':
       lines.push(pick(rng, ['An Ozols:', 'An die Halbschwadron:', 'Kalnis, bitte weitergeben:']));
       lines.push(obj ? `${cap(when)} ${n === 1 ? 'geht eine Rotte' : `gehen ${n} Rotten`} auf ${obj}.` : `${cap(when)} wird angegriffen.`);
@@ -73,7 +76,7 @@ export function noteFromDecision(decision, view, { seed = 1, difficulty = 'veter
       break;
     case 'vorbereiten':
       lines.push(pick(rng, ['Notiz für den Stab:', 'An Leutnant Ozols:', 'Für mich selbst:']));
-      lines.push(obj ? `Die Krämer sind bei ${obj} dünn. Dort setzen wir an.` : 'Wir suchen die dünne Stelle drüben.');
+      lines.push(obj ? `${foes} sind bei ${obj} dünn. Dort setzen wir an.` : 'Wir suchen die dünne Stelle drüben.');
       if (it.fire?.includes('harass')) lines.push('Bis dahin Störfeuer, damit sie nicht schlafen.');
       if (it.fire?.includes('counter')) lines.push('Erst ihre Batterie zum Schweigen bringen.');
       lines.push(pick(rng, ['Noch nicht. Erst die Figuren stellen.', 'Geduld ist auch eine Waffe, sagt Ruta.', 'Der Zug kommt, wenn die Diagonale offen ist.']));
@@ -95,7 +98,7 @@ export function noteFromDecision(decision, view, { seed = 1, difficulty = 'veter
   const rate = SMUDGE[difficulty] ?? SMUDGE.veteran;
   const shown = lines.map((l, i) => (i === 0 ? l : smudge(rng, l, rate)));
   const at = it.objective ?? (view.groups.find((g) => g.side === view.side)?.pos ?? { x: 0, y: 0 });
-  return { id: `notiz-${view.turn}`, turn: view.turn, posture: decision.posture, lines: shown, signature: 'L.', hint, at: { x: at.x, y: at.y } };
+  return { id: `notiz-${view.turn}`, turn: view.turn, posture, lines: shown, signature: 'L.', hint, at: { x: at.x, y: at.y } };
 }
 
 /**
