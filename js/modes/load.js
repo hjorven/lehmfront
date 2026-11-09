@@ -1,6 +1,6 @@
 // Gefecht laden je nach Modus (P17). Liest die Query-Parameter der Szene "gefecht":
 //   karte=zufall|asse|velde|kraehenholz|schacht, kseed=<Kartenseed>, fraktion=kaldern|morrow, ki=rekrut|veteran|lask,
-//   mode=hotseat, runden=<Stellungsrunden bis zur Abschlussmeldung, 0 = offen>, tageslage=<JJJJMMTT>.
+//   mode=hotseat, endlos=1 (Frontabschnitt, P22), runden=<Stellungsrunden bis zur Abschlussmeldung, 0 = offen>, tageslage=<JJJJMMTT>.
 // Ohne karte und tageslage bleibt alles wie vorher (scenario=<id> aus data/scenarios/).
 import { battleMap } from '../config/battlemaps.js';
 import {
@@ -17,6 +17,7 @@ export async function loadBattle(params, fetchJson) {
   const tl = params.get('tageslage');
   const karte = params.get('karte');
   const hotseat = params.get('mode') === 'hotseat';
+  const endlos = params.has('endlos'); // P22: Woche im Frontabschnitt; der Zustand kommt aus dem Speicher des Laufs
   if (tl && validDayKey(tl)) {
     const brief = dailyBrief(Number(tl));
     const mapJson = dailyMap(brief);
@@ -39,7 +40,9 @@ export async function loadBattle(params, fetchJson) {
   const faction = FACTION_IDS.includes(params.get('fraktion')) ? params.get('fraktion') : 'kaldern';
   const difficulty = DIFFICULTY_IDS.includes(params.get('ki')) ? params.get('ki') : 'veteran';
   const limit = Math.max(0, Math.min(60, num(params.get('runden'), 0) | 0));
-  const mode = { kind: hotseat ? 'hotseat' : 'frei', limit, label: hotseat ? 'Hotseat' : 'Gefecht frei', faction, difficulty };
+  const mode = endlos
+    ? { kind: 'endlos', limit: 0, label: 'Frontabschnitt', faction, difficulty }
+    : { kind: hotseat ? 'hotseat' : 'frei', limit, label: hotseat ? 'Hotseat' : 'Gefecht frei', faction, difficulty };
   if (karte === 'zufall') {
     const mapSeed = (num(params.get('kseed'), 1) >>> 0) || 1;
     const mapJson = mapJsonFor({ map: 'zufall', mapSeed, faction });

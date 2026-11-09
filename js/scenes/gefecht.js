@@ -66,6 +66,7 @@ import { loadBattle } from '../modes/load.js';
 import { attachModeRules } from '../ui/result.js';
 import { attachGameMenu, resumeGame } from '../ui/gamemenu.js';
 import { campaignMission } from '../ui/campaign/mission.js';
+import { endlessWeek } from '../ui/endless/week.js';
 import { prepareMission, missionAi, withMissionOrders } from '../missions/script.js';
 import { attachMissionUi } from '../ui/mission.js';
 
@@ -90,13 +91,14 @@ export async function mount(root, params) {
   const map = loadMap(mapJson);
   const mode = modeInfo?.kind === 'hotseat' ? 'hotseat' : 'frei';
   // Tageslage: fuer alle dieselbe Lage, darum keine URL-Eingriffe in Wetter, Rundenart oder Gegner
-  const fixed = modeInfo?.kind === 'tageslage';
+  const fixed = modeInfo?.kind === 'tageslage' || modeInfo?.kind === 'endlos';
   const seed = battle.seed ?? ((num(params.get('seed'), 1917) >>> 0) || 1);
   let state = createInitialState(map, scenario, seed);
   state = initEtappen(state, map, scenario); // P11: Etappe mit Grundausbau aus dem Szenario
   state = prepareMission(state, scenario); // P16: Ablaufplan einer Kampagnenmission (Lask, Wetter), sonst unveraendert
   // P14: Einsatz aus der Kampagne (Ansehen, Vertrauen, Berichte, Nachschub, Ersatz), sonst null
-  const campaignRun = campaignMission(params);
+  // P22: oder eine Woche im Frontabschnitt (Zustand aus dem Speicher des Laufs)
+  const campaignRun = campaignMission(params) ?? endlessWeek(params, map);
   if (campaignRun) state = campaignRun.prepare(state, map);
   if (!fixed && params.get('kind') === 'battle') { state.turnKind = 'battle'; state.battle = { round: 1 }; }
   if (!fixed) applyWeatherParams(state, map, params);
@@ -229,7 +231,7 @@ export async function mount(root, params) {
       preview: prev ? { ...prev, group: tool.group.id, cell: tool.hoverCell, ok: prev.ok ?? !!prev.path } : null,
       sightLine: !tool && hoverSight ? hoverSight : null,
       overlays: [artilleryOverlay(state), ...(decor ? [{ draw: decor }] : []), ...activeOverlays(),
-        ...(noteMark ? [laskNoteOverlay(noteMark)] : []), ...lehrling.overlays(), ...(missionUi?.overlays(state) ?? [])],
+        ...(noteMark ? [laskNoteOverlay(noteMark)] : []), ...lehrling.overlays(), ...(missionUi?.overlays(state) ?? []), ...(campaignRun?.overlays?.() ?? [])],
       plans: sidePlans[side],
       time: performance.now(),
     });
@@ -438,7 +440,7 @@ export async function mount(root, params) {
     return {
       side,
       supplies: { ...s.supplies, carts: currentWagons(map, state, side, sidePlans[side]).length, cartsTotal: capacityOf(state, side) }, morale, reputation: s.reputation, trust: s.trust,
-      roundTitle: roundTitle(state) + (mode === 'hotseat' ? ` · ${faction(s.faction).short}` : '') + rules.suffix(state),
+      roundTitle: roundTitle(state) + (mode === 'hotseat' ? ` · ${faction(s.faction).short}` : '') + rules.suffix(state) + (campaignRun?.suffix?.(state) ?? ''),
       roundSub: battleNow
         ? `Minute ${clk.minutes} von ${BATTLE_ROUNDS * BATTLE_MINUTES} · ${clockText(state.clock)} Uhr · ${attacking ? 'Sturm läuft' : 'Der Gegner greift an'}`
         : `${daytime} · ${clockText(state.clock)} Uhr · ${weatherName(state.weather)} · Abschnitt ${sector}`,

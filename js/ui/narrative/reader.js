@@ -181,7 +181,7 @@ export function playSteps(opts) {
     const page = pages[i];
     for (const id of paper.ids()) paper.dismiss(id);
     root.classList.toggle('is-title', page.kind === 'actcard');
-    section.textContent = SECTION[page.kind] ?? '';
+    section.textContent = page.steps[0].section ?? SECTION[page.kind] ?? ''; // P22: Schritte duerfen ihren Abschnitt selbst nennen
     const about = page.steps[0].about;
     sub.textContent = (about ? about + ' · ' : '') + `${i + 1} / ${pages.length}`;
     hint.textContent = page.steps.length > 1 ? 'Antippen holt ein Blatt nach vorn.' : '';
