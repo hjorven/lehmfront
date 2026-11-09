@@ -101,10 +101,9 @@ Jeder Thread traegt hier nach dem Merge ein, was fertig ist und was offen bleibt
 
 ## Offen und bekannte Macken
 
-- P08: Für andere Pakete: `addWounded(state, map, side, at, n, groupId)` (P05/P06/P09 melden Verwundete), `takeStock(state, map, side, sectionId, res, n)` (P04 Material, P05 Munition), `group.ammoLow` (Feuer schwächer), `trenchAt` liest neue Gräben aus `state.cells[k].trench`. Bisher erzeugt nur die Demo Verwundete.
+- P08: Für andere Pakete: `addWounded(state, map, side, at, n, groupId)` (P05/P06/P09 melden Verwundete), `takeStock(state, map, side, sectionId, res, n)` (P04 Material, P05 Munition), `group.ammoLow` (Feuer schwächer), `trenchAt` liest neue Gräben aus `state.cells[k].trench`. Die Phase `casualties` macht aus jedem Ereignis `losses` (P05 Feuer, später Nahkampf und Artillerie) zu 60 Prozent Verwundete, die im Abschnitt auf eine Lore warten; die anderen gelten als gefallen.
 - P08: Die Gegenseite auf der Asse-Karte hat kein Depot und gilt als versorgt (`abstract`). Die Etappe aus P11 sollte Kapazität (`cartsTotal`) und Nachschub (`income`) aus `etappeYield` setzen; bisher stammen sie aus dem Szenario.
 - P08: Mengen (6 je Lore, Verbrauch, Sterberate, Heilzeiten) sind geschätzt, Balancing in P21. `state.fallen` bekommt Einträge `{ side, group, leader, count, turn, cause: 'wounds', at }` ohne Einzelnamen.
-- P08: Die Werkzeugreihe scrollt auf dem Handy jetzt waagerecht, sobald mehr als drei Werkzeuge da sind.
 
 - T2: Die Texte sind Daten; Einhaengen machen P14/P15 (Ablauf), P22 (Endlos), P24/P26 (Akt 3 und 4, Enden). Offen: Harms und Vell kommen in den Missionen von Akt 3 und 4 kaum vor (nur Briefe und a4m4); wer mag, ergaenzt Briefing-Varianten. Die Auslöser der Erfolge sind nur in Worten beschrieben, Zaehler legt P14 fest.
 

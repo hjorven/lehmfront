@@ -25,7 +25,7 @@ import {
   DEFAULT_INCOME, WOUNDED_PER_CART, WOUNDED_PER_MEDIC_CART, WAITING_DEATH_PERCENT, TRUST_PER_WAITING_SECTION,
   MAX_TRUST_LOSS, HEAL_TURNS, VETERANS_PER_XP, BUILDING_ROLES, LINK, DEFAULT_SECTIONS, SECTION_LETTERS,
 } from './config/supply.js';
-import { seesPoint } from './view.js';
+import { visibleEnemies } from './sight.js';
 
 const key = (x, y) => x + ',' + y;
 const cmp = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
@@ -110,11 +110,12 @@ function hasDepotOnMap(map, side) {
 // ---------------------------------------------------------------- Netz
 
 // fog: nur Feinde, die die Seite sieht (Vorschau im Fenster, Overlay, Pruefpunkt). Die Aufloesung kennt alle.
-function enemyAt(state, side, fog = false) {
+function enemyAt(map, state, side, fog = false) {
   const s = new Set();
+  const seen = fog ? new Set(visibleEnemies(state, map, side)) : null;
   for (const g of state.groups) {
     if (g.side === side || g.status === 'lost') continue;
-    if (fog && !seesPoint(state, side, g.pos)) continue;
+    if (seen && !seen.has(g.id)) continue;
     s.add(key(g.pos.x, g.pos.y));
   }
   return s;
@@ -126,7 +127,7 @@ function enemyAt(state, side, fog = false) {
  */
 function searchNetwork(map, state, side, { ignoreBreaks = false, fog = false } = {}) {
   const ms = mapSide(side);
-  const foes = enemyAt(state, side, fog);
+  const foes = enemyAt(map, state, side, fog);
   const nodes = new Map();
   const order = [];
   const queue = [];
@@ -197,7 +198,7 @@ function blockedWhy(map, state, side, p, fog) {
   if (p.kind === 'rail' && !railAt(map, state, p.x, p.y)) return 'Gleis zerschossen';
   if (p.kind === 'trench') {
     if (sc?.trenchBlocked) return 'Laufgraben verschüttet';
-    if (enemyAt(state, side, fog).has(key(p.x, p.y))) return 'Feind im Graben';
+    if (enemyAt(map, state, side, fog).has(key(p.x, p.y))) return 'Feind im Graben';
     if (!trenchAt(map, state, p.x, p.y)) return 'Graben eingeebnet';
   }
   if (p.kind === 'depot') return 'Depot getroffen';

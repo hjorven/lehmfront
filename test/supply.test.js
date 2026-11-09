@@ -361,3 +361,23 @@ test('Asse-Karte: alle drei Abschnitte der Seite a sind ueber Gleis und Laufgrae
   assert.deepEqual(net.sections.map((s) => s.connected), [true, true, true]);
   for (const s of net.sections) assert.ok(s.route.length > 5);
 });
+
+test('Verluste aus dem Feuer werden zu Verwundeten, die auf eine Lore warten', async () => {
+  const { registerPhase, unregisterPhase, ORDER } = await import('../js/phases/registry.js');
+  registerPhase({
+    id: 'test-verluste', kind: 'both', order: { position: ORDER.position.artillery, battle: ORDER.battle.fire },
+    run(ctx) { ctx.emit('losses', { side: 'a', group: 'a02', amount: 5, reason: 'Test', at: { x: 11, y: 4 } }); },
+  });
+  try {
+    const { map } = setup();
+    const s = createInitialState(map, structuredClone(SCEN), 7);
+    s.turnKind = 'battle';
+    const r = resolveTurn(s, [], [], 7, 1, { map });
+    const w = r.log.find((e) => e.type === 'wounded');
+    assert.ok(w && w.count > 0 && w.count <= 5);
+    assert.equal(woundedCount(r.state.sides.a.supply.sections.B), w.count);
+    assert.deepEqual(resolveTurn(s, [], [], 7, 1, { map }), r);
+  } finally {
+    unregisterPhase('test-verluste');
+  }
+});
