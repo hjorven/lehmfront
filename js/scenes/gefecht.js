@@ -78,6 +78,8 @@ import { createKoop } from '../ui/koop.js';
 const num = (v, d) => (v === null || v === '' || !Number.isFinite(Number(v)) ? d : Number(v));
 const LONG_PRESS_MS = 430;
 const NARROW = 700;
+// Finger als Hauptzeiger (Tablet, Handy): Hinweise sprechen von Antippen statt Klicken und Tasten
+const coarse = () => typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches;
 
 export async function mount(root, params) {
   const fetchJson = (url) => fetch(url).then((r) => { if (!r.ok) throw new Error('Datei fehlt: ' + url); return r.json(); });
@@ -466,7 +468,7 @@ export async function mount(root, params) {
     if (!helpShown && !ordersNow().length && state.turn === 1) {
       return { title: 'Hinweis', text: narrow()
         ? 'Gruppe antippen und Befehl wählen, oder lang drücken für Befehle im Kreis.'
-        : 'Gruppe anklicken, dann Bewegen (B) oder Halten (H). Lang drücken oder Rechtsklick öffnet die Befehle im Kreis.' };
+        : (coarse() ? 'Gruppe antippen, dann Bewegen oder Halten wählen. Lang drücken öffnet die Befehle im Kreis.' : 'Gruppe anklicken, dann Bewegen (B) oder Halten (H). Lang drücken oder Rechtsklick öffnet die Befehle im Kreis.') };
     }
     return null;
   }
@@ -1021,6 +1023,7 @@ export async function mount(root, params) {
       const cell = p ? cellFromScreen(p).cell : null;
       if (cell === tool.hoverCell) return;
       tool.hoverCell = cell;
+      if (tool.armed && cell !== tool.armed) tool.armed = null; // Maus nach Finger (Tablet mit Maus): Vormerkung verfaellt
       tool.preview = cell ? tool.pick.preview(cell) : null;
       updateShield();
       drawDyn();
@@ -1040,7 +1043,7 @@ export async function mount(root, params) {
         tool.preview = tool.pick.preview(cell);
         // Finger haben kein Hover: das erste Antippen merkt das Ziel mit Bleistift vor und zeigt Weg und Kosten,
         // das zweite auf dasselbe Feld setzt den Befehl (Dienstbuch: "Ziel antippen")
-        if (p.touch && tool.preview && tool.pick.confirm !== false && getSetting('tap') === 'confirm' && tool.armed !== cell) {
+        if (p.touch && tool.preview && (tool.preview.ok ?? !!tool.preview.path) && tool.pick.confirm !== false && getSetting('tap') === 'confirm' && tool.armed !== cell) {
           tool.armed = cell;
           playSfx('pencil', { count: 1, intensity: 0.2 });
           refresh();
@@ -1186,7 +1189,7 @@ export async function mount(root, params) {
       e.preventDefault();
       e.stopPropagation();
       const cell = cellAt(map, Math.floor(cam.x), Math.floor(cam.y));
-      if (cell) { const t = tool; if (t.pick.pick(cell)) { if (tool === t) cancelTool(); } }
+      if (cell) { const t = tool; t.armed = null; if (t.pick.pick(cell)) { if (tool === t) cancelTool(); } else refresh(); }
     }
   });
 
