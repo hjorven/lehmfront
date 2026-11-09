@@ -14,6 +14,7 @@ export const ORDER_TYPES = {
   wire:        { id: 'wire',        label: 'Draht',           kind: 'position', target: 'path' },
   relieve:     { id: 'relieve',     label: 'Ablösen',         kind: 'position', target: null },
   supply_plan: { id: 'supply_plan', label: 'Lorenplan',       kind: 'position', target: null, scope: 'side' },
+  etappe:      { id: 'etappe',      label: 'Etappe',          kind: 'position', target: null, scope: 'side' },
   fire_plan:   { id: 'fire_plan',   label: 'Feuerplan',       kind: 'position', target: null, scope: 'side' },
   harass:      { id: 'harass',      label: 'Störfeuer',       kind: 'position', target: 'cell' },
   tunnel:      { id: 'tunnel',      label: 'Stollen',         kind: 'position', target: 'path' },

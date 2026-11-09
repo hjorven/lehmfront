@@ -15,7 +15,7 @@ function yieldLine(total, every) {
 
 const rounds = (n) => `${n} ${n === 1 ? 'Stellungsrunde' : 'Stellungsrunden'}`;
 
-export function createPanel(aside, { onPick, onBuild, onChooseReward, onRepair }) {
+export function createPanel(aside, { onPick, onBuild, onChooseReward, onRepair, onCancel }) {
   aside.setAttribute('aria-label', 'Bauoptionen');
   let openTotals = null;
 
@@ -101,12 +101,21 @@ export function createPanel(aside, { onPick, onBuild, onChooseReward, onRepair }
       const info = h('div', 'e3-info');
       info.append(h('b', null, def ? def.name : there.type));
       if (def) info.append(h('p', null, def.effect));
-      if (yb.blocked) info.append(h('p', 'st', yb.blocked));
+      if (there.planned) info.append(h('p', 'st', there.planned === 'repair' ? 'Reparatur geplant: beginnt mit der nächsten Stellungsrunde.' : `Bauauftrag: beginnt mit der nächsten Stellungsrunde, fertig in ${rounds(there.remaining)}.`));
+      else if (yb.blocked) info.append(h('p', 'st', yb.blocked));
       info.append(h('p', null, yieldLine(yb.blocked ? yb.base : yb.total, yb.every)));
       for (const bo of yb.bonus) info.append(h('em', null, bo.reason));
       for (const m of yb.missing) info.append(h('em', 'no', m));
+      if (there.spotted) info.append(h('p', 'st', there.spottedBy === 'smoke' ? 'Vom Gegner aufgeklärt: Er hat den Rauch gesehen.' : 'Vom Gegner aufgeklärt.'));
       aside.append(info);
-      if (there.damaged && onRepair) {
+      if (there.planned && onCancel) {
+        const no = h('button', 'e3-go', there.planned === 'repair' ? 'Reparatur streichen' : 'Bauauftrag streichen');
+        no.type = 'button';
+        no.dataset.fk = 'cancel';
+        no.style.marginTop = '8px';
+        no.addEventListener('click', () => onCancel(there.id));
+        aside.append(no);
+      } else if (there.damaged && onRepair) {
         const cost = repairCost(there.type);
         const can = material == null || cost <= material;
         const rep = h('button', 'e3-go', can ? `Reparieren · Material ${cost} · 1 Stellungsrunde` : `Reparatur braucht ${cost} Material`);

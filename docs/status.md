@@ -62,6 +62,17 @@ Jeder Thread traegt hier nach dem Merge ein, was fertig ist und was offen bleibt
   - Phase `js/phases/artillery.js`: Stellungsrunde flickt Leitungen und Gleise, lädt aus dem Depot nach, schießt Stör- und Gegenbatteriefeuer sofort und legt Gefechtspläne an. Gefechtsrunde schießt aktive Pläne, Sperrfeuer nur, wenn Feind bis 3 Felder an der Linie gesehen wird; „Feuer verlegen“ und „Feuer einstellen“ wirken nach der Verzögerung oder gehen verloren. Mündungsblitze verraten Batterien (Tag 20, Nacht 45 Prozent). Phase `shelled` setzt `underFire`.
   - Feuerplan-Editor im Blaupausen-Stil (`js/ui/fireplan.js`, Werkzeug „Feuerplan“ Taste A): Linie ziehen, Enden und Schrittweite an Griffen auf der Karte ziehen, Zeitbänder R1 bis R12 mit Uhrzeit, Sturmgruppen als Geister entlang ihres Weges mit Warnungen, Munitionsbilanz, Handy als Bodenblatt. Werkzeuge „Feuer verlegen“ (V) und „Feuer einstellen“ (E) für Beobachter, Prüfpunkt „Artillerie“ in „Vor der Runde“, feindliche Batterien im Bedrohungs-Overlay.
   - Szenario Asse: Kaldern bekommen Beobachter, Melder und eine zweite Leitung, Morrow zwei Batterien mit Sperrfeuer. Demos `&demo=feuerplan|walze|verlegen|einschlag`. Tests `test/artillery.test.js`.
+- P11 Etappe im Spiel: `js/etappe-map.js` (rein), Phase `js/phases/build.js` (Stellungsrunde, Schritt 4, nach Graben), Werkzeug `js/ui/tools/etappe.js`, Fenster `js/ui/etappe-window.js` mit dem Pappmodell aus E1.
+  - Die Etappe ist ein Raster aus Parzellen zu 3 x 3 Kartenfeldern über der Etappenzone (Asse: 7 x 13). Boden je Parzelle nach Mehrheit, Höhe nach dem höchsten Feld. Etappengebäude ersetzen die Kartengebäude der Etappe auf der Lagekarte (`withEtappe`) und in der Versorgung (`sideBuildings`, `buildingsWithRole` in `js/supply.js`).
+  - Zustand: `state.sides[s].etappe` (`fields`, `buildings`, `rewards`, `best`, `level`, `rounds`, `yield`). Grundausbau aus dem Szenario (`sides.a.etappe.buildings: [{ type, at: 'B6' }]`), sonst aus den Kartengebäuden (`MAP_TYPES`). Gleise der Karte werden Gleis-Parzellen (`map: true`). `initEtappen(state, map, scenario)` legt alles an.
+  - Seitenbefehl `{ type: 'etappe', builds: [{ type, x, y }], repairs: [id], reward: { level, id } }` (Parzellen-Koordinaten, höchstens 8 Bauten). Bauen kostet Material aus dem Depot; die erste Runde Arbeit zählt schon (Bauzeit 1 = fertig nach dieser Stellungsrunde). Reparatur: halbe Kosten, eine Runde.
+  - Erträge je Stellungsrunde: Loren setzen `supplies.cartsTotal`, Verpflegung kommt ins Depot, Material, Holz und Beton als Material ins Depot. Feldpost: alle 5 gezählten Stellungsrunden Moral +2 für alle Gruppen. Alle anderen Erträge stehen in `etappe.yield`.
+  - Etappenstufen: höchste erreichte Stufe bleibt in `etappe.best`, das Angebot verschwindet bei Beschuss nicht mehr. Der Grundausbau zählt als erreicht (keine Aufstiegsmeldung), seine Belohnung darf man wählen.
+  - Beschuss: `state.cells[k].buildingDamaged` auf einem Feld der Parzelle oder `damageBuildingAt(state, side, x, y)`. Die Phase übernimmt den Treffer, meldet ihn einmal, das Gebäude bringt nichts bis zur Reparatur (zerschossenes Depot: alle Abschnitte abgeschnitten).
+  - Aufklärung: Sieht eine Gruppe der Gegenseite ein Feld der Parzelle, ist das Gebäude dauerhaft aufgeklärt (`spotted`, `spottedBy`), die Gegenseite merkt es sich in `state.sides[foe].intel.buildings`. Auf der Lagekarte der Gegenseite erscheinen nur aufgeklärte Gebäude.
+  - Etappenfenster (Taste E oder Antippen der eigenen Etappe ohne gewählte Gruppe): Modell links, Bauoptionen mit Vorschau rechts (Handy: unten), geplante Bauten als Bleistift-Gerüst im Modell, Streichen, Reparatur, Belohnung; „Aufträge übernehmen" (Enter) / „Verwerfen" (Esc). Prüfpunkte: Belohnung offen, zerschossene Gebäude, Bauaufträge in der Zusammenfassung. Auf der Lagekarte: vorgemerkte Bauten gestrichelt mit Bleistift.
+  - Demos: `?scene=gefecht&demo=etappe`, `demo=etappe-plan`, `demo=etappe-karte` (nach einer Runde), `demo=etappe-schaden` (Bahnhof zerschossen).
+  - Überraschung: Am Tag steigt Rauch aus der Feldküche, im Modell und als Bleistiftfahne auf der Lagekarte. Steht die Küche näher als 28 Felder an einer feindlichen Gruppe, sieht der Gegner den Rauch: die Küche ist aufgeklärt, ein roter Kringel mit „Rauch gesehen!" erscheint. Nachts bleibt der Schornstein kalt.
 
 ### Für die nächsten Pakete (nach P07)
 
@@ -154,8 +165,15 @@ Jeder Thread traegt hier nach dem Merge ein, was fertig ist und was offen bleibt
 
 ## Offen und bekannte Macken
 
+- P11: Nur Loren, Verpflegung, Material/Holz/Beton und Feldpost wirken direkt. Moral (Küche wirkt schon über die Versorgung, P08 `warm_meal`), Erholung, Heilung, Trost, Ausbildung, Offiziere: P12 liest `etappe.yield`. Batterieplätze, Leitung, Streuung: P09. Sicht und Ballon: P05 oder später. Werkstatt (Reparatur) hat noch keine Wirkung.
+- P11: Artillerie (P09) soll Etappengebäude über `buildingDamaged` oder `damageBuildingAt` treffen; Gegenbatteriefeuer kann `state.sides[s].intel.buildings` lesen (Kartenrechteck, Typ, Runde).
+- P11: Auf der Asse hat nur Seite a eine Etappe; Seite b (Morrow) bekommt keine, solange ihre Karte kein Depot hat. Pathfinding nutzt weiter die Grundkarte: neue Gebäude sperren keine Felder.
+- P11: Der Akt steht noch nicht im Zustand (`state.act`, Standard 1). Gebäude ab Akt 2 und 3 erscheinen, sobald P14/P15 `state.act` setzen. Gebäude von Akt zu Akt mitnehmen oder neu anlegen (Plan 6) ist Sache des Kampagnenablaufs.
+- P11: Kosten und Rauchweite (28 Felder) sind geschätzt, Balancing in P21. Startmaterial 90 reicht für viele Bauten auf einmal.
+
+
 - P08: Für andere Pakete: `addWounded(state, map, side, at, n, groupId)` (P05/P06/P09 melden Verwundete), `takeStock(state, map, side, sectionId, res, n)` (P04 Material, P05 Munition), `group.ammoLow` (Feuer schwächer), `trenchAt` liest neue Gräben aus `state.cells[k].trench`. Die Phase `casualties` macht aus jedem Ereignis `losses` (P05 Feuer, später Nahkampf und Artillerie) zu 60 Prozent Verwundete, die im Abschnitt auf eine Lore warten; die anderen gelten als gefallen.
-- P08: Die Gegenseite auf der Asse-Karte hat kein Depot und gilt als versorgt (`abstract`). Die Etappe aus P11 sollte Kapazität (`cartsTotal`) und Nachschub (`income`) aus `etappeYield` setzen; bisher stammen sie aus dem Szenario.
+- P08: Die Gegenseite auf der Asse-Karte hat kein Depot und gilt als versorgt (`abstract`). Seit P11 setzt die Etappe `cartsTotal` und gibt Verpflegung und Material zusätzlich zum Nachschub (`income`) ins Depot.
 - P08: Mengen (6 je Lore, Verbrauch, Sterberate, Heilzeiten) sind geschätzt, Balancing in P21. `state.fallen` bekommt Einträge `{ side, group, leader, count, turn, cause: 'wounds', at }` ohne Einzelnamen.
 
 - T2: Die Texte sind Daten; Einhaengen machen P14/P15 (Ablauf), P22 (Endlos), P24/P26 (Akt 3 und 4, Enden). Offen: Harms und Vell kommen in den Missionen von Akt 3 und 4 kaum vor (nur Briefe und a4m4); wer mag, ergaenzt Briefing-Varianten. Die Auslöser der Erfolge sind nur in Worten beschrieben, Zaehler legt P14 fest.
@@ -171,10 +189,7 @@ Jeder Thread traegt hier nach dem Merge ein, was fertig ist und was offen bleibt
 - P02: Doppelklick zum Zoomen zählt in der Szene `karte` auch als zwei Antipp-Vorgänge (Weg/Sicht-Anzeige wird dabei zurückgesetzt). Nur Demo-Szene; P03 sollte Antippen mit kurzer Verzögerung von Doppelklick trennen.
 - P02: Szenen haben noch kein Abmelden: Kamera-Listener, ResizeObserver und `onThemeChange` bleiben bestehen. Harmlos, solange `main.js` Szenen nicht wechselt.
 - P02: Diagonale Grabenstücke werden als schräge Rechteckwelle gezeichnet; das sieht etwas unruhiger aus als gerade Abschnitte.
-- E1: Einhängen in Spielzustand und Runden fehlt noch (P11). Beschuss und Aufklärbarkeit sind nur als Feld `damaged` vorbereitet; Reparatur gibt es schon (`repairBuilding`).
 - E1: Kosten und Bauzeiten außer Feldküche, Ruhelager, Sägewerk und Fernmeldestelle (aus dem Mockup) sind geschätzt, Balancing in P21.
-- E1: Feldpost "alle 5 Runden" ist nur als `periodic` ausgewiesen; wann sie fällig ist (Bezug auf Runde oder Fertigstellung), legt P11 fest.
-- E1: Erreichte Belohnungsstufen hängen an der aktuellen Leistung; fällt sie vor der Wahl unter die Schwelle (Beschuss), verschwindet das Angebot wieder. P11 kann die höchste erreichte Stufe im Spielzustand merken.
 - E1: Figuren laufen auf gerader Linie zwischen Nachbargebäuden und gehen dabei sichtbar "durch die Tür" in den Kasten; auf Hängen schweben sie leicht.
 
 - T1: Die Zaehler der Erfahrungsberichte (`zaehler.ereignis`) sind Vorschlaege; P14 muss sie auf die echten Ereignistypen aus dem Protokoll abbilden. Die Statistiken fuer `wann.werte` (README) muss P07/P14 aus dem Protokoll zaehlen.
@@ -218,6 +233,10 @@ Stand 2026-11-08, von Jorven bestaetigt:
 - Bis zu 15 Threads gleichzeitig.
 
 ## Abweichungen vom Plan
+
+- P11: Etappenfelder sind Parzellen aus 3 x 3 Kartenfeldern statt einzelner Kartenfelder: so bleiben Nachbarboni lesbar, das Pappmodell bleibt klein genug für den Daumen, und die Gebäude der Asse-Karte (2 bis 3 Felder groß) passen hinein.
+- P11: Bauaufträge sind ein Befehl der ganzen Seite und wirken erst mit der Runde (WEGO), nicht sofort beim Antippen. Die Vorschau zeigt den Stand nach der Fertigstellung.
+- P11: Rauch der Feldküche verrät sie am Tag auf große Entfernung (eigene Idee, Plan 6 nennt nur "aufklärbar").
 
 - Z1: Weggewischte Blätter verschwinden nicht, sie landen in einer Ablage unten links und lassen sich zurückholen. Fotos haben eine beschriftete Rückseite (Antippen des vorderen Blattes dreht um). Feldpost kann zensiert sein.
 

@@ -26,6 +26,7 @@ import {
   MAX_TRUST_LOSS, HEAL_TURNS, VETERANS_PER_XP, BUILDING_ROLES, LINK, DEFAULT_SECTIONS, SECTION_LETTERS,
 } from './config/supply.js';
 import { visibleEnemies } from './sight.js';
+import { sideBuildings } from './etappe-map.js';
 
 const key = (x, y) => x + ',' + y;
 const cmp = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
@@ -91,10 +92,13 @@ function buildingDown(state, b) {
   return false;
 }
 
-/** Laufende Kartengebaeude einer Seite mit einer Rolle (depot, kitchen, aidpost, hospital), nach ID */
+/**
+ * Laufende Kartengebaeude einer Seite mit einer Rolle (depot, kitchen, aidpost, hospital), nach ID.
+ * Hat die Seite eine Etappe (P11), zaehlen deren Gebaeude statt der Kartengebaeude (sideBuildings).
+ */
 export function buildingsWithRole(map, state, side, role) {
   const types = BUILDING_ROLES[role] ?? [];
-  return (map.buildings ?? []).filter((b) => (b.side ?? 'own') === mapSide(side) && types.includes(b.type) && !buildingDown(state, b));
+  return sideBuildings(map, state, side).filter((b) => types.includes(b.type) && !b.down && !buildingDown(state, b));
 }
 
 function cellsOf(b) {
@@ -103,8 +107,8 @@ function cellsOf(b) {
   return out;
 }
 
-function hasDepotOnMap(map, side) {
-  return (map.buildings ?? []).some((b) => (b.side ?? 'own') === mapSide(side) && BUILDING_ROLES.depot.includes(b.type));
+function hasDepotOnMap(map, state, side) {
+  return sideBuildings(map, state, side).some((b) => BUILDING_ROLES.depot.includes(b.type));
 }
 
 // ---------------------------------------------------------------- Netz
@@ -146,7 +150,7 @@ function searchNetwork(map, state, side, { ignoreBreaks = false, fog = false } =
     return !state.cells?.[key(x, y)]?.trenchBlocked && !foes.has(key(x, y));
   };
   const depots = ignoreBreaks
-    ? (map.buildings ?? []).filter((b) => (b.side ?? 'own') === ms && BUILDING_ROLES.depot.includes(b.type))
+    ? sideBuildings(map, state, side).filter((b) => BUILDING_ROLES.depot.includes(b.type))
     : buildingsWithRole(map, state, side, 'depot');
   for (const d of depots) for (const c of cellsOf(d)) push(c.x, c.y, 'depot', null);
 
@@ -212,7 +216,7 @@ function blockedWhy(map, state, side, p, fog) {
  */
 export function supplyNetwork(map, state, side, { fog = false } = {}) {
   const sections = sectionsOf(map);
-  if (!hasDepotOnMap(map, side)) {
+  if (!hasDepotOnMap(map, state, side)) {
     return {
       abstract: true,
       sections: sections.map((s) => ({ ...s, connected: true, route: [], cutAt: null, cutWhy: null, anchor: frontAnchor(map, state, side, s) })),
@@ -404,7 +408,7 @@ export function standingPlan(map, state, side, opts = {}) {
 export function depotAfterIncome(state, map, side) {
   const st = state.sides[side]?.supplies ?? {};
   const out = { ...st };
-  if (!hasDepotOnMap(map, side) || buildingsWithRole(map, state, side, 'depot').length) {
+  if (!hasDepotOnMap(map, state, side) || buildingsWithRole(map, state, side, 'depot').length) {
     const income = { ...DEFAULT_INCOME, ...(st.income ?? {}) };
     for (const res of RESOURCES) out[res] = (out[res] ?? 0) + (income[res] ?? 0);
   }

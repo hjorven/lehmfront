@@ -291,9 +291,10 @@ export function etappeLevel(loren) {
   return { level: cur.level, minLoren: cur.minLoren, next: next ? next.minLoren : null, loren };
 }
 
-// Erreichte Stufen, fuer die noch keine Belohnung gewaehlt wurde
+// Erreichte Stufen, fuer die noch keine Belohnung gewaehlt wurde. etappe.best (hoechste je erreichte Stufe,
+// Spielzustand) haelt das Angebot offen, auch wenn Beschuss die Leistung vor der Wahl wieder senkt.
 export function pendingRewards(etappe) {
-  const level = etappeLevel(etappeYield(etappe).levelLoren).level;
+  const level = Math.max(etappeLevel(etappeYield(etappe).levelLoren).level, etappe.best | 0);
   const chosen = etappe.rewards || {};
   return ETAPPE_LEVELS.filter((L) => L.level > 1 && L.level <= level && !chosen[L.level]).map((L) => ({ level: L.level, rewards: L.rewards }));
 }

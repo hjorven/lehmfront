@@ -5,6 +5,7 @@
 import { loadMap, cellAt, cellLabel, applyCellState } from '../map.js';
 import { ORDER_TYPES } from '../config/orders.js';
 import { captureTrench } from '../trench.js';
+import { initEtappen, withEtappe, etappeOf, plotAt } from '../etappe-map.js';
 import { createInitialState, groupsOf, getGroup, otherSide } from '../state.js';
 import { resolveTurn } from '../resolve.js';
 import { viewFor } from '../view.js';
@@ -74,6 +75,7 @@ export async function mount(root, params) {
   const mode = params.get('mode') === 'hotseat' ? 'hotseat' : 'frei';
   const seed = (num(params.get('seed'), 1917) >>> 0) || 1;
   let state = createInitialState(map, scenario, seed);
+  state = initEtappen(state, map, scenario); // P11: Etappe mit Grundausbau aus dem Szenario
   if (params.get('kind') === 'battle') { state.turnKind = 'battle'; state.battle = { round: 1 }; }
   applyWeatherParams(state, map, params);
   const humans = mode === 'hotseat' ? ['a', 'b'] : ['a'];
@@ -81,8 +83,9 @@ export async function mount(root, params) {
   // Karte mit Graeben, Kratern usw. aus dem Spielzustand (Anzeige und Werkzeuge); env.map bleibt die Grundkarte
   // Nur Felder, die die planende Seite kennt (Nebel des Krieges fuer Graeben, Aufwurf usw.)
   let seenCells = viewFor(state, [], 'a', env).cells; // Seite a plant zuerst
-  let liveMap = applyCellState(map, seenCells);
-  const updateLiveMap = () => { seenCells = viewFor(state, [], side, env).cells; liveMap = applyCellState(map, seenCells); layer.setMap(liveMap); };
+  // P11: Etappengebaeude aus dem Spielzustand ersetzen die Kartengebaeude der Etappe (withEtappe)
+  let liveMap = withEtappe(applyCellState(map, seenCells), state, 'a');
+  const updateLiveMap = () => { seenCells = viewFor(state, [], side, env).cells; liveMap = withEtappe(applyCellState(map, seenCells), state, side); layer.setMap(liveMap); };
 
   // Planungszustand
   let side = 'a';
@@ -437,7 +440,7 @@ export async function mount(root, params) {
     refresh();
   }
 
-  function startTool(def, g) {
+  function startTool(def, g, extra = {}) {
     if (!def) return;
     if (book[side]?.sealed || modalOpen) return;
     const u = usable(def, g, state, env);
@@ -473,6 +476,7 @@ export async function mount(root, params) {
         applyTheme(base && !base.blueprint ? base : themeAt(darkness));
         return null;
       },
+      ...extra,
     });
     refresh();
   }
@@ -809,6 +813,11 @@ export async function mount(root, params) {
       const g = groupAtScreen(p);
       if (g) select(g.id);
       else if (selectedId) select(null);
+      else if (cell && state.turnKind === 'position' && !book[side]?.sealed) {
+        // P11: Antippen der eigenen Etappe (ohne gewaehlte Gruppe) oeffnet das Etappenfenster auf diesem Feld
+        const plot = plotAt(etappeOf(state, side), cell.x, cell.y);
+        if (plot) startTool(allTools().find((t) => t.id === 'etappe'), null, { focus: plot });
+      }
     },
   });
 
@@ -958,7 +967,7 @@ export async function mount(root, params) {
     get state() { return state; }, get book() { return book; }, map, cam,
     select: (id) => select(id, { center: false }),
     order: (o) => placeOrder(o),
-    tool: (id) => startTool(allTools().find((t) => t.id === id), selectedOwn()),
+    tool: (id, extra) => startTool(allTools().find((t) => t.id === id), selectedOwn(), extra),
     hover: (x, y) => { if (tool?.pick) { tool.hoverCell = cellAt(map, x, y); tool.preview = tool.pick.preview(tool.hoverCell); refresh(); } },
     radial: (id) => { const g = getGroup(state, id); const p = worldToScreen(cam, g.pos.x + 0.5, g.pos.y + 0.5); const r = root.getBoundingClientRect(); openRadial(g, p.x + r.left, p.y + r.top); },
     summary: (preset) => openSummary(preset),
@@ -1068,6 +1077,29 @@ export async function mount(root, params) {
       centerOn(cam, 45, narrow() ? 5 : 8.5, Math.max(cam.zoom, narrow() ? 26 : 30));
       api.tool('rebuild');
       tool?.api?.draw([{ x: 45.5, y: 5.5 }, { x: 45.5, y: 12.5 }]);
+    } else if (demo === 'etappe' || demo === 'etappe-plan' || demo === 'etappe-karte' || demo === 'etappe-schaden') {
+      // P11: Etappenfenster mit Bauauftrag; Lagekarte nach einer Runde (Kueche zu weit vorn, Rauch verraet sie)
+      const builds = [{ type: 'saegewerk', x: 4, y: 2 }, { type: 'gleis', x: 3, y: 5 }, { type: 'verbandsplatz', x: 2, y: 7 }];
+      if (demo === 'etappe') api.tool('etappe', { focus: { x: 4, y: 5 } });
+      else if (demo === 'etappe-plan') {
+        sidePlans[side] = { ...sidePlans[side], etappe: { type: 'etappe', builds, repairs: [], reward: null } };
+        centerOn(cam, 11, 15, Math.max(cam.zoom, narrow() ? 18 : 24));
+      } else {
+        sidePlans[side] = { ...sidePlans[side], etappe: { type: 'etappe', builds, repairs: [], reward: { level: 2, id: 'zweite-gleisstrecke' } } };
+        // Eine zweite Feldkueche steht schon weit vorn: am Tag sieht der Gegner ihren Rauch
+        state = structuredClone(state);
+        state.sides[side].etappe.buildings.push({ id: 'g099', type: 'feldkueche', x: 6, y: 4 });
+        if (demo === 'etappe-schaden') state.cells['7,16'] = { ...(state.cells['7,16'] ?? {}), buildingDamaged: true };
+        commitSide();
+        if (lastRound) { player.seek(1e9); player.next(); report.finishTyping(); report.hide(); }
+        if (demo === 'etappe-schaden') {
+          sidePlans[side] = {};
+          api.tool('etappe', { focus: { x: 2, y: 5 } });
+        } else {
+          api.select(null);
+          centerOn(cam, 11, 15, Math.max(cam.zoom, narrow() ? 18 : 24));
+        }
+      }
     }
     else if (demo === 'feuerplan' || demo === 'walze' || demo === 'verlegen' || demo === 'einschlag') {
       // P09: Walze vor Abschnitt A, Vorbereitungsfeuer auf den Graben vor Abschnitt B
