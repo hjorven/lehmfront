@@ -1,0 +1,44 @@
+/* Kampagnenmission im Gefecht (P16): Auftragszettel und Bleistiftnotizen der Figuren */
+
+/* Auftragszettel: Durchschlag des Stabsbefehls, unter der Rundenkarte */
+.m-slip{position:absolute;right:136px;top:104px;width:min(380px,40vw);padding:8px 14px 10px;font-size:13px;line-height:1.35;
+  border-top:3px double var(--line)}
+.m-slip-k{display:block;font:400 12px/1.2 var(--font-head);letter-spacing:.04em;text-transform:uppercase;color:var(--ink2);margin-bottom:4px}
+.m-slip ul{list-style:none;margin:0;padding:0}
+.m-slip li{display:flex;gap:8px;align-items:baseline;padding:1px 0}
+.m-tick{flex:none;width:14px;height:14px;border:1.5px solid var(--ink2);display:inline-flex;align-items:center;justify-content:center;
+  font:700 13px/1 var(--font-hand);color:var(--own);transform:translateY(2px)}
+.m-slip li.done{color:var(--ink2)}
+.m-slip li.done .m-tick{border-color:var(--own)}
+.m-slip li.warn{color:var(--danger);font-weight:600}
+.m-slip li.warn .m-tick{border-color:var(--danger)}
+
+/* Bleistiftnotiz einer Figur am Kartenrand */
+.m-note{position:absolute;left:276px;bottom:100px;width:min(300px,calc(100% - 24px));z-index:5;padding:12px 14px 10px 16px;
+  background:var(--card);color:var(--ink);transform:rotate(-1.4deg);box-shadow:var(--shadow);
+  clip-path:polygon(0 2%,8% 0,19% 2%,33% 0,47% 2%,61% 0,76% 2%,89% 0,100% 2%,100% 100%,0 100%);
+  border-bottom:2px solid var(--line)}
+.m-note[hidden]{display:none}
+.filming .m-note,.filming .m-arrow{display:none}
+.m-note::before{content:"";position:absolute;left:46%;top:-6px;width:54px;height:16px;background:var(--track);opacity:.8;transform:rotate(3deg)}
+.m-text{margin:4px 0 0;font:600 20px/1.22 var(--font-hand);color:var(--ink)}
+.m-from{display:block;text-align:right;font:600 19px/1.1 var(--font-hand);color:var(--ink2);margin-top:2px}
+.m-ok{margin-top:6px;min-height:40px;padding:6px 14px;border:var(--border);background:transparent;color:var(--ink);font:600 13px var(--font-ui);cursor:pointer}
+.m-ok:hover,.m-ok:focus-visible{background:var(--track)}
+.m-new{animation:m-in .5s ease-out}
+@keyframes m-in{from{opacity:0;transform:translateY(10px) rotate(-4deg)}to{opacity:1;transform:rotate(-1.4deg)}}
+
+.m-arrow{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:5;overflow:visible}
+.m-arrow path{fill:none;stroke:var(--pencil, var(--ink2));stroke-width:1.8;stroke-linecap:round;stroke-dasharray:6 3;opacity:.85}
+.m-arrow path + path{stroke-dasharray:none}
+
+.m-target{outline:2px dashed var(--pencil, var(--ink2));outline-offset:3px}
+
+@media (max-width:700px){
+  .m-slip{font-size:12.5px}
+  .m-note{left:8px;right:8px;width:auto;bottom:calc(92px + env(safe-area-inset-bottom));padding:9px 12px 8px 14px}
+  .m-text{font-size:18px}
+  .m-from{font-size:17px}
+  .sheet-open .m-note,.sheet-open .m-arrow{display:none}
+}
+@media (prefers-reduced-motion:reduce){.m-new{animation:none}}

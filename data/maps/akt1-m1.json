@@ -300,16 +300,12 @@
   ],
   "rails": [],
   "buildings": [
-    {"id":"depot","type":"depot","x":6,"y":18,"w":3,"h":2,"letter":"D","label":"Depot"},
-    {"id":"bahnhof","type":"bahnhof","x":10,"y":17,"w":3,"h":2,"letter":"B","label":"Feldbahnhof"},
     {"id":"fernmelde","type":"fernmelde","x":11,"y":14,"w":2,"h":2,"letter":"F","label":"Fernmelde"},
     {"id":"turm","type":"turm","x":8,"y":13,"w":2,"h":2,"letter":"T","label":"Kirchturm"},
     {"id":"unterstand1","type":"unterstand","x":19,"y":7,"w":1,"h":1,"letter":"","label":""},
     {"id":"unterstand2","type":"unterstand","x":20,"y":16,"w":1,"h":1,"letter":"","label":""},
     {"id":"unterstand3","type":"unterstand","x":19,"y":25,"w":1,"h":1,"letter":"","label":""},
     {"id":"unterstand4","type":"unterstand","x":19,"y":34,"w":1,"h":1,"letter":"","label":""},
-    {"id":"m-depot","type":"depot","x":51,"y":18,"w":3,"h":2,"letter":"D","label":"Depot","side":"enemy"},
-    {"id":"m-bahnhof","type":"bahnhof","x":47,"y":17,"w":3,"h":2,"letter":"B","label":"Feldbahnhof","side":"enemy"},
     {"id":"m-fernmelde","type":"fernmelde","x":47,"y":14,"w":2,"h":2,"letter":"F","label":"Fernmelde","side":"enemy"},
     {"id":"m-turm","type":"turm","x":50,"y":13,"w":2,"h":2,"letter":"T","label":"Kirchturm","side":"enemy"},
     {"id":"m-unterstand1","type":"unterstand","x":40,"y":7,"w":1,"h":1,"letter":"","label":"","side":"enemy"},
@@ -336,7 +332,7 @@
     {"text":"die Weide","x":30,"y":16.5,"size":0.55,"font":"hand","color":"pencil","alpha":0.85}
   ],
   "notes": [
-    {"text":"Linie: Mühle bis Krähenholz","x":16.5,"y":20.5,"to":[21.5,20],"rotate":-4},
-    {"text":"Oltmanns: „hier Löcher, kein Graben“","x":14,"y":26.8,"to":[21.6,26.2],"rotate":2}
+    {"text":"bis zum Wald","x":23.6,"y":13.8,"to":[22.6,12.4],"rotate":-4},
+    {"text":"„nur Löcher“","x":23.6,"y":27.6,"to":[22.6,26.4],"rotate":2}
   ]
 }

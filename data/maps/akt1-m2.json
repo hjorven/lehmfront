@@ -481,8 +481,6 @@
   ],
   "rails": [],
   "buildings": [
-    {"id":"depot","type":"depot","x":6,"y":18,"w":3,"h":2,"letter":"D","label":"Depot"},
-    {"id":"bahnhof","type":"bahnhof","x":10,"y":17,"w":3,"h":2,"letter":"B","label":"Feldbahnhof"},
     {"id":"kueche","type":"kueche","x":6,"y":11,"w":2,"h":2,"letter":"K","label":"Feldküche"},
     {"id":"ruhelager","type":"ruhelager","x":9,"y":11,"w":3,"h":2,"letter":"R","label":"Ruhelager"},
     {"id":"lazarett","type":"lazarett","x":6,"y":25,"w":3,"h":2,"letter":"L","label":"Lazarett"},
@@ -492,8 +490,6 @@
     {"id":"unterstand2","type":"unterstand","x":20,"y":16,"w":1,"h":1,"letter":"","label":""},
     {"id":"unterstand3","type":"unterstand","x":19,"y":25,"w":1,"h":1,"letter":"","label":""},
     {"id":"unterstand4","type":"unterstand","x":19,"y":34,"w":1,"h":1,"letter":"","label":""},
-    {"id":"m-depot","type":"depot","x":51,"y":18,"w":3,"h":2,"letter":"D","label":"Depot","side":"enemy"},
-    {"id":"m-bahnhof","type":"bahnhof","x":47,"y":17,"w":3,"h":2,"letter":"B","label":"Feldbahnhof","side":"enemy"},
     {"id":"m-kueche","type":"kueche","x":52,"y":11,"w":2,"h":2,"letter":"K","label":"Feldküche","side":"enemy"},
     {"id":"m-ruhelager","type":"ruhelager","x":48,"y":11,"w":3,"h":2,"letter":"R","label":"Ruhelager","side":"enemy"},
     {"id":"m-lazarett","type":"lazarett","x":51,"y":25,"w":3,"h":2,"letter":"L","label":"Lazarett","side":"enemy"},

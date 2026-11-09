@@ -67,6 +67,7 @@ import { attachModeRules } from '../ui/result.js';
 import { attachGameMenu, resumeGame } from '../ui/gamemenu.js';
 import { campaignMission } from '../ui/campaign/mission.js';
 import { prepareMission, missionAi, withMissionOrders } from '../missions/script.js';
+import { attachMissionUi } from '../ui/mission.js';
 
 const num = (v, d) => (v === null || v === '' || !Number.isFinite(Number(v)) ? d : Number(v));
 const LONG_PRESS_MS = 430;
@@ -228,7 +229,7 @@ export async function mount(root, params) {
       preview: prev ? { ...prev, group: tool.group.id, cell: tool.hoverCell, ok: prev.ok ?? !!prev.path } : null,
       sightLine: !tool && hoverSight ? hoverSight : null,
       overlays: [artilleryOverlay(state), ...(decor ? [{ draw: decor }] : []), ...activeOverlays(),
-        ...(noteMark ? [laskNoteOverlay(noteMark)] : []), ...lehrling.overlays()],
+        ...(noteMark ? [laskNoteOverlay(noteMark)] : []), ...lehrling.overlays(), ...(missionUi?.overlays(state) ?? [])],
       plans: sidePlans[side],
       time: performance.now(),
     });
@@ -282,7 +283,7 @@ export async function mount(root, params) {
     const groups = fr.groups.map((g) => ({ ...g, mark: groupMark(fr.state, g) }));
     drawBattle(dctx, cam, dpr, currentTheme(), {
       state: fr.state, map, side, groups, ghosts: [], orders: new Map(), selectedId, planning: false,
-      overlays: [artilleryOverlay(fr.state), { draw: (ctx, o) => drawFilmTrails(ctx, o, fr.trails) }],
+      overlays: [artilleryOverlay(fr.state), { draw: (ctx, o) => drawFilmTrails(ctx, o, fr.trails) }, ...(missionUi?.overlays(fr.state) ?? [])],
     });
     feelImpacts(fr.state);
   }
@@ -315,6 +316,8 @@ export async function mount(root, params) {
     onClose: () => { modalOpen = false; refresh(); },
   });
   // Taktik-Lehrling (P13, Taste T) und abgefangene Notizen von Lask
+  // P16: Auftragszettel, Hinweise der Figuren, in Mission 1 die Karte, die sich erst zeichnet (null ohne Mission)
+  const missionUi = attachMissionUi({ ui, scenario, map, params, getArchive: () => archive, onChange: () => refresh() });
   const lehrling = attachLehrling({
     ui, bar: ui.querySelector('.hud-right'), sheet: ui.querySelector('.hud-sheet'), decide, viewFor, map, env, seed, cfg: aiCfg,
     now: () => ({ state, side, log: lastLog, orderOf: (id) => orderOf(book, side, id), plans: sidePlans[side] }),
@@ -492,6 +495,7 @@ export async function mount(root, params) {
     });
     if (orderList.open) updateList();
     lehrling.sync();
+    missionUi?.sync({ state, orders: ordersNow(), selected: g, tool: tool?.def.id ?? null, busy: modalOpen || !!filmFrame });
     updateShield();
     if (!filmFrame) weather.update(state, side);
     drawDyn();
@@ -794,6 +798,7 @@ export async function mount(root, params) {
     drawDynNow();
     dynCv.focus({ preventScroll: true });
     // P14: im Einsatz aus der Kampagne meldet der Kampagnendialog das Ende (sonst die Abschlussmeldung von P17)
+    if (!filmReplay) missionUi?.afterFilm(state, lastLog);
     if (!filmReplay && !campaignRun?.afterFilm(ui)) rules.afterFilm();
   }
 

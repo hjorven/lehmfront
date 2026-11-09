@@ -134,15 +134,16 @@ export function buildM1() {
   let m = base();
   m = stripOwnLine(m);
   m = capEnemy(m, 1);
-  m = without(m, ['batterie', 'lazarett', 'werkstatt', 'ruhelager', 'kueche']);
+  // Noch keine Etappe: kein Depot, kein Bahnhof, getragen wird von Hand (Versorgung ohne Netz, js/supply.js)
+  m = without(m, ['batterie', 'lazarett', 'werkstatt', 'ruhelager', 'kueche', 'depot', 'bahnhof']);
   m = noRails(m);
   m = { ...m, craters: m.craters.filter((c) => !west(c.x) || c.x > FRONT_X + 1).filter((_, i) => i % 3 === 0) };
   return finish(m, 'akt1-m1', 'Asse-Nord, Tag 1', {
     sheet: { ...m.sheet, title: 'Lagekarte Asse-Nord (unvollständig)', blatt: 'Blatt 3, erste Fassung' },
     labels: placeLabels(m, { kuhle: false }),
     notes: [
-      { text: 'Linie: Mühle bis Krähenholz', x: 16.5, y: 20.5, to: [21.5, 20], rotate: -4 },
-      { text: 'Oltmanns: „hier Löcher, kein Graben“', x: 14, y: 26.8, to: [21.6, 26.2], rotate: 2 },
+      { text: 'bis zum Wald', x: 23.6, y: 13.8, to: [22.6, 12.4], rotate: -4 },
+      { text: '„nur Löcher“', x: 23.6, y: 27.6, to: [22.6, 26.4], rotate: 2 },
     ],
     cables: [],
   });
@@ -152,7 +153,7 @@ export function buildM1() {
 export function buildM2() {
   let m = base();
   m = capEnemy(m, 2);
-  m = without(m, ['batterie', 'werkstatt']);
+  m = without(m, ['batterie', 'werkstatt', 'depot', 'bahnhof']);
   m = noRails(m);
   return finish(m, 'akt1-m2', 'Asse-Nord, die Weide', {
     sheet: { ...m.sheet, blatt: 'Blatt 3, Tag 5' },
