@@ -573,6 +573,7 @@ export function applyImpacts(state, map, rng, impacts, { firing, emit, turn, wha
     const own = friendly ? ` Eigene Artillerie (${what}) schießt zu kurz.` : '';
     emit(losses ? 'losses' : 'suppressed', {
       side: g.side, group: g.id, amount: losses, cause: friendly ? 'friendly_fire' : 'artillery', suppressed: g.suppressed, pinned,
+      open: !g.inDugout && cov.cover === 'open',
       reason: `${head} (${hits})${tail}.${own}${pinned ? ' Die Gruppe ist niedergehalten.' : ''}`,
       at: { ...g.pos },
     });

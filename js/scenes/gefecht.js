@@ -76,6 +76,7 @@ import { carryOrders, recordFrom } from '../online/replay.js';
 import { setupOnline, attachMatch, brokenText, blockMatch, telegramLines } from '../online/session.js';
 import { attachLageRules } from '../ui/lage-rules.js';
 import { createKoop } from '../ui/koop.js';
+import { marginNotes, marginOverlay } from '../ui/margin-notes.js';
 
 const num = (v, d) => (v === null || v === '' || !Number.isFinite(Number(v)) ? d : Number(v));
 const LONG_PRESS_MS = 430;
@@ -156,6 +157,12 @@ export async function mount(root, params) {
   let side = humans[0];
   let book = createOrderBook();
   let decor = null;            // Zeichnung eines offenen Editors (Feuerplan, P09), unter den Gruppen
+  // Bleistiftnotizen aus dem Protokoll ("Traverse fehlt!"), je Seite aus dem Archiv, zwischengespeichert
+  let notesCache = { archive: null, side: null, notes: [] };
+  const notesOverlay = marginOverlay(() => {
+    if (notesCache.archive !== archive || notesCache.side !== side) notesCache = { archive, side, notes: marginNotes(archive?.rounds, side) };
+    return notesCache.notes;
+  });
   let burns = [];              // Brandloecher am Kartenrand nach Einschlaegen (P09, nur Optik)
   let shelledSeen = shelledCount(state); // Einschlaege, die der Film schon gezeigt hat (Papier vibriert bei neuen)
   let sidePlans = { a: {}, b: {} };  // Seitenbefehle dieser Runde nach Art (Lorenplan), nicht im Befehlsbuch
@@ -264,7 +271,7 @@ export async function mount(root, params) {
       sightLine: !tool && hoverSight ? hoverSight : null,
       overlays: [artilleryOverlay(state), ...(decor ? [{ draw: decor }] : []), ...activeOverlays(),
         ...(noteMark ? [laskNoteOverlay(noteMark)] : []), ...lehrling.overlays(), ...(missionUi?.overlays(state) ?? []), ...(campaignRun?.overlays?.() ?? []),
-        ...lageOverlays(), ...(koop ? [koop.overlay(() => state.groups)] : [])],
+        ...lageOverlays(), ...(koop ? [koop.overlay(() => state.groups)] : []), notesOverlay],
       plans: sidePlans[side],
       time: performance.now(),
     });
@@ -849,6 +856,7 @@ export async function mount(root, params) {
         text: `Die Befehle von ${faction(state.sides[side].faction).name} sind verschlossen. Gib das Gerät an ${faction(state.sides[waiting].faction).name} weiter.`,
         button: `Weiter als ${faction(state.sides[waiting].faction).short}`,
         to: faction(state.sides[waiting].faction).name, from: faction(state.sides[side].faction).name, note: state.turn,
+        writable: !koop,
         onGo: () => {
           modalOpen = false; side = waiting; updateLiveMap(); homeView(); onCamera();
           if (reportDue.has(side)) showReport();
@@ -1405,6 +1413,14 @@ export async function mount(root, params) {
       const d = decide(lv, { map, seed, ...aiCfg, posture: params.get('lage') || undefined });
       const note = noteFromDecision(d, lv, { seed, difficulty: d.difficulty });
       showNote({ ...note, found: 'von einem Beobachter aus dem Niemandsland geholt' });
+    }
+    else if (demo === 'notizen') {
+      // Bleistiftnotizen aus dem Protokoll: eine erfundene Runde mit typischen Fehlern
+      archive = { ...archive, rounds: [...archive.rounds, { turn: 0, log: [
+        { type: 'losses', side, cause: 'enfilade', at: { x: own[0].pos.x, y: own[0].pos.y } },
+        { type: 'assault', side, at: { x: 40, y: 20 }, wire: { x: 42, y: 21 } },
+        { type: 'flood', side, at: { x: own[own.length - 1].pos.x, y: own[own.length - 1].pos.y + 2 } },
+      ] }] };
     }
     else if (demo === 'sichtlinie') { api.select(own[0].id); hoverSight = sightLabel(sightLine(map, own[0], { x: 41, y: 12 }, darknessOf(state))); }
     else if (demo === 'lorenplan' || demo === 'versorgung') {

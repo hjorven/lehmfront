@@ -114,7 +114,7 @@ const SEAL_NOTES = ['Nicht hineinsehen.', 'Nur für die Abschnittsführung.', 'E
  * Uebergabebildschirm. opts: { title, text, button, onGo, to?, from?, note? }
  * to/from: Namen der Fraktionen fuer die Anschrift, note: Zahl fuer die Bleistiftnotiz (z. B. die Runde).
  */
-export function showHandover(root, { title, text, button, onGo, to = '', from = '', note = 0 }) {
+export function showHandover(root, { title, text, button, onGo, to = '', from = '', note = 0, writable = false }) {
   const m = modal(root, 'handover', title, null);
   m.box.classList.add('envelope');
   const pencil = SEAL_NOTES[Math.abs(note | 0) % SEAL_NOTES.length];
@@ -124,6 +124,7 @@ export function showHandover(root, { title, text, button, onGo, to = '', from = 
     ${to ? `<p class="env-addr"><span>An</span> ${esc(to)}<br><span>Von</span> ${esc(from)}</p>` : ''}
     <b class="ho-title">${esc(title)}</b><p class="ho-text">${esc(text)}</p>
     <p class="env-note" aria-hidden="true">${esc(pencil)}</p>
+    ${writable ? `<label class="env-write"><span>Bleistift für drüben</span><input type="text" maxlength="80" autocomplete="off" spellcheck="false" placeholder="Grüße über das Niemandsland (freiwillig)"></label>` : ''}
     <button type="button" class="btn go seal" aria-describedby="ho-hold"><span class="seal-fill" aria-hidden="true"></span><span class="seal-label">${esc(button)}</span></button>
     <small id="ho-hold" class="ho-hold">Siegel gedrückt halten, bis es bricht.</small>`;
   const go = m.box.querySelector('.go');
@@ -143,6 +144,14 @@ export function showHandover(root, { title, text, button, onGo, to = '', from = 
   go.addEventListener('keyup', (e) => { if (e.key === 'Enter' || e.key === ' ') stop(); });
   go.addEventListener('click', (e) => e.preventDefault()); // nur Halten oeffnet
   go.addEventListener('contextmenu', (e) => e.preventDefault());
+  // Hotseat (Idee aus P17): die abgebende Seite kann mit Bleistift etwas auf den Umschlag schreiben. Die Zeile
+  // ersetzt dann den gedruckten Vermerk; Enter im Feld bricht kein Siegel.
+  const write = m.box.querySelector('.env-write input');
+  if (write) {
+    const noteEl = m.box.querySelector('.env-note');
+    write.addEventListener('input', () => { noteEl.textContent = write.value.trim() || pencil; noteEl.classList.toggle('own', !!write.value.trim()); });
+    write.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); go.focus({ preventScroll: true }); } e.stopPropagation(); });
+  }
   go.focus({ preventScroll: true });
   return m;
 }
