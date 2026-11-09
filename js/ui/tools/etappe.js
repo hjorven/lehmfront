@@ -11,6 +11,7 @@ import { BUILDINGS } from '../../config/buildings.js';
 import { pendingRewards } from '../../etappe.js';
 import { etappeOf, plotRect, plotCenter, plotName, planView, isBuilt } from '../../etappe-map.js';
 import { isSmoking } from '../../phases/build.js';
+import { registerCue, shellCue } from '../../audio/cues.js';
 
 export const ETAPPE_ICON = '<path d="M3 20 H21"/><path d="M5 20 V11 L10 7 L15 11 V20"/><path d="M15 14 H20 V20"/><path d="M8.5 20 V15 H11.5 V20"/><path d="M17.5 11 V8"/>';
 
@@ -152,3 +153,11 @@ registerDecor({
     }
   },
 });
+
+// Klaenge (P19): Treffer klingt wie ein ferner Einschlag, Fertigmeldung nach Arbeit, Feldpost nach Papier
+const mine = (e, ctx) => e.side === ctx.side;
+registerCue('building_damaged', (e, ctx) => shellCue(e, ctx, 0.5));
+registerCue('build_done', (e, ctx) => (mine(e, ctx) ? [{ name: 'steps', opts: { count: 3, intensity: 0.3 } }] : null));
+registerCue('building_repaired', (e, ctx) => (mine(e, ctx) ? [{ name: 'steps', opts: { count: 3, intensity: 0.3 } }] : null));
+registerCue('feldpost', (e, ctx) => (mine(e, ctx) ? [{ name: 'paper', opts: { intensity: 0.45 } }] : null));
+registerCue('building_spotted', (e, ctx) => (mine(e, ctx) ? [{ name: 'pencil', opts: { count: 2, intensity: 0.35 } }] : null));
