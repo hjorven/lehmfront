@@ -80,3 +80,9 @@
   .gefecht .bare-btn2{width:100%;justify-content:center;min-height:44px;font-weight:700}
   .gefecht.bare .bare-note{font-size:19px}
 }
+
+/* ---------- Schild angedockt (Finger): ohne Zeiger, am Rand ---------- */
+.gefecht .shield.docked::after{display:none}
+.gefecht .shield.docked{border-left:4px solid var(--own)}
+/* beim Zielen schlank: Kopf, Befehl, Vorschau */
+.gefecht .shield.compact footer{margin-top:4px}

@@ -576,7 +576,33 @@ export async function mount(root, params) {
     let safeBottom = n ? 96 : 92;
     // P18: Auf dem Handy liegt das Telegramm unten quer; das Schild bleibt darueber statt es zu verdecken
     if (n && report.open) safeBottom = Math.max(safeBottom, root.clientHeight - report.el.offsetTop + 8);
-    return { x: p.x, y: p.y, h: b.h * cam.zoom + 8, safeTop: n ? 60 : 12, safeBottom };
+    // Finger (Tablet aufgeraeumt, Handy): Schild am Rand andocken, nicht ueber den Feldern noerdlich oder suedlich
+    const dock = n || root.classList.contains('tidy');
+    let safeTop = n ? 60 : 12;
+    if (dock) {
+      // unter Kopfleiste und Hinweis bleiben
+      const top = root.getBoundingClientRect().top;
+      for (const el of ui.querySelectorAll('.hud-strip, .hint:not([hidden])')) {
+        const r = el.getBoundingClientRect();
+        if (r.height && getComputedStyle(el).visibility !== 'hidden') safeTop = Math.max(safeTop, r.bottom - top + 8);
+      }
+      const bar = ui.querySelector('.bottom');
+      if (bar) safeBottom = Math.max(safeBottom, root.clientHeight - (bar.getBoundingClientRect().top - top) + 8);
+    }
+    // Kaertchen im unteren Band (Missionsnotiz, Lehrling, Telegramm), die das Schild nicht verdecken darf
+    const avoid = [];
+    if (dock) {
+      const top = root.getBoundingClientRect().top, left = root.getBoundingClientRect().left;
+      for (const el of ui.querySelectorAll('.m-note, .m-chip, .lehrling, .report, .telegram')) {
+        if (el.hidden) continue;
+        const r = el.getBoundingClientRect();
+        if (r.width && r.height) avoid.push({ left: r.left - left, right: r.right - left, top: r.top - top, bottom: r.bottom - top });
+      }
+    }
+    const safeRight = dock && !n ? (ui.querySelector('.hud-right')?.offsetWidth ?? 0) + 20 : 8;
+    // Beim Zielen nur Kopf, Befehl und Vorschau
+    const compact = !!(tool?.pick && tool.group?.id === g.id);
+    return { x: p.x, y: p.y, h: b.h * cam.zoom + 8, safeTop, safeBottom, safeRight, dock, compact, avoid };
   }
   function updateShield() {
     const g = selectedId ? getGroup(state, selectedId) : null;
