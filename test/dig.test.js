@@ -152,7 +152,7 @@ test('Grabgeschwindigkeit: Wetter, Erschöpfung, Vertrauen und Stärke bremsen; 
   g.size = 10;
   s.weather.kind = 'rain';
   assert.equal(digRate(s, g, MAP).rate, 80);
-  g.fatigue = 40;
+  g.fatigue = 75; // P12: Erschoepfung bremst erst ab 35, 75 ergibt 80 Prozent
   assert.equal(digRate(s, g, MAP).rate, 64);
   s.sides.a.trust = 0;
   assert.equal(digRate(s, g, MAP).rate, 51);

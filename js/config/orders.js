@@ -13,6 +13,7 @@ export const ORDER_TYPES = {
   rebuild:     { id: 'rebuild',     label: 'Umbauen',         kind: 'position', target: 'path' },
   wire:        { id: 'wire',        label: 'Draht',           kind: 'position', target: 'path' },
   relieve:     { id: 'relieve',     label: 'Ablösen',         kind: 'position', target: null },
+  refill:      { id: 'refill',      label: 'Auffüllen',       kind: 'position', target: null },
   supply_plan: { id: 'supply_plan', label: 'Lorenplan',       kind: 'position', target: null, scope: 'side' },
   etappe:      { id: 'etappe',      label: 'Etappe',          kind: 'position', target: null, scope: 'side' },
   fire_plan:   { id: 'fire_plan',   label: 'Feuerplan',       kind: 'position', target: null, scope: 'side' },

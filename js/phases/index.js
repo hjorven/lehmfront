@@ -9,6 +9,7 @@ import './fire.js';
 import './hold.js';
 import './intel.js';
 import './melee.js';
+import './morale.js';
 import './move.js';
 import './rebuild.js';
 import './supply.js';
