@@ -145,3 +145,8 @@ test('Engine: hush senkt Umgebung und Musik und holt sie zurueck, ohne Kontext e
     assert.ok(back && back.v > 0, 'kommt zurueck');
   }
 });
+
+test('Zwei Gruppen auf einmal verloren: die Front verstummt nur einmal', () => {
+  const out = planCues([{ type: 'group_lost', at: at(1, 1) }, { type: 'group_lost', at: at(2, 2) }], ctx);
+  assert.equal(out.filter((c) => c.name === 'hush').length, 1);
+});

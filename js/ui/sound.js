@@ -79,12 +79,14 @@ export function mountSoundControls({ bar, sheet = null }) {
   bar.append(button, pop);
 
   let card = null;
+  let sheetPanel = null;
   if (sheet) {
     card = document.createElement('section');
     card.className = 'card snd-card';
     card.setAttribute('aria-label', 'Klang');
     card.innerHTML = '<span class="k">Klang</span>';
-    card.append(soundPanel({ idPrefix: 'snd-sheet' }).el);
+    sheetPanel = soundPanel({ idPrefix: 'snd-sheet' });
+    card.append(sheetPanel.el);
     sheet.append(card);
   }
 
@@ -92,7 +94,7 @@ export function mountSoundControls({ bar, sheet = null }) {
   button.innerHTML = 'Ton <small></small>';
   const word = button.querySelector('small');
   const label = (s) => { word.textContent = stateWord(s); };
-  audio.onChange(label);
+  const offLabel = audio.onChange(label);
   label(audio.state());
 
   function close() {
@@ -106,11 +108,17 @@ export function mountSoundControls({ bar, sheet = null }) {
     button.setAttribute('aria-expanded', String(!pop.hidden));
     if (!pop.hidden) pop.querySelector('input')?.focus({ preventScroll: true });
   });
-  document.addEventListener('pointerdown', (e) => {
+  const outside = (e) => {
     if (!pop.hidden && !pop.contains(e.target) && !button.contains(e.target)) close();
-  }, true);
+  };
+  document.addEventListener('pointerdown', outside, true);
   pop.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') { e.stopPropagation(); close(); button.focus(); }
   });
-  return { button, pop, card, close };
+  function destroy() {
+    offLabel(); panel.destroy(); sheetPanel?.destroy();
+    document.removeEventListener('pointerdown', outside, true);
+    button.remove(); pop.remove(); card?.remove();
+  }
+  return { button, pop, card, close, destroy };
 }

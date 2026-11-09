@@ -61,7 +61,7 @@ export function planCues(events, ctx = {}) {
     for (const cue of list) {
       if (!cue || typeof cue.name !== 'string' || out.length >= MAX_CUES) continue;
       const n = count.get(cue.name) ?? 0;
-      if (n >= MAX_SAME) continue;
+      if (n >= (cue.name === 'hush' ? 1 : MAX_SAME)) continue;
       count.set(cue.name, n + 1);
       const opts = { ...(cue.opts ?? {}) };
       if (e.at && Number.isFinite(e.at.x) && opts.pan === undefined && opts.x === undefined) {

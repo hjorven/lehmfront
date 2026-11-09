@@ -293,6 +293,9 @@ export function createAudioEngine({ win = globalThis.window, seed = 7 } = {}) {
       persist();
       if (nodes) {
         const t = ac.currentTime;
+        // eine laufende Stille (hush) endet fuer diesen Bus, sonst kaeme spaeter der alte Pegel zurueck
+        nodes[bus].gain.cancelScheduledValues(t);
+        nodes[bus].gain.setValueAtTime(nodes[bus].gain.value, t);
         nodes[bus].gain.setTargetAtTime(busGain(bus), t, RAMP.volume);
         if (bus === 'sfx') nodes.sfxDirect.gain.setTargetAtTime(busGain(bus), t, RAMP.volume);
       }

@@ -98,14 +98,15 @@ export function createFilmPlayer(root, { onFrame, onEnd, onLines }) {
     return { state: base, groups, trails: [...trails.values()], t: time, section: index, f };
   }
 
-  function render() {
+  // audible: Klaenge zu neuen Zeilen und Abschnitten spielen (beim Abspielen ja, beim Scrubbing nein)
+  function render(audible = playing) {
     if (!film) return;
     const fr = frameAt(t);
     onFrame(fr);
     const n = linesUntil(film, t);
     if (n !== lastLines) {
       // Klang nur beim Abspielen, nicht beim Scrubbing (P19)
-      if (playing && lastLines >= 0 && n > lastLines) cueEvents(film.lines.slice(lastLines, n), { side, state: fr.state });
+      if (audible && lastLines >= 0 && n > lastLines) cueEvents(film.lines.slice(lastLines, n), { side, state: fr.state });
       onLines(n, playing);
       lastLines = n;
     }
@@ -115,13 +116,13 @@ export function createFilmPlayer(root, { onFrame, onEnd, onLines }) {
       const k = transitionAt(film.total, t) ?? 0;
       if (k !== lastK) { transitionHook({ t: k, ...trans }); lastK = k; }
     }
-    updateBar(fr);
+    updateBar(fr, audible);
   }
 
-  function updateBar(fr) {
+  function updateBar(fr, audible) {
     const s = film.sections[fr.section];
     if (fr.section !== lastSection) {
-      if (playing && lastSection >= 0) cueSection(s.key);
+      if (audible && lastSection >= 0) cueSection(s.key);
       el.querySelectorAll('.film-tab').forEach((b, i) => {
         b.classList.toggle('on', i === fr.section);
         b.setAttribute('aria-selected', String(i === fr.section));
@@ -146,7 +147,8 @@ export function createFilmPlayer(root, { onFrame, onEnd, onLines }) {
     last = ts;
     t = Math.min(stopAt, t + dt);
     if (t >= stopAt) playing = false;
-    render();
+    // der Halte-Frame am Abschnittsende gehoert noch zum Abspielen (sonst tickt die Uhr nie)
+    render(true);
     if (playing) raf = requestAnimationFrame(tick);
     else if (t >= film.total) finish();
   }
@@ -157,7 +159,7 @@ export function createFilmPlayer(root, { onFrame, onEnd, onLines }) {
     if (reducedMotion()) {
       t = target;
       playing = false;
-      render();
+      render(true);
       if (t >= film.total) finish();
       return;
     }
