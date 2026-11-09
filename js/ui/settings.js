@@ -53,7 +53,7 @@ const TOUCH = [
   ['Lang drücken', 'Befehle der Gruppe im Kreis'],
   ['Ziel antippen', 'vormerken (Bleistift), noch einmal antippen setzt den Befehl'],
   ['Ziehen, zwei Finger', 'Karte schieben und zoomen'],
-  ['Pfeil an der Werkzeugreihe', 'weitere Befehle, die Zahl sagt, wie viele verdeckt sind'],
+  ['Lasche an der Werkzeugreihe', 'weitere Befehle; die Zahl sagt, wie viele noch verdeckt sind'],
   ['„Vor der Runde“', 'Prüfpunkt antippen springt zur Gruppe (wie Leertaste)'],
   ['Befehle, Overlays, Lehrling, Menü', 'Knöpfe oben rechts (wie Tab, 1 bis 4, T, O)'],
 ];

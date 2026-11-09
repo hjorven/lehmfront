@@ -39,6 +39,7 @@ npm test                                   # Regeltests (node --test)
 npm run serve                              # http://localhost:8080/
 node tools/shot.mjs --dark                 # Screenshots Desktop + Handy, hell + dunkel, nach shots/
 node tools/shot.mjs --path "/?scene=gefecht" --name gefecht --dark
+node tools/shot.mjs --tablet --dark       # zusaetzlich iPad hoch und quer (Touch)
 node tools/shot.mjs --check                # nur Konsolenfehler und fehlende Dateien pruefen (laeuft auch in CI)
 node tools/precache.mjs                    # nach neuen/entfernten Dateien: Offline-Liste in sw.js neu schreiben (Test prueft das)
 ```
