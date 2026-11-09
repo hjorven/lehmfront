@@ -9,7 +9,7 @@ import { featureOn, checkSap, checkTunnel, sapRounds, tunnelRate, tunnelRounds, 
 import { sapRate } from '../../phases/sap.js';
 import { raidProblem, raidPath } from '../../phases/raid.js';
 import { timeDarkness } from '../../phases/weather.js';
-import { SAP, TUNNEL, RAID, TRAITS, OFFICER_SKILLS } from '../../config/akt2.js';
+import { SAP, TUNNEL, RAID, TRAITS } from '../../config/akt2.js';
 import { groupName } from '../labels.js';
 import { FONTS } from '../../render/map-layer.js';
 import { unitBox } from '../../render/units-layer.js';
@@ -309,8 +309,7 @@ registerDecor({
       const marks = [];
       if (g.officer) {
         const last = String(g.officer.name ?? '').split(' ').pop();
-        const skill = OFFICER_SKILLS[g.officer.skill]?.label;
-        marks.push([g.officer.rank === 'Leutnant' ? 'Lt.' : 'Zf', last, skill ? `(${skill})` : ''].filter(Boolean).join(' '));
+        marks.push([g.officer.rank === 'Leutnant' ? 'Lt.' : 'Zf', last].filter(Boolean).join(' '));
       }
       for (const t of g.traits ?? []) if (TRAITS[t]) marks.push(TRAITS[t].short);
       if (!marks.length) continue;
