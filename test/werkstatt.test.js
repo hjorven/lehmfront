@@ -114,3 +114,30 @@ test('Lage-Code: kaputte Codes geben eine deutsche Meldung', async () => {
   await assert.rejects(decodeLage('hallo'), /kein Lage-Code/);
   await assert.rejects(decodeLage(CODE_PREFIX + 'AAAA'), /beschädigt/);
 });
+
+test('Aufreiben braucht keine Felder und ergibt ein gueltiges Ziel', async () => {
+  const { goalText } = await import('../js/modes/goals.js');
+  const d = playable();
+  d.goal = { type: 'destroy', cells: [] };
+  const l = docToLage(d);
+  assert.deepEqual(l.goal, { type: 'destroy', groups: 'all' });
+  assert.deepEqual(lageProblems(l), []);
+  assert.match(goalText(l.goal), /Alle feindlichen/);
+});
+
+test('Lage-Pruefung meldet kaputte Ziele und Gruppen ohne Standort', () => {
+  const l = docToLage(playable());
+  assert.ok(lageProblems({ ...l, goal: { type: 'take' } }).some((t) => /mindestens ein Feld/.test(t)));
+  assert.ok(lageProblems({ ...l, goal: { type: 'take', cells: [[99, 1]] } }).some((t) => /außerhalb/.test(t)));
+  assert.ok(lageProblems({ ...l, goal: { type: 'fliegen', cells: [[1, 1]] } }).some((t) => /Unbekannte/.test(t)));
+  assert.ok(lageProblems({ ...l, goal: { type: 'destroy' } }).some((t) => /Aufreiben/.test(t)));
+  const s = structuredClone(l.scenario);
+  delete s.sides.a.groups[0].pos;
+  assert.ok(lageProblems({ ...l, scenario: s }).some((t) => /keinen Standort/.test(t)));
+});
+
+test('Import lehnt zu grosse oder unvollstaendige Karten ab', () => {
+  const l = docToLage(playable());
+  assert.throws(() => lageToDoc({ ...l, map: { ...l.map, width: 200, height: 200 } }), /zwischen 4 und/);
+  assert.throws(() => lageToDoc({ ...l, map: { ...l.map, terrain: l.map.terrain.slice(1) } }), /unvollständig/);
+});

@@ -34,7 +34,8 @@ export function createKoop(state, map) {
   const owner = splitGroups(state.groups, map.height);
   let cmd = 1;
   let note = { 1: '', 2: '' };   // Zettel an das jeweilige Kommando
-  const ownerOf = (g) => owner[g.id] ?? (g.pos.y + 0.5 < map.height / 2 ? 1 : 2);
+  // Neue Gruppen (Ersatz, Verstaerkung) bekommen ihr Kommando beim ersten Blick und behalten es
+  const ownerOf = (g) => (owner[g.id] ??= g.pos.y + 0.5 < map.height / 2 ? 1 : 2);
   const C = (id) => COMMANDS[id - 1];
 
   return {
@@ -42,6 +43,7 @@ export function createKoop(state, map) {
     owns: (g) => ownerOf(g) === cmd,
     ownerName: (g) => C(ownerOf(g)).name,
     title: () => C(cmd).name,
+    short: () => C(cmd).short,
     /** Text fuer den Knopf "Runde ausfuehren" */
     button: () => (cmd === 1 ? `An ${C(2).short} übergeben` : 'Runde ausführen'),
     last: () => cmd === 2,

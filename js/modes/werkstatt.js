@@ -10,6 +10,7 @@
 import { puzzleMapJson } from './puzzle.js';
 import { ENFILADE_RUN, insertTraverses } from '../trench.js';
 import { TERRAIN, MAX_HEIGHT } from '../map.js';
+import { MAX_SIDE } from './lage-code.js';
 
 export const SIZES = {
   klein: { id: 'klein', label: 'Klein', width: 18, height: 12 },
@@ -200,6 +201,13 @@ export function fixRuns(doc, side = 'own') {
   return changed;
 }
 
+/** Hat der Entwurf ein Ziel, das ins Spiel geht? (Aufreiben ohne Felder, sonst mindestens ein Feld) */
+export function hasGoal(doc) {
+  const g = doc.goal;
+  if (!g || !GOAL_TYPES.includes(g.type) || g.type === 'keins') return false;
+  return g.type === 'destroy' || !!g.cells?.length;
+}
+
 /** Spielbare Lage aus dem Entwurf (Format js/modes/lage-code.js) */
 export function docToLage(doc) {
   const map = puzzleMapJson({ ...doc, id: 'eigen', num: '', title: doc.title || 'Eigene Lage' });
@@ -222,8 +230,9 @@ export function docToLage(doc) {
   const lage = { title: doc.title || 'Eigene Lage', map, scenario, kind: doc.kind, limit: doc.limit ?? 8 };
   if (doc.author) lage.author = doc.author;
   if (doc.brief) lage.brief = doc.brief;
-  if (doc.goal?.cells?.length && doc.goal.type !== 'keins') {
-    lage.goal = { type: doc.goal.type, cells: doc.goal.cells.map((c) => [c[0], c[1]]) };
+  if (hasGoal(doc)) {
+    // Aufreiben braucht keine Felder: alle Gruppen drueben (Format js/modes/goals.js)
+    lage.goal = doc.goal.type === 'destroy' ? { type: 'destroy', groups: 'all' } : { type: doc.goal.type, cells: doc.goal.cells.map((c) => [c[0], c[1]]) };
     if (Number.isFinite(doc.maxLosses) && doc.maxLosses > 0) lage.maxLosses = doc.maxLosses;
   }
   return lage;
@@ -234,6 +243,11 @@ export function lageToDoc(lage) {
   const m = lage?.map;
   if (!m || !Array.isArray(m.terrain)) throw new Error('In der Datei steht keine Lage.');
   const w = m.width, h = m.height;
+  if (!(Number.isInteger(w) && Number.isInteger(h) && w >= 4 && h >= 4 && w <= MAX_SIDE && h <= MAX_SIDE)) {
+    throw new Error(`Die Karte muss zwischen 4 und ${MAX_SIDE} Felder je Seite haben.`);
+  }
+  const okRows = (r) => Array.isArray(r) && r.length === h && r.every((row) => typeof row === 'string' && row.length === w);
+  if (!okRows(m.terrain) || (m.heights && !okRows(m.heights))) throw new Error('Die Karte in der Datei ist unvollständig.');
   const doc = blankDoc();
   Object.assign(doc, { width: w, height: h, title: lage.title ?? m.name ?? 'Eigene Lage', author: lage.author ?? '', brief: lage.brief ?? '' });
   doc.terrain = m.terrain.slice();
@@ -249,14 +263,18 @@ export function lageToDoc(lage) {
   for (const t of m.trenches ?? []) put(t.x, t.y, t.side === 'enemy' ? (t.kind === 'comm' ? ';' : '#') : (t.kind === 'comm' ? ':' : '='));
   const sc = lage.scenario ?? {};
   const back = (g) => ({ type: g.type, at: [g.pos.x, g.pos.y] });
-  doc.groups = { a: (sc.sides?.a?.groups ?? []).map(back), b: (sc.sides?.b?.groups ?? []).map(back) };
+  const okG = (g) => g && Number.isInteger(g.pos?.x) && Number.isInteger(g.pos?.y) && g.pos.x >= 0 && g.pos.y >= 0 && g.pos.x < w && g.pos.y < h;
+  doc.groups = { a: (sc.sides?.a?.groups ?? []).filter(okG).map(back).slice(0, MAX_GROUPS), b: (sc.sides?.b?.groups ?? []).filter(okG).map(back).slice(0, MAX_GROUPS) };
   doc.factions = { a: sc.sides?.a?.faction ?? 'kaldern', b: sc.sides?.b?.faction ?? 'morrow' };
   doc.enemy = sc.sides?.b?.control === 'ai' && ENEMY_MODES.includes(sc.sides.b.ai?.difficulty) ? sc.sides.b.ai.difficulty : 'halten';
   doc.kind = lage.kind === 'position' || sc.turnKind === 'position' ? 'position' : 'battle';
   doc.startHour = sc.startHour ?? 10;
   doc.weather = sc.weather?.kind ?? 'clear';
   doc.limit = lage.limit ?? 8;
-  doc.goal = lage.goal ? { type: lage.goal.type, cells: (lage.goal.cells ?? []).map((c) => (Array.isArray(c) ? [c[0], c[1]] : [c.x, c.y])) } : null;
+  doc.goal = lage.goal && GOAL_TYPES.includes(lage.goal.type)
+    ? { type: lage.goal.type, cells: (Array.isArray(lage.goal.cells) ? lage.goal.cells : []).map((c) => (Array.isArray(c) ? [c[0], c[1]] : [c?.x, c?.y]))
+      .filter(([x, y]) => Number.isInteger(x) && Number.isInteger(y) && x >= 0 && y >= 0 && x < w && y < h).slice(0, 6) }
+    : null;
   doc.maxLosses = Number.isFinite(lage.maxLosses) ? lage.maxLosses : null;
   return doc;
 }

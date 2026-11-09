@@ -43,17 +43,38 @@ export function lageProblems(lage) {
     const list = sc?.sides?.[s]?.groups ?? [];
     if (!list.length) out.push(s === 'a' ? 'Die eigene Seite hat keine Gruppe.' : 'Drüben steht niemand.');
     for (const g of list) {
-      const c = map.cells[g.pos.y * map.width + g.pos.x];
+      if (!Number.isInteger(g?.pos?.x) || !Number.isInteger(g?.pos?.y)) { out.push('Eine Gruppe hat keinen Standort.'); continue; }
+      const c = g.pos.x >= 0 && g.pos.x < map.width ? map.cells[g.pos.y * map.width + g.pos.x] : null;
       if (!c) { out.push(`Gruppe außerhalb der Karte bei ${g.pos.x + 1}/${g.pos.y + 1}.`); continue; }
       if (c.terrain === 'wasser' || c.building) out.push(`Gruppe auf unbegehbarem Feld ${g.pos.x + 1}/${g.pos.y + 1}.`);
     }
-    const keys = new Set(list.map((g) => g.pos.x + ',' + g.pos.y));
+    const keys = new Set(list.map((g) => g?.pos?.x + ',' + g?.pos?.y));
     if (keys.size !== list.length) out.push('Zwei Gruppen stehen auf demselben Feld.');
   }
   if (out.length) return out;
   try { createInitialState(map, sc, 1); } catch (e) { out.push(e.message); }
+  if (lage.goal) out.push(...goalProblems(lage.goal, map));
   if (lage.goal && !(lage.limit >= 1)) out.push('Ein Ziel braucht eine Frist.');
   return out;
+}
+
+const GOAL_NEEDS_CELLS = new Set(['take', 'hold', 'reach']);
+
+/** Ziel einer eigenen Lage pruefen (Formate js/modes/goals.js; dig bleibt den Puzzle-Lagen vorbehalten) */
+function goalProblems(goal, map) {
+  if (typeof goal !== 'object') return ['Das Ziel ist unlesbar.'];
+  if (goal.type === 'destroy') {
+    return goal.groups === 'all' || (Array.isArray(goal.groups) && goal.groups.length && goal.groups.every((g) => typeof g === 'string'))
+      ? [] : ['Beim Aufreiben fehlt, wer aufgerieben werden soll.'];
+  }
+  if (!GOAL_NEEDS_CELLS.has(goal.type)) return ['Unbekannte Zielart.'];
+  const cells = Array.isArray(goal.cells) ? goal.cells : [];
+  if (!cells.length) return ['Das Ziel braucht mindestens ein Feld.'];
+  const inMap = (c) => {
+    const x = Array.isArray(c) ? c[0] : c?.x, y = Array.isArray(c) ? c[1] : c?.y;
+    return Number.isInteger(x) && Number.isInteger(y) && x >= 0 && y >= 0 && x < map.width && y < map.height;
+  };
+  return cells.every(inMap) ? [] : ['Ein Zielfeld liegt außerhalb der Karte.'];
 }
 
 /** Lage -> Code */

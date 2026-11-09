@@ -20,13 +20,13 @@ import { goalText } from '../modes/goals.js';
 import { encodeLage, decodeLage, lageProblems } from '../modes/lage-code.js';
 import {
   SIZES, ENEMY_MODES, PLACE_TYPES, TERRAIN_TOOLS, blankDoc, paintCell, toggleGroup, toggleGoalCell,
-  judgePosition, fixRuns, docToLage, lageToDoc,
+  judgePosition, fixRuns, docToLage, lageToDoc, hasGoal,
 } from '../modes/werkstatt.js';
 
 const DRAFT_KEY = 'lehmfront.werkstatt.entwurf';
 const SHELF_KEY = 'lehmfront.werkstatt.v1';
 const WEATHER = [['clear', 'Klar'], ['overcast', 'Bedeckt'], ['rain', 'Regen'], ['fog', 'Nebel']];
-const GOALS = [['keins', 'Kein Ziel (freies Gefecht)'], ['take', 'Nehmen'], ['hold', 'Halten'], ['destroy', 'Aufreiben']];
+const GOALS = [['keins', 'Kein Ziel (freies Gefecht)'], ['take', 'Nehmen'], ['hold', 'Halten'], ['destroy', 'Alle drüben aufreiben']];
 
 /** Werkzeuge: layer + Zeichen; line = als Linie mit Traversen-Option zeichnen */
 const TOOLS = {
@@ -61,6 +61,11 @@ const HINTS = {
 
 const read = (k, d) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } };
 const write = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* voll oder gesperrt */ } };
+
+/** Laesst sich aus dem Entwurf ein Kartenblatt bauen? Sonst null (kaputte Datei, alter Entwurf) */
+function usable(d) {
+  try { loadMap(docToLage(d).map); return d; } catch { return null; }
+}
 
 /** Beispiele fuer Screenshots und den ersten Besuch: ein schnurgerader Graben, der dem Ausbilder missfaellt */
 function demoDoc(kind) {
@@ -99,10 +104,10 @@ export async function mount(root, params = new URLSearchParams(location.search))
   let doc = null, note = '';
   const demo = params.get('demo');
   if (params.get('lage')) {
-    try { doc = lageToDoc(await decodeLage(params.get('lage'))); note = 'Lage aus dem Code geladen.'; } catch (e) { note = e.message; }
+    try { doc = usable(lageToDoc(await decodeLage(params.get('lage')))); note = doc ? 'Lage aus dem Code geladen.' : 'Die Karte im Code lässt sich nicht zeichnen.'; } catch (e) { note = e.message; }
   }
   if (!doc && demo) doc = demoDoc(demo);
-  if (!doc) { const saved = read(DRAFT_KEY, null); try { doc = saved ? lageToDoc(saved) : null; } catch { doc = null; } }
+  if (!doc) { const saved = read(DRAFT_KEY, null); try { doc = saved ? usable(lageToDoc(saved)) : null; } catch { doc = null; } }
   if (!doc) doc = demoDoc('sand');
   let tab = params.get('tab') === 'mission' || demo === 'mission' || params.get('lage') ? 'mission' : 'sand';
   let tool = 'fire', placeSide = 'a', placeType = 'rifles', autoTraverse = false;
@@ -149,13 +154,6 @@ export async function mount(root, params = new URLSearchParams(location.search))
     dctx.clearRect(0, 0, w, h);
     applyCameraTransform(dctx, cam, dpr);
     const px = 1 / cam.zoom;
-    // Ziel
-    if (doc.goal?.cells?.length) {
-      dctx.save();
-      dctx.strokeStyle = th.danger; dctx.lineWidth = 2.5 * px; dctx.setLineDash([6 * px, 4 * px]);
-      for (const [x, y] of doc.goal.cells) { dctx.beginPath(); dctx.arc(x + 0.5, y + 0.5, 0.62, 0, Math.PI * 2); dctx.stroke(); }
-      dctx.restore();
-    }
     // Laengsfeuer: im Sandkasten immer, im Editor fuer die eigene Linie ebenfalls (der Ausbilder schaut mit)
     for (const r of judged.runs) {
       dctx.save();
@@ -192,6 +190,17 @@ export async function mount(root, params = new URLSearchParams(location.search))
         const pos = { x: g.at[0], y: g.at[1] };
         drawUnit(dctx, cam, th, { id: s + i, side: s, type: g.type, pos, status: 'ok' }, MARKS[g.type] ?? String(i + 1));
       });
+    }
+    // Ziel ueber den Gruppen, damit der Ring nicht unter einem Kaertchen verschwindet
+    if (doc.goal?.cells?.length && doc.goal.type !== 'destroy' && doc.goal.type !== 'keins') {
+      dctx.save();
+      dctx.strokeStyle = th.danger; dctx.fillStyle = th.danger; dctx.lineWidth = 3 * px; dctx.setLineDash([7 * px, 4 * px]);
+      dctx.font = `700 ${Math.max(0.4, 14 * px)}px ${FONTS.hand}`; dctx.textAlign = 'left'; dctx.textBaseline = 'top';
+      for (const [x, y] of doc.goal.cells) {
+        dctx.beginPath(); dctx.arc(x + 0.5, y + 0.5, 0.82, 0, Math.PI * 2); dctx.stroke();
+        dctx.fillText('Ziel', x + 1.05, y + 0.85);
+      }
+      dctx.restore();
     }
     // laufender Strich
     if (stroke?.line && stroke.points.length) {
@@ -250,7 +259,7 @@ export async function mount(root, params = new URLSearchParams(location.search))
     pointers.set(e.pointerId, p);
     if (pointers.size === 2) {
       // zweiter Finger: Strich verwerfen, Karte bewegen
-      if (stroke?.dirty && undo.length) { doc = JSON.parse(undo.pop()); rebuild(); }
+      if (stroke && undo.length) { const prev = undo.pop(); if (stroke.dirty) { doc = JSON.parse(prev); rebuild(); } }
       stroke = null;
       const [a, b] = [...pointers.values()];
       pinch = { mid: { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 }, dist: Math.hypot(a.x - b.x, a.y - b.y) || 1 };
@@ -258,6 +267,7 @@ export async function mount(root, params = new URLSearchParams(location.search))
       return;
     }
     if (pointers.size > 2) return;
+    hintEl.hidden = true; // der Hinweis verdeckt sonst auf dem Handy die Legende
     if (tool === 'pan' || e.button === 1) { panLast = p; return; }
     const c = cellOf(p);
     const t = TOOLS[tool];
@@ -348,8 +358,8 @@ export async function mount(root, params = new URLSearchParams(location.search))
   }
   function problemsHtml() {
     const bad = lageProblems(docToLage(doc));
-    if (doc.goal?.cells?.length && doc.goal.type !== 'keins') {
-      const g = { type: doc.goal.type, cells: doc.goal.cells };
+    if (hasGoal(doc)) {
+      const g = docToLage(doc).goal;
       return bad.length ? `<span class="bad">${esc(bad[0])}</span>` : esc('Spielbar. Auftrag: ' + goalText(g).replace(/\.$/, '') + ', Frist ' + doc.limit + ' Runden.');
     }
     return bad.length ? `<span class="bad">${esc(bad[0])}</span>` : 'Spielbar als freies Gefecht.';
@@ -441,6 +451,7 @@ export async function mount(root, params = new URLSearchParams(location.search))
     const t = TOOLS[tool];
     const kind = t.line ? 'line' : t.layer === 'group' ? 'group' : t.layer === 'goal' ? 'goal' : t.layer === 'pan' ? 'pan' : 'paint';
     hintEl.textContent = `${t.label}: ${HINTS[kind]}`;
+    hintEl.hidden = false;
   }
 
   async function shareCode() {
@@ -454,7 +465,10 @@ export async function mount(root, params = new URLSearchParams(location.search))
     try { await navigator.clipboard.writeText(text); flash(what + ' liegt in der Zwischenablage.'); } catch { flash(what + ' steht unten zum Kopieren.'); }
     if (pre) { pre.hidden = false; pre.textContent = text; }
   }
-  const adopt = (d, msg) => { remember(); doc = d; changed(); fit(); renderSide(); flash(msg); };
+  const adopt = (d, msg) => {
+    if (!usable(d)) { flash('Die Karte in dieser Lage lässt sich nicht zeichnen.', true); return; }
+    remember(); doc = d; changed(); fit(); renderSide(); flash(msg);
+  };
 
   side.addEventListener('click', async (e) => {
     const b = e.target.closest('button');
@@ -556,7 +570,7 @@ export async function mount(root, params = new URLSearchParams(location.search))
     else if (k === 'size') return;
     else {
       if (k === 'goal') doc.goal = el.value === 'keins' ? (doc.goal ? { ...doc.goal, type: 'keins' } : null) : { type: el.value, cells: doc.goal?.cells ?? [] };
-      if (k === 'goal' && el.value !== 'keins' && !doc.goal.cells.length) { tool = 'goal'; renderSide(); flash('Jetzt die Zielfelder auf der Karte antippen.'); }
+      if (k === 'goal' && el.value !== 'keins' && el.value !== 'destroy' && !doc.goal.cells.length) { tool = 'goal'; renderSide(); flash('Jetzt die Zielfelder auf der Karte antippen.'); }
       if (k === 'limit') doc.limit = Math.max(1, Math.min(40, Math.round(Number(el.value) || 8)));
       if (k === 'maxLosses') doc.maxLosses = el.value === '' ? null : Math.max(0, Math.round(Number(el.value)));
       if (k === 'kind') doc.kind = el.value;

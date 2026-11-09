@@ -88,3 +88,4 @@
   .ws-hint{bottom:8px;left:8px;font-size:12px;padding:6px 8px;max-width:calc(100% - 196px)}
   .ws-zoom{right:8px;bottom:8px}
 }
+.ws-hint[hidden]{display:none}

@@ -7,7 +7,7 @@
 import { battleMap } from '../config/battlemaps.js';
 import { puzzleFile } from '../config/puzzles.js';
 import { puzzleMapJson, puzzleScenario, preparePuzzleState, scriptedOrders } from './puzzle.js';
-import { decodeLage } from './lage-code.js';
+import { decodeLage, CODE_PREFIX } from './lage-code.js';
 import {
   FACTION_IDS, DIFFICULTY_IDS, validDayKey, mapJsonFor, skirmishScenario, adaptFixedScenario, dailyBrief, dailyMap,
 } from './skirmish.js';
@@ -91,8 +91,9 @@ export async function loadLage(params, fetchJson) {
       mode: { kind: 'puzzle', limit: 0, label: 'Puzzle-Lage' },
     };
   }
+  // Nur echte Lage-Codes: lage= nutzt auch die Demo der Lask-Notiz (demo=notiz&lage=sturm)
   const code = params.get('lage');
-  if (code) {
+  if (code && code.startsWith(CODE_PREFIX)) {
     const l = await decodeLage(code);
     const scenario = structuredClone(l.scenario);
     scenario.id = 'lage-eigen';

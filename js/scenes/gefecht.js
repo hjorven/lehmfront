@@ -108,8 +108,10 @@ export async function mount(root, params) {
   if (campaignRun) state = campaignRun.prepare(state, map);
   // P25: Puzzle-Lage oder eigene Lage legt ihren Startzustand fest (Gefechtsrunde, eroberte Graeben)
   if (battle.prepare) state = battle.prepare(state);
-  if (!fixed && params.get('kind') === 'battle') { state.turnKind = 'battle'; state.battle = { round: 1 }; }
-  if (!fixed) applyWeatherParams(state, map, params);
+  // Tageslage und Puzzle-Lagen (P25: die Loesung gilt fuer feste Bedingungen) nehmen keine Vorgaben aus der Adresse
+  const locked = fixed || modeInfo?.kind === 'puzzle';
+  if (!locked && params.get('kind') === 'battle') { state.turnKind = 'battle'; state.battle = { round: 1 }; }
+  if (!locked) applyWeatherParams(state, map, params);
   // P18: Spielstand aus ?slot= ersetzt den Startzustand; Archiv und KI-Gedaechtnis folgen weiter unten
   const startState = structuredClone(state);
   let resumed = await resumeGame(params);
@@ -398,7 +400,11 @@ export async function mount(root, params) {
   const shield = createShield(ui);
   const orderList = createOrderList(ui, {
     onJump: (id) => { select(id, { center: true }); if (narrow()) closeList(); },
-    onClear: (id) => { book = clearOrder(book, side, id); playSfx('paper'); refresh(); },
+    onClear: (id) => {
+      const g = getGroup(state, id);
+      if (koop && g && !koop.owns(g)) { flash(`Gehört zu ${koop.ownerName(g)}. Pfeile sehen, aber nicht ändern.`); return; }
+      book = clearOrder(book, side, id); playSfx('paper'); refresh();
+    },
     onClose: () => closeList(),
   });
   // Telegramm, Phasenfilm und Protokoll-Archiv (P07)
@@ -476,7 +482,7 @@ export async function mount(root, params) {
       roundSub: battleNow
         ? `Minute ${clk.minutes} von ${BATTLE_ROUNDS * BATTLE_MINUTES} · ${clockText(state.clock)} Uhr · ${attacking ? 'Sturm läuft' : 'Der Gegner greift an'}`
         : `${daytime} · ${clockText(state.clock)} Uhr · ${weatherName(state.weather)} · Abschnitt ${sector}`,
-      stripRound: battleNow ? `G${clk.round} · ${clk.minutes}/${BATTLE_ROUNDS * BATTLE_MINUTES} Min` : `R${state.turn} · ${daytime}`,
+      stripRound: (battleNow ? `G${clk.round} · ${clk.minutes}/${BATTLE_ROUNDS * BATTLE_MINUTES} Min` : `R${state.turn} · ${daytime}`) + (koop ? ` · ${koop.short()}` : ''),
       clock: clockView(),
       roundAction: battleNow && attacking && !state.battle?.outcome?.[side] && !book[side]?.sealed && assaultersOf(side).length ? 'Angriff abbrechen' : null,
       orderCount: orders.length,
@@ -691,6 +697,10 @@ export async function mount(root, params) {
 
   function doUndo() {
     if (tool) { cancelTool(); return; }
+    // P25 Koop: nur eigene Eintraege zuruecknehmen, nie die des anderen Kommandos
+    const lastG = book[side]?.history?.at(-1)?.group;
+    const lastOwner = lastG ? getGroup(state, lastG) : null;
+    if (koop && lastOwner && !koop.owns(lastOwner)) { flash(`Der letzte Eintrag stammt von ${koop.ownerName(lastOwner)}. Den nimmst du nicht zurück.`); return; }
     const r = undo(book, side);
     if (!r.group) { flash('Nichts zurückzunehmen.'); return; }
     book = r.book;

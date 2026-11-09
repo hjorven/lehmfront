@@ -183,6 +183,22 @@ Jeder Thread traegt hier nach dem Merge ein, was fertig ist und was offen bleibt
   - Klang: Stempel, Fernschreiber (Länge nach Telegramm), Papier und Bleistift; Cues für `mutiny` und `staff_threat`; leises Grollen im Gefechtsstand.
   - Überraschung: Der Stab antwortet auf jeden Einsatz, und je tiefer das Ansehen sinkt, desto knapper wird er. Bei hohem Ansehen ein langes, warmes Telegramm mit Unterschrift, dann sachlich, dann „ERHALTEN STOP WEITERMACHEN STOP“, und ganz unten nur noch ein leerer Streifen mit dem Stempel „Z. D. A.“ (zu den Akten). Der Papierstreifen wird schmaler, der Fernschreiber rattert kürzer. Dazu bleiben alte Frontlinien als Bleistiftringe auf dem Kartentisch stehen.
 
+- P25 Puzzle-Lagen, Werkstatt, Koop (Plan 8 und 9):
+  - Zwölf Puzzle-Lagen unter `data/puzzles/` (Format im Kopf von `js/modes/puzzle.js`: ASCII-Ebenen, Gruppen, Drehbuch der Gegenseite, Lösung, falsche Ansätze), gespielt über `?scene=gefecht&puzzle=<datei>`. Jede Lösung gewinnt, jeder hinterlegte falsche Ansatz verliert (`test/puzzle.test.js`, Läufer `js/modes/puzzle-run.js`). Ziele `take`, `hold`, `destroy`, `reach` (auch ungesehen), `dig` (Graben ohne Gerade über drei Felder) in `js/modes/goals.js`.
+  - Ruhige Würfel: `state.steady` ersetzt in `resolveTurn` jeden Phasenstrom durch `createSteadyRng` (van der Corput). Alles über der Hälfte gelingt, Treffer fallen wie erwartet; so hat eine Lage genau eine verlässliche Lösung. `state.reveal` zeigt in `viewFor` alle Gruppen (nur Anzeige, Sichtregeln unverändert).
+  - Lehrgangsmappe `?scene=puzzle` mit Kartenskizzen, Stempeln und Noten; Übungsblatt und Ergebnis im Gefecht (`js/ui/lage-rules.js`, gleiche Schnittstelle wie `js/ui/result.js`), Bleistifthinweise einzeln aufdeckbar, Plan der Gegenseite als rote Pfeile, Lösung als Skizze. Fortschritt in `localStorage` `lehmfront.lehrgang.v1`.
+  - Werkstatt `?scene=werkstatt` (`&tab=mission`, `&demo=sand|mission`, `&lage=<Code>` zum Bearbeiten): Sandkasten (Feuer- und Laufgraben ziehen, Draht, Trichter, Radierer, Traversen von selbst oder nachträglich, der Ausbilder benotet die Stellung und zeigt, wo ein MG längs feuern würde) und Missionseditor (Boden, Höhe, Gräben beider Seiten, Draht, Truppen, Ziel, Frist, Verluste, Fraktionen, Gegner hält oder KI-Stufe, Uhrzeit, Wetter, drei Blattgrößen). Rückgängig (auch Strg+Z), Entwurf bleibt im Browser.
+  - Teilen ohne Server: Lage-Code `L1.` + base64url(deflate-raw(JSON)) (`js/modes/lage-code.js`), spielbar als `?scene=gefecht&lage=<Code>`, als Datei sichern/laden, eigene Mappe in `localStorage` `lehmfront.werkstatt.v1` (bewusst nicht in den Kartentaschen von P18, die nur Spielstände führen).
+  - Koop gegen KI (`?scene=gefecht-frei&mode=koop`, `js/ui/koop.js`): Kommando Nord (obere Kartenhälfte) plant zuerst, dann Süd; Loren, Depot, Feuerplan und Etappe sind gemeinsam. Fremde Gruppen sieht man mit Pfeilen, ändern geht nicht. Zusammenfassung und Prüfliste zählen nur die eigenen Gruppen.
+  - Hauptmenü: Koop, Lehrgang, Werkstatt.
+  - Überraschung: Der Ausbilder schreibt mit rotem Bleistift auf die Sandkasten-Karte, wo ein feindliches MG stünde und wie viele Felder es leerfegt, und gibt eine Stellungsnote. In der Lehrgangsmappe tragen gelöste Lagen Stempel und Note mit einer Randnotiz. Im Koop schreibt Nord beim Weitergeben einen Zettel an Süd, der beim Planen oben auf der Karte liegt.
+
+### Für die nächsten Pakete (nach P25)
+
+- Lagen der Werkstatt über Supabase (P20) teilen, Folgearbeit: Eine Lage ist JSON (`docToLage` in `js/modes/werkstatt.js`), der Code aus `encodeLage` passt in eine Spalte; vor dem Speichern `lageProblems(lage)` prüfen. In der Werkstatt steht unter „Teilen“ der Platzhalter-Satz zum Lageaustausch.
+- Neue Puzzle-Lage: JSON nach dem Muster in `data/puzzles/`, Dateiname in `js/config/puzzles.js`, `node tools/precache.mjs`; der Test spielt Lösung und falsche Ansätze automatisch.
+- Weitere Lage-Ziele: `goalMet` und `goalText` in `js/modes/goals.js` erweitern.
+
 ### Für die nächsten Pakete (nach P16)
 
 - Akt 2 bis 4: Szenario mit `mission`-Block (siehe Kopf von `js/missions/script.js`), Richter in `js/missions/akt<n>.js` und in `js/missions/index.js` importieren, Spielerinnen für den Simulator und einen Test wie `test/akt1.test.js`. Karten am besten wie `tools/maps/akt1.mjs` aus der Asse-Grundkarte ableiten.
@@ -311,6 +327,8 @@ Jeder Thread traegt hier nach dem Merge ein, was fertig ist und was offen bleibt
 
 ## Offen und bekannte Macken
 
+- P25: Teilen der Werkstatt-Lagen über das Netz ist noch nicht an P20 angeschlossen (Code, Link und Datei gehen schon; ein Link reicht ohne Server). Koop ist nur lokal an einem Gerät. Im Koop nimmt Rückgängig nur eigene Einträge zurück; liegt Nords Eintrag zuletzt, sagt Süd das Spiel. Ruhige Würfel gelten nur in Puzzle-Lagen; eigene Lagen aus der Werkstatt würfeln normal. Feuerrichtung gezeichneter Gräben ist fest (eigene nach Osten, feindliche nach Westen), auch bei waagrechten Linien. Puzzle-Lagen haben feste Lösungen, andere Wege können ebenfalls gewinnen; geprüft wird nur, dass die Lösung gewinnt und die offensichtlichen Irrwege verlieren.
+
 - P16: Die gegrabene Linie aus Mission 1 wird nicht in Mission 2 übernommen (jede Mission hat ihre feste Karte). Mission 2 lässt sich mit Glück auch passiv halten (1 von 6 Seeds), Mission 6 in 2 von 6 (dann ohne ein einziges verlorenes Grabenfeld). Die Hinweise für Erfahrungsberichte (Lattenroste) und das Entwässern kommen in Akt 1 nicht vor, weil die Berichte dort noch gesperrt sind. Fristen zählen die Stellungsrunden aus dem Protokoll-Archiv: lädt man einen Stand aus einer älteren Version (ohne Archiv), beginnen sie neu. Auf dem Handy steht nur die erste offene Auftragszeile über der Werkzeugreihe, der ganze Zettel liegt in der Seitenleiste.
 - P22: Der Lauf liegt nur in `localStorage` (Export über P18 deckt ihn nicht ab). Die KI drüben löst nicht ab; in langen Läufen bleiben ihre Gruppen vorn, werden aber jede Woche aufgefüllt. Schnee hat weiter keine eigene Regel, der Winter wirkt über Wetter und Frost beim Graben. Nebenläufe im selben Browser (zwei Tabs) überschreiben sich.
 
@@ -404,6 +422,7 @@ Stand 2026-11-08, von Jorven bestaetigt:
 ## Abweichungen vom Plan
 
 - P22: Die Jahreszeiten folgen den Akten der Kampagne (Sommer, Herbst, Winter, Frühling) und schalten Gebäude und Berichte des passenden Akts frei. Die Bestenliste ist lokal; nach Plan zählt sie erst, wenn der Server das Befehlsprotokoll nachrechnet (P20). „Abschnitt abgeben“ beendet einen Lauf ohne Niederlage.
+- P25: Puzzle-Lagen würfeln nicht (ruhige Würfel), damit „eine Lösung“ wirklich verlässlich ist; das Übungsblatt sagt es dem Spieler. Missionseditor und Sandbox sind eine gemeinsame Szene (Werkstatt) mit zwei Reitern; „Als Missionsstart übernehmen“ wechselt mit der gebauten Stellung in den Editor. Koop ist vorerst lokal an einem Gerät (Plan 9 nennt Koop allgemein); online wäre eine Folgearbeit auf P20.
 
 - P17: Zufallskarten und die drei neuen handgebauten Karten sind gespiegelt oder punktgespiegelt (Plan 9: Spiegelkarten zuerst), beide Seiten haben dasselbe Gelände und dieselbe Aufstellung; nur die Fraktionen unterscheiden sich. Die Spielerfraktion steht immer im Westen. Gefecht frei hat eine wählbare Dauer (8, 14, 24 Stellungsrunden oder offen) und endet mit einer Abschlussmeldung. Die Tageslage ist eine Woche aus 14 Stellungsrunden mit den Punkten aus Plan 8.3.
 

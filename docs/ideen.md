@@ -35,3 +35,6 @@ Neue Ideen landen hier, nicht im Code (Plan 13). Mit Datum und Paket, aus dem si
 - 2026-11-09, P16: Die Notizen der Figuren könnten Eselsohren bekommen und nach dem Tod der Figur grau werden; wer Harms verliert, liest seine alten Zettel noch in der Ablage.
 - 2026-11-09, P22: Im Endlosmodus könnte drüben ein Name wiederkehren: ein Gefangener aus Woche 3 schreibt in Woche 20 aus dem Lager eine Karte an seinen alten Gruppenführer.
 - 2026-11-09, P22: Das Kerbholz könnte mit den Jahreszeiten Moos, Reif und Risse bekommen, und nach vierzig Wochen ist kein Platz mehr auf dem Balken.
+- 2026-11-09, P25: Der Ausbilder im Sandkasten könnte sich an frühere Stellungen erinnern („Letzte Woche war das besser.“) und nach drei sauberen Stellungen eine eigene Puzzle-Lage aus der Stellung des Spielers machen.
+- 2026-11-09, P25: Geteilte Lagen könnten den Namen des Verfassers als Bleistiftunterschrift unten auf dem Blatt tragen, und wer sie löst, setzt sein Kürzel daneben (Umlaufmappe).
+- 2026-11-09, P25: Im Koop könnten die Zettel zwischen Nord und Süd am Ende als kleiner Stapel in der Abschlussmeldung liegen.

@@ -296,7 +296,10 @@ export function attachLageRules({ ui, map, start, lage: p, kind = 'puzzle', resu
       if (puzzle) {
         const old = readProgress()[p.id] ?? {};
         const g = gradeOf(verdict);
-        const better = verdict.status === 'won' && (!old.solved || (verdict.clean && !old.clean) || verdict.losses < (old.losses ?? 1e9));
+        // Besser heisst: hoehere Note, bei gleicher Note weniger Verluste. Nie ein besseres Ergebnis ueberschreiben.
+        const rank = (x) => ['bestanden', 'gut', 'sehr gut'].indexOf(x ?? 'bestanden');
+        const better = verdict.status === 'won' && (!old.solved || rank(g) > rank(old.grade)
+          || (rank(g) === rank(old.grade) && verdict.losses < (old.losses ?? 1e9)));
         writeProgress(p.id, {
           tries: (old.tries ?? 0) + 1,
           ...(better ? { solved: true, clean: !!verdict.clean, rounds: verdict.rounds, losses: verdict.losses, grade: g } : {}),
