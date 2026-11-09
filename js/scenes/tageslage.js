@@ -79,4 +79,6 @@ export async function mount(root, params) {
   new ResizeObserver(fit).observe(sheet);
   fit();
   root.querySelector('.mb-start').addEventListener('click', () => playSfx('stamp'));
+  // P20: Wachbuch der Front (online, vom Stab nachgerechnet), wenn eine Leitung geschaltet ist
+  import('../online/front-board.js').then((m) => m.mountFrontBoard(root.querySelector('.wachbuch'), key)).catch(() => {});
 }

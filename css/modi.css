@@ -92,3 +92,18 @@ body[data-scene="gefecht-frei"],body[data-scene="tageslage"]{overflow:auto}
 .tl-brief li span{color:var(--ink2)}
 .tl-brief li b{font-family:var(--font-num);font-weight:600;text-align:right}
 .tl-order{font:700 21px/1.2 var(--font-hand);color:var(--ink);margin:0;transform:rotate(-.6deg)}
+
+/* ---------- P20: Wiedergabe-Link und Meldung an den Stab ---------- */
+.rm-link{border:1px dashed var(--line);padding:8px 10px;margin:0 0 10px;background:var(--paper)}
+.rm-link label{display:flex;flex-direction:column;gap:4px;font-size:13.5px;color:var(--ink2)}
+.rm-link input{font:12px var(--font-num);color:var(--ink);background:var(--card);border:var(--border);padding:6px;min-height:36px;width:100%}
+.rm-link small{display:block;margin-top:4px;font:11px var(--font-num);color:var(--ink2)}
+.rm-stab{border-top:2px solid var(--ink);padding:10px 0 4px;margin:0 0 10px}
+.rm-stab b{font:400 16px var(--font-head)}
+.rm-stab p{margin:4px 0 8px;font-size:13.5px;color:var(--ink2)}
+.rm-stab .btn{min-height:44px}
+.rm-stab-out{margin-top:8px;font-size:14px}
+.rm-checked{display:inline-block;padding:1px 8px;border:2px solid var(--own);color:var(--own);font:400 13px var(--font-head);text-transform:uppercase;transform:rotate(-3deg)}
+.rm-front{list-style:none;margin:8px 0 0;padding:0}
+.rm-front li{display:flex;gap:8px;align-items:baseline;border-bottom:1px solid var(--track);font:700 19px/1.1 var(--font-hand)}
+.rm-front li b{font:600 14px var(--font-num);margin-left:auto}
