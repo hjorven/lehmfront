@@ -9,6 +9,7 @@ import { getSettings, setSettings, resetSettings, onSettingsChange, SETTING_CHOI
 import { createSaveStore, exportSave, inspectSave } from '../save.js';
 import { SLOTS, AUTO_SLOT, freeSlot, exportName, slotTitle, loadHref } from '../savegame.js';
 import { playSfx } from '../audio/engine.js';
+import { packBackup, readBackup, collectLocal, restoreLocal, BACKUP_MAX } from '../backup.js';
 
 export const TABS = [
   ['akten', 'Spielstände'],
@@ -128,6 +129,12 @@ export function openSettings({ tab = 'akten', game = null, container = document.
       <ul class="set-slots">${[...SLOTS, ...extra.map((x) => x.slot)].map((slot) => slotHtml(slot, bySlot.get(slot), !!game && !reason)).join('')}</ul>
       <div class="set-row">
         <label class="btn set-import">Spielstand einlesen<input type="file" accept=".json,application/json" hidden></label>
+      </div>
+      <h3 class="set-sub-h">Dienstbuch sichern</h3>
+      <p class="set-note">Feldzug, Frontabschnitt, Lehrgangsmappe, Wachbuch, Werkstatt und Einstellungen liegen nur in diesem Browser. Die Sicherung nimmt sie als eine Datei mit, etwa auf ein anderes Gerät.</p>
+      <div class="set-row">
+        <button type="button" class="btn" data-act="backup">Sicherung speichern</button>
+        <label class="btn set-import">Sicherung einlesen<input type="file" data-kind="backup" accept=".json,application/json" hidden></label>
       </div>`;
     for (const cv of panel.querySelectorAll('canvas[data-slot]')) drawSketch(cv, bySlot.get(cv.dataset.slot)?.meta?.sketch);
   }
@@ -220,6 +227,52 @@ export function openSettings({ tab = 'akten', game = null, container = document.
     }
   }
 
+  // ---------- Sicherung des ganzen Dienstbuchs (P27) ----------
+  let pendingBackup = null;
+  function saveBackup() {
+    const entries = collectLocal();
+    if (!Object.keys(entries).length) { say('Noch nichts zu sichern.', 'warn'); return; }
+    const d = new Date();
+    const day = [d.getFullYear(), String(d.getMonth() + 1).padStart(2, '0'), String(d.getDate()).padStart(2, '0')].join('-');
+    download(`lehmfront-dienstbuch-${day}.json`, packBackup(entries, { savedAt: d.toISOString() }));
+    playSfx('stamp', { intensity: 0.4 });
+    say('Dienstbuch als Datei gesichert.');
+  }
+
+  async function inspectBackup(file) {
+    if (!file) return;
+    try {
+      if (file.size > BACKUP_MAX) throw new Error('die Datei ist zu groß für eine Sicherung');
+      const info = readBackup(await file.text());
+      pendingBackup = info;
+      const what = [info.campaign ? 'Feldzug' : '', info.endless ? 'Frontabschnitt' : ''].filter(Boolean).join(' und ') || 'Einstellungen und Listen';
+      const row = $('#set-panel-akten .set-restore') ?? Object.assign(document.createElement('div'), { className: 'set-row set-restore' });
+      row.innerHTML = `<button type="button" class="btn" data-act="restore">Sicherung übernehmen (${esc(what)})</button>`;
+      $('#set-panel-akten').append(row);
+      say(`${info.count} Einträge gelesen. ${info.stamp === 'ok' ? 'Zensurstempel unversehrt.' : 'Der Zensurstempel ist verletzt: die Datei wurde verändert.'} Übernehmen ersetzt Feldzug und Läufe in diesem Browser und lädt das Titelblatt neu.`, info.stamp === 'ok' ? '' : 'warn');
+    } catch (e) {
+      pendingBackup = null;
+      $('#set-panel-akten .set-restore')?.remove();
+      say('Nicht lesbar: ' + e.message, 'warn');
+    }
+  }
+
+  function restoreBackup(btn) {
+    if (!pendingBackup) return;
+    if (!confirmTwice(btn, 'Wirklich ersetzen?')) return;
+    try {
+      restoreLocal(pendingBackup.entries);
+      pendingBackup = null;
+      btn.closest('.set-restore')?.remove();
+      playSfx('paper', { intensity: 0.5 });
+      say('Sicherung übernommen. Das Blatt wird neu geladen.');
+      // Eine laufende Szene haelt Feldzug oder Lauf im Speicher und schriebe sie sonst gleich wieder zurueck
+      setTimeout(() => location.assign(location.pathname), 900);
+    } catch (e) {
+      say('Das hat nicht geklappt: ' + e.message, 'warn');
+    }
+  }
+
   // ---------- Darstellung ----------
   function renderView(panel) {
     const s = getSettings();
@@ -261,12 +314,14 @@ export function openSettings({ tab = 'akten', game = null, container = document.
     if (tab) { select(tab.dataset.tab); return; }
     const act = e.target.closest('[data-act]');
     if (!act) return;
+    if (act.dataset.act === 'backup') { saveBackup(); return; }
+    if (act.dataset.act === 'restore') { restoreBackup(act); return; }
     if (act.dataset.act === 'reset') { resetSettings(); renderView($('#set-panel-ansicht')); say('Darstellung zurückgesetzt.'); return; }
     slotAction(act);
   });
   dlg.addEventListener('change', (e) => {
     const t = e.target;
-    if (t.type === 'file') { importFile(t.files?.[0]); t.value = ''; return; }
+    if (t.type === 'file') { (t.dataset.kind === 'backup' ? inspectBackup : importFile)(t.files?.[0]); t.value = ''; return; }
     const m = /^set-(\w+)$/.exec(t.name || '');
     if (!m || !(m[1] in SETTING_CHOICES)) return;
     const v = SETTING_CHOICES[m[1]].find((x) => String(x) === t.value);

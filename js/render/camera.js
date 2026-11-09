@@ -95,6 +95,30 @@ export function centerOn(cam, wx, wy, zoom = cam.zoom) {
   return clampCamera(cam);
 }
 
+/**
+ * P27: Felder ins Bild ruecken. Liegen alle (mit Rand pad in Feldern) schon im Ausschnitt, bleibt die Kamera stehen
+ * und es kommt false zurueck. Sonst wird auf ihre Mitte zentriert und hoechstens so weit herausgezoomt, dass sie passen
+ * (nie unter fitZoom, nie hineingezoomt). inset: { top, bottom } in Bildschirmpixeln, die von Leisten verdeckt sind.
+ */
+export function frameCells(cam, cells, { pad = 1, inset = {} } = {}) {
+  if (!cells?.length) return false;
+  const top = inset.top ?? 0, bottom = inset.bottom ?? 0;
+  let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+  for (const c of cells) {
+    x0 = Math.min(x0, c.x - pad); y0 = Math.min(y0, c.y - pad);
+    x1 = Math.max(x1, c.x + 1 + pad); y1 = Math.max(y1, c.y + 1 + pad);
+  }
+  const usableH = Math.max(40, cam.viewH - top - bottom);
+  const tl = screenToWorld(cam, 0, top), br = screenToWorld(cam, cam.viewW, top + usableH);
+  if (x0 >= tl.x && y0 >= tl.y && x1 <= br.x && y1 <= br.y) return false;
+  const need = Math.min(cam.viewW / (x1 - x0), usableH / (y1 - y0));
+  const zoom = Math.max(fitZoom(cam), Math.min(cam.zoom, need));
+  // Mitte des freien Bereichs auf die Mitte der Felder legen
+  const shift = (top - bottom) / 2 / zoom;
+  centerOn(cam, (x0 + x1) / 2, (y0 + y1) / 2 - shift, zoom);
+  return true;
+}
+
 /** Canvas-Transformation fuer Weltkoordinaten (dpr = Geraetepixel pro CSS-Pixel). */
 export function applyCameraTransform(ctx, cam, dpr = 1) {
   const z = cam.zoom * dpr;

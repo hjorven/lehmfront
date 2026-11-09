@@ -126,10 +126,15 @@ export function createFilmPlayer(root, { onFrame, onEnd, onLines }) {
       el.querySelectorAll('.film-tab').forEach((b, i) => {
         b.classList.toggle('on', i === fr.section);
         b.setAttribute('aria-selected', String(i === fr.section));
+        // P27: auf schmalen Schirmen scrollen die Reiter; der laufende rueckt ins Bild
+        if (i === fr.section) {
+          const bar = b.parentElement;
+          if (bar.scrollWidth > bar.clientWidth + 1) bar.scrollLeft = Math.max(0, b.offsetLeft - bar.offsetLeft - (bar.clientWidth - b.offsetWidth) / 2);
+        }
       });
       lastSection = fr.section;
     }
-    el.querySelector('.film-phase').textContent = `Phase: ${s.label}`;
+    el.querySelector('.film-phase').innerHTML = `Phase ${fr.section + 1} von ${film.sections.length}<span class="ph-name">: ${esc(s.label)}</span>`;
     el.querySelector('.film-clock').textContent = clockText(clockDuring(film.clockBefore, film.clockAfter, film.total, t));
     const range = el.querySelector('.scrub');
     range.value = String(Math.round(t));
@@ -281,7 +286,7 @@ export function createFilmPlayer(root, { onFrame, onEnd, onLines }) {
         <div class="film-ctrl">
           <button type="button" class="btn play"></button>
           <input class="scrub" type="range" min="0" max="${f.total}" step="10" value="0" aria-label="Zeitleiste der Runde">
-          <button type="button" class="btn auto" aria-pressed="${auto}" title="Ohne Halt bei jeder Phase">Durchlaufen</button>
+          <button type="button" class="btn auto" aria-pressed="${auto}" title="Ohne Halt bei jeder Phase" aria-label="Durchlaufen"><span class="lg">Durchlaufen</span><span class="sm">Ohne Halt</span></button>
           <button type="button" class="btn skip" aria-keyshortcuts="Escape">Überspringen <kbd>Esc</kbd></button>
         </div>`;
       el.hidden = false;

@@ -55,7 +55,7 @@ export async function mount(root, params) {
         <li><span>Du führst</span><b>${esc(f.name)}</b></li>
         <li><span>Drüben</span><b>${esc(foe.name)}, ${esc(DIFFICULTIES[brief.difficulty].label)}</b></li>
         <li><span>Dauer</span><b>${brief.rounds} Stellungsrunden</b></li>
-        <li><span>Wertung</span><b>Woche gehalten 100, Feld 5, Verwundeter 2, Gefallener −3</b></li>
+        <li><span>Wertung</span><b>Woche gehalten 100, je Feld 5, je Verwundeter 2, je Gefallener −3</b></li>
       </ul>
       <div class="wachbuch"><b class="wb-title">Wachbuch, ${esc(dayLabel(key))}</b>
         ${board.length ? `<ol>${board.slice(0, 5).map((e, i) => `<li><span class="wb-n">${i + 1}.</span><span class="wb-name">${esc(e.name)}</span><span class="wb-f">${esc(FACTIONS[e.faction]?.short ?? '')}</span><b>${e.points}</b></li>`).join('')}</ol>` : '<p class="wb-empty">Heute hat noch niemand auf diesem Gerät gemeldet.</p>'}

@@ -13,7 +13,7 @@ import { sightLine, coverAt, PINNED, darknessOf } from '../sight.js';
 import { faction } from '../config/factions.js';
 import { themeAt, applyTheme, currentTheme, baseTheme, onThemeChange, blueprintTheme } from '../theme.js';
 import {
-  createCamera, resizeCamera, attachCameraControls, screenToWorld, worldToScreen, centerOn, fitZoom,
+  createCamera, resizeCamera, attachCameraControls, screenToWorld, worldToScreen, centerOn, fitZoom, frameCells,
 } from '../render/camera.js';
 import { createMapLayer, sheetBounds, FONTS } from '../render/map-layer.js';
 import { drawBattle, hitUnit, unitBox } from '../render/units-layer.js';
@@ -647,7 +647,13 @@ export async function mount(root, params) {
     def.begin({
       group: g, state, map: liveMap, side, cam,
       setOrder: (o) => placeOrder(o),
-      pickCell: (req) => { if (tool !== t) return; t.pick = req; t.armed = null; t.pickHint = req.hint; refresh(); },
+      pickCell: (req) => {
+        if (tool !== t) return;
+        t.pick = req; t.armed = null; t.pickHint = req.hint;
+        // P27: auf dem Handy die moeglichen Ziele ins Bild ruecken (Leisten oben und unten freihalten)
+        if (req.focus?.length && narrow() && frameCells(cam, req.focus, { pad: 1, inset: { top: 70, bottom: 190 } })) onCamera();
+        refresh();
+      },
       hint: (text) => flash(text, 'warn'),
       cancel: () => { if (tool === t) cancelTool(); },
       ui,

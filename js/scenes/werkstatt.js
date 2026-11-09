@@ -51,13 +51,23 @@ const MISSION_SETS = [
   ['Stellung', ['fire', 'comm', 'efire', 'ecomm', 'wire', 'ewire', 'crater', 'erase']],
   ['Truppen und Ziel', ['group', 'goal', 'pan']],
 ];
-const HINTS = {
+// P27: Hinweise je nach Eingabegeraet (mit Maus keine Fingergesten nennen)
+const HINTS_TOUCH = {
   line: 'Mit dem Finger ziehen. Zurückfahren radiert. Zwei Finger schieben und zoomen.',
   paint: 'Antippen oder darüberstreichen. Zwei Finger schieben und zoomen.',
   group: 'Antippen setzt eine Gruppe, noch einmal antippen nimmt sie weg.',
   goal: 'Felder antippen, die gehalten oder genommen werden sollen (bis sechs).',
-  pan: 'Karte ziehen. Mausrad oder zwei Finger zoomen.',
+  pan: 'Karte ziehen. Zwei Finger zoomen.',
 };
+const HINTS_MOUSE = {
+  line: 'Mit gedrückter Maustaste ziehen. Zurückfahren radiert. Mittlere Maustaste schiebt, Mausrad zoomt.',
+  paint: 'Anklicken oder mit gedrückter Taste darüberstreichen. Mausrad zoomt.',
+  group: 'Anklicken setzt eine Gruppe, noch einmal anklicken nimmt sie weg.',
+  goal: 'Felder anklicken, die gehalten oder genommen werden sollen (bis sechs).',
+  pan: 'Karte ziehen. Mausrad zoomt.',
+};
+const coarse = () => { try { return matchMedia('(pointer: coarse)').matches; } catch { return false; } };
+const hintFor = (kind) => (coarse() ? HINTS_TOUCH : HINTS_MOUSE)[kind];
 
 const read = (k, d) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } };
 const write = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* voll oder gesperrt */ } };
@@ -450,7 +460,7 @@ export async function mount(root, params = new URLSearchParams(location.search))
   function updateHint() {
     const t = TOOLS[tool];
     const kind = t.line ? 'line' : t.layer === 'group' ? 'group' : t.layer === 'goal' ? 'goal' : t.layer === 'pan' ? 'pan' : 'paint';
-    hintEl.textContent = `${t.label}: ${HINTS[kind]}`;
+    hintEl.textContent = `${t.label}: ${hintFor(kind)}`;
     hintEl.hidden = false;
   }
 

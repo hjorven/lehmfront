@@ -4,10 +4,17 @@ import { createRng } from './rng.js';
 import { audio, playSfx } from './audio/engine.js';
 import { dayKey, dayLabel } from './modes/skirmish.js';
 import { boardFor } from './modes/board.js';
+import { AFTERMATH, campaignAftermath } from './aftermath.js';
 
-export const VERSION = '1.0.0';
+export const VERSION = '1.5.0';
 const FIELD_DAY_KEY = 'lehmfront.berichtigt'; // Druckvermerk auf dem Titelblatt (P21)
 const MONTHS = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+
+// Ueberraschung P27: das Titelblatt erinnert sich an den Ausgang des Feldzugs (js/aftermath.js)
+const CAMPAIGN_KEY = 'lehmfront-campaign';
+function readAftermath() {
+  try { return campaignAftermath(localStorage.getItem(CAMPAIGN_KEY)); } catch { return null; }
+}
 
 function drawBackground(canvas) {
   const dpr = window.devicePixelRatio || 1;
@@ -39,10 +46,13 @@ function drawBackground(canvas) {
   }
 
   // Eigener Graben als Rechteckwelle (blau), feindlicher (rot)
-  const crenel = (x0, color) => {
-    ctx.globalAlpha = 0.55;
+  const after = readAftermath();
+  const look = after ? AFTERMATH[after.ended] : { own: 'solid', enemy: 'solid' };
+  const crenel = (x0, color, how = 'solid') => {
+    ctx.globalAlpha = how === 'faint' ? 0.22 : 0.55;
     ctx.strokeStyle = color;
     ctx.lineWidth = 2;
+    ctx.setLineDash(how === 'dashed' ? [6, 7] : []);
     ctx.beginPath();
     let x = x0;
     ctx.moveTo(x, 0);
@@ -55,9 +65,39 @@ function drawBackground(canvas) {
     }
     ctx.stroke();
   };
-  crenel(w * 0.58, v('own'));
-  crenel(w * 0.86, v('enemy'));
+  crenel(w * (look.own === 'forward' ? 0.8 : 0.58), v('own'), look.own === 'forward' ? 'solid' : look.own);
+  crenel(w * 0.86, v('enemy'), look.enemy);
+  ctx.setLineDash([]);
   ctx.globalAlpha = 1;
+  if (!after) return;
+  // Breit: zwischen dem alten Platz des eigenen Grabens und dem feindlichen, frei vom Menue. Schmal: oben ueber dem Titel.
+  // Die Schrift wird kleiner, bis der Vermerk in die Luecke passt, und bricht notfalls in zwei Zeilen.
+  const wide = w >= 900;
+  // Schmal ist ueber dem Titel nur Platz fuer eine Zeile: dort steht nur der Vermerk
+  const x = wide ? w * 0.58 + 24 : 16, y = wide ? h * 0.78 : 15;
+  const room = wide ? w * (look.own === 'forward' ? 0.8 : 0.86) - x - 16 : w - x - 12;
+  const second = after.fallen ? `${after.fallen} ${after.fallen === 1 ? 'Name' : 'Namen'} auf der Liste.` : 'Kein Name auf der Liste.';
+  let size = wide ? 22 : 15;
+  let lines = wide ? [look.note, second] : [`${look.note} ${second}`];
+  const fit = () => { ctx.font = `${size}px Caveat, cursive`; return Math.max(...lines.map((l) => ctx.measureText(l).width)) <= room; };
+  while (!fit() && size > 14) size--;
+  if (!fit() && !wide) lines = [look.note];
+  while (!fit() && !wide && size > 11) size--;
+  if (!fit() && wide) {
+    // an einem Punkt oder Komma in der Mitte umbrechen
+    const cut = look.note.search(/[.,] /);
+    if (cut > 0) lines = [look.note.slice(0, cut + 1), look.note.slice(cut + 2), second];
+    size = 22;
+    while (!fit() && size > 13) size--;
+  }
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(-0.035);
+  ctx.fillStyle = v('ink2') || v('ink');
+  ctx.globalAlpha = 0.85;
+  ctx.textAlign = 'left';
+  lines.forEach((l, i) => ctx.fillText(l, 0, i * size * 1.15));
+  ctx.restore();
 }
 
 // Szenen: ?scene=<name> laedt js/scenes/<name>.js und ruft dessen mount(root, params) auf.
@@ -86,6 +126,7 @@ if (scene) {
   const canvas = document.getElementById('bg');
   const redraw = () => drawBackground(canvas);
   redraw();
+  if (readAftermath()) document.fonts?.load('20px Caveat').then(redraw).catch(() => {});
   addEventListener('resize', redraw);
   matchMedia('(prefers-color-scheme: dark)').addEventListener('change', redraw);
   showImprint();
