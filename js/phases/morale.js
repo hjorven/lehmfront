@@ -17,6 +17,7 @@
 import { registerPhase, ORDER } from './registry.js';
 import { registerOrderValidator } from '../orders.js';
 import { registerDigFactor } from './dig.js';
+import { registerLetterCategory } from '../letters.js';
 import { cellLabel, TERRAIN } from '../map.js';
 import { byId, compareId, newLeader, otherSide, SIDES } from '../state.js';
 import { PINNED } from '../sight.js';
@@ -448,6 +449,11 @@ registerDigFactor('erschoepfung', ({ group }) => {
   const pct = digFatiguePct(group.fatigue ?? 0);
   return pct === 100 ? null : { pct, label: 'Erschöpfung' };
 });
+
+// Feldpost (P15): wer abgeloest wurde oder zu lange vorn ist, schreibt davon; ein gefallener Gruppenfuehrer wiegt schwer
+registerLetterCategory('relieved', 'abloesung');
+registerLetterCategory('too_long', 'abloesung');
+registerLetterCategory('leader_fallen', 'verluste');
 
 registerPhase({ id: 'relieve', kind: 'position', order: ORDER.position.movement + 5, run: runRelieve });
 registerPhase({ id: 'morale', kind: 'both', order: { position: ORDER.position.morale, battle: ORDER.battle.morale }, run(ctx) {
