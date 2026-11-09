@@ -49,7 +49,15 @@ Zum Ausprobieren mit einem eigenen Projekt ohne Commit im Browser:
   geschrieben, zusammen mit dem Protokoll in `matches.record` für den Replay-Link.
 - Wartende Partien sieht nur ihr Anleger; Beitreten nur mit Code über `join`.
 - Die Tageslage-Bestenliste zeigt Punkte, die Befehle liegen in `daily_orders` ohne Policy.
+- Der Startzustand (Namen und Heimatorte der Gruppenführer) kommt aus einem öffentlichen Seed aus der
+  Partie-ID (`initSeedFor`), alle Würfe der Runden aus dem geheimen Seed. Sonst ließe sich der geheime Seed
+  aus den eigenen Namen in Sekunden zurückrechnen. Der Replay-Link trägt beide (`seed`, `iseed`).
 - `lf_turn_status` verrät nur, ob die Gegenseite für die laufende Runde abgegeben hat.
+
+## Nach Regeländerungen
+
+Die Functions rechnen mit ihrer eigenen Kopie der Spiellogik. GitHub Pages ist nach jedem Merge live, die
+Functions nicht: nach jeder Änderung an Regeln oder KI `node tools/sync-functions.mjs` und neu deployen.
 
 ## Fristen
 

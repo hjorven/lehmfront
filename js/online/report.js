@@ -26,7 +26,19 @@ async function share(url, box) {
 export function decorateReport(section, { info, report, record }) {
   const rec = record?.();
   const foot = section.querySelector('.rm-foot');
-  if (rec && rec.r.length && foot) {
+  const replayPage = new URLSearchParams(location.search).has('wiedergabe');
+  // Tageslage: der Link traegt die eigenen Befehle; solange der Tag laeuft, liesse sich damit die Woche
+  // abschreiben und unter eigenem Namen melden. Darum erst ab dem naechsten Tag.
+  const d = new Date();
+  const todayKey = d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
+  const dayOpen = info?.kind === 'tageslage' && Number(info.key) >= todayKey - 1;
+  if (dayOpen && foot) {
+    const hint = document.createElement('p');
+    hint.className = 'rm-link-later';
+    hint.textContent = 'Den Wiedergabe-Link dieser Tageslage gibt es ab übermorgen, damit niemand die Woche abschreibt.';
+    foot.before(hint);
+  }
+  if (rec && rec.r.length && foot && !dayOpen) {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'btn rm-replay';
@@ -38,7 +50,7 @@ export function decorateReport(section, { info, report, record }) {
     foot.prepend(btn);
     btn.addEventListener('click', async () => share(await replayUrl(rec), box));
   }
-  if (info?.kind !== 'tageslage' || !onlineEnabled() || !rec) return;
+  if (info?.kind !== 'tageslage' || !onlineEnabled() || !rec || replayPage) return;
   const block = document.createElement('div');
   block.className = 'rm-stab';
   block.innerHTML = `<b>Meldung an den Stab</b>

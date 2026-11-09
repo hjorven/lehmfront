@@ -70,7 +70,7 @@ import { endlessWeek } from '../ui/endless/week.js';
 import { prepareMission, missionAi, withMissionOrders } from '../missions/script.js';
 import { attachMissionUi } from '../ui/mission.js';
 import { carryOrders, recordFrom } from '../online/replay.js';
-import { setupOnline, attachMatch, brokenText } from '../online/session.js';
+import { setupOnline, attachMatch, brokenText, blockMatch, telegramLines } from '../online/session.js';
 
 const num = (v, d) => (v === null || v === '' || !Number.isFinite(Number(v)) ? d : Number(v));
 const LONG_PRESS_MS = 430;
@@ -95,7 +95,9 @@ export async function mount(root, params) {
   // Tageslage: fuer alle dieselbe Lage, darum keine URL-Eingriffe in Wetter, Rundenart oder Gegner
   const fixed = modeInfo?.kind === 'tageslage' || modeInfo?.kind === 'endlos';
   const seed = battle.seed ?? ((num(params.get('seed'), 1917) >>> 0) || 1);
-  let state = createInitialState(map, scenario, seed);
+  // P20: Wiedergabe eines Online-Gefechts: Startzustand aus dem oeffentlichen Seed (iseed), Wuerfe aus seed
+  let state = createInitialState(map, scenario, params.has('iseed') ? (num(params.get('iseed'), seed) >>> 0) : seed);
+  state.seed = seed;
   state = initEtappen(state, map, scenario); // P11: Etappe mit Grundausbau aus dem Szenario
   state = prepareMission(state, scenario); // P16: Ablaufplan einer Kampagnenmission (Lask, Wetter), sonst unveraendert
   // P14: Einsatz aus der Kampagne (Ansehen, Vertrauen, Berichte, Nachschub, Ersatz), sonst null
@@ -110,6 +112,7 @@ export async function mount(root, params) {
   // P20: Wiedergabe-Link (wiedergabe=1, Protokoll im Anker) oder Online-Gefecht (match=<id>)
   const online = await setupOnline(params, { map, start: startState, seed, info: modeInfo });
   if (online?.resumed) resumed = online.resumed;
+  if (online?.kind === 'match') resumed = null; // Online gilt nur die Sicht vom Stab, nie ein lokaler Stand
   if (online?.state) state = online.state;
   if (resumed) state = resumed.state;
   const humans = online?.side ? [online.side] : mode === 'hotseat' ? ['a', 'b'] : ['a'];
@@ -156,7 +159,7 @@ export async function mount(root, params) {
   let modalOpen = false;
   if (resumed) { archive = resumed.archive ?? archive; aiMemory = resumed.aiMemory; lastLog = resumed.lastLog; if (resumed.book) book = resumed.book; }
   if (online?.kind === 'match' && online.state) { lastLog = online.log; book = nextRound(book, { a: [], b: [], [online.side]: online.carry }); }
-  const forcedDark = params.has('night') ? Math.max(0, Math.min(1, num(params.get('night'), 0))) : null;
+  const forcedDark = params.has('night') && !fixed ? Math.max(0, Math.min(1, num(params.get('night'), 0))) : null;
   // Erzwungene Nacht auch fuer die Regeln (Sichtweite, Trefferchance): Uhr auf 22 Uhr stellen
   if (forcedDark !== null && forcedDark >= 0.5 && !state.night) { state.clock = { ...state.clock, hour: 22, minute: 0 }; state.night = true; }
   let hoverSight = null;       // Sichtlinie der gewaehlten Gruppe zum Feld unter der Maus (P05)
@@ -316,7 +319,8 @@ export async function mount(root, params) {
   const rules = attachModeRules({
     ui, info: modeInfo, map, start: startState, scenario, humans, aiCfg,
     // P20: Befehlsprotokoll fuer Wiedergabe-Link und Nachrechnen der Tageslage (nicht fuer Kampagne und Online)
-    record: () => (campaignRun || online?.kind === 'match' ? null
+    // Mit erzwungener Nacht (night=, nur Ansicht) liesse sich die Partie nicht genau nachrechnen
+    record: () => (campaignRun || online?.kind === 'match' || params.has('night') ? null
       : recordFrom(archive, { query: saveQuery(params), seed, title: map.name })),
     onOpen: () => { modalOpen = true; cancelTool(false); radial.hide(); refresh(); },
     onClose: () => { modalOpen = false; refresh(); dynCv.focus({ preventScroll: true }); },
@@ -326,7 +330,9 @@ export async function mount(root, params) {
   const gameMenu = attachGameMenu({
     ui, params,
     snapshot: () => ({ state, map: liveMap, archive, aiMemory, lastLog, rules: rules.snapshot(), side, book }),
-    busy: () => (filmFrame || book.a?.sealed || book.b?.sealed ? 'Während der Ausführung oder Übergabe kann nicht abgelegt werden.' : rules.ended ? 'Die Partie ist beendet.' : null),
+    busy: () => (online?.kind === 'match' ? 'Online-Gefechte liegen beim Stab, nicht in der Kartentasche.'
+      : online?.kind === 'replay' ? 'Eine Wiedergabe steckt im Link, nicht in der Kartentasche.'
+      : filmFrame || book.a?.sealed || book.b?.sealed ? 'Während der Ausführung oder Übergabe kann nicht abgelegt werden.' : rules.ended ? 'Die Partie ist beendet.' : null),
     canOpen: () => !modalOpen && !filmFrame,
     ended: () => rules.ended,
     onOpen: () => { cancelTool(false); radial.hide(); modalOpen = true; refresh(); },
@@ -1162,13 +1168,19 @@ export async function mount(root, params) {
     u.searchParams.delete('slot');
     history.replaceState(history.state, '', u);
   }
-  if (online?.broken) flash(brokenText(online), 'warn');
+  if (online?.broken && online.kind === 'match') blockMatch(ui, brokenText(online), () => { cancelTool(false); modalOpen = true; refresh(); });
+  else if (online?.broken) flash(brokenText(online), 'warn');
   else if (online?.kind === 'replay') {
     flash(`Wiedergabe: ${online.rounds} Runden nachgerechnet. Das Protokoll (P) zeigt jede Runde als Film.`);
     if (!params.has('demo')) setTimeout(() => { if (!modalOpen) openArchive(); }, 600);
   } else if (matchLink?.finished) matchLink.showEnd();
   else if (matchLink?.waiting) matchLink.wait();
-  else if (online?.kind === 'match') flash(`Zweikampf, ${roundTitle(state)}: deine Befehle.`);
+  else if (online?.kind === 'match') {
+    flash(`Zweikampf, ${roundTitle(state)}: deine Befehle.`);
+    // Telegramm der letzten Runde aus der eigenen Sicht (ein Film geht nicht: der volle Zustand bleibt beim Stab)
+    const tl = telegramLines(online.log);
+    if (tl.length) { report.show({ title: `Telegramm · vor ${roundTitle(state)}`, sub: `${tl.length} ${tl.length === 1 ? 'Zeile' : 'Zeilen'}`, lines: tl, actions: false }); report.setCount(tl.length, false); }
+  }
   else if (resumed) flash(resumed.reload ? `Akte wieder aufgenommen: ${roundTitle(state)}.` : `Spielstand geladen: ${roundTitle(state)}.`);
 
   // ---------- Demo-Zustaende fuer Screenshots und Tests ----------

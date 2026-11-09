@@ -97,6 +97,7 @@ body[data-scene="gefecht-frei"],body[data-scene="tageslage"]{overflow:auto}
 .rm-link{border:1px dashed var(--line);padding:8px 10px;margin:0 0 10px;background:var(--paper)}
 .rm-link label{display:flex;flex-direction:column;gap:4px;font-size:13.5px;color:var(--ink2)}
 .rm-link input{font:12px var(--font-num);color:var(--ink);background:var(--card);border:var(--border);padding:6px;min-height:36px;width:100%}
+.rm-link-later{margin:0 0 10px;font:700 18px/1.15 var(--font-hand);color:var(--ink2)}
 .rm-link small{display:block;margin-top:4px;font:11px var(--font-num);color:var(--ink2)}
 .rm-stab{border-top:2px solid var(--ink);padding:10px 0 4px;margin:0 0 10px}
 .rm-stab b{font:400 16px var(--font-head)}

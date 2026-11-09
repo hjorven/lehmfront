@@ -298,6 +298,7 @@ export function loadMatch(id) {
 export function submitOrders(id, turn, orders) {
   return withClient(async (sb) => {
     const { error } = await sb.from('match_orders').insert({ match_id: id, turn, orders });
+    if (error && /row-level security/i.test(error.message)) return { ok: false, why: 'Diese Runde ist beim Stab schon abgeschlossen. Bitte neu laden.' };
     if (error && !/duplicate|unique/i.test(error.message)) return { ok: false, why: why(error) };
     if (error) return { ok: false, why: 'Für diese Runde sind schon Befehle abgegeben.' };
     return invoke(sb, 'resolve', { matchId: id });

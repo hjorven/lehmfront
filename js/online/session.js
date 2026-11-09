@@ -7,6 +7,8 @@ import { replayRounds, carryOrders } from './replay.js';
 import { recordFromHash } from './link.js';
 import { stateFromView, turnState } from './match.js';
 import { esc, ensureCss } from '../ui/dom.js';
+import { cellLabel } from '../map.js';
+import { stopText, toneOf, SECTION_LABELS } from '../film.js';
 import { candle } from '../ui/candle.js';
 
 /**
@@ -16,7 +18,8 @@ export async function setupOnline(params, { map, start, seed, info }) {
   if (params.get('wiedergabe') === '1') {
     const rec = await recordFromHash();
     if (!rec) return { kind: 'replay', broken: true };
-    const r = replayRounds(start, rec.r, { map, seed, limit: info?.limit ?? 0, stopAtEnd: false });
+    let r;
+    try { r = replayRounds(start, rec.r, { map, seed, limit: info?.limit ?? 0, stopAtEnd: false }); } catch { return { kind: 'replay', broken: true }; }
     return {
       kind: 'replay',
       record: rec,
@@ -32,6 +35,35 @@ export async function setupOnline(params, { map, start, seed, info }) {
   const state = stateFromView(start, got.view);
   const carry = carryOrders(state, got.view.log ?? [])[got.side];
   return { kind: 'match', id, net, side: got.side, match: got.match, submitted: got.submitted, state, carry, log: got.view.log ?? [] };
+}
+
+/** Telegrammzeilen aus der Sicht der letzten Runde (ohne Film: Reihenfolge des Protokolls) */
+export function telegramLines(log) {
+  return (log ?? []).filter((e) => e.reason && !(e.phase === 'orders' && e.side === undefined)).map((e, i) => ({
+    id: 'v' + i,
+    head: `${String(SECTION_LABELS[e.phase] ?? e.phase ?? '').toUpperCase()}` + (e.side && e.at ? ` · FELD ${cellLabel(e.at.x, e.at.y)}` : ''),
+    text: stopText(e.reason),
+    tone: toneOf(e),
+    at: e.at ? { ...e.at } : null,
+    group: null,
+    type: e.type,
+    event: e,
+  }));
+}
+
+/** Online-Gefecht nicht ladbar: Blatt statt eines Hotseat-Spiels auf beiden Seiten */
+export function blockMatch(ui, text, onBlock = () => {}) {
+  ensureCss('css/fernamt.css');
+  onBlock();
+  const sheet = document.createElement('div');
+  sheet.className = 'fa-wait-back';
+  sheet.innerHTML = `<section class="fa-wait card" role="dialog" aria-modal="true" aria-label="Online-Gefecht">
+    <header><span class="fa-kicker">Zweikampf</span><b>Keine Verbindung zum Stab</b></header>
+    <p>${esc(text)}</p>
+    <footer><button type="button" class="btn fa-retry">Neu laden</button><a class="btn" href="?scene=fernamt">Zum Fernsprechamt</a></footer></section>`;
+  ui.append(sheet);
+  sheet.querySelector('.fa-retry').addEventListener('click', () => location.reload());
+  sheet.querySelector('a.btn').focus({ preventScroll: true });
 }
 
 /** Hinweis, wenn Link oder Gefecht nicht ladbar sind */

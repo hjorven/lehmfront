@@ -60,14 +60,29 @@ export function matchQuery(mapId, matchId) {
 }
 
 /**
- * Startzustand einer Partie (Edge Function join). Liefert den Inhalt von match_states.state:
- * { state, start, tally, carry, seed, mapId } und die Sicht beider Seiten.
+ * Oeffentlicher Start-Seed einer Partie aus ihrer ID (FNV-1a). Davon haengen nur Namen und Heimatorte der
+ * Gruppenfuehrer ab, die beide Seiten sehen. Wuerde der geheime Seed das auch tun, liesse er sich aus den
+ * eigenen Namen in Sekunden zurueckrechnen (Review P20).
  */
-export function startMatch(mapId, seed) {
+export function initSeedFor(matchId) {
+  let h = 0x811c9dc5;
+  const s = String(matchId);
+  for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 0x01000193); }
+  return (h >>> 0) || 1;
+}
+
+/**
+ * Startzustand einer Partie (Edge Function join). seed = geheimer Seed fuer alle Wuerfe der Runden,
+ * initSeed = oeffentlicher Seed fuer den Startzustand. Liefert den Inhalt von match_states.state:
+ * { state, start, tally, carry, seed, initSeed, mapId } und die Sicht beider Seiten.
+ */
+export function startMatch(mapId, seed, initSeed = 1) {
   const { mapJson, scenario } = matchBattle(mapId);
   const map = loadMap(mapJson);
-  const state = initEtappen(createInitialState(map, scenario, seed >>> 0), map, scenario);
-  const ms = { mapId, seed: seed >>> 0, state, start: state, tally: emptyTally(), carry: { a: [], b: [] } };
+  const init = createInitialState(map, scenario, initSeed >>> 0);
+  init.seed = seed >>> 0; // die Runden wuerfeln mit dem geheimen Seed (resolveTurn prueft state.seed)
+  const state = initEtappen(init, map, scenario);
+  const ms = { mapId, seed: seed >>> 0, initSeed: initSeed >>> 0, state, start: state, tally: emptyTally(), carry: { a: [], b: [] } };
   return { ms, views: viewsOf(ms, [], map) };
 }
 
@@ -88,7 +103,14 @@ export function resolveMatch(ms, orders) {
   const env = { map };
   const pick = (s) => (Array.isArray(orders?.[s]) ? cleanOrders(orders[s]) : (ms.carry?.[s] ?? []));
   const before = ms.state;
-  const r = resolveTurn(before, pick('a'), pick('b'), ms.seed, before.turn, env);
+  let r;
+  try {
+    r = resolveTurn(before, pick('a'), pick('b'), ms.seed, before.turn, env);
+  } catch {
+    // Befehle, an denen die Rechnung scheitert, gelten als Halten (sonst haengt die Partie fuer immer)
+    orders = { a: [], b: [] };
+    r = resolveTurn(before, [], [], ms.seed, before.turn, env);
+  }
   const tally = tallyLog(ms.tally ?? emptyTally(), r.log, { before: before.turnKind, after: r.state.turnKind });
   const used = [...(ms.used ?? []), [pick('a'), pick('b')]];
   const next = { ...ms, state: r.state, tally, carry: carryOrders(r.state, r.log), used };
@@ -110,6 +132,7 @@ export function matchRecord(ms, matchId) {
   q.delete('match');
   q.set('runden', String(MATCH_LIMIT));
   q.set('seed', String(ms.seed));
+  q.set('iseed', String(ms.initSeed ?? ms.seed));
   const sorted = new URLSearchParams([...q.entries()].sort((x, y) => (x[0] < y[0] ? -1 : x[0] > y[0] ? 1 : 0)));
   return { v: 1, q: sorted.toString(), s: ms.seed, t: 'Zweikampf', r: (ms.used ?? []).map(([a, b]) => [a, b]) };
 }

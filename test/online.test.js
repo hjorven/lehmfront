@@ -19,7 +19,7 @@ import {
 } from '../js/online/replay.js';
 import {
   startMatch, resolveMatch, stateFromView, matchRecord, matchQuery, parseMapId, normalizeCode, turnState,
-  MATCH_LIMIT, matchBattle,
+  MATCH_LIMIT, matchBattle, initSeedFor,
 } from '../js/online/match.js';
 import { closure } from '../tools/sync-functions.mjs';
 
@@ -175,14 +175,17 @@ test('Zweikampf: Sicht verraet keine verdeckten Gruppen, Seed und Vorraete der G
 });
 
 test('Zweikampf: Replay-Link einer beendeten Partie zeigt im Gefecht genau dieselbe Partie', async () => {
-  let { ms } = startMatch('schacht', 777);
+  let { ms } = startMatch('schacht', 777, initSeedFor('00000000-0000-4000-8000-000000000001'));
   for (let i = 0; i < 5; i++) ms = resolveMatch(ms, { a: [], b: null }).ms;
   const rec = checkRecord(matchRecord(ms, '00000000-0000-4000-8000-000000000001'));
   assert.ok(rec);
   const params = new URLSearchParams(rec.q);
   const b = await loadBattle(params, null);
   const map = loadMap(b.mapJson);
-  const start = initEtappen(createInitialState(map, b.scenario, rec.s), map, b.scenario);
+  // wie gefecht.js: Startzustand aus iseed, Wuerfe aus seed
+  const init = createInitialState(map, b.scenario, Number(params.get('iseed')));
+  init.seed = rec.s;
+  const start = initEtappen(init, map, b.scenario);
   const r = replayRounds(start, rec.r, { map, seed: rec.s, stopAtEnd: false });
   assert.deepEqual(r.state, ms.state);
   assert.match(matchQuery('zufall-12', 'id'), /kseed=12/);
@@ -213,4 +216,11 @@ test('Schema: RLS auf allen Tabellen, verdeckter Zustand ohne Policy, kein gehei
   for (const f of [...walk('js/'), ...walk('supabase/migrations/'), 'supabase/config.toml']) {
     assert.ok(!/eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{20,}/.test(read(f)), 'JWT in ' + f);
   }
+});
+
+test('Zweikampf: die Sicht beim Start verraet nichts ueber den geheimen Seed', () => {
+  const i = initSeedFor('00000000-0000-4000-8000-0000000000aa');
+  const one = startMatch('velde', 12345, i).views;
+  const two = startMatch('velde', 987654321, i).views;
+  assert.deepEqual(one, two);
 });

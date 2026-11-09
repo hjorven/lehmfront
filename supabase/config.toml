@@ -5,7 +5,7 @@ project_id = "lehmfront"
 enable_signup = true
 enable_anonymous_sign_ins = true
 site_url = "https://hjorven.github.io/lehmfront/"
-additional_redirect_urls = ["http://localhost:8080/"]
+additional_redirect_urls = ["https://hjorven.github.io/lehmfront/?scene=fernamt", "http://localhost:8080/", "http://localhost:8080/?scene=fernamt"]
 
 [functions.join]
 verify_jwt = true

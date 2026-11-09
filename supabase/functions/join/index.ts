@@ -1,7 +1,7 @@
 // Edge Function join (P20, Plan 11.2): Partie per Einladungscode beitreten. Setzt player_b, wuerfelt den
 // geheimen Seed, legt den vollen Startzustand (match_states) und die Sicht beider Seiten (match_views) an.
 import { serve, admin, json, fail, secretSeed } from '../_lib/http.ts';
-import { startMatch, normalizeCode, deadlineMs } from '../_shared/js/online/match.js';
+import { startMatch, normalizeCode, deadlineMs, initSeedFor } from '../_shared/js/online/match.js';
 
 serve(async (body, uid) => {
   const code = normalizeCode(body.code);
@@ -21,7 +21,7 @@ serve(async (body, uid) => {
     .eq('id', match.id).eq('status', 'waiting').is('player_b', null).select('id');
   if (!claimed || claimed.length === 0) return fail(409, 'Jemand anderes war schneller.');
 
-  const { ms, views } = startMatch(match.map_id, secretSeed());
+  const { ms, views } = startMatch(match.map_id, secretSeed(), initSeedFor(match.id));
   const st = await db.from('match_states').insert({ match_id: match.id, state: ms });
   const vw = await db.from('match_views').upsert([
     { match_id: match.id, user_id: match.player_a, side: 'a', turn: ms.state.turn, view: views.a },

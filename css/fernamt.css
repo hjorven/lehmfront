@@ -23,6 +23,7 @@ body[data-scene="fernamt"]{overflow:auto}
 .fa-card label{display:flex;flex-direction:column;gap:3px;flex:1 1 180px;font:12px var(--font-num);color:var(--ink2);text-transform:uppercase;letter-spacing:.04em}
 .fa-card input,.fa-card select{font:15px var(--font-ui);color:var(--ink);background:var(--paper);border:var(--border);border-radius:var(--radius);padding:8px;min-height:44px;text-transform:none;letter-spacing:0}
 .fa-join input{font:600 18px var(--font-num);letter-spacing:.18em;text-transform:uppercase}
+.fa-card input::placeholder{color:var(--ink2);opacity:.6;font-weight:400}
 .fa-card input:disabled,.fa-card select:disabled{opacity:.55}
 .fa-card input:focus-visible,.fa-card select:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 .fa-anon{margin:0 0 12px}

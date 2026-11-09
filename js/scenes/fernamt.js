@@ -53,7 +53,7 @@ export async function mount(root, params) {
   const on = net.onlineEnabled();
   const today = (() => { const d = demo ? new Date(2026, 10, 9) : new Date(); return dayKey(d.getFullYear(), d.getMonth() + 1, d.getDate()); })();
 
-  root.className = on ? 'fa' : 'fa off';
+  root.className = 'fa off';
   root.innerHTML = `
     <header class="fa-head">
       <a class="fa-back" href="./">Hauptmenü</a>
@@ -78,6 +78,8 @@ export async function mount(root, params) {
       user = u.ok ? u.user : null;
       profile = user ? (await net.myProfile()).profile ?? null : null;
     }
+    // Auf dem Handy steht ohne Anschluss erst die Anmeldung, dann der Zweikampf
+    root.classList.toggle('off', !on || !user);
     renderAnschluss();
     renderZweikampf();
     renderTaschen();
