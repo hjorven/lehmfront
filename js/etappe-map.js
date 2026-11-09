@@ -185,6 +185,7 @@ export function initEtappen(state, map, scenario = null) {
     const et = createEtappe(map, side, spec);
     if (et) {
       next.sides[side].etappe = et;
+      next.sides[side].supplies.cartsTotal = Math.max(0, (et.yield.loren ?? 0) - (next.sides[side].supplies.cartsLost | 0));
       syncRails(next, side);
     }
   }
@@ -298,15 +299,6 @@ export const MAP_LABELS = {
   offiziersquartier: 'Offiziere', gedenkstaette: 'Gedenkstätte', betonmischer: 'Beton',
 };
 
-/** Schluessel fuer "hat sich an der Etappe etwas geaendert" (Anzeige neu bauen) */
-export function etappeSignature(state) {
-  return ['a', 'b'].map((s) => {
-    const et = etappeOf(state, s);
-    if (!et) return '-';
-    return et.buildings.map((b) => `${b.id}:${b.type}:${b.x}:${b.y}:${b.remaining | 0}:${b.damaged ? 1 : 0}:${b.spotted ? 1 : 0}`).join(';');
-  }).join('|');
-}
-
 /**
  * Etappe mit den Auftraegen dieser Runde fuer das Etappenfenster (noch nicht ausgefuehrt).
  * plan: { builds: [{type,x,y}], repairs: [id], reward: {level,id}|null }. Liefert
@@ -315,18 +307,20 @@ export function etappeSignature(state) {
  */
 export function planView(et, plan, material) {
   const p = plan ?? {};
+  // Die Belohnung wirkt in der Runde vor den Bauten (Pionierpark verkuerzt die Bauzeit schon)
+  const etR = p.reward ? { ...et, rewards: { ...(et.rewards ?? {}), [p.reward.level]: p.reward.id } } : et;
   const repairs = new Set(p.repairs ?? []);
   let cost = 0;
   const buildings = et.buildings.map((b) => {
     if (!repairs.has(b.id) || !b.damaged) return b;
     cost += repairCost(b.type);
-    return { ...b, damaged: false, remaining: 1, planned: 'repair' };
+    return { ...b, damaged: false, remaining: Math.max(1, b.remaining | 0), planned: 'repair' };
   });
   (p.builds ?? []).forEach((w, i) => {
     const def = BUILDINGS[w.type];
     if (!def) return;
     cost += def.cost;
-    buildings.push({ id: 'plan-' + i, type: w.type, x: w.x, y: w.y, remaining: buildTimeFor(et, w.type), planned: 'build' });
+    buildings.push({ id: 'plan-' + i, type: w.type, x: w.x, y: w.y, remaining: buildTimeFor(etR, w.type), planned: 'build' });
   });
   const rewards = p.reward ? { ...(et.rewards ?? {}), [p.reward.level]: p.reward.id } : (et.rewards ?? {});
   return { fields: et.fields, buildings, rewards, best: et.best ?? 1, material: material - cost, cost };

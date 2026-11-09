@@ -74,15 +74,17 @@ export function runEtappeSide(state, side, ctx) {
   const emit = (type, f) => ctx.emit(type, { side, ...f });
   const act = (state.act | 0) || 1;
 
-  // 1. Treffer aus dem Beschuss uebernehmen (buildingDamaged auf einem Feld der Parzelle)
-  for (const b of [...et.buildings].sort(byId)) {
-    if (BUILDINGS[b.type]?.kind === 'rail') continue;
+  // 1. Treffer aus dem Beschuss uebernehmen (buildingDamaged auf einem Feld der Parzelle). Treffer auf leere
+  //    Parzellen und Gleise verfallen, damit ein spaeterer Bau dort nicht als getroffen gilt.
+  for (const f of [...et.fields].sort((p, q) => p.y - q.y || p.x - q.x)) {
     let hit = false;
-    for (const c of plotCells(et, b.x, b.y)) {
+    for (const c of plotCells(et, f.x, f.y)) {
       const k = c.x + ',' + c.y;
       if (state.cells[k]?.buildingDamaged) { hit = true; const { buildingDamaged, ...rest } = state.cells[k]; state.cells[k] = rest; }
     }
-    if (hit && !b.damaged) {
+    if (!hit) continue;
+    const b = [...et.buildings].sort(byId).find((q) => q.x === f.x && q.y === f.y && BUILDINGS[q.type]?.kind !== 'rail');
+    if (b && !b.damaged) {
       b.damaged = true;
       delete b.repairing;
     }
@@ -113,6 +115,7 @@ export function runEtappeSide(state, side, ctx) {
 
   // 3. Reparaturen (halbe Baukosten, eine Stellungsrunde)
   for (const id of [...new Set(order?.repairs ?? [])].sort()) {
+    const left = et.buildings.find((x) => x.id === id)?.remaining | 0; // getroffene Baustelle: Restbauzeit bleibt
     const r = repairBuilding(et, id, { material: sup.material ?? 0 });
     const b = et.buildings.find((x) => x.id === id);
     if (!r.ok) {
@@ -122,7 +125,8 @@ export function runEtappeSide(state, side, ctx) {
     sup.material = (sup.material ?? 0) - r.cost;
     et.buildings = r.etappe.buildings;
     const nb = et.buildings.find((x) => x.id === id);
-    nb.repairing = true;
+    nb.remaining = Math.max(1, left);
+    if (!left) nb.repairing = true;
     delete nb.reported;
     emit('repair_started', { building: id, cost: r.cost, reason: `Pioniere reparieren ${nameOf(nb.type)} ${plotName(nb.x, nb.y)} für ${r.cost} Material.`, at: where(et, nb) });
   }
@@ -146,8 +150,11 @@ export function runEtappeSide(state, side, ctx) {
   }
 
   // 5. Eine Stellungsrunde Arbeit: was diese Runde begonnen wurde, zaehlt schon mit
-  const adv = advanceConstruction(et);
-  et.buildings = adv.etappe.buildings;
+  //    Getroffene Baustellen ruhen, bis sie repariert sind.
+  const halted = new Map(et.buildings.filter((b) => b.damaged && b.remaining > 0).map((b) => [b.id, b.remaining]));
+  const adv = advanceConstruction({ ...et, buildings: et.buildings.map((b) => (halted.has(b.id) ? { ...b, remaining: 0 } : b)) });
+  et.buildings = adv.etappe.buildings.map((b) => (halted.has(b.id) ? { ...b, remaining: halted.get(b.id) } : b));
+  adv.finished = adv.finished.filter((id) => !halted.has(id));
   for (const id of adv.finished) {
     const b = et.buildings.find((x) => x.id === id);
     const again = b.repairing;
@@ -164,7 +171,7 @@ export function runEtappeSide(state, side, ctx) {
   const y = etappeYield(et);
   const t = y.total;
   et.rounds = (et.rounds | 0) + 1;
-  sup.cartsTotal = Math.max(0, t.loren ?? 0);
+  sup.cartsTotal = etappeCarts(et, sup);
   const food = t.verpflegung ?? 0;
   const mat = (t.material ?? 0) + (t.holz ?? 0) + (t.beton ?? 0);
   if (food) sup.food = (sup.food ?? 0) + food;
@@ -196,6 +203,14 @@ export function runEtappeSide(state, side, ctx) {
   //    Rauch aus der Feldkueche, den man weit sieht. Wer zu weit vorn kocht, verraet seine Kueche.
   if (ctx.map) spotBuildings(state, side, et, ctx);
   return y;
+}
+
+/**
+ * Loren je Runde aus der Etappe. Andere Pakete (P09: Feldbahn zerschossen) ziehen voruebergehend
+ * supplies.cartsLost ab, statt cartsTotal zu ueberschreiben; die Etappe setzt cartsTotal jede Runde neu.
+ */
+export function etappeCarts(et, sup) {
+  return Math.max(0, (etappeYield(et).total.loren ?? 0) - (sup?.cartsLost | 0));
 }
 
 function rewardName(level, id) {

@@ -9,7 +9,7 @@ import { ensureCss } from '../dom.js';
 import { openEtappeWindow } from '../etappe-window.js';
 import { BUILDINGS } from '../../config/buildings.js';
 import { pendingRewards } from '../../etappe.js';
-import { etappeOf, plotRect, plotCenter, plotName, planView, isBuilt } from '../../etappe-map.js';
+import { etappeOf, plotRect, plotCenter, plotName, planView, isBuilt, MAP_LABELS } from '../../etappe-map.js';
 import { isSmoking } from '../../phases/build.js';
 import { registerCue, shellCue } from '../../audio/cues.js';
 
@@ -59,7 +59,7 @@ registerCheck('etappe', ({ state, side, plans }) => {
   const pending = pendingRewards({ ...et, rewards: view.rewards });
   if (pending.length) {
     const d = et.buildings.find((b) => b.type === 'depot') ?? et.buildings[0];
-    out.push({ tone: 'warn', text: `Etappe Stufe ${pending[0].level}: Belohnung wählen (Taste E)`, at: d ? plotCenter(et, d.x, d.y) : null });
+    out.push({ tone: 'warn', text: `Etappe Stufe ${pending[0].level}: Belohnung im Etappenfenster wählen`, at: d ? plotCenter(et, d.x, d.y) : null });
   }
   const repairs = new Set(plan?.repairs ?? []);
   for (const b of [...et.buildings].sort((p, q) => (p.id < q.id ? -1 : 1))) {
@@ -88,21 +88,19 @@ function handText(ctx, px, text, x, y, color, size = 15, align = 'center') {
   ctx.restore();
 }
 
-/** Bleistift-Rauchfahne: drei weiche Boegen, die nach oben auseinanderlaufen (Wind aus Westen) */
+/** Bleistift-Rauchfahne: Kringel, die nach oben groesser werden und mit dem Wind (aus Westen) abziehen */
 function smoke(ctx, x, y, px, color) {
   ctx.save();
   ctx.strokeStyle = color;
   ctx.lineCap = 'round';
-  for (let i = 0; i < 3; i++) {
-    const ox = i * 0.32, oy = -i * 0.08;
-    ctx.globalAlpha = 0.65 - i * 0.15;
-    ctx.lineWidth = Math.max(1, 1.6 - i * 0.3) * px;
+  const puffs = [[0, 0, 0.16], [0.18, -0.42, 0.22], [0.48, -0.9, 0.29], [0.9, -1.4, 0.36]];
+  puffs.forEach(([dx, dy, r], i) => {
+    ctx.globalAlpha = 0.8 - i * 0.14;
+    ctx.lineWidth = Math.max(1.2, 2.2 - i * 0.3) * px;
     ctx.beginPath();
-    ctx.moveTo(x + ox, y + oy);
-    ctx.bezierCurveTo(x + ox - 0.45, y + oy - 0.5, x + ox + 0.55, y + oy - 0.9, x + ox + 0.2, y + oy - 1.4);
-    ctx.bezierCurveTo(x + ox - 0.1, y + oy - 1.8, x + ox + 0.75, y + oy - 2.1, x + ox + 0.9, y + oy - 2.5);
+    ctx.arc(x + dx, y + dy, r, 0.4, Math.PI * 2 - 0.2);
     ctx.stroke();
-  }
+  });
   ctx.restore();
 }
 
@@ -132,7 +130,7 @@ registerDecor({
         ctx.strokeRect(r.x + 0.3, r.y + 0.25, r.w - 0.6, r.h - 1.05);
       }
       ctx.restore();
-      handText(ctx, px, def.kind === 'rail' ? 'Gleis?' : def.name + '?', r.x + r.w / 2, r.y + (def.kind === 'rail' ? r.h / 2 - 0.45 : r.h / 2 - 0.45), th.pencil ?? th.ink, 15);
+      handText(ctx, px, (def.kind === 'rail' ? 'Gleis' : MAP_LABELS[w.type] ?? def.name) + '?', r.x + r.w / 2, r.y + r.h / 2 - 0.45, th.pencil ?? th.ink, 14);
     }
     for (const b of et.buildings) {
       const def = BUILDINGS[b.type];
@@ -148,7 +146,7 @@ registerDecor({
         ctx.ellipse(r.x + r.w / 2, r.y + r.h / 2 - 0.4, r.w * 0.62, r.h * 0.48, -0.12, 0.2, Math.PI * 2 - 0.1);
         ctx.stroke();
         ctx.restore();
-        handText(ctx, px, b.spottedBy === 'smoke' ? 'Rauch gesehen!' : 'aufgeklärt', r.x + r.w + 0.1, r.y + 0.1, th.danger, 14, 'left');
+        handText(ctx, px, b.spottedBy === 'smoke' ? 'Rauch gesehen!' : 'aufgeklärt', r.x + r.w / 2, r.y - 0.35, th.danger, 14);
       }
     }
   },

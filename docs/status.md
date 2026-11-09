@@ -161,7 +161,7 @@ Jeder Thread traegt hier nach dem Merge ein, was fertig ist und was offen bleibt
 ## Offen und bekannte Macken
 
 - P11: Nur Loren, Verpflegung, Material/Holz/Beton und Feldpost wirken direkt. Moral (Küche wirkt schon über die Versorgung, P08 `warm_meal`), Erholung, Heilung, Trost, Ausbildung, Offiziere: P12 liest `etappe.yield`. Batterieplätze, Leitung, Streuung: P09. Sicht und Ballon: P05 oder später. Werkstatt (Reparatur) hat noch keine Wirkung.
-- P11: Artillerie (P09) soll Etappengebäude über `buildingDamaged` oder `damageBuildingAt` treffen; Gegenbatteriefeuer kann `state.sides[s].intel.buildings` lesen (Kartenrechteck, Typ, Runde).
+- P11: Artillerie (P09) soll Etappengebäude über `buildingDamaged` oder `damageBuildingAt` treffen; Gegenbatteriefeuer kann `state.sides[s].intel.buildings` lesen (Kartenrechteck, Typ, Runde). Hat eine Seite eine Etappe, setzt die Phase `etappe` jede Runde `supplies.cartsTotal` neu: zerschossene Feldbahn bitte als `supplies.cartsLost` (wird abgezogen) melden, nicht `cartsTotal` überschreiben. Getroffene Baustellen ruhen bis zur Reparatur. Das Etappenfenster öffnet beim Antippen eines Gebäudes der eigenen Etappe (ohne gewählte Gruppe) oder mit Taste E.
 - P11: Auf der Asse hat nur Seite a eine Etappe; Seite b (Morrow) bekommt keine, solange ihre Karte kein Depot hat. Pathfinding nutzt weiter die Grundkarte: neue Gebäude sperren keine Felder.
 - P11: Der Akt steht noch nicht im Zustand (`state.act`, Standard 1). Gebäude ab Akt 2 und 3 erscheinen, sobald P14/P15 `state.act` setzen. Gebäude von Akt zu Akt mitnehmen oder neu anlegen (Plan 6) ist Sache des Kampagnenablaufs.
 - P11: Kosten und Rauchweite (28 Felder) sind geschätzt, Balancing in P21. Startmaterial 90 reicht für viele Bauten auf einmal.

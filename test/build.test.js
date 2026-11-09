@@ -293,3 +293,30 @@ test('runEtappeSide ohne Karte (reine Regeln) laeuft und spaeht nicht', () => {
   assert.equal(y.total.loren, 6);
   assert.ok(!log.some((e) => e.type === 'building_spotted'));
 });
+
+test('Getroffene Baustelle ruht bis zur Reparatur; Reparatur behaelt die Restbauzeit', () => {
+  const s = start();
+  let r = turn(s, { builds: [{ type: 'feldlazarett', x: 4, y: 2 }] }); // 3 Runden, nach Runde 1 noch 2
+  const rect = plotRect(r.state.sides.a.etappe, 4, 2);
+  r.state.cells[rect.x + ',' + rect.y] = { buildingDamaged: true };
+  r = turn(r.state);
+  let b = at(r.state.sides.a.etappe, 4, 2);
+  assert.equal(b.damaged, true);
+  assert.equal(b.remaining, 2, 'keine Arbeit an einer zerschossenen Baustelle');
+  r = turn(r.state);
+  assert.equal(ofPhase(r.log, 'build_done').length, 0);
+  r = turn(r.state, { repairs: [b.id] });
+  b = at(r.state.sides.a.etappe, 4, 2);
+  assert.equal(b.damaged, false);
+  assert.equal(b.remaining, 1, 'Reparatur plus eine Runde Arbeit, Rest bleibt');
+});
+
+test('Treffer auf leere Parzelle verfaellt; cartsLost zieht Loren ab', () => {
+  const s = start();
+  const rect = plotRect(s.sides.a.etappe, 4, 4);
+  s.cells[rect.x + ',' + rect.y] = { buildingDamaged: true };
+  s.sides.a.supplies.cartsLost = 2;
+  const r = turn(s);
+  assert.equal(r.state.cells[rect.x + ',' + rect.y].buildingDamaged, undefined);
+  assert.equal(capacityOf(r.state, 'a'), 4);
+});

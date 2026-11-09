@@ -107,8 +107,18 @@ export function openEtappeWindow(root, { state, side, plan, focus = null, night 
 
   function onKey(e) {
     if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); close(false); return; }
-    const t = e.target;
-    if (e.key === 'Enter' && !(t instanceof HTMLButtonElement) && !(t instanceof HTMLInputElement) && !(t instanceof HTMLSummaryElement)) {
+    const t = e.target instanceof Element ? e.target : null;
+    if (e.key === 'Tab') {
+      // Fokus bleibt im Fenster (aria-modal)
+      const list = [...box.querySelectorAll('button:not([disabled]), summary, [tabindex="0"]')].filter((x) => x.offsetParent !== null);
+      if (!list.length) return;
+      const first = list[0], last = list[list.length - 1];
+      if (e.shiftKey && (t === first || !box.contains(t))) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && (t === last || !box.contains(t))) { e.preventDefault(); first.focus(); }
+      return;
+    }
+    // Enter uebernimmt, ausser auf Knoepfen und im Modell (dort waehlt Enter ein Feld)
+    if (e.key === 'Enter' && !(t && t.closest('button, input, select, textarea, summary, a, .e3-stage'))) {
       e.preventDefault(); e.stopPropagation(); close(true);
     }
   }
@@ -116,9 +126,15 @@ export function openEtappeWindow(root, { state, side, plan, focus = null, night 
   $('.x').addEventListener('click', () => close(false));
   $('.etw-cancel').addEventListener('click', () => close(false));
   $('.etw-apply').addEventListener('click', () => close(true));
-  back.addEventListener('pointerdown', (e) => { if (e.target === back) close(false); });
+  // Klick neben das Fenster schliesst nur, solange nichts vorgemerkt ist (sonst gingen Auftraege verloren)
+  back.addEventListener('pointerdown', (e) => {
+    if (e.target !== back) return;
+    if (!work.builds.length && !work.repairs.length && !work.reward) close(false);
+    else { note = 'Aufträge übernehmen oder verwerfen.'; summary(); }
+  });
   summary();
-  box.focus({ preventScroll: true });
+  // Fokus aufs Modell: Pfeiltasten waehlen sofort ein Feld
+  (box.querySelector('.e3-stage') ?? box).focus({ preventScroll: true });
   return { close: () => close(false), apply: () => close(true), el: box, win };
 }
 

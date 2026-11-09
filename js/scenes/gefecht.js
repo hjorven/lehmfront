@@ -798,8 +798,10 @@ export async function mount(root, params) {
       if (suppressTap) { suppressTap = false; return; }
       if (modalOpen) return;
       if (radial.open) { radial.hide(); refresh(); return; }
+      // Ein Tippen, das nur etwas schliesst, oeffnet nichts Neues (P11: sonst ginge das Etappenfenster auf)
+      let closedSomething = hud.popoverOpen;
       hud.closePopover();
-      if (root.classList.contains('sheet-open')) { root.classList.remove('sheet-open'); hud.setSheet(false); }
+      if (root.classList.contains('sheet-open')) { root.classList.remove('sheet-open'); hud.setSheet(false); closedSomething = true; }
       const { cell } = cellFromScreen(p);
       if (tool?.pick) {
         if (!cell) return;
@@ -813,10 +815,14 @@ export async function mount(root, params) {
       const g = groupAtScreen(p);
       if (g) select(g.id);
       else if (selectedId) select(null);
-      else if (cell && state.turnKind === 'position' && !book[side]?.sealed) {
-        // P11: Antippen der eigenen Etappe (ohne gewaehlte Gruppe) oeffnet das Etappenfenster auf diesem Feld
-        const plot = plotAt(etappeOf(state, side), cell.x, cell.y);
-        if (plot) startTool(allTools().find((t) => t.id === 'etappe'), null, { focus: plot });
+      else if (cell && !closedSomething && state.turnKind === 'position' && !book[side]?.sealed) {
+        // P11: Antippen eines Gebaeudes oder vorgemerkten Baus der eigenen Etappe (ohne gewaehlte Gruppe)
+        // oeffnet das Etappenfenster auf diesem Feld
+        const et = etappeOf(state, side);
+        const plot = plotAt(et, cell.x, cell.y);
+        const hit = plot && ([...et.buildings, ...(sidePlans[side].etappe?.builds ?? [])]
+          .some((b) => b.x === plot.x && b.y === plot.y && b.type !== 'gleis'));
+        if (hit) startTool(allTools().find((t) => t.id === 'etappe'), null, { focus: plot });
       }
     },
   });
