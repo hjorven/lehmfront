@@ -1,0 +1,209 @@
+{
+  "id": "akt1-m5",
+  "name": "Gewitter",
+  "map": "akt1-m5",
+  "startHour": 6,
+  "startDay": 19,
+  "turnKind": "position",
+  "weather": {
+    "kind": "storm",
+    "wet": 1,
+    "fixed": true
+  },
+  "mission": {
+    "id": "a1m5",
+    "hints": [
+      "hinweis.wetter",
+      "hinweis.schlamm"
+    ],
+    "weather": [
+      {
+        "from": 1,
+        "kind": "storm"
+      },
+      {
+        "from": 4,
+        "kind": "rain"
+      },
+      {
+        "from": 5,
+        "kind": "overcast"
+      }
+    ],
+    "lask": [
+      {
+        "from": 1,
+        "posture": "halten"
+      },
+      {
+        "from": 3,
+        "posture": "vorbereiten"
+      },
+      {
+        "from": 4,
+        "posture": "sturm"
+      },
+      {
+        "from": 5,
+        "posture": "auto"
+      }
+    ]
+  },
+  "sides": {
+    "a": {
+      "faction": "kaldern",
+      "groups": [
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 22,
+            "y": 10
+          },
+          "morale": 66
+        },
+        {
+          "type": "mg",
+          "pos": {
+            "x": 23,
+            "y": 16
+          },
+          "morale": 64,
+          "leader": {
+            "name": "Dirk Lohmann",
+            "home": "Kelling"
+          }
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 22,
+            "y": 20
+          },
+          "morale": 68,
+          "leader": {
+            "name": "Otto Harms",
+            "home": "Ostmoor"
+          }
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 24,
+            "y": 25
+          },
+          "morale": 42,
+          "fatigue": 60,
+          "strength": 7
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 24,
+            "y": 27
+          },
+          "morale": 44,
+          "fatigue": 55,
+          "strength": 7
+        },
+        {
+          "type": "pioneers",
+          "pos": {
+            "x": 22,
+            "y": 23
+          },
+          "morale": 66,
+          "leader": {
+            "name": "Swantje Fedders",
+            "home": "Grauwarf"
+          }
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 22,
+            "y": 33
+          },
+          "morale": 64
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 12,
+            "y": 9
+          },
+          "morale": 74,
+          "status": "rest"
+        }
+      ]
+    },
+    "b": {
+      "faction": "morrow",
+      "control": "ai",
+      "ai": {
+        "doctrine": "masse",
+        "difficulty": "veteran"
+      },
+      "artillery": {
+        "batteries": [
+          {
+            "id": "mb1",
+            "type": "feldhaubitzen",
+            "x": 52,
+            "y": 29,
+            "w": 2,
+            "h": 2,
+            "label": "Batterie Morrow"
+          }
+        ],
+        "exchange": {
+          "x": 48,
+          "y": 15
+        }
+      },
+      "groups": [
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 37,
+            "y": 10
+          }
+        },
+        {
+          "type": "mg",
+          "pos": {
+            "x": 36,
+            "y": 16
+          }
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 37,
+            "y": 22
+          }
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 37,
+            "y": 26
+          }
+        },
+        {
+          "type": "pioneers",
+          "pos": {
+            "x": 37,
+            "y": 28
+          }
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 37,
+            "y": 33
+          }
+        }
+      ]
+    }
+  }
+}

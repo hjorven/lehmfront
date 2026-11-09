@@ -1,0 +1,68 @@
+{
+  "id": "akt1-m6",
+  "name": "Die Welle",
+  "map": "akt1-m6",
+  "startHour": 6,
+  "startDay": 24,
+  "turnKind": "position",
+  "weather": { "kind": "overcast" },
+  "mission": {
+    "id": "a1m6",
+    "hints": ["hinweis.abloesung", "hinweis.ersatz", "hinweis.etappe", "hinweis.sturm_halten"],
+    "lask": [
+      { "from": 1, "posture": "vorbereiten" },
+      { "from": 2, "posture": "sturm" },
+      { "from": 3, "posture": "halten" },
+      { "from": 4, "posture": "vorbereiten" },
+      { "from": 5, "posture": "sturm" },
+      { "from": 6, "posture": "halten" },
+      { "from": 7, "posture": "sturm" },
+      { "from": 8, "posture": "auto" }
+    ]
+  },
+  "sides": {
+    "a": {
+      "faction": "kaldern",
+      "groups": [
+        { "type": "rifles", "pos": { "x": 22, "y": 7 }, "morale": 64 },
+        { "type": "mg", "pos": { "x": 22, "y": 10 }, "morale": 66, "leader": { "name": "Dirk Lohmann", "home": "Kelling" } },
+        { "type": "rifles", "pos": { "x": 23, "y": 15 }, "morale": 66, "leader": { "name": "Otto Harms", "home": "Ostmoor" } },
+        { "type": "mg", "pos": { "x": 23, "y": 18 }, "morale": 62 },
+        { "type": "pioneers", "pos": { "x": 22, "y": 22 }, "morale": 64, "leader": { "name": "Swantje Fedders", "home": "Grauwarf" } },
+        { "type": "rifles", "pos": { "x": 22, "y": 26 }, "morale": 60 },
+        { "type": "rifles", "pos": { "x": 22, "y": 32 }, "morale": 62 },
+        { "type": "observers", "pos": { "x": 22, "y": 13 }, "morale": 66 },
+        { "type": "rifles", "pos": { "x": 16, "y": 12 }, "morale": 70 },
+        { "type": "rifles", "pos": { "x": 16, "y": 27 }, "morale": 70 },
+        { "type": "medics", "pos": { "x": 16, "y": 20 }, "morale": 70 }
+      ]
+    },
+    "b": {
+      "faction": "morrow",
+      "control": "ai",
+      "ai": { "doctrine": "masse", "difficulty": "veteran" },
+      "artillery": {
+        "batteries": [
+          { "id": "mb1", "type": "feldhaubitzen", "x": 52, "y": 6, "w": 2, "h": 2, "label": "Batterie Morrow 1" },
+          { "id": "mb2", "type": "feldhaubitzen", "x": 52, "y": 29, "w": 2, "h": 2, "label": "Batterie Morrow 2" }
+        ],
+        "exchange": { "x": 48, "y": 15 }
+      },
+      "groups": [
+        { "type": "rifles", "pos": { "x": 37, "y": 6 } },
+        { "type": "rifles", "pos": { "x": 37, "y": 10 } },
+        { "type": "mg", "pos": { "x": 36, "y": 15 } },
+        { "type": "rifles", "pos": { "x": 36, "y": 17 } },
+        { "type": "rifles", "pos": { "x": 37, "y": 21 } },
+        { "type": "pioneers", "pos": { "x": 37, "y": 24 } },
+        { "type": "rifles", "pos": { "x": 37, "y": 27 } },
+        { "type": "mg", "pos": { "x": 37, "y": 31 } },
+        { "type": "rifles", "pos": { "x": 37, "y": 34 } },
+        { "type": "rifles", "pos": { "x": 43, "y": 12 } },
+        { "type": "rifles", "pos": { "x": 43, "y": 20 } },
+        { "type": "rifles", "pos": { "x": 43, "y": 28 } },
+        { "type": "pioneers", "pos": { "x": 43, "y": 32 } }
+      ]
+    }
+  }
+}

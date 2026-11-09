@@ -5,7 +5,12 @@
 export const DEFAULT_SCENARIO = 'asse-frei';
 
 export const MISSION_SCENARIOS = {
-  // a1m1: 'akt1-m1',
+  a1m1: 'akt1-m1',
+  a1m2: 'akt1-m2',
+  a1m3: 'akt1-m3',
+  a1m4: 'akt1-m4',
+  a1m5: 'akt1-m5',
+  a1m6: 'akt1-m6',
 };
 
 export function scenarioForMission(mission) {

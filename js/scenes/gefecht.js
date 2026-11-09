@@ -66,6 +66,8 @@ import { loadBattle } from '../modes/load.js';
 import { attachModeRules } from '../ui/result.js';
 import { attachGameMenu, resumeGame } from '../ui/gamemenu.js';
 import { campaignMission } from '../ui/campaign/mission.js';
+import { prepareMission, missionAi, withMissionOrders } from '../missions/script.js';
+import { attachMissionUi } from '../ui/mission.js';
 
 const num = (v, d) => (v === null || v === '' || !Number.isFinite(Number(v)) ? d : Number(v));
 const LONG_PRESS_MS = 430;
@@ -92,9 +94,10 @@ export async function mount(root, params) {
   const seed = battle.seed ?? ((num(params.get('seed'), 1917) >>> 0) || 1);
   let state = createInitialState(map, scenario, seed);
   state = initEtappen(state, map, scenario); // P11: Etappe mit Grundausbau aus dem Szenario
+  state = prepareMission(state, scenario); // P16: Ablaufplan einer Kampagnenmission (Lask, Wetter), sonst unveraendert
   // P14: Einsatz aus der Kampagne (Ansehen, Vertrauen, Berichte, Nachschub, Ersatz), sonst null
   const campaignRun = campaignMission(params);
-  if (campaignRun) state = campaignRun.prepare(state);
+  if (campaignRun) state = campaignRun.prepare(state, map);
   if (!fixed && params.get('kind') === 'battle') { state.turnKind = 'battle'; state.battle = { round: 1 }; }
   if (!fixed) applyWeatherParams(state, map, params);
   // P18: Spielstand aus ?slot= ersetzt den Startzustand; Archiv und KI-Gedaechtnis folgen weiter unten
@@ -226,7 +229,7 @@ export async function mount(root, params) {
       preview: prev ? { ...prev, group: tool.group.id, cell: tool.hoverCell, ok: prev.ok ?? !!prev.path } : null,
       sightLine: !tool && hoverSight ? hoverSight : null,
       overlays: [artilleryOverlay(state), ...(decor ? [{ draw: decor }] : []), ...activeOverlays(),
-        ...(noteMark ? [laskNoteOverlay(noteMark)] : []), ...lehrling.overlays()],
+        ...(noteMark ? [laskNoteOverlay(noteMark)] : []), ...lehrling.overlays(), ...(missionUi?.overlays(state) ?? [])],
       plans: sidePlans[side],
       time: performance.now(),
     });
@@ -280,7 +283,7 @@ export async function mount(root, params) {
     const groups = fr.groups.map((g) => ({ ...g, mark: groupMark(fr.state, g) }));
     drawBattle(dctx, cam, dpr, currentTheme(), {
       state: fr.state, map, side, groups, ghosts: [], orders: new Map(), selectedId, planning: false,
-      overlays: [artilleryOverlay(fr.state), { draw: (ctx, o) => drawFilmTrails(ctx, o, fr.trails) }],
+      overlays: [artilleryOverlay(fr.state), { draw: (ctx, o) => drawFilmTrails(ctx, o, fr.trails) }, ...(missionUi?.overlays(fr.state) ?? [])],
     });
     feelImpacts(fr.state);
   }
@@ -313,6 +316,8 @@ export async function mount(root, params) {
     onClose: () => { modalOpen = false; refresh(); },
   });
   // Taktik-Lehrling (P13, Taste T) und abgefangene Notizen von Lask
+  // P16: Auftragszettel, Hinweise der Figuren, in Mission 1 die Karte, die sich erst zeichnet (null ohne Mission)
+  const missionUi = attachMissionUi({ ui, scenario, map, params, getArchive: () => archive, onChange: () => refresh() });
   const lehrling = attachLehrling({
     ui, bar: ui.querySelector('.hud-right'), sheet: ui.querySelector('.hud-sheet'), decide, viewFor, map, env, seed, cfg: aiCfg,
     now: () => ({ state, side, log: lastLog, orderOf: (id) => orderOf(book, side, id), plans: sidePlans[side] }),
@@ -490,6 +495,7 @@ export async function mount(root, params) {
     });
     if (orderList.open) updateList();
     lehrling.sync();
+    missionUi?.sync({ state, orders: ordersNow(), selected: g, tool: tool?.def.id ?? null, busy: modalOpen || !!filmFrame });
     updateShield();
     if (!filmFrame) weather.update(state, side);
     drawDyn();
@@ -792,6 +798,7 @@ export async function mount(root, params) {
     drawDynNow();
     dynCv.focus({ preventScroll: true });
     // P14: im Einsatz aus der Kampagne meldet der Kampagnendialog das Ende (sonst die Abschlussmeldung von P17)
+    if (!filmReplay) missionUi?.afterFilm(state, lastLog);
     if (!filmReplay && !campaignRun?.afterFilm(ui)) rules.afterFilm();
   }
 
@@ -833,10 +840,10 @@ export async function mount(root, params) {
     let ordersB;
     if (humans.includes('b')) ordersB = withPlans('b', listOrders(book, 'b'));
     else {
-      const d = aiNext?.turn === state.turn ? aiNext.decision : decide(viewFor(state, lastLog, 'b', env), { map, seed, ...aiCfg, memory: aiMemory });
+      const d = aiNext?.turn === state.turn ? aiNext.decision : decide(viewFor(state, lastLog, 'b', env), { map, seed, ...aiCfg, ...missionAi(state), memory: aiMemory });
       aiMemory = d.memory;
       const fresh = new Set(d.orders.map((o) => o.group).filter(Boolean));
-      ordersB = [...d.orders, ...listOrders(book, 'b').filter((o) => o.carried && !fresh.has(o.group))];
+      ordersB = withMissionOrders([...d.orders, ...listOrders(book, 'b').filter((o) => o.carried && !fresh.has(o.group))], state);
     }
     const input = { state, ordersA, ordersB, seed, turn: state.turn, env };
     const r = resolveTurn(state, ordersA, ordersB, seed, state.turn, env);
@@ -851,7 +858,7 @@ export async function mount(root, params) {
     aiNext = null;
     if (!humans.includes('b') && !state.result) {
       const lv = viewFor(state, lastLog, 'b', env);
-      const d = decide(lv, { map, seed, ...aiCfg, memory: aiMemory });
+      const d = decide(lv, { map, seed, ...aiCfg, ...missionAi(state), memory: aiMemory });
       aiNext = { turn: state.turn, decision: d };
       pendingNote = maybeIntercept({ decision: d, laskView: lv, playerView: viewFor(state, lastLog, 'a', env), seed, difficulty: d.difficulty });
     }

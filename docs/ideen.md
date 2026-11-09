@@ -31,3 +31,5 @@ Neue Ideen landen hier, nicht im Code (Plan 13). Mit Datum und Paket, aus dem si
 - 2026-11-09, P14: Eine verweigerte Order könnte Wochen später als Randnotiz in einer Zeitung wieder auftauchen („Ein Abschnitt an der Asse soll ...“).
 - 2026-11-09, P18: Die Kartentaschen könnten mit jedem Speichern abgegriffener aussehen (Eselsohren, Fingerabdrücke aus Lehm), und ein lange nicht geöffneter Stand bekommt Staub.
 - 2026-11-09, P18: Offline könnte das Spiel einen Vermerk „Leitung gestört, Meldungen per Läufer“ zeigen und die Telegramme handschriftlich statt getippt setzen.
+- 2026-11-09, P16: Die in Mission 1 gegrabene Linie könnte als Bleistiftlinie auf der Karte von Mission 2 stehen bleiben, mit Knicken und Lücken genau so, wie der Spieler sie gezogen hat.
+- 2026-11-09, P16: Die Notizen der Figuren könnten Eselsohren bekommen und nach dem Tod der Figur grau werden; wer Harms verliert, liest seine alten Zettel noch in der Ablage.

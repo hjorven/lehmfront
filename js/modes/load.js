@@ -30,7 +30,9 @@ export async function loadBattle(params, fetchJson) {
   }
   if (!karte) {
     const scenId = /^[a-z0-9-]+$/.test(params.get('scenario') || '') ? params.get('scenario') : 'asse-frei';
-    const scenario = await fetchJson(`data/scenarios/${scenId}.json`);
+    // Kampagnenmissionen (P16 ff.) liegen unter data/missions/akt<n>-m<n>.json
+    const dir = /^akt\d+-m\d+$/.test(scenId) ? 'missions' : 'scenarios';
+    const scenario = await fetchJson(`data/${dir}/${scenId}.json`);
     const mapJson = await fetchJson(`data/maps/${scenario.map}.json`);
     return { scenario, mapJson, scenId, mode: { kind: hotseat ? 'hotseat' : 'frei', limit: num(params.get('runden'), 0) } };
   }

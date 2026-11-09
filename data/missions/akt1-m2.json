@@ -1,0 +1,48 @@
+{
+  "id": "akt1-m2",
+  "name": "Die Weide",
+  "map": "akt1-m2",
+  "startHour": 6,
+  "startDay": 4,
+  "turnKind": "position",
+  "weather": { "kind": "clear" },
+  "mission": {
+    "id": "a1m2",
+    "hints": ["hinweis.mg_sektor", "hinweis.draht", "hinweis.unterstand", "hinweis.unterdrueckung"],
+    "lask": [
+      { "from": 1, "posture": "halten" },
+      { "from": 2, "posture": "vorbereiten" },
+      { "from": 3, "posture": "sturm" },
+      { "from": 4, "posture": "auto" }
+    ]
+  },
+  "sides": {
+    "a": {
+      "faction": "kaldern",
+      "groups": [
+        { "type": "rifles", "pos": { "x": 22, "y": 12 }, "morale": 70, "leader": { "name": "Otto Harms", "home": "Ostmoor" } },
+        { "type": "mg", "pos": { "x": 22, "y": 10 }, "morale": 72, "leader": { "name": "Dirk Lohmann", "home": "Kelling" } },
+        { "type": "rifles", "pos": { "x": 23, "y": 17 }, "morale": 66 },
+        { "type": "pioneers", "pos": { "x": 22, "y": 21 }, "morale": 70, "leader": { "name": "Swantje Fedders", "home": "Grauwarf" } },
+        { "type": "rifles", "pos": { "x": 22, "y": 27 }, "morale": 66 }
+      ]
+    },
+    "b": {
+      "faction": "morrow",
+      "control": "ai",
+      "ai": { "doctrine": "masse", "difficulty": "rekrut" },
+      "artillery": {
+        "batteries": [{ "id": "mb1", "type": "feldhaubitzen", "x": 52, "y": 29, "w": 2, "h": 2, "label": "Batterie Morrow" }],
+        "exchange": { "x": 48, "y": 15 }
+      },
+      "groups": [
+        { "type": "rifles", "pos": { "x": 37, "y": 10 } },
+        { "type": "rifles", "pos": { "x": 36, "y": 15 } },
+        { "type": "rifles", "pos": { "x": 36, "y": 18 } },
+        { "type": "mg", "pos": { "x": 37, "y": 22 } },
+        { "type": "rifles", "pos": { "x": 37, "y": 25 } },
+        { "type": "pioneers", "pos": { "x": 37, "y": 30 } }
+      ]
+    }
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "id": "akt1-m4",
+  "name": "Der Turm von Ostervenn",
+  "map": "akt1-m4",
+  "startHour": 6,
+  "startDay": 14,
+  "turnKind": "position",
+  "weather": { "kind": "clear" },
+  "mission": {
+    "id": "a1m4",
+    "hints": ["hinweis.feuerplan", "hinweis.beobachter", "hinweis.moerser"],
+    "lask": [{ "from": 1, "posture": "halten" }]
+  },
+  "sides": {
+    "a": {
+      "faction": "kaldern",
+      "groups": [
+        { "type": "rifles", "pos": { "x": 22, "y": 11 }, "morale": 70, "leader": { "name": "Otto Harms", "home": "Ostmoor" } },
+        { "type": "observers", "pos": { "x": 16, "y": 13 }, "morale": 68 },
+        { "type": "mortar", "pos": { "x": 22, "y": 15 }, "morale": 66 },
+        { "type": "rifles", "pos": { "x": 23, "y": 18 }, "morale": 64 },
+        { "type": "pioneers", "pos": { "x": 22, "y": 24 }, "morale": 68, "leader": { "name": "Swantje Fedders", "home": "Grauwarf" } },
+        { "type": "rifles", "pos": { "x": 22, "y": 30 }, "morale": 62 }
+      ]
+    },
+    "b": {
+      "faction": "morrow",
+      "control": "ai",
+      "ai": { "doctrine": "masse", "difficulty": "rekrut" },
+      "artillery": { "batteries": [] },
+      "groups": [
+        { "id": "nest", "type": "mg", "pos": { "x": 31, "y": 14 }, "morale": 70 },
+        { "type": "rifles", "pos": { "x": 37, "y": 9 } },
+        { "type": "rifles", "pos": { "x": 36, "y": 17 } },
+        { "type": "mg", "pos": { "x": 37, "y": 24 } },
+        { "type": "rifles", "pos": { "x": 37, "y": 31 } }
+      ]
+    }
+  }
+}
