@@ -56,6 +56,12 @@ Jeder Thread traegt hier nach dem Merge ein, was fertig ist und was offen bleibt
   - Regler: Knopf „Ton“ rechts im Gefecht mit Klappkarte, auf dem Handy als Karte „Klang“ in der Seitenleiste (`js/ui/sound.js`, auch fuer P18 nutzbar).
   - Ueberraschung: wird eine Gruppe aufgerieben, verstummt die ganze Front fuer drei Sekunden, dann schlaegt die Uhr einmal und das Grollen kommt langsam zurueck (`audio.hush`).
   - Offen: Feinschliff der Ansichten (Uebergaenge, Mikroanimationen, Token-Konsistenz) als zweiter PR; Hauptmenue und Feldzugskarte bekommen ihren Klang, sobald es sie gibt.
+- P09 Artillerie und Feuerplan:
+  - Daten `js/config/artillery.js` (Batteriearten Feldhaubitzen und schwere Haubitzen mit Granaten je Runde, Reichweite, Streuung, Lager, Nachschub; Planarten Vorbereitungsfeuer, Sperrfeuer, Feuerwalze, Störfeuer, Gegenbatteriefeuer; Verzögerung Telefon 1 / Melder 2 Runden).
+  - Reine Regeln `js/artillery.js`: Batterien sind Etappengebäude (`batterie` auf der Karte oder `artillery.batteries` im Szenario), Leitungen aus `map.cables` und `artillery.lines`, Walzenposition je Gefechtsrunde (`planCellsAt`, `walzeTimeline`), Streuung als Summe dreier Würfe (Kaldern x 0,8, Morrow x 1,3, Fernmeldestelle x 0,85, nach Verlegen durch Beobachter x 0,7, nachts x 1,15), Verbindung Beobachter zu Batterie (`commandLink`), Einschläge mit Kratern, Draht, Gleis, Leitung, Batterie, Verlusten und Eigenbeschuss (`applyImpacts`), Sturmgeister entlang des Weges (`stormGhosts`).
+  - Phase `js/phases/artillery.js`: Stellungsrunde flickt Leitungen und Gleise, lädt aus dem Depot nach, schießt Stör- und Gegenbatteriefeuer sofort und legt Gefechtspläne an. Gefechtsrunde schießt aktive Pläne, Sperrfeuer nur, wenn Feind bis 3 Felder an der Linie gesehen wird; „Feuer verlegen“ und „Feuer einstellen“ wirken nach der Verzögerung oder gehen verloren. Mündungsblitze verraten Batterien (Tag 20, Nacht 45 Prozent). Phase `shelled` setzt `underFire`.
+  - Feuerplan-Editor im Blaupausen-Stil (`js/ui/fireplan.js`, Werkzeug „Feuerplan“ Taste A): Linie ziehen, Enden und Schrittweite an Griffen auf der Karte ziehen, Zeitbänder R1 bis R12 mit Uhrzeit, Sturmgruppen als Geister entlang ihres Weges mit Warnungen, Munitionsbilanz, Handy als Bodenblatt. Werkzeuge „Feuer verlegen“ (V) und „Feuer einstellen“ (E) für Beobachter, Prüfpunkt „Artillerie“ in „Vor der Runde“, feindliche Batterien im Bedrohungs-Overlay.
+  - Szenario Asse: Kaldern bekommen Beobachter, Melder und eine zweite Leitung, Morrow zwei Batterien mit Sperrfeuer. Demos `&demo=feuerplan|walze|verlegen|einschlag`. Tests `test/artillery.test.js`.
 
 ### Für die nächsten Pakete (nach P07)
 
@@ -137,6 +143,14 @@ Jeder Thread traegt hier nach dem Merge ein, was fertig ist und was offen bleibt
 - Dynamische Ebene: `registerDecor({ id, order, draw(ctx, d) })` und `registerOrderPainter(type, fn)` aus `js/render/decor.js` zeichnen eigene Dinge, ohne `units-layer.js` anzufassen.
 - Werkzeuge dürfen `orderTypes` und `describe(order, group, state, map)` angeben (Text in Schild und Befehlsliste). Zeichenwerkzeuge bekommen in `ctx` zusätzlich `ui`, `cam`, `onCancel(fn)`, `redraw(camera?)`, `expose(api)`.
 - Ereignisse dürfen `carry` (ein Befehl) tragen; der Gefechtsbildschirm setzt ihn in der nächsten Runde als Befehl („läuft weiter“), wenn die Rundenart passt.
+### Für die nächsten Pakete (nach P09)
+
+- P10: Krater stehen in `state.cells[k]` als `crater` (1 Trichter, 2 großer Krater), `shelled` (Zahl der Einschläge) und `fresh` (Runde des letzten Einschlags). Ereignis `impacts` (ohne Seite) trägt alle Einschlagsfelder einer Salve, gut für Rauch und Erdfontänen. Die Szene zeichnet frische Trichter bisher schlicht (`drawFreshCraters`).
+- P06: Feuerpläne laufen nur in Gefechtsrunden; die Asse-Szene wechselt bisher nur per `&kind=battle`. Die Walze rechnet ab `state.battle.round` (die Uhr zählt hoch); Sturmgeister nutzen `assault`-/`move`-Befehle und die Feldkosten aus `js/map.js`. Wenn P06 den Sturm umbaut, `stormGhosts` in `js/artillery.js` mitziehen.
+- P08: `cells[k].railBroken = turn` sperrt das Gleis, die Artillerie-Phase flickt es in der nächsten Stellungsrunde (Ereignis `rail_repaired`). Nachschub der Batterien bucht `supplies.ammo` ab (Ereignis `battery_supplied`).
+- P11: Batterien und Fernmeldestelle sind Etappengebäude (`batterie`, `fernmelde`); `initArtillery` liest sie aus der Karte. Beschädigte Gebäude sollten `artillery.batteries[].silenced` setzen.
+- P13: Die KI schickt noch keine Feuerpläne. Befehl der ganzen Seite: `{ type: 'fire_plan', plans: [...] }` (Format `normalizePlan`), Prüfung mit `validatePlan`. Aufgeklärte feindliche Batterien stehen in `artillery.known`.
+- P14: Erfahrungsbericht „Feuerwalze“ schaltet die Walze noch nicht frei; die Planart `creep` ist immer verfügbar.
 
 ## Offen und bekannte Macken
 
@@ -183,6 +197,13 @@ Jeder Thread traegt hier nach dem Merge ein, was fertig ist und was offen bleibt
 - P04: Die Gruppe rückt beim Graben zum zuletzt bearbeiteten Feld nach. Ist das Feld besetzt, bleibt sie stehen; ein weitergetragener Rest gilt, solange irgendein Feld davon höchstens drei Felder entfernt ist. Grabgeschwindigkeit und Materialkosten sind Startwerte für das Balancing (P21).
 - P04: Laufgräben warnen nicht vor Längsfeuer, `enfiladeOf` zählt sie im Gefecht aber mit. Schräg gezeichnete Linien zerfallen in kurze Stücke und lösen selten eine Warnung aus.
 - P04: Die Anzeige von Gräben und Aufwurf folgt `viewFor(...).cells`; solange `cellVisible` immer wahr ist, sieht man feindliche Gräben überall.
+
+- P09: Die gedruckte Leitungs-Unterbrechung auf der Asse-Karte (`map.cables`, Etikett „Leitung durchtrennt“) bleibt stehen, auch wenn die Leitung im Spiel geflickt ist; die Leitungen im Zustand sind maßgeblich.
+- P09: Brandlöcher am Blattrand und das Zittern der Karte leben nur in der Szene (nicht im Spielstand); nach Neuladen sind sie weg.
+- P09: Mengen (Granaten, Trefferchance, Leitungsriss 40 Prozent, Schweigen 2 Runden) sind geschätzt, Balancing in P21.
+- P09: Der Unterstand schützt vor Granaten (`g.inDugout`), aber noch setzt keine Phase das Feld; das kommt mit dem Befehl `dugout` (P06/P12).
+- P09: Eine Batterie schießt je Runde nur einen Plan (kleinste Plan-ID zuerst). Der Editor warnt bei Überschneidung, die Kopfzeile „Munition danach“ rechnet aber beide Pläne voll.
+- P09: Krater machen über `mudAt` (P10) von selbst Schlamm; ein eigenes `mud` setzen die Einschläge nicht, sonst zählte es doppelt.
 
 ## Freigaben und Entscheidungen von Jorven
 
@@ -234,3 +255,7 @@ Stand 2026-11-08, von Jorven bestaetigt:
 - P04: Die Gruppe wandert beim Graben die Linie entlang (sie steht am Ende am zuletzt bearbeiteten Feld), statt am Platz zu bleiben.
 - P04, Überraschung: frischer Aufwurf. Frisch gegrabene Felder tragen zwei Runden lang Lehmhaufen auf der Feindseite; Gegner in Sichtweite (tags 10 Felder, nachts 3) bekommen eine Meldung „Frisch aufgeworfener Lehm bei ...“ bzw. nachts „Spatengeräusche“. Nachts graben lohnt sich also. Beim Zeichnen zeigt eine gestrichelte Schusslinie mit „MG?“, von wo ein gerader Abschnitt bestrichen werden kann.
 - P04: Umbauen geht auch an eigenen, nie eroberten Gräben (Feuerrichtung drehen). Antippen eines eroberten Feldes nimmt den ganzen eroberten Abschnitt.
+- P09: Der Feuerplan-Editor färbt die ganze Karte in Blaupause (Thema `blueprintTheme` in `js/theme.js`), solange er offen ist; die Nacht bleibt dabei erhalten (dunkleres Blau).
+- P09: Sperrfeuer ist „auf Abruf“: es schießt nur in Runden, in denen Feind bis 3 Felder an der Linie gesehen wird, und spart sonst Munition.
+- P09: Beide Seiten zielen erst und dann schlagen alle Granaten gemeinsam ein (auch Gegenbatteriefeuer), damit keine Seite zuerst trifft. Hat ein Beobachter das Feuer verlegt, streut es weniger (x 0,7), weil er die Lage der Einschläge sieht. Zerschossene Gleise und Leitungen werden in der nächsten Stellungsrunde von selbst geflickt.
+- P09: Das Asse-Szenario hat jetzt 5 statt 3 Kaldern-Gruppen (Beobachter und Melder), damit die Leitungsregeln spielbar sind.

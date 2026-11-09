@@ -28,9 +28,10 @@ function lineEast(from, n) {
   return Array.from({ length: n }, (_, i) => ({ x: from.x - i - 1, y: from.y }));
 }
 
-test('Szenario Gefecht frei: 3 gegen 3 auf begehbaren Feldern, Seite b ist KI', () => {
+test('Szenario Gefecht frei: 5 gegen 3 auf begehbaren Feldern, Seite b ist KI', () => {
   const s = fresh();
-  assert.equal(s.groups.filter((g) => g.side === 'a').length, 3);
+  // P09: Seite a hat zusaetzlich Beobachter und Melder fuer die Artillerie
+  assert.equal(s.groups.filter((g) => g.side === 'a').length, 5);
   assert.equal(s.groups.filter((g) => g.side === 'b').length, 3);
   assert.equal(s.sides.b.control, 'ai');
   for (const g of s.groups) {
@@ -154,7 +155,7 @@ test('Checkliste: angemeldete Pruefpunkte, Warnungen zuerst, Fehler werden Warnu
   registerCheck('test-ok', () => [{ tone: 'ok', text: 'Alle Abschnitte erreichbar' }]);
   registerCheck('test-kaputt', () => { throw new Error('kaputt'); });
   try {
-    const all = [{ group: 'a01', type: 'hold' }, { group: 'a02', type: 'hold' }, { group: 'a03', type: 'hold' }];
+    const all = s.groups.filter((g) => g.side === 'a').map((g) => ({ group: g.id, type: 'hold' }));
     const items = checklist({ state: s, side: 'a', orders: all });
     assert.equal(items[0].tone, 'warn');
     assert.ok(items.some((i) => i.text === 'Alle Abschnitte erreichbar'));

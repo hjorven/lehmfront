@@ -10,7 +10,7 @@ import { resolveTurn } from '../resolve.js';
 import { viewFor } from '../view.js';
 import { sightLine, coverAt, PINNED, darknessOf } from '../sight.js';
 import { faction } from '../config/factions.js';
-import { themeAt, applyTheme, currentTheme, onThemeChange } from '../theme.js';
+import { themeAt, applyTheme, currentTheme, onThemeChange, blueprintTheme } from '../theme.js';
 import {
   createCamera, resizeCamera, attachCameraControls, screenToWorld, worldToScreen, centerOn, fitZoom,
 } from '../render/camera.js';
@@ -48,6 +48,8 @@ import { phasesFor } from '../phases/registry.js';
 import { createFilmPlayer } from '../ui/film.js';
 import { attachWeather, applyWeatherParams } from '../ui/weather-fx.js';
 import { mudAt, MUD_WORDS, waterAt, WATER_WORDS } from '../weather.js';
+import { drawArtilleryMap, burnSpot } from '../render/artillery-layer.js';
+import { hashSeed } from '../render/geometry.js';
 import { createTelegram } from '../ui/telegram.js';
 import { createArchiveView } from '../ui/archive.js';
 import { drawFilmTrails } from '../render/film-layer.js';
@@ -64,6 +66,7 @@ export async function mount(root, params) {
     fetchJson(`data/maps/${scenario.map}.json`),
     ensureCss('css/gefecht.css'),
     ensureCss('css/film.css'),
+    ensureCss('css/feuerplan.css'), // P09: Editor und Zittern der Karte bei Einschlaegen
     Promise.all(['16px "Special Elite"', '16px "IBM Plex Mono"', '700 16px "IBM Plex Mono"', '700 16px "Caveat"', '16px "IBM Plex Sans"', '700 16px "IBM Plex Sans"']
       .map((f) => document.fonts.load(f))).catch(() => {}),
   ]);
@@ -84,6 +87,9 @@ export async function mount(root, params) {
   // Planungszustand
   let side = 'a';
   let book = createOrderBook();
+  let decor = null;            // Zeichnung eines offenen Editors (Feuerplan, P09), unter den Gruppen
+  let burns = [];              // Brandloecher am Kartenrand nach Einschlaegen (P09, nur Optik)
+  let shelledSeen = shelledCount(state); // Einschlaege, die der Film schon gezeigt hat (Papier vibriert bei neuen)
   let sidePlans = { a: {}, b: {} };  // Seitenbefehle dieser Runde nach Art (Lorenplan), nicht im Befehlsbuch
   let plannerWindow = null;
   let selectedId = null;
@@ -180,7 +186,7 @@ export async function mount(root, params) {
       hover: tool?.pick ? tool.hoverCell : null,
       preview: prev ? { ...prev, group: tool.group.id, cell: tool.hoverCell, ok: prev.ok ?? !!prev.path } : null,
       sightLine: !tool && hoverSight ? hoverSight : null,
-      overlays: activeOverlays(),
+      overlays: [artilleryOverlay(state), ...(decor ? [{ draw: decor }] : []), ...activeOverlays()],
       plans: sidePlans[side],
       time: performance.now(),
     });
@@ -189,6 +195,38 @@ export async function mount(root, params) {
     // gedrosselt auf etwa 30 Bilder je Sekunde, angehalten, solange ein Fenster offen ist
     if (!animTimer && !modalOpen && !reducedMotion() && !params.has('demo') && activeOverlays().some((o) => o.animated)) {
       animTimer = setTimeout(() => { animTimer = 0; drawDyn(); }, 33);
+    }
+  }
+
+  // Artillerie (P09): scharfe Feuerplaene, durchtrennte Leitungen, frische Trichter, Brandloecher am Rand
+  function artilleryOverlay(st) {
+    return { draw: (ctx, o) => drawArtilleryMap(ctx, { ...o, state: st, pending: decor ? [] : sidePlans[side].fire_plan?.plans ?? null, burns }) };
+  }
+  function shelledCount(st) {
+    let n = 0;
+    for (const k in st.cells) n += st.cells[k].shelled ?? 0;
+    return n;
+  }
+  /** Ueberraschung P09: neue Einschlaege lassen das Papier kurz vibrieren und brennen Loecher in den Kartenrand */
+  function feelImpacts(st) {
+    const n = shelledCount(st);
+    if (n <= shelledSeen) { shelledSeen = Math.min(shelledSeen, n); return; }
+    shelledSeen = n;
+    const imp = (lastRound?.result.log ?? []).filter((e) => e.type === 'impacts');
+    const turn = lastRound?.input.state.turn ?? state.turn;
+    for (const e of imp) {
+      const seed = hashSeed('brand', turn, e.at.x, e.at.y);
+      if (burns.some((b) => b.seed === seed)) continue;
+      burns.push({ ...burnSpot(map, e.at, seed), age: 0, turn });
+    }
+    burns = burns.slice(-14).map((b) => ({ ...b, age: b.turn === turn ? 0 : 1 }));
+    // Klang kommt ueber die Ereignis-Haken (impacts, js/ui/tools/artillery.js)
+    if (!reducedMotion()) {
+      root.classList.remove('shake');
+      void root.offsetWidth;
+      root.classList.add('shake');
+      setTimeout(() => root.classList.remove('shake'), 600);
+      if (navigator.vibrate && navigator.userActivation?.hasBeenActive !== false) try { navigator.vibrate([18, 40, 12]); } catch { /* egal */ }
     }
   }
 
@@ -202,8 +240,9 @@ export async function mount(root, params) {
     const groups = fr.groups.map((g) => ({ ...g, mark: groupMark(fr.state, g) }));
     drawBattle(dctx, cam, dpr, currentTheme(), {
       state: fr.state, map, side, groups, ghosts: [], orders: new Map(), selectedId, planning: false,
-      overlays: [{ draw: (ctx, o) => drawFilmTrails(ctx, o, fr.trails) }],
+      overlays: [artilleryOverlay(fr.state), { draw: (ctx, o) => drawFilmTrails(ctx, o, fr.trails) }],
     });
+    feelImpacts(fr.state);
   }
 
   // ---------- Oberflaeche ----------
@@ -424,6 +463,16 @@ export async function mount(root, params) {
       onCancel: (fn) => { t.cleanup = fn; },
       redraw: (camera = false) => { if (camera) onCamera(); else drawDyn(); },
       expose: (a) => { t.api = a; },
+      // Fuer Editoren auf der Karte (Feuerplan, P09)
+      root, cam,
+      setDecor: (fn) => { decor = fn; drawDyn(); },
+      onEnd: (fn) => { t.onEnd = fn; },
+      marks: () => Object.fromEntries(groupsOf(state, side).map((x) => [x.id, groupMark(state, x)])),
+      blueprint: (on, base) => {
+        if (on) { const b = currentTheme(); applyTheme(blueprintTheme(b)); playSfx('paper', { intensity: 0.6 }); return b; }
+        applyTheme(base && !base.blueprint ? base : themeAt(darkness));
+        return null;
+      },
     });
     refresh();
   }
@@ -432,6 +481,7 @@ export async function mount(root, params) {
     const t = tool;
     tool = null;
     if (t?.cleanup) try { t.cleanup(); } catch (err) { console.error(err); }
+    if (t?.onEnd) try { t.onEnd(); } catch (err) { console.error(err); }
     if (doRefresh) refresh();
   }
 
@@ -583,6 +633,7 @@ export async function mount(root, params) {
   let filmReplay = false;
   function endFilm() {
     filmFrame = null;
+    feelImpacts(state);
     modalOpen = false;
     root.classList.remove('filming');
     report.setFilmActive(false);
@@ -680,7 +731,7 @@ export async function mount(root, params) {
 
   // ---------- Radiales Menue ----------
   function openRadial(g, clientX, clientY) {
-    if (!g || g.side !== side || modalOpen || book[side]?.sealed) return false;
+    if (!g || g.side !== side || modalOpen || book[side]?.sealed || root.classList.contains('fp-open')) return false;
     cancelTool(false);
     selectedId = g.id;
     const r = root.getBoundingClientRect();
@@ -843,6 +894,8 @@ export async function mount(root, params) {
       else if (selectedId) select(null);
       return;
     }
+    // Feuerplan-Editor offen: keine Werkzeugtasten, sonst gingen die ungespeicherten Plaene verloren
+    if (root.classList.contains('fp-open')) return;
     if (e.key === 'Tab' && !e.shiftKey && (onMap || orderList.el.contains(t))) {
       // Tab auf der Karte oeffnet die Befehlsliste; in der Liste wird normal weitergesprungen
       if (onMap) { e.preventDefault(); toggleList(); }
@@ -1015,6 +1068,39 @@ export async function mount(root, params) {
       centerOn(cam, 45, narrow() ? 5 : 8.5, Math.max(cam.zoom, narrow() ? 26 : 30));
       api.tool('rebuild');
       tool?.api?.draw([{ x: 45.5, y: 5.5 }, { x: 45.5, y: 12.5 }]);
+    }
+    else if (demo === 'feuerplan' || demo === 'walze' || demo === 'verlegen' || demo === 'einschlag') {
+      // P09: Walze vor Abschnitt A, Vorbereitungsfeuer auf den Graben vor Abschnitt B
+      const walze = { id: 'w1', kind: 'creep', batteries: ['batterie1', 'batterie2'], a: { x: 38, y: 4 }, b: { x: 38, y: 12 }, dir: 'E', step: 1, rounds: 6, start: 1 };
+      const prep = { id: 'v1', kind: 'prep', batteries: ['batterie2'], a: { x: 45, y: 16 }, b: { x: 45, y: 21 }, dir: 'E', rounds: 2, start: 1 };
+      if (demo === 'feuerplan') {
+        sidePlans.a = { ...sidePlans.a, fire_plan: { type: 'fire_plan', plans: [walze, prep] } };
+        centerOn(cam, narrow() ? 38 : 36, narrow() ? 10 : 13, Math.max(fitZoom(cam), narrow() ? 17 : 24));
+        onCamera();
+        api.tool('fireplan');
+      } else {
+        state = structuredClone(state);
+        state.turnKind = 'battle'; state.battle = { round: 1 };
+        state.sides.a.artillery.plans = [walze, prep];
+        if (demo === 'einschlag') {
+          centerOn(cam, narrow() ? 40 : 36, 12, Math.max(fitZoom(cam), narrow() ? 17 : 20));
+          onCamera();
+          commitSide();
+          if (lastRound) { player.seek(1e9); player.next(); report.finishTyping(); }
+        } else {
+          for (let i = 0; i < 2; i++) state = resolveTurn(state, [], [], seed, state.turn, env).state;
+          lastRound = null;
+          if (demo === 'verlegen') state.sides.a.artillery.lines.find((l) => l.to === 'B-Stelle Mitte').cut = { x: 25, y: 16 };
+          const obs = groupsOf(state, side).find((g) => g.type === 'observers');
+          centerOn(cam, narrow() ? 38 : 36, 10, Math.max(fitZoom(cam), narrow() ? 17 : 24));
+          onCamera();
+          if (demo === 'verlegen') {
+            api.select(obs.id);
+            api.tool('shift');
+            api.hover(42, 10);
+          }
+        }
+      }
     }
     onCamera();
     refresh();

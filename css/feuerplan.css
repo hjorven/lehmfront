@@ -1,0 +1,53 @@
+/* Feuerplan-Editor (P09, Plan 7.4, Stil 02 Blaupause). Farben nur ueber die CSS-Variablen aus js/theme.js;
+   waehrend der Editor offen ist, setzt er das Blaupausen-Thema (BLUEPRINT), die Kaertchen werden blau mit weisser Schrift.
+   Desktop: Planblatt rechts. Handy hochkant: Planblatt unten, Werkzeugreihe ausgeblendet. */
+.gefecht.fp-open .bottom, .gefecht.fp-open .check{display:none}
+.gefecht.fp-open .card{border-style:dashed}
+.fp{position:absolute;right:12px;top:110px;width:330px;max-height:calc(100% - 130px);overflow:auto;padding:0 0 10px;font:13.5px/1.35 var(--font-ui);z-index:3}
+.fp-head{display:flex;align-items:baseline;gap:10px;padding:10px 12px 8px;border-bottom:1px dashed var(--line)}
+.fp-head b{font:400 18px/1.1 var(--font-head)}
+.fp-head span{font:12px var(--font-num);color:var(--ink2)}
+.fp-head .x{margin-left:auto;width:36px;height:36px;font-size:22px;line-height:1;background:none;border:1px solid var(--line);border-radius:var(--radius);color:var(--ink)}
+.fp .tabs,.fp .adds{display:flex;flex-wrap:wrap;gap:6px;padding:8px 12px 0}
+.fp .tab,.fp .add,.fp .row.act button,.fp-foot button{min-height:36px;padding:4px 10px;background:none;color:var(--ink);border:1px solid var(--line);border-radius:var(--radius);font:600 13px var(--font-ui)}
+.fp .tab.on{border:2px solid var(--accent);padding:3px 9px;color:var(--accent)}
+.fp .add{border-style:dashed;font-weight:400;color:var(--ink2)}
+.fp .add:disabled{opacity:.45;cursor:not-allowed}
+.fp .sum{display:block;margin:10px 12px 0;padding:8px 10px;border:1px solid var(--ink);border-radius:var(--radius)}
+.fp .sum b{display:block;font:400 16px/1.25 var(--font-head)}
+.fp .sum span{display:block;font:12.5px/1.4 var(--font-num);margin-top:3px}
+.fp .bats{display:flex;flex-wrap:wrap;gap:6px;padding:10px 12px 0}
+.fp .chip{display:flex;flex-direction:column;align-items:flex-start;min-height:44px;padding:4px 10px;background:none;color:var(--ink2);border:1px dashed var(--line);border-radius:var(--radius);font:12px var(--font-ui);text-align:left}
+.fp .chip b{font:600 13px var(--font-ui)}
+.fp .chip.on{color:var(--ink);border:2px solid var(--ink);padding:3px 9px}
+.fp .chip.warn span{color:var(--danger)}
+.fp .row{display:flex;flex-wrap:wrap;gap:8px 12px;padding:10px 12px 0}
+.fp .stp{display:flex;align-items:center;gap:6px}
+.fp .stp > span{font:12px var(--font-ui);color:var(--ink2);min-width:46px}
+.fp .stp b{font:700 13px var(--font-num);min-width:54px;text-align:center}
+.fp .stp button{width:36px;height:36px;background:none;color:var(--ink);border:1px solid var(--line);border-radius:var(--radius);font:700 18px/1 var(--font-num)}
+.fp .warn{margin:10px 12px 0;padding:6px 10px 6px 24px;border-left:3px solid var(--danger);color:var(--ink);font-size:13px}
+.fp .warn li + li{margin-top:3px}
+.fp .note,.fp .empty,.fp .help{margin:10px 12px 0;color:var(--ink2)}
+.fp .help{font:16px/1.25 var(--font-hand);color:var(--accent)}
+.fp .del{color:var(--danger) !important}
+.fp-foot{position:sticky;bottom:-10px;display:flex;gap:8px;justify-content:flex-end;margin-top:12px;padding:10px 12px;background:var(--card);border-top:1px dashed var(--line)}
+.fp-foot .go{background:var(--ink);color:var(--card);border-color:var(--ink);font-weight:700;min-width:120px}
+.fp-foot .go:disabled{opacity:.45;cursor:not-allowed}
+
+/* Ueberraschung: Einschlaege lassen das Papier kurz vibrieren */
+.gefecht.shake canvas{animation:fp-shake .55s cubic-bezier(.36,.07,.19,.97) both}
+@keyframes fp-shake{
+  10%,90%{transform:translate(-1px,1px)}
+  20%,80%{transform:translate(2px,-1px)}
+  30%,50%,70%{transform:translate(-3px,2px) rotate(-.15deg)}
+  40%,60%{transform:translate(3px,-2px) rotate(.15deg)}
+}
+@media (prefers-reduced-motion:reduce){.gefecht.shake canvas{animation:none}}
+
+@media (max-width:699px){
+  .fp{left:8px;right:8px;top:auto;bottom:calc(8px + env(safe-area-inset-bottom));width:auto;max-height:48%}
+  .gefecht.fp-open .hint{display:none}
+  .fp .tabs{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+  .fp .tab,.fp .add{flex:0 0 auto}
+}
