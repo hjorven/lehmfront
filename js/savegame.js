@@ -79,9 +79,20 @@ export function packGame(game) {
         rules: game.rules ?? null,
         side: game.side ?? 'a',
         book: game.book ?? null,
+        decor: game.decor ?? null,
       },
     },
   };
+}
+
+/** Szenenschmuck (P21): Brandloecher am Kartenrand und Tropfenflecken, nur Optik. Fremdes wird verworfen. */
+function cleanDecor(d) {
+  if (!d || typeof d !== 'object') return null;
+  const num = (v) => Number.isFinite(v);
+  const burns = Array.isArray(d.burns) ? d.burns.filter((b) => b && typeof b === 'object' && num(b.seed) && num(b.turn) && num(b.x) && num(b.y) && num(b.r))
+    .slice(-14).map((b) => ({ x: b.x, y: b.y, r: b.r, seed: b.seed, turn: b.turn, age: 1 })) : [];
+  const stains = Array.isArray(d.stains) ? d.stains.filter((s) => s && num(s.x) && num(s.y) && num(s.r)).slice(-60).map((s) => ({ x: s.x, y: s.y, r: s.r })) : [];
+  return { burns, stains };
 }
 
 /**
@@ -101,6 +112,7 @@ export function unpackGame(loaded) {
     rules: g.rules ?? null,
     side: g.side === 'b' ? 'b' : 'a',
     book: g.book && typeof g.book === 'object' ? g.book : null,
+    decor: cleanDecor(g.decor),
     archiveDropped: !sameVersion && !!g.archive,
   };
 }

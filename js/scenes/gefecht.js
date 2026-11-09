@@ -166,7 +166,7 @@ export async function mount(root, params) {
   let helpShown = false;
   let suppressTap = false;
   let modalOpen = false;
-  if (resumed) { archive = resumed.archive ?? archive; aiMemory = resumed.aiMemory; lastLog = resumed.lastLog; if (resumed.book) book = resumed.book; }
+  if (resumed) { archive = resumed.archive ?? archive; aiMemory = resumed.aiMemory; lastLog = resumed.lastLog; if (resumed.book) book = resumed.book; if (resumed.decor) burns = resumed.decor.burns; }
   if (online?.kind === 'match' && online.state) { lastLog = online.log; book = nextRound(book, { a: [], b: [], [online.side]: online.carry }); }
   const forcedDark = params.has('night') && !fixed ? Math.max(0, Math.min(1, num(params.get('night'), 0))) : null;
   // Erzwungene Nacht auch fuer die Regeln (Sichtweite, Trefferchance): Uhr auf 22 Uhr stellen
@@ -204,6 +204,7 @@ export async function mount(root, params) {
 
   const layer = createMapLayer(staticCv, liveMap, { getCamera: () => cam, getTheme: currentTheme });
   const weather = attachWeather({ root, before: dynCv, map, seed, cam, staticCanvas: staticCv, getTheme: currentTheme, still: params.has('demo') });
+  if (resumed?.decor?.stains?.length) weather.layer.importStains(resumed.decor.stains); // Tropfenflecken aus der Akte (P21)
   const dctx = dynCv.getContext('2d');
   let dpr = 1;
 
@@ -342,7 +343,8 @@ export async function mount(root, params) {
   // P18: Dienstbuch (Einstellungen, Spielstaende, Klang, Tasten) und laufende Akte nach jeder Runde
   const gameMenu = attachGameMenu({
     ui, params,
-    snapshot: () => ({ state, map: liveMap, archive, aiMemory, lastLog, rules: { ...rules.snapshot(), ...(koop ? { koop: koop.snapshot() } : {}) }, side, book }),
+    snapshot: () => ({ state, map: liveMap, archive, aiMemory, lastLog, rules: { ...rules.snapshot(), ...(koop ? { koop: koop.snapshot() } : {}) }, side, book,
+      decor: { burns: burns.map(({ x, y, r, seed, turn }) => ({ x, y, r, seed, turn })), stains: weather.layer.exportStains?.() ?? [] } }),
     busy: () => (online?.kind === 'match' ? 'Online-Gefechte liegen beim Stab, nicht in der Kartentasche.'
       : online?.kind === 'replay' ? 'Eine Wiedergabe steckt im Link, nicht in der Kartentasche.'
       : filmFrame || book.a?.sealed || book.b?.sealed ? 'Während der Ausführung oder Übergabe kann nicht abgelegt werden.' : rules.ended ? 'Die Partie ist beendet.' : null),

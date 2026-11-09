@@ -497,6 +497,18 @@ export function createWeatherLayer(canvas, { map, seed = 1, getCamera, getTheme,
     drawNow() { draw(); },
     destroy() { cancelAnimationFrame(pending); cancelAnimationFrame(loop); },
     get stains() { return dropStains.length; },
+    /** Gebliebene Tropfenflecken fuer den Spielstand (P21): nur Mitte und Radius, die Form kommt neu aus dem Seed */
+    exportStains() { return dropStains.map((d) => ({ x: +d.cx.toFixed(4), y: +d.cy.toFixed(4), r: +d.rad.toFixed(4) })); },
+    importStains(list) {
+      if (!Array.isArray(list)) return;
+      dropStains.length = 0;
+      for (const d of list.slice(-MAX_DROP_STAINS)) {
+        if (!Number.isFinite(d?.x) || !Number.isFinite(d?.y) || !Number.isFinite(d?.r)) continue;
+        const rr = prng(hashSeed(Math.floor(d.x * 100), Math.floor(d.y * 100))); // wie beim Landen des Tropfens
+        dropStains.push({ cx: d.x, cy: d.y, rad: d.r, pts: blob(rr, d.x, d.y, d.r, 10) });
+      }
+      layer.invalidate();
+    },
   };
   return layer;
 }

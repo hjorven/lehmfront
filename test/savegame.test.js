@@ -123,3 +123,15 @@ test('Manifest: relativ, installierbar', () => {
   assert.match(html, /<link rel="manifest" href="manifest.webmanifest">/);
   assert.doesNotMatch(html, /(href|src)="\//);
 });
+
+test('Szenenschmuck (Brandlöcher, Tropfenflecken) kommt mit der Akte zurück, Fremdes fällt weg', () => {
+  const decor = {
+    burns: [{ x: -0.8, y: 4.2, r: 0.7, seed: 123, turn: 3 }, { x: 'boese', y: 1, r: 1, seed: 1, turn: 1 }],
+    stains: [{ x: 10.5, y: 3.25, r: 0.12 }, { x: 1 }],
+  };
+  const { state, meta } = packGame({ state: { turn: 4, turnKind: 'position', clock: { day: 1, hour: 6, minute: 0 } }, query: 'scene=gefecht', decor });
+  const out = unpackGame({ state, meta, version: SAVE_VERSION });
+  assert.deepEqual(out.decor.burns, [{ x: -0.8, y: 4.2, r: 0.7, seed: 123, turn: 3, age: 1 }]);
+  assert.deepEqual(out.decor.stains, [{ x: 10.5, y: 3.25, r: 0.12 }]);
+  assert.equal(unpackGame({ state: {}, version: SAVE_VERSION, meta: { game: {} } }).decor, null, 'alte Akten ohne Schmuck');
+});

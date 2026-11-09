@@ -1,6 +1,7 @@
 // Tageszeit als Stilwechsel (Plan 7.7): Tag = Stil 01 Generalstabskarte, Nacht = Stil 04.
 // Ein Faktor darkness 0..1 steuert Canvas-Thema und CSS-Variablen gleichzeitig.
 // Reine Optik: hier ist Math.sin erlaubt. Spielregeln lesen darkness ueber rules.visibilityFromDarkness.
+import { getSetting, onSettingsChange } from './settings.js';
 
 /** Schluessel, die als CSS-Variablen (--name) auf die Kaertchen wirken. */
 export const CSS_KEYS = ['paper', 'card', 'ink', 'ink2', 'line', 'track', 'own', 'enemy', 'accent', 'danger'];
@@ -131,7 +132,29 @@ export function contrast(a, b) {
   return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
 }
 
-let current = themeAt(0);
+/**
+ * Hoher Kontrast fuer die gezeichnete Karte (P21): Signaturfarben ruecken vom Papier weg (auf hellem Papier dunkler,
+ * auf dunklem heller, jede Farbe in ihre eigene Richtung), Falten und Flecken werden blasser. Papier, Kaertchen und Tisch bleiben, die Kaertchen regelt
+ * css/einstellungen.css. Die Farben von Eigen und Feind behalten ihren Ton.
+ */
+const KEEP = new Set(['paper', 'card', 'track', 'desk', 'shade', 'stain', 'fold', 'fog', 'flareLight', 'wetPaper']);
+export function boostContrast(theme) {
+  const out = { ...theme };
+  const lum = (h) => { const r = hexToRgb(h); return 0.2126 * r[0] + 0.7152 * r[1] + 0.0722 * r[2]; };
+  const p = lum(theme.paper);
+  for (const [k, v] of Object.entries(theme)) {
+    if (KEEP.has(k) || typeof v !== 'string' || v[0] !== '#') continue;
+    // Jede Farbe weiter in die Richtung, in der sie schon vom Papier abweicht
+    out[k] = lum(v) <= p ? mix(v, '#000000', 0.32) : mix(v, '#ffffff', 0.28);
+  }
+  if (typeof theme.foldAlpha === 'number') out.foldAlpha = theme.foldAlpha * 0.6;
+  if (typeof theme.stainAlpha === 'number') out.stainAlpha = theme.stainAlpha * 0.6;
+  out.highContrast = true;
+  return out;
+}
+
+let base = themeAt(0);
+let current = base;
 const listeners = new Set();
 
 export function currentTheme() {
@@ -146,6 +169,8 @@ export function onThemeChange(fn) {
 
 /** Setzt die CSS-Variablen der Kaertchen und meldet das Canvas-Thema an alle Renderer. */
 export function applyTheme(theme, el = typeof document !== 'undefined' ? document.body : null) {
+  base = theme;
+  if (getSetting('contrast') && !theme.highContrast) theme = boostContrast(theme);
   current = theme;
   if (el) {
     for (const k of CSS_KEYS) el.style.setProperty('--' + k, theme[k]);
@@ -214,3 +239,6 @@ export function applyWarRoom(el) {
   if (!el) return;
   for (const [k, v] of Object.entries(WARROOM)) el.style.setProperty('--wr-' + k.replace(/[A-Z]/g, (c) => '-' + c.toLowerCase()), v);
 }
+
+// Kontrast im Dienstbuch umgestellt: Karte sofort mit dem neuen Thema zeichnen
+onSettingsChange(() => { if (typeof document !== 'undefined') applyTheme(base); });
