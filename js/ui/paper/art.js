@@ -7,7 +7,7 @@ import { hashString } from './layout.js';
 // Legt eine Leinwand an, gemalt wird erst, wenn sie im DOM haengt (dann sind die CSS-Variablen bekannt)
 export function artCanvas(type, seed, w, h, label) {
   const c = document.createElement('canvas');
-  c.className = 'paper-art paper-art-' + type;
+  c.className = 'paper-art paper-art-' + type.split(':')[0]; // Klasse ohne Motiv, damit die CSS-Groesse greift
   c.dataset.art = type;
   c.dataset.seed = String(seed);
   c.dataset.w = String(w);
@@ -38,6 +38,15 @@ export function paintArt(c) {
 }
 
 const PAINTERS = { photo, wash, lino, press };
+
+/** Weitere Bildart anmelden (P15: Flecken, Flurkarte, Postkarte). fn(ctx, w, h, rng, v, motif) */
+export function registerPainter(name, fn) {
+  PAINTERS[name] = fn;
+}
+
+export function getPainter(name) {
+  return PAINTERS[name] ?? null;
+}
 
 // ---------- Fundstueck-Foto: Sepia, Koernung, Vignette, Kratzer ----------
 function photo(ctx, w, h, rng, v, motif = 'graben') {

@@ -341,6 +341,11 @@ Wichtig für die Feldpost (P15):
 3. Unter den Feldpost-Vorlagen der Tonlage eine wählen, deren `wann` erfüllt ist. Auswahl immer
    über `rngForTurn` und nach `id` sortiert, damit dieselbe Mission dieselben Briefe ergibt.
 
+Umgesetzt in `js/letters.js` (P15), Ablauf und Schnittstelle in `js/ui/narrative/README.md`. Abweichungen: Zufall über
+`createRng` aus Seed, Mission und Seite (eine Mission hat keine einzelne Runde). `{ort}` ist der nächste benannte Ort der
+Karte, die Feldpostprüfstelle schwärzt heikle Orte als `[[...]]`. In festen Texten füllt P15 `{gruppe}` und
+`{gruppenfuehrer}` mit der ersten lebenden eigenen Gruppe, P14/P16 können eine andere vorgeben (`storyValues`).
+
 ## Telegramme und Großschrift
 
 Stabsbefehle stehen in den Daten bereits in Großbuchstaben. `ß` wird als `SS` geschrieben,

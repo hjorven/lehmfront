@@ -48,6 +48,17 @@ registerKind('letter', {
       d.closing ? el('p', 'paper-letter-closing', d.closing) : null,
       d.signature ? el('p', 'paper-letter-signature', d.signature) : null,
     ]);
+    // Vermerk unter abgefangenen Briefen (Schreibmaschine), P15
+    if (d.note) front.append(el('div', 'paper-letter-note', [d.noteTitle ? el('b', null, d.noteTitle) : null, ...paras(d.note).map((p) => el('p', null, p))]));
+    if (d.crooked) front.classList.add('is-crooked');
+    // Flecken nach Wetter und Tageszeit beim Schreiben (Liste wie ['wasser', 'wachs']), P15
+    if (d.stains && d.stains.length) {
+      const c = artCanvas('stain:' + d.stains.join('+'), d.seed ?? d.id, 310, 620, null);
+      c.classList.add('paper-art-stain');
+      c.removeAttribute('role');
+      c.setAttribute('aria-hidden', 'true');
+      front.prepend(c);
+    }
     const censoredAny = body.some(hasCensored);
     if (censoredAny || d.examined) front.append(stamp(d.examinedBy || 'Geprüft · Feldpostprüfstelle 3', 'paper-stamp-round'));
     return { front, title: d.title || (d.signature ? 'Brief von ' + d.signature : 'Brief') };
@@ -128,7 +139,7 @@ registerKind('casualties', {
 registerKind('newspaper', {
   label: 'Zeitung',
   render(d) {
-    const cols = paras(d.columns).map((p) => el('p', null, p));
+    const cols = paras(d.columns).map((p) => el('p', null, censored(p)));
     const front = el('div', 'paper-news-body', [
       el('div', 'paper-news-mast', d.masthead || 'Kalderner Bote'),
       el('div', 'paper-news-meta', [el('span', null, d.date || ''), el('span', null, d.issue || ''), el('span', null, d.price || '')]),
@@ -138,6 +149,8 @@ registerKind('newspaper', {
       d.pictureCaption ? el('p', 'paper-news-caption', d.pictureCaption) : null,
       el('div', 'paper-news-cols', cols),
     ]);
+    // Bleistiftnotiz eines Lesers an der Front, schraeg ueber den Satzspiegel (T2, Plan 7.8 Stil 10)
+    if (d.margin) front.append(el('p', 'paper-news-margin', d.margin));
     return { front, title: (d.masthead || 'Zeitung') + ' ' + (d.date || '') };
   },
 });
@@ -147,7 +160,7 @@ registerKind('photo', {
   label: 'Fundstück',
   render(d) {
     const front = el('div', 'paper-photo-body', [
-      artCanvas('photo:' + (d.motif || 'graben'), d.seed ?? d.id, 220, 160, d.caption || 'Foto'),
+      artCanvas((d.motif === 'karte' ? 'flur' : d.motif === 'postkarte' ? 'postcard' : 'photo:' + (d.motif || 'graben')), d.seed ?? d.id, 220, 160, d.alt || d.caption || 'Foto'),
       d.caption ? el('p', 'paper-photo-caption', d.caption) : null,
     ]);
     let back = null;
@@ -170,6 +183,7 @@ registerKind('actcard', {
       el('div', 'paper-act-label', d.act || 'Akt'),
       el('h3', 'paper-act-title', d.title || ''),
       d.subtitle ? el('p', 'paper-act-sub', d.subtitle) : null,
+      d.text ? el('p', 'paper-act-text', d.text) : null,
     ]);
     return { front, title: (d.act || 'Akt') + ': ' + (d.title || '') };
   },

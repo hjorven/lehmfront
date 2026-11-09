@@ -136,7 +136,7 @@
 .paper-photo{--w:240px}
 .paper-photo .paper-face{--face:var(--photo-frame)}
 .paper-photo-body{padding:11px 11px 8px}
-.paper-art-photo{width:100%; height:auto; aspect-ratio:220/160; display:block}
+.paper-art-photo,.paper-art-flur,.paper-art-postcard{width:100%; height:auto; aspect-ratio:220/160; display:block}
 .paper-photo-caption{margin:6px 2px 0; font:400 17px/1.15 var(--font-hand); color:var(--letter-ink)}
 .paper-photo .paper-back{--face:var(--photo-back); display:flex}
 .paper-photo-back{display:flex; flex-direction:column; justify-content:space-between; padding:16px 16px 12px; width:100%}
@@ -153,6 +153,23 @@
 .paper-act-label{display:inline-block; margin-top:10px; background:var(--lino-red); color:var(--lino-ground); font:700 13px/1 var(--font-ui); letter-spacing:.14em; text-transform:uppercase; padding:5px 8px}
 .paper-act-title{margin:6px 0 2px; font:700 26px/1.05 var(--font-ui); text-transform:uppercase; letter-spacing:.02em}
 .paper-act-sub{margin:0; font:400 13px/1.35 var(--font-ui)}
+
+/* ---------- Ergaenzungen P15: Vermerk, Flecken, schiefe Nachtschrift, Randnotiz, Akttext ---------- */
+.paper-layer{--stain-water:#6f7f8c; --stain-ink:#24324f; --stain-mud:#7a5a34; --stain-wax:#e3d29c; --stain-wax-edge:#9c8550; --stain-soot:#3a332c; --stain-dust:#8d7e66}
+.paper-art-stain{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; pointer-events:none}
+.paper-letter-body{position:relative}
+.paper-letter-body > :not(.paper-art-stain){position:relative}
+.paper-letter-body.is-crooked p:not(.paper-letter-date){transform-origin:left center}
+.paper-letter-body.is-crooked p:nth-child(3n+1){transform:rotate(-1.1deg)}
+.paper-letter-body.is-crooked p:nth-child(3n+2){transform:rotate(.7deg) translateX(3px)}
+.paper-letter-body.is-crooked p:nth-child(3n){transform:rotate(-.4deg)}
+.paper-letter-note{margin:16px -6px 0 -14px; padding:8px 10px; border:1px solid var(--tele-border); background:var(--tele-paper); font:400 11.5px/1.4 var(--font-head); color:var(--sheet-ink); transform:rotate(.6deg)}
+.paper-letter-note b{display:block; font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--sheet-ink2); margin-bottom:3px}
+.paper-letter-note p{margin:0; text-indent:0 !important}
+.paper-letter-note p + p{margin-top:4px}
+.paper-news-body{position:relative}
+.paper-news-margin{position:absolute; right:10px; bottom:18px; max-width:58%; margin:0; padding:2px 6px; font:400 18px/1.15 var(--font-hand); color:var(--letter-ink); transform:rotate(-5deg); background:color-mix(in srgb, var(--news-paper) 90%, transparent)}
+.paper-act-text{margin:8px 0 0; font:400 12.5px/1.45 var(--font-ui)}
 
 /* ---------- Ablage: weggewischte Blaetter ---------- */
 .paper-pile{position:absolute; left:12px; bottom:12px; z-index:100000; pointer-events:auto; display:flex; align-items:center; gap:10px; min-height:44px; padding:8px 12px 8px 10px;

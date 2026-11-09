@@ -92,6 +92,20 @@ Jeder Thread traegt hier nach dem Merge ein, was fertig ist und was offen bleibt
 - P09 Artillerie: `g.shelled = true` in der Artilleriephase (vor `dugout`, Gefecht Schritt 2) treibt Gruppen in den Unterstand und hält sie dort (ist angeschlossen: `applyImpacts` setzt ihn, die Phase `shelled` löscht ihn nach der Bewegung). Draht zerstören: `state.cells[k].wire = null`. Feuerpläne laufen jetzt, sobald ein Angriff angesetzt ist (`state.battle.round` 1 bis 12, `battleMinute(state)`). `stormGhosts` liest weiter `assault`-Befehle; Feldkosten mit Feldzustand über `stepCost(map, a, b, state)`.
 - P12 Moral: `melee`, `group_captured`, `counter_missed` und `battle_end` (mit `outcome`) sind Haken für Moral und Vertrauen. P13 KI: Befehle `attack`, `assault`, `dugout`, `wire`; `state.battle.counter[side]` ist der Stabsbefehl zum Gegenstoß.
 - Neue Befehlsart `attack` in `js/config/orders.js`; `HOLD_TYPES` enthält jetzt auch `attack`.
+- P15 Erzählung zwischen den Missionen (Demo `?scene=erzaehlung`, Parameter im Kopf von `js/scenes/erzaehlung.js`):
+  - Rein: `js/letters.js` (generierte Feldpost aus `templates.json`, drei Tonlagen nach Moral und Vertrauen, ein echtes Ereignis der Gruppe aus dem Protokoll, Ort aus der Karte, Prüfstelle schwärzt heikle Orte), `js/narrative/` (Textauswahl mit `wann` und Slots, Namen für die Gefallenenliste aus `losses`/`wounded`/`group_lost`/`wounded_waiting`, Statistiken für `wann.werte`, Ablauf zwischen zwei Missionen, Prolog, Entscheidungen, Kampagnenbuch).
+  - Tisch zwischen den Missionen (`js/ui/narrative/reader.js`): Blätter kommen nacheinander auf die Schreibunterlage (Gefallenenliste, Tagebuch, Briefe, abgefangene Briefe von Lask mit Vermerk, Feldpost, Fundstück mit Notiz, Entscheidung, beim Aktwechsel vier Zeitungen als Aufschlag und die Aktkarte auf schwarzem Druckstock, dann Lage und Stabsbefehl der nächsten Mission). Entscheidungen halten an (Tasten 1 bis 4), Ansehen und Vertrauen stehen mit Änderung im Kopf. Gelesenes liegt in der Ablage. Lange Briefe scrollen, waagrecht wischen legt ab.
+  - Tagebuch der Kommandantin (`js/ui/narrative/journal.js`, Stil 06): Lesezeichen Tagebuch, Buch des Abschnitts (alle Namen der Kampagne, neue werden beim Öffnen mit Bleistift eingetragen), Fundstücke (sechs Ketten, Abschluss nach dem vierten Stück), Briefe (Antippen legt sie auf den Tisch).
+  - Neue Blattarten `briefing` und `decision`, Bilder für Flurkarte, Feldpostkarte und Flecken (`js/ui/narrative/kinds.js`); Z1 kann jetzt Vermerk unter Briefen, Randnotiz und Zensur in Zeitungen, Text auf Aktkarten.
+  - Zehn neue Ereignis-Sätze für die Feldpost (Regen, Post, Nacht, Mangel, Versorgung, Ablösung, Essen, Verwundet), zusätzliche Nachnamen nur für Gefallene und Feldpost (`soldierLast` in `data/names.json`).
+  - Überraschung: Briefe tragen Flecken nach Wetter und Tageszeit der Mission, in der sie geschrieben wurden: Wasserränder mit verlaufener Tinte bei Regen, Lehmfinger bei Schlamm, klammes Papier bei Nebel, Frostkristalle, nachts Wachstropfen und schiefe Zeilen. Dazu kratzt der Bleistift hörbar, während die neuen Namen ins Buch des Abschnitts geschrieben werden.
+
+### Für die nächsten Pakete (nach P15)
+
+- P14 ruft nur `playPrologue`, `playInterlude`, `showJournal` aus `js/ui/narrative/index.js` auf (Beispiel in `js/ui/narrative/README.md`). Der Kampagnenzustand (`createCampaign`) ist reines JSON; Entscheidungen zwischen den Missionen wendet `playInterlude` selbst an. P14 setzt Missions-Flags (`harms_gefallen`, `velde_verloren` ...) vor dem Aufruf und rechnet die Folgen des Stabsbefehls.
+- Neue Ereignisse: `registerLetterCategory(type, kategorie)` (Feldpost), `registerCasualtySource(type, fn)` (Gefallenenliste), `registerStat(name, fn)` (Statistik für Texte).
+- Entscheidungen mit `mission` (a3m4, a3m5, a4m3, a4m4) erscheinen nach Lage und Befehl ihrer Mission, also vor dem Spielen; P24 kann sie stattdessen mitten in der Mission zeigen (`decisionSheet` + `applyChoice`).
+- Schlusssequenz nach a4m6 und `ende.wahl` macht P26; das Buch des Abschnitts (`campaign.book.fallen`) ist die Gefallenenliste der Kampagne dafür.
 
 ### Für die nächsten Pakete (nach P07)
 
@@ -242,6 +256,10 @@ Jeder Thread traegt hier nach dem Merge ein, was fertig ist und was offen bleibt
 - P09: Der Unterstand schützt vor Granaten (`g.inDugout`), aber noch setzt keine Phase das Feld; das kommt mit dem Befehl `dugout` (P06/P12).
 - P09: Eine Batterie schießt je Runde nur einen Plan (kleinste Plan-ID zuerst). Der Editor warnt bei Überschneidung, die Kopfzeile „Munition danach“ rechnet aber beide Pläne voll.
 - P09: Krater machen über `mudAt` (P10) von selbst Schlamm; ein eigenes `mud` setzen die Einschläge nicht, sonst zählte es doppelt.
+- P15: Die Namen auf der Gefallenenliste werden aus Seed, Mission, Runde und Gruppe gezogen; die Spiellogik kennt nur Stärken. Wer im Spiel noch als „Ausfall“ zählt, kann also auf der Liste einen anderen Namen tragen als in einem späteren Text. Gruppenführer aufgeriebener Gruppen stehen mit echtem Namen drauf.
+- P15: Die Zeitungen eines Aktwechsels liegen auf dem Handy gestapelt; jede muss einmal angetippt werden, um nach vorn zu kommen.
+- P15: Ohne Archiv (z. B. Mission ohne Protokoll) schreiben alle Gruppen „Es war ruhig“; die Kategorie Regen/Schlamm kommt dann nur aus dem Wetter.
+- P15: Fundstücke gibt P14/P16 mit `finds` an `playInterlude`; wo sie auf der Karte liegen, entscheidet die Mission.
 
 ## Freigaben und Entscheidungen von Jorven
 
@@ -304,3 +322,6 @@ Stand 2026-11-08, von Jorven bestaetigt:
 - P06: „Angriff ansetzen“ ist ein eigener Befehl der Stellungsrunde (`attack`) mit dem ganzen Sturmweg; die Gefechtsrunden beginnen nach Ablauf der zwölf Stunden. Wer ein Gefecht beginnt, plant also im großen Zeitmaßstab, wer es führt, im kleinen.
 - P06: Gefangenschaft statt Vernichtung: Wer im Unterstand überrascht oder eingeschlossen wird, ergibt sich; Gefangene stehen nicht in der Gefallenenliste.
 - P06: Draht kostet Material (1 je Feld) und geht nachts schneller; Pioniere schneiden im Sturm Gassen, die alle Folgenden nutzen.
+- P15: Briefe zwischen den Missionen liegen nicht über der Karte, sondern auf einer Schreibunterlage im Unterstand (Tisch der Kommandantin); über der Karte im Gefecht bleibt die Papierebene frei für Telegramme. Die Zeitungen kommen als ein Aufschlag, die Aktkarte auf schwarzem Grund wie ein Druckstock.
+- P15: Die Lage vor einer Mission ist ein eigenes Blatt (Schreibmaschine, Ziele zum Abhaken) statt eines Telegramms; der Stabsbefehl bleibt Telegramm und wird getippt.
+- P15: Auch die festen Briefe der Geschichte bekommen die Flecken des Wetters ihrer Mission.
