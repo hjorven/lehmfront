@@ -59,6 +59,7 @@ function makeBattery(spec, factionId) {
     id: String(spec.id), type: t.id, label: spec.label || t.name,
     pos: { x: spec.pos?.x ?? spec.x, y: spec.pos?.y ?? spec.y }, w: spec.w || 2, h: spec.h || 2,
     ammo: Math.min(cap, spec.ammo ?? cap), silenced: 0,
+    ...(spec.center ? { center: { x: spec.center.x, y: spec.center.y } } : {}),
   };
 }
 
@@ -76,7 +77,7 @@ function makeLine(spec, i) {
 
 /**
  * Artillerie einer Seite fuer den Anfangszustand. spec (Szenario sides.x.artillery, optional):
- * { batteries: [{ id, type, pos|x,y, w, h, label, ammo }], exchange: {x,y}, lines: [{ id, to, points, cut }], plans: [plan] }
+ * { batteries: [{ id, type, pos|x,y, w, h, label, ammo, center? }], exchange: {x,y}, lines: [{ id, to, points, cut }], plans: [plan] }
  * Ohne Angaben liest die Seite a ihre Batterien, Fernmeldestelle und Leitungen von der Karte (Gebaeude "batterie",
  * "fernmelde", map.cables), Seite b entsprechend die Gebaeude mit side "enemy".
  */
@@ -110,6 +111,7 @@ export function batteryType(b) {
 }
 
 export function batteryCenter(b) {
+  if (b.center) return { x: b.center.x, y: b.center.y }; // gespiegelte Karten: Mitte fest vorgegeben (P17)
   return { x: b.pos.x + Math.floor((b.w - 1) / 2), y: b.pos.y + Math.floor((b.h - 1) / 2) };
 }
 

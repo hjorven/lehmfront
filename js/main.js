@@ -1,5 +1,8 @@
 // Einstieg. Bis die Spielansichten stehen: Titelbild mit gezeichneter Lagekarte im Hintergrund.
 import { createRng } from './rng.js';
+import { audio, playSfx } from './audio/engine.js';
+import { dayKey, dayLabel } from './modes/skirmish.js';
+import { boardFor } from './modes/board.js';
 
 export const VERSION = '0.1.0';
 
@@ -82,4 +85,38 @@ if (scene) {
   addEventListener('resize', redraw);
   matchMedia('(prefers-color-scheme: dark)').addEventListener('change', redraw);
   document.getElementById('version').textContent = 'v' + VERSION;
+  menuSound();
+  menuToday();
+}
+
+// Klang im Hauptmenue (P17, Hinweis aus P19): ferne Front, Wind, karge Musik, sobald jemand tippt.
+// Fahren die Finger ueber die Eintraege, raschelt Papier; der Knopf unten schaltet den Ton.
+function menuSound() {
+  const dark = matchMedia('(prefers-color-scheme: dark)').matches;
+  audio.init();
+  audio.setAmbience({ darkness: dark ? 0.85 : 0.2, wind: 0.3, rain: 0, battle: 0.06 });
+  audio.startMusic();
+  for (const b of document.querySelectorAll('.menu-list .btn:not([disabled])')) {
+    b.addEventListener('pointerenter', () => playSfx('paper', { intensity: 0.18 }));
+    b.addEventListener('click', () => playSfx('stamp', { intensity: 0.5 }));
+  }
+  const btn = document.getElementById('menu-sound');
+  if (!btn) return;
+  const show = (s) => {
+    btn.textContent = !s.ready ? 'Ton: tippen zum Wecken' : s.muted ? 'Ton: aus' : 'Ton: an';
+    btn.setAttribute('aria-pressed', String(s.ready && !s.muted));
+  };
+  audio.onChange(show);
+  show(audio.init());
+  btn.addEventListener('click', () => { if (audio.init().ready) audio.setMuted(!audio.isMuted()); });
+}
+
+// Tageslage im Menue: heutiges Datum und der beste Eintrag im Wachbuch dieses Geraets
+function menuToday() {
+  const a = document.getElementById('menu-tageslage');
+  if (!a) return;
+  const d = new Date();
+  const key = dayKey(d.getFullYear(), d.getMonth() + 1, d.getDate());
+  const best = boardFor(key)[0];
+  a.querySelector('small').textContent = best ? `${dayLabel(key)} · bisher ${best.points}` : dayLabel(key);
 }

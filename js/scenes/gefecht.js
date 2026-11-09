@@ -62,17 +62,18 @@ import { hashSeed } from '../render/geometry.js';
 import { createTelegram } from '../ui/telegram.js';
 import { createArchiveView } from '../ui/archive.js';
 import { drawFilmTrails } from '../render/film-layer.js';
+import { loadBattle } from '../modes/load.js';
+import { attachModeRules } from '../ui/result.js';
 
 const num = (v, d) => (v === null || v === '' || !Number.isFinite(Number(v)) ? d : Number(v));
 const LONG_PRESS_MS = 430;
 const NARROW = 700;
 
 export async function mount(root, params) {
-  const scenId = /^[a-z0-9-]+$/.test(params.get('scenario') || '') ? params.get('scenario') : 'asse-frei';
   const fetchJson = (url) => fetch(url).then((r) => { if (!r.ok) throw new Error('Datei fehlt: ' + url); return r.json(); });
-  const scenario = await fetchJson(`data/scenarios/${scenId}.json`);
-  const [mapJson] = await Promise.all([
-    fetchJson(`data/maps/${scenario.map}.json`),
+  // P17: Modus aus der URL (Gefecht frei mit Karte, Zufallskarte, Hotseat, Tageslage), sonst scenario=<id>
+  const [battle] = await Promise.all([
+    loadBattle(params, fetchJson),
     ensureCss('css/gefecht.css'),
     ensureCss('css/film.css'),
     ensureCss('css/feuerplan.css'), // P09: Editor und Zittern der Karte bei Einschlaegen
@@ -81,17 +82,26 @@ export async function mount(root, params) {
     Promise.all(['16px "Special Elite"', '16px "IBM Plex Mono"', '700 16px "IBM Plex Mono"', '700 16px "Caveat"', '16px "IBM Plex Sans"', '700 16px "IBM Plex Sans"']
       .map((f) => document.fonts.load(f))).catch(() => {}),
   ]);
+  const { scenario, mapJson, scenId, mode: modeInfo } = battle;
   const map = loadMap(mapJson);
-  const mode = params.get('mode') === 'hotseat' ? 'hotseat' : 'frei';
-  const seed = (num(params.get('seed'), 1917) >>> 0) || 1;
+  const mode = modeInfo?.kind === 'hotseat' ? 'hotseat' : 'frei';
+  // Tageslage: fuer alle dieselbe Lage, darum keine URL-Eingriffe in Wetter, Rundenart oder Gegner
+  const fixed = modeInfo?.kind === 'tageslage';
+  const seed = battle.seed ?? ((num(params.get('seed'), 1917) >>> 0) || 1);
   let state = createInitialState(map, scenario, seed);
   state = initEtappen(state, map, scenario); // P11: Etappe mit Grundausbau aus dem Szenario
-  if (params.get('kind') === 'battle') { state.turnKind = 'battle'; state.battle = { round: 1 }; }
-  applyWeatherParams(state, map, params);
+  if (!fixed && params.get('kind') === 'battle') { state.turnKind = 'battle'; state.battle = { round: 1 }; }
+  if (!fixed) applyWeatherParams(state, map, params);
   const humans = mode === 'hotseat' ? ['a', 'b'] : ['a'];
   const env = { map };
-  // KI-Kommandant (P13): Doktrin und Schwierigkeit aus dem Szenario (sides.b.ai), per URL &doktrin= &ki=
-  const aiCfg = { doctrine: params.get('doktrin') || scenario.sides.b.ai?.doctrine, difficulty: params.get('ki') || scenario.sides.b.ai?.difficulty };
+  // KI-Kommandant (P13): Doktrin und Schwierigkeit aus dem Szenario (sides.b.ai), per URL &doktrin= &ki=.
+  // Mit Marschbefehl (karte=) steckt die Wahl schon im Szenario; die Tageslage nimmt gar keine URL-Eingriffe an.
+  const sai = scenario.sides.b.ai ?? {};
+  const urlAi = { doctrine: params.get('doktrin') || undefined, difficulty: params.get('ki') || undefined };
+  let aiCfg;
+  if (fixed) aiCfg = { doctrine: sai.doctrine, difficulty: sai.difficulty };
+  else if (modeInfo?.map) aiCfg = { doctrine: sai.doctrine ?? urlAi.doctrine, difficulty: sai.difficulty ?? urlAi.difficulty };
+  else aiCfg = { doctrine: urlAi.doctrine ?? sai.doctrine, difficulty: urlAi.difficulty ?? sai.difficulty };
   let aiMemory;                 // Gedaechtnis der KI ueber die Runden
   let aiNext = null;            // { turn, decision }: Lasks naechster Zug, schon nach der Runde gerechnet (Notizen)
   let pendingNote = null;       // abgefangene Notiz, erscheint nach dem Phasenfilm
@@ -275,6 +285,12 @@ export async function mount(root, params) {
   });
   // Klang (P19): Knopf rechts, auf dem Handy als Karte in der Seitenleiste
   mountSoundControls({ bar: ui.querySelector('.hud-right'), sheet: ui.querySelector('.hud-sheet') });
+  // P17: Rundengrenze und Abschlussmeldung (Gefecht frei, Hotseat, Tageslage)
+  const rules = attachModeRules({
+    ui, info: modeInfo, map, start: structuredClone(state), scenario, humans, aiCfg,
+    onOpen: () => { modalOpen = true; cancelTool(false); radial.hide(); refresh(); },
+    onClose: () => { modalOpen = false; refresh(); dynCv.focus({ preventScroll: true }); },
+  });
   // Taktik-Lehrling (P13, Taste T) und abgefangene Notizen von Lask
   const lehrling = attachLehrling({
     ui, bar: ui.querySelector('.hud-right'), sheet: ui.querySelector('.hud-sheet'), decide, viewFor, map, env, seed, cfg: aiCfg,
@@ -395,7 +411,7 @@ export async function mount(root, params) {
     return {
       side,
       supplies: { ...s.supplies, carts: currentWagons(map, state, side, sidePlans[side]).length, cartsTotal: capacityOf(state, side) }, morale, reputation: s.reputation, trust: s.trust,
-      roundTitle: roundTitle(state) + (mode === 'hotseat' ? ` · ${faction(s.faction).short}` : ''),
+      roundTitle: roundTitle(state) + (mode === 'hotseat' ? ` · ${faction(s.faction).short}` : '') + rules.suffix(state),
       roundSub: battleNow
         ? `Minute ${clk.minutes} von ${BATTLE_ROUNDS * BATTLE_MINUTES} · ${clockText(state.clock)} Uhr · ${attacking ? 'Sturm läuft' : 'Der Gegner greift an'}`
         : `${daytime} · ${clockText(state.clock)} Uhr · ${weatherName(state.weather)} · Abschnitt ${sector}`,
@@ -654,6 +670,7 @@ export async function mount(root, params) {
   function openSummary(preset = 0) {
     if (modalOpen) return;
     if (state.result) { flash(state.result.reason); return; }
+    if (rules.ended) { rules.show(); return; }
     cancelTool(false);
     radial.hide();
     const orders = ordersNow();
@@ -689,6 +706,7 @@ export async function mount(root, params) {
         title: 'Befehle versiegelt',
         text: `Die Befehle von ${faction(state.sides[side].faction).name} sind verschlossen. Gib das Gerät an ${faction(state.sides[waiting].faction).name} weiter.`,
         button: `Weiter als ${faction(state.sides[waiting].faction).short}`,
+        to: faction(state.sides[waiting].faction).name, from: faction(state.sides[side].faction).name, note: state.turn,
         onGo: () => {
           modalOpen = false; side = waiting; updateLiveMap(); homeView(); onCamera();
           if (reportDue.has(side)) showReport();
@@ -748,6 +766,7 @@ export async function mount(root, params) {
     if (clockSnapDue && !filmReplay) snapClock();
     drawDynNow();
     dynCv.focus({ preventScroll: true });
+    if (!filmReplay) rules.afterFilm();
   }
 
   function openArchive() {
@@ -797,6 +816,7 @@ export async function mount(root, params) {
     const r = resolveTurn(state, ordersA, ordersB, seed, state.turn, env);
     const before = state;
     state = r.state;
+    rules.afterResolve(before, state, r.log);
     if (before.turnKind !== state.turnKind) clockSnapDue = true;
     hoverSight = null;
     lastLog = r.log;
@@ -843,6 +863,7 @@ export async function mount(root, params) {
         title: `Runde ${before.turn} ausgeführt`,
         text: `Das Telegramm liegt bereit. ${faction(state.sides[side].faction).name} sieht zuerst den Film der Runde.`,
         button: `Weiter als ${faction(state.sides[side].faction).short}`,
+        to: faction(state.sides[side].faction).name, from: 'Fernschreibstelle', note: state.turn,
         onGo: () => { modalOpen = false; homeView(); onCamera(); showReport(); refresh(); },
       });
     } else {
@@ -1147,6 +1168,12 @@ export async function mount(root, params) {
         if (humans.length === 1) api.select(own[0].id);
       }
     } else if (demo === 'uebergabe') { plan(); commitSide(); }
+    else if (demo === 'ende') {
+      // P17: Abschlussmeldung nach der letzten Stellungsrunde (Tageslage: 14)
+      const foe = groupsOf(state, otherSide(side));
+      foe[0].strength = Math.max(1, foe[0].strength - 4);
+      rules.forceEnd(state, { positionRounds: modeInfo.limit || 12, battles: 2, losses: { a: 6, b: 9 }, wounded: { a: 3, b: 4 }, returned: { a: 2, b: 0 } });
+    }
     else if (demo === 'zeichnen') {
       api.select(own[1].id);
       placeOrder({ group: own[1].id, type: 'redeploy', path: pathTo(own[1], 25, 21) });

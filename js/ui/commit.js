@@ -104,13 +104,45 @@ export function showSummary(root, s, { title, sub, onCommit, onCancel, preset = 
 }
 
 /** Uebergabe zwischen zwei Spielern an einem Geraet (Hotseat, Platzhalter fuer P17) */
-export function showHandover(root, { title, text, button, onGo }) {
+// Uebergabe im Hotseat (P17, Plan 9): ein verschlossener Umschlag auf leerem Papier. Er verraet nichts ueber den
+// Plan der anderen Seite (keine Zahl der Befehle, keine Dauer, keine Karte) und oeffnet sich erst, wenn das Siegel
+// eine Weile gedrueckt wird: ein versehentliches Tippen der abgebenden Person zeigt der naechsten nichts.
+const SEAL_MS = 700;
+const SEAL_NOTES = ['Nicht hineinsehen.', 'Nur für die Abschnittsführung.', 'Erst lesen, wenn allein.', 'Bitte umdrehen und warten.'];
+
+/**
+ * Uebergabebildschirm. opts: { title, text, button, onGo, to?, from?, note? }
+ * to/from: Namen der Fraktionen fuer die Anschrift, note: Zahl fuer die Bleistiftnotiz (z. B. die Runde).
+ */
+export function showHandover(root, { title, text, button, onGo, to = '', from = '', note = 0 }) {
   const m = modal(root, 'handover', title, null);
-  m.box.innerHTML = `<div class="stamp" aria-hidden="true">Verschlossen</div>
-    <b class="ho-title">${esc(title)}</b><p>${esc(text)}</p>
-    <button type="button" class="btn go">${esc(button)}</button>`;
+  m.box.classList.add('envelope');
+  const pencil = SEAL_NOTES[Math.abs(note | 0) % SEAL_NOTES.length];
+  m.box.innerHTML = `<svg class="env-flap" viewBox="0 0 100 40" preserveAspectRatio="none" aria-hidden="true"><path d="M0 0 L50 34 L100 0"/></svg>
+    <span class="env-seal" aria-hidden="true"></span>
+    <div class="stamp" aria-hidden="true">Verschlossen</div>
+    ${to ? `<p class="env-addr"><span>An</span> ${esc(to)}<br><span>Von</span> ${esc(from)}</p>` : ''}
+    <b class="ho-title">${esc(title)}</b><p class="ho-text">${esc(text)}</p>
+    <p class="env-note" aria-hidden="true">${esc(pencil)}</p>
+    <button type="button" class="btn go seal" aria-describedby="ho-hold"><span class="seal-fill" aria-hidden="true"></span><span class="seal-label">${esc(button)}</span></button>
+    <small id="ho-hold" class="ho-hold">Siegel gedrückt halten, bis es bricht.</small>`;
   const go = m.box.querySelector('.go');
-  go.addEventListener('click', () => { m.close(); onGo(); });
+  let t0 = 0, raf = 0, done = false;
+  const set = (p) => go.style.setProperty('--p', String(p));
+  const stop = () => { if (done) return; cancelAnimationFrame(raf); raf = 0; t0 = 0; set(0); go.classList.remove('holding'); };
+  const tick = (now) => {
+    const p = Math.min(1, (now - t0) / SEAL_MS);
+    set(p);
+    if (p >= 1) { done = true; go.classList.add('broken'); m.close(); onGo(); return; }
+    raf = requestAnimationFrame(tick);
+  };
+  const start = () => { if (done || raf) return; t0 = performance.now(); go.classList.add('holding'); raf = requestAnimationFrame(tick); };
+  go.addEventListener('pointerdown', (e) => { e.preventDefault(); go.setPointerCapture?.(e.pointerId); start(); });
+  for (const ev of ['pointerup', 'pointercancel', 'lostpointercapture']) go.addEventListener(ev, stop);
+  go.addEventListener('keydown', (e) => { if ((e.key === 'Enter' || e.key === ' ') && !e.repeat) { e.preventDefault(); start(); } });
+  go.addEventListener('keyup', (e) => { if (e.key === 'Enter' || e.key === ' ') stop(); });
+  go.addEventListener('click', (e) => e.preventDefault()); // nur Halten oeffnet
+  go.addEventListener('contextmenu', (e) => e.preventDefault());
   go.focus({ preventScroll: true });
   return m;
 }

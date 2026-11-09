@@ -16,9 +16,11 @@
   <p class="sub">Ein Frontabschnitt an der Asse. Jeder Meter Graben ist erkämpft.</p>
   <nav class="menu-list" aria-label="Hauptmenü">
     <button class="btn" disabled>Kampagne <small>in Arbeit</small></button>
-    <a class="btn" href="?scene=gefecht">Gefecht frei <small>Asse-Nord, 3 gegen 3</small></a>
-    <a class="btn" href="?scene=gefecht&amp;mode=hotseat">Hotseat <small>zwei an einem Gerät</small></a>
+    <a class="btn" href="?scene=gefecht-frei">Gefecht frei <small>vier Karten oder Zufall</small></a>
+    <a class="btn" href="?scene=tageslage" id="menu-tageslage">Tageslage <small>für alle dieselbe</small></a>
+    <a class="btn" href="?scene=gefecht-frei&amp;mode=hotseat">Hotseat <small>zwei an einem Gerät</small></a>
   </nav>
+  <button type="button" class="menu-sound" id="menu-sound" aria-pressed="false">Ton: tippen zum Wecken</button>
 </main>
 <div class="version" id="version"></div>
 <script type="module" src="js/main.js"></script>

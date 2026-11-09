@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04 # Playwright 1.50 kennt ubuntu-latest (26.04) noch nicht
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -35,3 +35,6 @@ jobs:
           node tools/shot.mjs --check --path "/?scene=gefecht"
           node tools/shot.mjs --check --path "/?scene=gefecht&demo=bericht"
           node tools/shot.mjs --check --path "/?scene=gefecht&mode=hotseat&demo=uebergabe&night=1"
+          node tools/shot.mjs --check --path "/?scene=gefecht-frei"
+          node tools/shot.mjs --check --path "/?scene=tageslage&tag=20261109"
+          node tools/shot.mjs --check --path "/?scene=gefecht&karte=zufall&kseed=7&runden=8&demo=ende"
