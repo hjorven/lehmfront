@@ -16,6 +16,7 @@
 // berechnet (mudAt). So bleibt der Zustand klein und jede Regel liest dieselbe Zahl.
 import { TERRAIN, cellAt, neighbors, distance } from './map.js';
 import { getCell } from './state.js';
+import { seasonWeather } from './config/seasons.js';
 
 export const WEATHER_KINDS = ['clear', 'overcast', 'rain', 'storm', 'fog'];
 export const WEATHER_NAMES = { clear: 'klar', overcast: 'bedeckt', rain: 'Regen', storm: 'Sturm', fog: 'Nebel', snow: 'Schnee' };
@@ -61,7 +62,8 @@ const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 /** Wetter der naechsten Stellungsrunde wuerfeln. Liefert ein neues weather-Objekt (ohne wet, das macht stepWet). */
 export function rollWeather(rng, prev) {
   const from = WEATHER_TABLE[prev?.kind] ? prev.kind : 'clear';
-  const row = WEATHER_TABLE[from];
+  // P22: Jahreszeit (state.weather.season) schaltet die Tabelle um
+  const row = (seasonWeather(prev?.season) ?? WEATHER_TABLE)[from];
   let roll = Math.floor(rng() * 100);
   let kind = from;
   for (const k of WEATHER_KINDS) {

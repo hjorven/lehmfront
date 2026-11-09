@@ -14,6 +14,7 @@ import './mission.js';
 import './morale.js';
 import './move.js';
 import './rebuild.js';
+import './season.js';
 import './supply.js';
 import './weather.js';
 import './wire.js';

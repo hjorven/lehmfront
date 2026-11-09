@@ -18,6 +18,14 @@ function isReload() {
  * Mission (bleibt bis zur Meldung gleich), so geht ein Einsatz auch nach dem Schliessen des Browsers weiter.
  */
 export async function resumeKeyFor(params) {
+  // P22: im Frontabschnitt gehoert die Akte zur laufenden Woche
+  if (params.has('endlos')) {
+    try {
+      const { weekStamp } = await import('./endless/store.js');
+      const w = weekStamp();
+      return w ? 'endlos-' + w : null;
+    } catch { return null; }
+  }
   if (!params.has('campaign')) return null;
   try {
     const { loadMissionStart } = await import('./campaign/store.js');

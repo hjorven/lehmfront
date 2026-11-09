@@ -7,7 +7,7 @@
 // VERSION haengt an der Liste: neue oder entfernte Dateien ergeben einen neuen Cache und den Update-Hinweis.
 
 // precache:start
-const VERSION = 'b228fd4b';
+const VERSION = 'b694fecf';
 const FILES = [
   'assets/fonts/caveat-latin-400-normal.woff2',
   'assets/fonts/caveat-latin-700-normal.woff2',
@@ -26,6 +26,7 @@ const FILES = [
   'css/feldzug.css',
   'css/feuerplan.css',
   'css/film.css',
+  'css/frontabschnitt.css',
   'css/gefecht.css',
   'css/graben.css',
   'css/karte.css',
@@ -99,6 +100,7 @@ const FILES = [
   'js/config/names.js',
   'js/config/orders.js',
   'js/config/reports.js',
+  'js/config/seasons.js',
   'js/config/supply.js',
   'js/config/units.js',
   'js/etappe-map.js',
@@ -115,10 +117,12 @@ const FILES = [
   'js/missions/run.js',
   'js/missions/script.js',
   'js/modes/board.js',
+  'js/modes/endless.js',
   'js/modes/load.js',
   'js/modes/skirmish.js',
   'js/morale.js',
   'js/narrative/casualties.js',
+  'js/narrative/endless.js',
   'js/narrative/interlude.js',
   'js/narrative/places.js',
   'js/narrative/sheets.js',
@@ -142,6 +146,7 @@ const FILES = [
   'js/phases/move.js',
   'js/phases/rebuild.js',
   'js/phases/registry.js',
+  'js/phases/season.js',
   'js/phases/supply.js',
   'js/phases/weather.js',
   'js/phases/wire.js',
@@ -165,6 +170,7 @@ const FILES = [
   'js/scenes/erzaehlung.js',
   'js/scenes/etappe.js',
   'js/scenes/feldzug.js',
+  'js/scenes/frontabschnitt.js',
   'js/scenes/gefecht-frei.js',
   'js/scenes/gefecht.js',
   'js/scenes/karte.js',
@@ -186,6 +192,8 @@ const FILES = [
   'js/ui/commit.js',
   'js/ui/daytime.js',
   'js/ui/dom.js',
+  'js/ui/endless/store.js',
+  'js/ui/endless/week.js',
   'js/ui/etappe-window.js',
   'js/ui/etappe3d/index.js',
   'js/ui/etappe3d/model.js',
