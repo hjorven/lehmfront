@@ -450,14 +450,23 @@ export function drawMapLayer(ctx, geo, cam, th, dpr = 1) {
       ctx.fill(t.path);
       continue;
     }
-    const outer = t.level === 1 ? tw * 0.5 : t.level === 3 ? tw * 1.3 : tw;
+    const outer = t.level === 1 ? tw * 0.5 : t.level === 4 ? tw * 1.5 : t.level === 3 ? tw * 1.3 : tw;
     ctx.strokeStyle = color;
     ctx.lineWidth = outer * px;
     ctx.stroke(t.path);
     if (t.level >= 2) {
       ctx.strokeStyle = th.paper;
-      ctx.lineWidth = Math.max(1, outer * (t.level === 3 ? 0.36 : 0.42)) * px;
+      ctx.lineWidth = Math.max(1, outer * (t.level >= 3 ? 0.36 : 0.42)) * px;
       ctx.stroke(t.path);
+    }
+    if (t.level === 4) {
+      // Betoniert: Fugen als kurze Querstriche in der Grabensohle
+      ctx.save();
+      ctx.strokeStyle = color;
+      ctx.lineWidth = Math.max(1, outer * 0.32) * px;
+      ctx.setLineDash([0.08, 0.22]);
+      ctx.stroke(t.path);
+      ctx.restore();
     }
     // Schuetzenauftritte: kurze Striche zur Feuerrichtung, erst beim Hineinzoomen
     if (z >= 26 && t.bays.length) {

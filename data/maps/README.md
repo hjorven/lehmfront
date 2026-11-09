@@ -12,7 +12,7 @@ Ein Feld sind 10 Meter.
 | `terrain` | Zeilen als Text, ein Zeichen je Feld: `.` Lehm, `k` Kreide, `f` Fels, `s` Sumpf, `w` Wald, `d` Dorf, `~` Wasser |
 | `heights` | Zeilen, Ziffer 0 bis 3 je Feld |
 | `zones` | Zeilen: `E` Etappe, `S` Stellung (eigen), `N` Niemandsland, `s` Stellung (Feind), `e` Etappe (Feind) |
-| `trenches` | `{x, y, side: own/enemy, kind: fire/comm, level: 1..3, facing: N/NE/E/SE/S/SW/W/NW}` je Grabenfeld. `fire` = Feuergraben (Rechteckwelle), `comm` = Laufgraben (Zickzack) |
+| `trenches` | `{x, y, side: own/enemy, kind: fire/comm, level: 1..4 (Schützenloch, Schützengraben, ausgebaut, betoniert), facing: N/NE/E/SE/S/SW/W/NW}` je Grabenfeld. `fire` = Feuergraben (Rechteckwelle), `comm` = Laufgraben (Zickzack) |
 | `wire` | `{x, y, side}` je Drahtfeld |
 | `craters` | `{x, y, size: 1/2}` |
 | `rails` | `[x, y]` je Gleisfeld (Feldbahn) |

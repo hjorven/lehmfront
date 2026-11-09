@@ -178,15 +178,15 @@ test('Werkzeug-Register: Bewegen und Halten, Tasten eindeutig', () => {
   assert.equal(toolByKey('B').id, 'move');
   assert.equal(toolByKey('h').id, 'hold');
   assert.throws(() => registerTool({ id: 'x', key: 'b', label: 'X', canUse: () => true, begin() {} }), /schon an move/);
-  registerTool({ id: 'test-graben', key: 'g', label: 'Graben', order: 10, canUse: () => 'Nur Pioniere', begin() {} });
+  registerTool({ id: 'test-probe', key: 'q', label: 'Probe', order: 1, canUse: () => 'Nur Pioniere', begin() {} });
   try {
-    assert.equal(allTools()[0].id, 'test-graben');
+    assert.equal(allTools()[0].id, 'test-probe');
     const s = fresh();
-    assert.deepEqual(usable(toolByKey('g'), s.groups[0], s), { ok: false, why: 'Nur Pioniere' });
+    assert.deepEqual(usable(toolByKey('q'), s.groups[0], s), { ok: false, why: 'Nur Pioniere' });
     assert.equal(usable(toolByKey('b'), null, s).ok, false);
     assert.equal(usable(toolByKey('b'), s.groups[0], s).ok, true);
   } finally {
-    unregisterTool('test-graben');
+    unregisterTool('test-probe');
   }
 });
 
