@@ -24,6 +24,7 @@ registerStat('verwundete_liegen', ({ rounds, side }) => {
 registerStat('gefangene', ({ rounds, side }) => sum(rounds, side, 'prisoners', 'count'));
 registerStat('felder_gewonnen', ({ rounds, side }) => count(rounds, side, 'trench_taken'));
 registerStat('felder_verloren', ({ rounds, side }) => count(rounds, side, 'trench_lost'));
+// Stellungsrunden; Gefechtsrunden (kind 'battle') liegen dazwischen und zaehlen nicht
 registerStat('runden', ({ rounds }) => rounds.filter((r) => r.kind !== 'battle').length);
 registerStat('depot_leer', ({ rounds, side }) => count(rounds, side, 'depot_empty'));
 registerStat('abloesung_verspaetet', ({ rounds, side }) => count(rounds, side, 'relief_late'));

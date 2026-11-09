@@ -44,7 +44,7 @@
 .narr-btn-main{margin-left:auto; background:var(--btn-main); color:var(--btn-main-ink); border-color:var(--btn-main); font-weight:700; min-width:128px}
 .narr-btn small{font:400 11px/1 var(--font-num); opacity:.75; margin-left:6px}
 .narr-progress{display:flex; gap:3px; align-items:flex-end; flex:1 1 auto; min-width:0; overflow:hidden; height:22px}
-.narr-progress i{display:block; flex:0 0 8px; height:12px; background:var(--bar-line); opacity:.35; transform:rotate(-4deg)}
+.narr-progress i{display:block; flex:0 1 8px; min-width:2px; height:12px; background:var(--bar-line); opacity:.35; transform:rotate(-4deg)}
 .narr-progress i.is-done{opacity:.9}
 .narr-progress i.is-now{height:18px; opacity:1; background:var(--bar-ink)}
 .narr-progress i.is-decision{background:var(--book-red)}
@@ -118,7 +118,7 @@
 .journal-nav span{font:400 13px/1 var(--font-num)}
 
 /* Buch des Abschnitts: Namen mit Bleistift, neue Namen werden beim Oeffnen eingetragen */
-.journal-ledger h4{margin:18px 0 2px; font:400 13px/1.3 var(--font-head); color:var(--book-ink2); letter-spacing:.06em; text-transform:uppercase; border-bottom:1px solid var(--book-ink2)}
+.journal-ledger h4{margin:30px 0 0; font:400 13px/30px var(--font-head); color:var(--book-ink2); letter-spacing:.06em; text-transform:uppercase}
 .journal-ledger ol{list-style:none; margin:0; padding:0}
 .journal-ledger li{display:grid; grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr); gap:2px 10px; align-items:baseline; min-height:30px; color:var(--book-pencil)}
 .journal-ledger .n{font:700 21px/30px var(--font-hand); color:var(--book-ink)}
@@ -141,16 +141,17 @@
 .journal-slot.is-empty span{display:grid; place-items:center; height:100%; font:700 26px/1 var(--font-hand)}
 .journal-slot .paper-art{width:100%; height:auto; aspect-ratio:220/160; margin:0; transform:rotate(-2deg)}
 .journal-slot b{display:block; margin-top:4px; font:400 15px/1.1 var(--font-hand)}
-.journal-find h3{margin-top:4px}
-.journal-find .paper-art{max-width:320px}
-.journal-find .journal-back{font:400 18px/1.35 var(--font-hand); color:var(--letter-ink, #24324f); border-left:2px solid var(--book-ink2); padding-left:10px}
+.journal-more{margin-top:6px; min-height:44px; padding:6px 12px; border:1px solid var(--book-ink2); border-radius:3px; background:transparent; color:var(--book-ink); cursor:pointer; font:700 19px/1 var(--font-hand)}
 
 /* Briefe: Liste, Antippen legt den Brief auf den Tisch */
 .journal-letters{list-style:none; margin:0; padding:0}
 .journal-letters li{border-bottom:1px solid var(--book-rule)}
 .journal-letters button{display:flex; justify-content:space-between; gap:10px; width:100%; min-height:44px; padding:6px 2px; border:0; background:transparent; color:var(--book-ink); cursor:pointer; text-align:left; font:400 19px/1.2 var(--font-hand)}
 .journal-letters small{font:400 12px/1.2 var(--font-head); color:var(--book-ink2); white-space:nowrap}
-.journal-paper{position:fixed; inset:0; z-index:75; pointer-events:none}
+.journal-paper{position:fixed; inset:0; z-index:75; pointer-events:none; overflow:hidden}
+.journal-paper.is-open{pointer-events:auto; overflow-x:hidden; overflow-y:auto; overscroll-behavior:contain; -webkit-overflow-scrolling:touch; background:color-mix(in srgb, var(--book-cover) 30%, transparent)}
+.journal-paper-host{position:relative; min-height:100%}
+.journal-paper .paper-sheet{touch-action:pan-y}
 .journal-paper .paper-pile{display:none}
 
 @media (max-width: 720px){

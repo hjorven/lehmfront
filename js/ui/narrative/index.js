@@ -16,7 +16,7 @@
 import { loadTexts, loadNarrativeStyles } from './load.js';
 import { playSteps } from './reader.js';
 import { openJournal } from './journal.js';
-import { buildInterlude, buildPrologue, applyChoice, followUpSteps, recordInterlude, createCampaign, missionTitle } from '../../narrative/interlude.js';
+import { buildInterlude, buildPrologue, applyChoice, followUpSteps, recordInterlude, createCampaign, missionTitle, tailSteps } from '../../narrative/interlude.js';
 
 export { createCampaign, loadTexts };
 
@@ -31,7 +31,12 @@ export async function playInterlude(input) {
   let campaign = input.campaign;
   const extraDiary = [];
   const snapshot = () => recordInterlude(campaign, built, { extraDiary });
-  const fresh = built.book.fallen.map((f) => f.name);
+  let fresh = built.book.fallen.map((f) => f.name);
+  const freshOnce = () => {
+    const f = fresh;
+    fresh = [];
+    return f;
+  };
   let journal = null;
   const reader = playSteps({
     steps: built.steps,
@@ -44,11 +49,13 @@ export async function playInterlude(input) {
       campaign = applyChoice(campaign, index, decisionId, optionId);
       const more = followUpSteps(index, campaign, built, decisionId);
       for (const s of more) extraDiary.push(s.entry);
-      return more;
+      // Briefing, Befehl und weitere Entscheidungen mit den Flags nach der Wahl neu aufloesen
+      return { extra: more, tail: tailSteps(index, campaign, built) };
     },
     onJournal() {
       if (journal) return;
-      journal = openJournal({ campaign: snapshot(), index, fresh, onClose: () => (journal = null) });
+      // Erst beim ersten Oeffnen in dieser Zwischenszene schreibt der Bleistift die neuen Namen ein
+      journal = openJournal({ campaign: snapshot(), index, fresh: freshOnce(), onClose: () => (journal = null) });
     },
   });
   const { choices } = await reader.done;
@@ -70,7 +77,7 @@ export async function playPrologue({ campaign = createCampaign(), mission = 'a1m
     stats: () => ({ ansehen: c.ansehen, vertrauen: c.vertrauen }),
     onChoice(decisionId, optionId) {
       c = applyChoice(c, index, decisionId, optionId);
-      return followUpSteps(index, c, built, decisionId);
+      return { extra: followUpSteps(index, c, built, decisionId), tail: tailSteps(index, c, built) };
     },
   });
   const { choices } = await reader.done;

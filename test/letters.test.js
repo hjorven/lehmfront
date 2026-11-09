@@ -175,3 +175,13 @@ test('jede Vorlage und jeder Ereignissatz laesst sich vollstaendig fuellen', () 
     assert.deepEqual(placeholdersIn(fill(t.text, values)), [], t.id);
   }
 });
+
+test('frueher Gefallene schreiben keine Briefe mehr, Anreden wiederholen sich erst, wenn alle vergeben sind', () => {
+  const first = run({ count: 6, seed: 12 });
+  const writers = first.map((l) => l.writer.name);
+  const later = run({ count: 6, seed: 12, used: writers });
+  assert.ok(later.every((l) => !writers.includes(l.writer.name)));
+  const anreden = templates.filter((t) => t.art === 'anrede' && (!t.fraktion || t.fraktion === 'kaldern')).map((t) => t.text);
+  const used = first.map((l) => anreden.find((a) => l.text.startsWith(a + ',')));
+  assert.equal(new Set(used).size, Math.min(used.length, anreden.length));
+});

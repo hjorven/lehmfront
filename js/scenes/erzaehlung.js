@@ -11,7 +11,7 @@
 import { loadTexts, loadNarrativeStyles } from '../ui/narrative/load.js';
 import { playSteps } from '../ui/narrative/reader.js';
 import { openJournal } from '../ui/narrative/journal.js';
-import { buildInterlude, buildPrologue, applyChoice, followUpSteps, recordInterlude, createCampaign, missionTitle } from '../narrative/interlude.js';
+import { buildInterlude, buildPrologue, applyChoice, followUpSteps, recordInterlude, createCampaign, missionTitle, tailSteps } from '../narrative/interlude.js';
 import { MISSIONS } from '../narrative/texts.js';
 
 const WEATHER_KIND = { trocken: 'clear', regen: 'rain', schlamm: 'mud', nebel: 'fog', frost: 'frost', schnee: 'snow' };
@@ -118,7 +118,7 @@ export async function mount(root, params) {
     });
     let c = campaign;
     const extra = [];
-    const fresh = built.book.fallen.map((f) => f.name);
+    let fresh = built.book.fallen.map((f) => f.name);
     let journal = null;
     const r = playSteps({
       steps: built.steps,
@@ -130,11 +130,12 @@ export async function mount(root, params) {
         c = applyChoice(c, index, id, opt);
         const more = followUpSteps(index, c, built, id);
         extra.push(...more.map((s) => s.entry));
-        return more;
+        return { extra: more, tail: tailSteps(index, c, built) };
       },
       onJournal() {
         if (journal) return;
         journal = openJournal({ campaign: recordInterlude(c, built, { extraDiary: extra }), index, fresh, onClose: () => (journal = null) });
+        fresh = [];
       },
     });
     if (params.get('wahl')) r.choose(params.get('wahl'));

@@ -10,7 +10,7 @@
 // daraus Wasserraender, Lehmfinger, Wachstropfen (Ueberraschung des Pakets P15).
 import { createRng } from './rng.js';
 import { matches, fill, numberWord, placeholdersIn, hashText } from './narrative/texts.js';
-import { makeSoldierName } from './narrative/casualties.js';
+import { makeSoldierName, blockLeaders } from './narrative/casualties.js';
 import { placePhrase } from './narrative/places.js';
 
 export const TONES = ['zuversichtlich', 'erschoepft', 'verbittert'];
@@ -160,8 +160,9 @@ export function generateFieldPost(opts) {
   const weather = weatherWord(opts.weather ?? state?.weather?.kind);
   const night = opts.night ?? state?.night ?? false;
   const rng = createRng(hashText(`feldpost|${seed}|${mission}|${side}`));
-  const used = new Set([...casualties.fallen, ...casualties.wounded].map((c) => c.name));
-  for (const g of Object.values(groups)) if (g.leader) used.add(g.leader);
+  // Vergeben: Namen dieser Mission, frueher Gefallene (opts.used, Buch des Abschnitts), Gruppenfuehrer
+  const used = new Set([...(opts.used ?? []), ...casualties.fallen.map((c) => c.name), ...casualties.wounded.map((c) => c.name)]);
+  blockLeaders(used, groups);
 
   const anreden = templates.filter((e) => e.art === 'anrede' && (!e.fraktion || e.fraktion === faction)).sort(byId);
   const sentences = templates.filter((e) => e.art === 'ereignis').sort(byId);
@@ -182,6 +183,7 @@ export function generateFieldPost(opts) {
   }
 
   const usedTemplates = new Set();
+  const usedAnreden = new Set();
   const usedSentences = new Set();
   const usedCats = new Map();
   const out = [];
@@ -222,7 +224,9 @@ export function generateFieldPost(opts) {
 
     const writer = makeSoldierName(rng, faction, used);
     const comrade = exp.wounded && cat === 'verwundet' ? { name: exp.wounded.name } : makeSoldierName(rng, faction, used);
-    const anrede = pickOne(rng, anreden);
+    const freshAnreden = anreden.filter((a) => !usedAnreden.has(a.id));
+    const anrede = pickOne(rng, freshAnreden.length ? freshAnreden : anreden);
+    usedAnreden.add(anrede.id);
     const place = placePhrase(map, exp.at);
     // Die Pruefstelle schwaerzt militaerische Orte, bei verbitterten Briefen jeden Ort
     const censorPlace = place.sensitive || (tone === 'verbittert' && !!place.name);

@@ -18,3 +18,7 @@ Neue Ideen landen hier, nicht im Code (Plan 13). Mit Datum und Paket, aus dem si
 - 2026-11-09, P09: Schwere Granaten, die nicht explodieren (Blindgänger), bleiben als Bleistiftkreuz auf der Karte und können Wochen später einen Graben sperren, bis ein Pionier sie räumt.
 - 2026-11-09, P11: Nachts könnte die Feldküche nur abgedunkelt kochen (weniger Moral, kein Rauch), am Tag mit voller Wirkung, aber sichtbar: eine Umschaltung im Etappenfenster "Essen bei Nacht".
 - 2026-11-09, P11: Aufgeklärte Gebäude des Gegners könnten auf der eigenen Lagekarte als Bleistiftskizze aus Luftbild oder Gefangenenaussage erscheinen, mit Datum der Meldung.
+- 2026-11-09, P15: Antworten von zu Hause: Zwischen zwei Missionen kommt gelegentlich ein Brief zurück an jemanden aus dem Abschnitt, der inzwischen gefallen ist. Er geht ungeöffnet mit dem Vermerk „Empfänger gefallen, zurück an Absender“ in die Ablage.
+- 2026-11-09, P15: Das Buch des Abschnitts könnte im Endlosmodus weitergeführt werden und beim Ende als letzte Seite die Summe aller Namen nennen, ohne Kommentar.
+- 2026-11-09, P15: Feldpost einer Gruppe, die lange vorn war, könnte zunehmend kürzer werden (Vorlage kürzen nach `abloesung_verspaetet`).
+

@@ -47,13 +47,21 @@ registerKind('decision', {
         ]), { type: 'button' }),
       ]),
     );
-    opts.forEach((li, i) => (li.firstChild.dataset.option = d.options[i].id));
+    opts.forEach((li, i) => {
+      const b = li.firstChild;
+      b.dataset.option = d.options[i].id;
+      // Schon gewaehlt (Blatt aus der Ablage zurueckgeholt): Wahl zeigen, Knoepfe sperren
+      if (d.chosen) {
+        b.disabled = true;
+        if (d.chosen === d.options[i].id) b.classList.add('is-chosen');
+      }
+    });
     const front = el('div', 'narr-dec-body', [
       el('div', 'narr-dec-head', [el('b', null, 'ENTSCHEIDUNG'), el('span', null, 'Major Brandt')]),
       el('h3', 'narr-dec-title', d.title || ''),
       ...paras(d.body).map((p) => el('p', 'narr-dec-p', p)),
       el('ol', 'narr-options', opts),
-      el('div', 'narr-dec-result'),
+      el('div', 'narr-dec-result', d.chosen ? d.options.find((o) => o.id === d.chosen)?.text ?? '' : ''),
     ]);
     return { front, title: 'Entscheidung: ' + (d.title || '') };
   },

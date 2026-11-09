@@ -15,7 +15,8 @@ import { hashText } from './texts.js';
 /** Hauptfiguren und erzaehlte Tote werden nie zufaellig vergeben */
 const STORY_NAMES = new Set(['Ilse Brandt', 'Otto Harms', 'Jost Vell', 'Tjark Boysen', 'Folkert Ubben', 'Hinrich Tiedemann', 'Maren Tiedemann', 'Teodor Lask', 'Ruta Lask', 'Mira Selin']);
 // Nachnamen von Figuren der Geschichte: ein zufaelliger "Maren Boysen" waere eine falsche Spur
-const STORY_SURNAMES = new Set(['Brandt', 'Harms', 'Vell', 'Lask', 'Selin', 'Boysen', 'Ubben', 'Tiedemann', 'Fedders', 'Aurach', 'Kalnis']);
+// Auch Absender und Empfaenger der festen Briefe (data/letters): Albers, Lohmann, Vos, Ebens, bei Morrow Dravin
+const STORY_SURNAMES = new Set(['Brandt', 'Harms', 'Vell', 'Lask', 'Selin', 'Boysen', 'Ubben', 'Tiedemann', 'Fedders', 'Aurach', 'Kalnis', 'Albers', 'Lohmann', 'Vos', 'Ebens', 'Dravin']);
 
 const CAUSES = {
   enfilade: 'Längsfeuer',
@@ -63,12 +64,13 @@ function surnameOf(n) {
 /** Erzeugt einen Soldatennamen, der noch nicht vergeben ist */
 export function makeSoldierName(rng, factionId, used) {
   const pool = NAMES[factionId] ?? NAMES.kaldern;
-  const first = [...pool.first, ...(pool.firstWomen ?? [])];
+  const first = [...pool.first, ...(pool.women === false ? [] : pool.firstWomen ?? [])];
   const lasts = [...pool.last, ...(pool.soldierLast ?? [])];
   for (let i = 0; i < 60; i++) {
     const last = lasts[Math.floor(rng() * lasts.length)];
     const name = first[Math.floor(rng() * first.length)] + ' ' + last;
-    if (STORY_NAMES.has(name) || STORY_SURNAMES.has(last) || (pool.reserved ?? []).includes(name) || used.has(name)) continue;
+    // '~Nachname' in used sperrt einen Nachnamen (z. B. den der Gruppenfuehrer: sonst wirkt der Gefallene wie ein Verwandter)
+    if (STORY_NAMES.has(name) || STORY_SURNAMES.has(last) || (pool.reserved ?? []).includes(name) || used.has(name) || used.has('~' + last)) continue;
     used.add(name);
     return { name, home: pool.homes[Math.floor(rng() * pool.homes.length)] };
   }
@@ -85,7 +87,7 @@ export function makeSoldierName(rng, factionId, used) {
 export function rollCasualties(rounds, opts) {
   const { side, faction = 'kaldern', seed = 0, mission = '', groups = {} } = opts;
   const used = new Set(opts.used ?? []);
-  for (const g of Object.values(groups)) if (g.leader) used.add(g.leader);
+  blockLeaders(used, groups);
   const fallen = [];
   const wounded = [];
   const sorted = [...rounds].sort((a, b) => a.turn - b.turn);
@@ -142,13 +144,23 @@ export function rollCasualties(rounds, opts) {
   return { fallen, wounded };
 }
 
+/** Gruppenfuehrer vergeben, ihre Nachnamen fuer Zufallsnamen gesperrt */
+export function blockLeaders(used, groups) {
+  for (const g of Object.values(groups)) {
+    if (!g.leader) continue;
+    used.add(g.leader);
+    used.add('~' + surnameOf(g.leader));
+  }
+}
+
 /** Gruppen-Steckbriefe fuer rollCasualties aus einem Spielzustand (Nummern wie in der Oberflaeche) */
-export function groupInfoFrom(state, side) {
+export function groupInfoFrom(state, side, faction = 'kaldern') {
+  const unit = faction === 'morrow' ? 'Rotte' : 'Gruppe';
   const own = state.groups.filter((g) => g.side === side).map((g) => g.id).sort();
   const out = {};
   for (const g of state.groups) {
     if (g.side !== side) continue;
-    out[g.id] = { label: `${own.indexOf(g.id) + 1}. Gruppe`, leader: g.leader?.name ?? null, home: g.leader?.home ?? '', type: g.type };
+    out[g.id] = { label: `${own.indexOf(g.id) + 1}. ${unit}`, leader: g.leader?.name ?? null, home: g.leader?.home ?? '', type: g.type };
   }
   return out;
 }

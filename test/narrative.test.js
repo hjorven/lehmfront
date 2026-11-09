@@ -6,7 +6,7 @@ import { indexTexts, matches, pickSlot, resolveEntries, fill, numberWord, nextMi
 import { rollCasualties, makeSoldierName, fixedDeathsAfter, groupInfoFrom } from '../js/narrative/casualties.js';
 import { missionStats } from '../js/narrative/stats.js';
 import { placePhrase } from '../js/narrative/places.js';
-import { buildInterlude, buildPrologue, applyChoice, followUpSteps, recordInterlude, createCampaign } from '../js/narrative/interlude.js';
+import { buildInterlude, buildPrologue, applyChoice, followUpSteps, recordInterlude, createCampaign, tailSteps } from '../js/narrative/interlude.js';
 import { splitLetter, orderSheet, consequenceText, actSheet, findSheet } from '../js/narrative/sheets.js';
 import { createRng } from '../js/rng.js';
 import { TEXT_FILES } from '../js/ui/narrative/load.js';
@@ -101,9 +101,39 @@ test('Zufallsnamen meiden Hauptfiguren und Familien der Geschichte', () => {
   const rng = createRng(1);
   for (let i = 0; i < 200; i++) {
     const { name } = makeSoldierName(rng, 'kaldern', used);
-    assert.ok(!/\b(Brandt|Harms|Vell|Boysen|Ubben|Tiedemann|Fedders)$/.test(name), name);
+    assert.ok(!/\b(Brandt|Harms|Vell|Boysen|Ubben|Tiedemann|Fedders|Albers|Lohmann|Vos|Ebens)$/.test(name), name);
   }
   assert.equal(used.size, 200);
+  // Nachnamen der Gruppenfuehrer gesperrt, Morrow ohne Frauennamen (names.json women:false)
+  const c = rollCasualties(rounds, { side: 'a', faction: 'kaldern', seed: 5, mission: 'a1m1', groups: { a01: { label: '1. Gruppe', leader: 'Gerd Siebels' }, ...groups } });
+  assert.ok(c.fallen.every((f) => f.leader || !f.name.endsWith(' Siebels')));
+  const names = read('data/names.json');
+  const morrowUsed = new Set();
+  for (let i = 0; i < 100; i++) {
+    const { name } = makeSoldierName(rng, 'morrow', morrowUsed);
+    assert.ok(!(names.morrow.firstWomen ?? []).includes(name.split(' ')[0]), name);
+    assert.ok(!name.endsWith(' Dravin'), name);
+  }
+});
+
+test('Wahl schaltet Briefing der naechsten Mission um (a2m5 vell_angriff), Neuaufloesung nach der Wahl', () => {
+  let campaign = createCampaign({ flags: ['harms_gefallen'] });
+  const built = buildInterlude(index, { campaign, mission: 'a2m4', outcome: 'sieg', rounds: [], groups, seed: 2 });
+  const dec = built.steps.find((s) => s.kind === 'decision' && s.entry === 'a2m5.entscheidung');
+  assert.ok(dec && dec.tail);
+  assert.ok(built.steps.some((s) => s.entry === 'a2m5.briefing'));
+  campaign = applyChoice(campaign, index, 'a2m5.entscheidung', 'gehen');
+  const tail = tailSteps(index, campaign, built);
+  assert.ok(tail.every((s) => s.tail));
+  assert.ok(!tail.some((s) => s.entry === 'a2m5.entscheidung'), 'gewaehlte Entscheidung kommt nicht wieder');
+  assert.ok(tail.some((s) => s.entry === 'a2m5.briefing.angriff'));
+  assert.ok(!tail.some((s) => s.entry === 'a2m5.briefing'));
+});
+
+test('nach a4m6 keine Briefe und keine Feldpost (Schlusssequenz P26)', () => {
+  const built = buildInterlude(index, { campaign: createCampaign({ flags: ['ende_waffenstillstand'] }), mission: 'a4m6', outcome: 'sieg', rounds, groups, finalState, seed: 2 });
+  assert.equal(built.next, null);
+  assert.ok(!built.steps.some((s) => s.kind === 'letter' || s.kind === 'fieldpost' || s.kind === 'lask'));
 });
 
 test('feste Tote nach a2m2, Gruppen-Steckbriefe aus dem Zustand', () => {

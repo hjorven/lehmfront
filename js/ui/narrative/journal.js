@@ -129,12 +129,12 @@ function pagesFor(tab, { campaign, index, fresh, openSheets }) {
           ]));
           return b;
         });
-        const heading = el('h4', null, [complete && end ? end.titel : c.items[0]?.titel ?? c.id, el('small', null, `${have} / ${c.items.length}`)]);
+        // Der Name einer Spur zeigt sich erst, wenn sie vollstaendig ist
+        const heading = el('h4', null, [complete && end ? end.titel : `Spur ${chains.indexOf(c) + 1}`, el('small', null, `${have} / ${c.items.length}`)]);
         const chainEl = el('div', 'journal-chain', [heading, el('div', 'journal-slots', slots)]);
         if (complete && end) {
-          const b = el('button', 'narr-btn', 'Wie es ausging');
+          const b = el('button', 'journal-more', 'Wie es ausging');
           b.type = 'button';
-          b.style.marginTop = '6px';
           b.addEventListener('click', () => openSheets([{ id: end.id, kind: 'diary', date: 'Nachtrag', title: end.titel, body: end.text, sketch: false }]));
           chainEl.append(b);
         }
@@ -149,7 +149,7 @@ function pagesFor(tab, { campaign, index, fresh, openSheets }) {
     if (l.fieldpost) return { l, label: `Feldpost von ${l.fieldpost.writer.name}`, meta: l.fieldpost.groupLabel, sheet: () => fieldPostSheet(l.fieldpost) };
     const e = index.byId.get(l.id);
     if (!e) return null;
-    const label = e.art === 'lask' ? `${e.absender} an ${e.empfaenger}` : `${e.absender} an ${e.empfaenger}`;
+    const label = `${e.absender} an ${e.empfaenger}`;
     const meta = e.art === 'lask' ? 'abgefangen' : `Brief ${e.nr ?? ''}`;
     return { l, label, meta, sheet: () => letterSheet(e, e.art === 'lask' ? { title: 'Abgefangener Brief' } : {}) };
   }).filter(Boolean);
@@ -198,28 +198,59 @@ export function openJournal({ campaign, index, fresh = [], tab = null, onClose =
   const root = el('div', 'journal', bookEl);
   root.setAttribute('role', 'dialog');
   root.setAttribute('aria-label', 'Tagebuch der Kommandantin');
-  const paperHost = el('div', 'journal-paper');
+  // Blaetter aus dem Tagebuch liegen in einer eigenen, scrollbaren Ebene: lange Briefe passen auf dem Handy nicht
+  // auf den Schirm. Tippen neben die Blaetter legt sie weg.
+  const paperHost = el('div', 'journal-paper-host');
+  const paperScroll = el('div', 'journal-paper', paperHost);
   const putAway = el('button', 'narr-btn', 'Blätter weglegen');
   putAway.type = 'button';
   putAway.hidden = true;
   Object.assign(putAway.style, { position: 'fixed', left: '50%', bottom: '12px', transform: 'translateX(-50%)', zIndex: 76, pointerEvents: 'auto', background: 'var(--bar)', color: 'var(--bar-ink)' });
-  root.append(paperHost, putAway);
+  root.append(paperScroll, putAway);
+  // Was unter dem Tagebuch liegt (der Tisch), ist fuer Tastatur und Vorleser gesperrt, solange es offen ist
+  const under = [...document.body.children].filter((n) => n !== root && !n.inert);
+  const returnFocus = document.activeElement;
+  under.forEach((n) => (n.inert = true));
   document.body.append(root);
-  const paper = createPaperLayer(paperHost, { light: 'auto', hooks: paperHooks({ onDismiss: () => queueMicrotask(() => (putAway.hidden = paper.ids().length === 0)) }) });
+  const setOpen = (open) => {
+    putAway.hidden = !open;
+    paperScroll.classList.toggle('is-open', open);
+    if (!open) paperHost.style.minHeight = '';
+  };
+  const paper = createPaperLayer(paperHost, { light: 'auto', hooks: paperHooks({ onDismiss: () => queueMicrotask(() => setOpen(paper.ids().length > 0)) }) });
+  const nodeOf = (id) => [...paperHost.querySelectorAll('.paper-sheet')].find((n) => n.dataset.id === id);
 
   function openSheets(list) {
     paper.clear();
-    const w = paperHost.clientWidth || innerWidth;
+    setOpen(true);
+    paperScroll.scrollTop = 0;
+    const w = paperScroll.clientWidth || innerWidth;
+    const narrow = w < 720;
+    // Platz schaffen, damit die Ebene untereinander gelegte Blaetter nicht an den Rand klemmt
+    paperHost.style.minHeight = list.length * 1400 + 'px';
+    let y = 60;
+    let bottom = 0;
     list.forEach((s, i) => {
       const sw = Math.min(s.kind === 'photo' ? 240 : 320, w - 24);
-      const x = w < 720 ? (w - sw) / 2 + i * 10 : w / 2 - sw - 10 + i * (sw + 20) * (list.length > 1 ? 1 : 0.5);
-      paper.add(s, { x: Math.max(8, x), y: 60 + i * (w < 720 ? 120 : 0), rot: i % 2 ? 2 : -2 });
+      // Handy: untereinander statt uebereinander, Desktop: nebeneinander
+      const x = narrow ? (w - sw) / 2 + (i % 2 ? 6 : -6) : w / 2 - sw - 10 + i * (sw + 20) * (list.length > 1 ? 1 : 0.5);
+      paper.add(s, { x: Math.max(8, x), y: narrow ? y : 60, rot: i % 2 ? 1.5 : -1.5 });
+      const h = nodeOf(s.id)?.offsetHeight ?? 400;
+      if (narrow) y += h + 24;
+      bottom = Math.max(bottom, (narrow ? y : 60 + h + 24));
     });
-    putAway.hidden = false;
+    // Unten Luft fuer den Knopf "Blätter weglegen"
+    paperHost.style.minHeight = Math.max(paperScroll.clientHeight, bottom + 80) + 'px';
   }
   putAway.addEventListener('click', () => {
     paper.clear();
-    putAway.hidden = true;
+    setOpen(false);
+  });
+  paperScroll.addEventListener('click', (e) => {
+    if (e.target === paperScroll || e.target === paperHost) {
+      paper.clear();
+      setOpen(false);
+    }
   });
 
   const tabBtns = TABS.map(([id, label]) => {
@@ -239,11 +270,15 @@ export function openJournal({ campaign, index, fresh = [], tab = null, onClose =
   const single = () => (root.clientWidth || innerWidth) < 720;
 
   let built = [];
+  // Neue Namen schreibt der Bleistift nur beim ersten Aufschlagen ein, nicht bei jedem Blaettern
+  let freshNow = fresh;
+  let wasSingle = single();
   function render() {
     paper.clear();
-    putAway.hidden = true;
+    setOpen(false);
+    wasSingle = single();
     tabBtns.forEach((b) => b.setAttribute('aria-selected', String(b.dataset.tab === current)));
-    built = pagesFor(current, { campaign, index, fresh, openSheets });
+    built = pagesFor(current, { campaign, index, fresh: freshNow, openSheets });
     const per = single() ? 1 : 2;
     // Neue Namen: gleich auf der Seite mit dem letzten Eintrag aufschlagen
     if (page === 'end') page = Math.max(0, built.length - per);
@@ -260,6 +295,7 @@ export function openJournal({ campaign, index, fresh = [], tab = null, onClose =
     if (freshRows && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
       for (let i = 0; i < Math.min(freshRows, 6); i++) playSfx('pencil', { delay: 0.3 + i * 0.45 });
     }
+    if (freshRows) freshNow = [];
     count.textContent = built.length > per ? `Seite ${page + 1}${per === 2 && shown.length > 1 ? '–' + (page + 2) : ''} von ${built.length}` : '';
     prev.disabled = page === 0;
     next.disabled = page + per >= built.length;
@@ -274,10 +310,19 @@ export function openJournal({ campaign, index, fresh = [], tab = null, onClose =
     render();
   });
 
+  // Handy gedreht: zwischen Doppelseite und Einzelseite wechseln
+  function onResize() {
+    if (single() !== wasSingle) render();
+  }
+  addEventListener('resize', onResize);
+
   function close() {
     removeEventListener('keydown', onKey);
+    removeEventListener('resize', onResize);
     paper.destroy();
     root.remove();
+    under.forEach((n) => (n.inert = false));
+    returnFocus?.focus?.({ preventScroll: true });
     onClose?.();
     resolveClosed();
   }
@@ -287,7 +332,7 @@ export function openJournal({ campaign, index, fresh = [], tab = null, onClose =
       e.preventDefault();
       if (paper.ids().length) {
         paper.clear();
-        putAway.hidden = true;
+        setOpen(false);
       } else close();
     } else if (e.key === 'ArrowRight' && !next.disabled && !e.target.closest?.('.paper-sheet')) next.click();
     else if (e.key === 'ArrowLeft' && !prev.disabled && !e.target.closest?.('.paper-sheet')) prev.click();

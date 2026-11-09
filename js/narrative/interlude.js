@@ -55,9 +55,10 @@ export function fillSheet(sheet, values) {
 export function storyValues(groups, finalState, over = {}) {
   const alive = Object.keys(groups).sort().filter((id) => finalState?.groups?.find((g) => g.id === id)?.status !== 'lost');
   const g = groups[alive[0]] ?? null;
-  const leader = g?.leader ?? 'Unteroffizier Wessel';
+  // Rueckfall wie in den Briefen der Geschichte: Unteroffizier Dirk Lohmann, 2. Gruppe
+  const leader = g?.leader ?? 'Dirk Lohmann';
   return {
-    gruppe: g?.label ?? 'der 2. Gruppe',
+    gruppe: g?.label ?? '2. Gruppe',
     gruppenfuehrer: leader,
     gruppenfuehrer_nachname: leader.slice(leader.lastIndexOf(' ') + 1),
     abschnitt: 'Asse-Nord',
@@ -67,6 +68,7 @@ export function storyValues(groups, finalState, over = {}) {
 }
 
 function step(kind, sheet, entry = null, more = {}) {
+  // tail: Schritt haengt von Entscheidungen dieser Zwischenszene ab und wird nach einer Wahl neu aufgeloest
   return { kind, id: sheet.id, sheet, entry: entry ? entry.id : null, ...more };
 }
 
@@ -92,15 +94,36 @@ export function beforeMission(index, campaign, mission, { fromMission = null } =
   for (const e of resolveEntries(index, (x) => x.art === 'briefing' && x.mission === mission, ctx)) steps.push(step('briefing', S.briefingSheet(e), e, { about }));
   for (const e of resolveEntries(index, (x) => x.art === 'befehl' && x.mission === mission, ctx)) steps.push(step('order', S.orderSheet(e), e, { about }));
   for (const e of resolveEntries(index, (x) => x.art === 'entscheidung' && x.mission === mission, ctx)) {
+    if (campaign.book?.decisions?.[e.id]) continue;
     steps.push(step('decision', S.decisionSheet(e, (w) => matches(w, ctx)), e, { about }));
   }
   return steps;
 }
 
+/**
+ * Die Schritte ab der ersten Entscheidung, aufgeloest mit dem Kampagnenzustand nach den bisherigen Wahlen:
+ * noch offene Entscheidungen dieser Zwischenszene, dann (Zeitungen, Aktkarte,) Briefing und Befehl der naechsten
+ * Mission. Eine Wahl kann Briefing oder Befehl umschalten (a2m5 vell_angriff, a4m6 lask_gemeldet).
+ */
+export function tailSteps(index, campaign, built) {
+  const steps = [];
+  if (built.mission) {
+    const ctx = textCtx(campaign, built.ctxExtra);
+    for (const e of resolveEntries(index, (x) => x.art === 'entscheidung' && x.nach === built.mission, ctx)) {
+      if (campaign.book.decisions[e.id]) continue;
+      steps.push(step('decision', S.decisionSheet(e, (w) => matches(w, ctx)), e, { about: missionTitle(index, built.mission) }));
+    }
+    if (built.next) steps.push(...beforeMission(index, campaign, built.next, { fromMission: built.mission }));
+  } else if (built.next) {
+    steps.push(...beforeMission(index, campaign, built.next).filter((s) => s.kind === 'decision'));
+  }
+  return steps.map((s) => ({ ...s, sheet: fillSheet(s.sheet, built.values ?? {}), tail: true }));
+}
+
 /** Prolog vor a1m1 (oder Einstieg in eine beliebige Mission): Zeitungen, Aktkarte, Briefing, Befehl */
 export function buildPrologue(index, campaign, mission = MISSIONS[0]) {
   const values = storyValues({}, null, campaign.storyValues);
-  const steps = beforeMission(index, campaign, mission).map((s) => ({ ...s, sheet: fillSheet(s.sheet, values) }));
+  const steps = beforeMission(index, campaign, mission).map((s) => ({ ...s, sheet: fillSheet(s.sheet, values), tail: s.kind === 'decision' }));
   return { mission: null, next: mission, steps, values, followUps: followUpsFor(index) };
 }
 
@@ -126,12 +149,14 @@ export function buildInterlude(index, input) {
   const seed = input.seed ?? campaign.seed ?? 0;
   const rounds = input.rounds ?? [];
   const fs = input.finalState ?? null;
-  const groups = input.groups ?? (fs ? groupInfoFrom(fs, side) : {});
+  const groups = input.groups ?? (fs ? groupInfoFrom(fs, side, faction) : {});
   const weather = weatherWord(input.weather ?? fs?.weather?.kind);
-  const lastRound = rounds.length ? rounds[rounds.length - 1] : null;
+  const lastRound = rounds.reduce((best, r) => (!best || (r.turn ?? 0) >= (best.turn ?? 0) ? r : best), null);
   const night = input.night ?? fs?.night ?? lastRound?.night ?? false;
   const sector = input.sector ?? 'Asse-Nord';
   const title = missionTitle(index, mission);
+  // Nach a4m6 kommt die Schlusssequenz (P26); die Briefe danach (brief.24) zeigt sie selbst
+  const finale = !nextMission(mission);
 
   const casualties = rollCasualties(rounds, {
     side, faction, seed, mission, groups,
@@ -144,7 +169,8 @@ export function buildInterlude(index, input) {
     if (campaign.flags.includes(flag) && !known.has(d.name)) casualties.fallen.push({ ...d, group: null, turn: null, at: null, story: true });
   }
   const stats = missionStats({ rounds, side, casualties, finalState: fs });
-  const ctx = textCtx(campaign, { outcome, werte: stats, wetter: weather, tageszeit: night ? 'nacht' : 'tag' });
+  const ctxExtra = { outcome, werte: stats, wetter: weather, tageszeit: night ? 'nacht' : 'tag' };
+  const ctx = textCtx(campaign, ctxExtra);
   const day = fs?.clock?.day ?? null;
 
   const steps = [];
@@ -156,17 +182,18 @@ export function buildInterlude(index, input) {
   }
   // Auch die festen Briefe tragen Wetter und Tageszeit der Mission als Flecken; Lasks Briefe kommen als Abschrift
   const stains = stainsFor(weather, night);
-  for (const e of resolveEntries(index, (x) => x.art === 'brief' && x.nach === mission, ctx)) {
+  for (const e of resolveEntries(index, (x) => x.art === 'brief' && x.nach === mission && !finale, ctx)) {
     steps.push(step('letter', S.letterSheet(e, { fields: { stains, crooked: night, seed: e.id } }), e));
   }
-  for (const e of resolveEntries(index, (x) => x.art === 'lask' && x.nach === mission, ctx)) steps.push(step('lask', S.letterSheet(e, { title: 'Abgefangener Brief' }), e));
+  for (const e of resolveEntries(index, (x) => x.art === 'lask' && x.nach === mission && !finale, ctx)) steps.push(step('lask', S.letterSheet(e, { title: 'Abgefangener Brief' }), e));
 
   const templates = index.list.filter((e) => e.art === 'feldpost' || e.art === 'ereignis' || e.art === 'anrede');
   const fieldpost = generateFieldPost({
     templates, side, faction, groups, state: fs, rounds, casualties,
     trust: campaign.vertrauen, reputation: campaign.ansehen, flags: campaign.flags, werte: stats,
     weather, night, act: actOf(mission), map: input.map ?? null, sector, seed, mission,
-    count: input.letterCount ?? 3,
+    count: finale ? 0 : input.letterCount ?? 3,
+    used: campaign.book.fallen.map((f) => f.name),
   });
   for (const fp of fieldpost) steps.push(step('fieldpost', S.fieldPostSheet(fp), null, { tone: fp.tone }));
 
@@ -183,18 +210,16 @@ export function buildInterlude(index, input) {
     if (end && chain.length && chain.every((x) => found.has(x.id))) steps.push(step('findchain', S.findChainSheet(end), end));
   }
 
-  for (const e of resolveEntries(index, (x) => x.art === 'entscheidung' && x.nach === mission, ctx)) {
-    steps.push(step('decision', S.decisionSheet(e, (w) => matches(w, ctx)), e));
-  }
-
   for (const s of steps) s.about ??= title;
   const next = nextMission(mission);
-  if (next) for (const s of beforeMission(index, campaign, next, { fromMission: mission })) steps.push(s);
   const values = storyValues(groups, fs, input.storyValues);
   for (const s of steps) s.sheet = fillSheet(s.sheet, values);
+  // Entscheidungen, Briefing und Befehl: mit dem Zustand vor der ersten Wahl; der Leser loest sie nach jeder Wahl neu auf
+  const built = { mission, next, values, ctxExtra };
+  steps.push(...tailSteps(index, campaign, built));
 
   return {
-    mission, outcome, next, stats, casualties, fieldpost, steps, values, followUps: followUpsFor(index),
+    mission, outcome, next, stats, casualties, fieldpost, steps, values, ctxExtra, followUps: followUpsFor(index),
     book: {
       fallen: casualties.fallen.map((c) => ({ ...c, mission, missionTitle: title })),
       diary: steps.filter((s) => s.kind === 'diary').map((s) => s.entry),

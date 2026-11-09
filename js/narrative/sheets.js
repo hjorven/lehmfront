@@ -1,6 +1,6 @@
 // Uebersetzt Spieltexte (data/texts/README.md) in Blaetter der Papierebene (js/ui/paper/README.md).
 // Rein: kein DOM. Jede Funktion liefert ein Blatt-Objekt { id, kind, ... }.
-import { actRoman, actOf } from './texts.js';
+import { actRoman, actOf, numberWord } from './texts.js';
 
 const SIGN = '−'; // echtes Minuszeichen in Folgen
 
@@ -142,7 +142,7 @@ export function casualtySheet({ id, mission, missionTitle, sector, day, fallen, 
   const entries = fallen.map((c) => ({ name: c.name, group: c.groupLabel ?? '', turn: c.turn ?? '', cause: c.causeText ?? '' }));
   const notes = [];
   if (!entries.length) notes.push('Keine Gefallenen in diesem Einsatz.');
-  if (wounded) notes.push(`Verwundet: ${wounded}.`);
+  if (wounded) notes.push(`Verwundet gemeldet: ${wounded === 1 ? 'eine Person' : numberWord(wounded) + ' Personen'}.`);
   if (entries.length) notes.push('Angehörige über Ortsbehörde benachrichtigen.');
   return {
     id,

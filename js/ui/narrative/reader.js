@@ -6,7 +6,9 @@
 //
 // steps: aus js/narrative/interlude.js ({ kind, id, sheet, entry }). Zeitungen hintereinander liegen als
 // ein Aufschlag gemeinsam auf dem Tisch. onChoice(decisionId, optionId) darf weitere Schritte liefern
-// (Tagebuch nach einer Entscheidung), die direkt danach kommen.
+// (Tagebuch nach einer Entscheidung), die direkt danach kommen: als Liste oder als { extra, tail }. tail ersetzt
+// alle noch kommenden Schritte mit tail: true (die Wahl kann Briefing und Befehl der naechsten Mission umschalten).
+// destroy() von aussen loest done mit { choices, aborted: true } auf.
 import { createPaperLayer } from '../paper/index.js';
 import { el } from '../paper/registry.js';
 import { paperHooks } from '../../audio/director.js';
@@ -107,7 +109,10 @@ export function playSteps(opts) {
       ...hooks,
       onDismiss: (a) => {
         hooks.onDismiss?.(a);
-        queueMicrotask(updatePile);
+        queueMicrotask(() => {
+          updatePile();
+          if (pending && !paper.ids().includes(pending.id)) hint.textContent = 'Die Entscheidung liegt unter „Abgelegt“.';
+        });
       },
     }),
   });
@@ -115,6 +120,7 @@ export function playSteps(opts) {
   pileBtn.addEventListener('click', () => {
     paper.restore();
     updatePile();
+    if (pending && paper.ids().includes(pending.id)) hint.textContent = '';
   });
   journalBtn?.addEventListener('click', () => onJournal());
 
@@ -183,7 +189,8 @@ export function playSteps(opts) {
     page.steps.forEach((s, k) => paper.add(s.sheet, { ...pos[k], typed: s.kind === 'order' }));
     fitHost(page, pos);
     stage.scrollTop = 0;
-    pending = page.kind === 'decision' && !choices[page.steps[0].entry ?? page.steps[0].id] ? page.steps[0] : null;
+    const dec = page.steps[0];
+    pending = page.kind === 'decision' && dec.sheet.options?.length && !choices[dec.entry ?? dec.id] ? dec : null;
     nextBtn.disabled = !!pending;
     nextBtn.textContent = i === pages.length - 1 ? finishLabel : 'Weiter';
     renderProgress();
@@ -201,6 +208,8 @@ export function playSteps(opts) {
     const id = stepObj.entry ?? stepObj.id;
     if (choices[id]) return;
     choices[id] = optionId;
+    // Wahl im Blatt merken: holt man es aus der Ablage zurueck, zeigt es die Wahl statt offener Knoepfe
+    stepObj.sheet.chosen = optionId;
     const opt = stepObj.sheet.options.find((o) => o.id === optionId);
     if (node) {
       node.querySelectorAll('.narr-option').forEach((b) => {
@@ -214,9 +223,13 @@ export function playSteps(opts) {
     const page = pages[idx];
     fitHost(page, layout(page));
     playSfx('stamp');
-    const extra = onChoice ? onChoice(id, optionId) ?? [] : [];
-    if (extra.length) pages = [...pages.slice(0, idx + 1), ...paginate(extra), ...pages.slice(idx + 1)];
+    const res2 = onChoice ? onChoice(id, optionId) ?? [] : [];
+    const extra = Array.isArray(res2) ? res2 : res2.extra ?? [];
+    const rest = pages.slice(idx + 1);
+    const kept = Array.isArray(res2?.tail) ? rest.filter((p) => !p.steps.every((s) => s.tail)) : rest;
+    pages = [...pages.slice(0, idx + 1), ...paginate(extra), ...kept, ...(Array.isArray(res2?.tail) ? paginate(res2.tail) : [])];
     pending = null;
+    hint.textContent = '';
     renderAxes();
     nextBtn.disabled = false;
     nextBtn.textContent = idx === pages.length - 1 ? finishLabel : 'Weiter';
@@ -227,6 +240,10 @@ export function playSteps(opts) {
   // Wahlknoepfe liegen auf einem Blatt: das Blatt soll sie nicht als Ziehen verstehen
   host.addEventListener('pointerdown', (e) => {
     if (e.target.closest?.('.narr-option')) e.stopPropagation();
+  }, true);
+  // Enter und Leertaste auf einem Wahlknopf: der Knopf klickt selbst, das Blatt darf die Taste nicht abfangen
+  host.addEventListener('keydown', (e) => {
+    if (e.target.closest?.('.narr-option') && !/^[1-9]$/.test(e.key)) e.stopPropagation();
   }, true);
   host.addEventListener('click', (e) => {
     const b = e.target.closest?.('.narr-option');
@@ -249,6 +266,8 @@ export function playSteps(opts) {
       return;
     }
     const onControl = e.target.closest?.('button, .paper-sheet, input, a');
+    // Leertaste scrollt lange Blaetter erst bis unten, dann blaettert sie weiter
+    if (e.key === ' ' && !onControl && stage.scrollTop + stage.clientHeight < stage.scrollHeight - 4) return;
     if ((e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowRight') && (!onControl || e.target === nextBtn)) {
       if (e.target === nextBtn && e.key !== 'ArrowRight') return; // Klick des Knopfes reicht
       e.preventDefault();
@@ -256,17 +275,42 @@ export function playSteps(opts) {
     }
   }
   addEventListener('keydown', onKey);
+  // Handy gedreht oder Fenster veraendert: Blaetter der Seite neu legen
+  let resizeTimer = 0;
+  function onResize() {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      if (idx < 0 || !root.isConnected) return;
+      const page = pages[idx];
+      const pos = layout(page);
+      page.steps.forEach((s, k) => {
+        if (!paper.ids().includes(s.id)) return; // abgelegte bleiben in der Ablage
+        paper.remove(s.id);
+        paper.add(s.sheet, pos[k]);
+      });
+      fitHost(page, pos);
+    }, 150);
+  }
+  addEventListener('resize', onResize);
 
-  function destroy() {
+  let ended = false;
+  function end(result) {
+    if (ended) return;
+    ended = true;
     removeEventListener('keydown', onKey);
+    removeEventListener('resize', onResize);
+    clearTimeout(resizeTimer);
+    try {
+      audio.stopMusic();
+    } catch {
+      /* Klang nicht verfuegbar */
+    }
     paper.destroy();
     root.remove();
+    resolveDone(result);
   }
-
-  function finish() {
-    destroy();
-    resolveDone({ choices });
-  }
+  const destroy = () => end({ choices, aborted: true });
+  const finish = () => end({ choices });
 
   if (pages.length) show(Math.max(0, Math.min(pages.length - 1, opts.startAt ?? 0)));
   else queueMicrotask(finish);
