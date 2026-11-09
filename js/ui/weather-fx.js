@@ -37,7 +37,7 @@ export function applyWeatherParams(state, map, params) {
   if (params.has('flares')) {
     state.flares = String(params.get('flares')).split(';').map((p) => p.split(',').map(Number))
       .filter(([x, y]) => Number.isInteger(x) && Number.isInteger(y))
-      .map(([x, y]) => ({ x: x - 1, y: y - 1, r: FLARE_RADIUS, side: 'a', auto: false }));
+      .map(([x, y]) => ({ x: x - 1, y: y - 1, r: FLARE_RADIUS, side: 'a', auto: false, turn: state.turn }));
   }
 }
 

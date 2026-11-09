@@ -727,7 +727,7 @@ export async function mount(root, params) {
       if (!tool?.pick) {
         const g = selectedOwn();
         const cell = p && g && !modalOpen ? cellFromScreen(p).cell : null;
-        const next = cell && (cell.x !== g.pos.x || cell.y !== g.pos.y) ? sightLabel(sightLine(map, g, cell, darknessOf(state))) : null;
+        const next = cell && (cell.x !== g.pos.x || cell.y !== g.pos.y) ? sightLabel(sightLine(map, g, cell, darknessOf(state), state)) : null;
         const k = (s) => (s ? `${s.to.x},${s.to.y},${s.from.x},${s.from.y}` : '');
         if (k(next) !== k(hoverSight)) { hoverSight = next; drawDyn(); }
         return;

@@ -14,7 +14,7 @@ export function drainPreview(map, state, group, cell) {
   const mat = state.sides[group.side].supplies.material ?? 0;
   if (mat < DRAIN_COST) return { ok: false, text: `${at}: zu wenig Material (${mat} von ${DRAIN_COST})` };
   const n = drainCells(state, map, cell).length;
-  return { ok: true, text: `Entwässern bei ${at} (${WATER_WORDS[waterAt(state, cell.x, cell.y)]}) · ${n} Grabenfelder · ${DRAIN_COST} Material` };
+  return { ok: true, text: `Entwässern bei ${at} (${WATER_WORDS[waterAt(state, cell.x, cell.y)]}) · ${n} ${n === 1 ? 'Grabenfeld' : 'Grabenfelder'} · ${DRAIN_COST} Material` };
 }
 
 registerTool({
@@ -28,7 +28,8 @@ registerTool({
     if (group.status === 'lost') return 'Gruppe ist aufgerieben';
     if (state.turnKind === 'battle') return 'Entwässern geht nur in Stellungsrunden';
     const map = env.map;
-    const near = [group.pos, ...[[-1, 0], [1, 0], [0, -1], [0, 1]].map(([dx, dy]) => ({ x: group.pos.x + dx, y: group.pos.y + dy }))];
+    const near = [];
+    for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) near.push({ x: group.pos.x + dx, y: group.pos.y + dy });
     if (!near.some((p) => trenchOf(state, map, p.x, p.y))) return 'Kein Graben in der Nähe';
     return true;
   },

@@ -15,7 +15,7 @@ import { surname } from './hold.js';
 import { addStepCostRule } from './move.js';
 import {
   rollWeather, stepWet, waterGain, waterLoss, mudAt, mudMoveCost, trenchOf, isSink, flareAt, flareProblem,
-  MAX_WATER, MUD_MORALE, WATER_MORALE, FLARE_RADIUS, FLARE_HEAR, FLARE_DARKNESS, WEATHER_NAMES, MUD_IN, WATER_WORDS,
+  MAX_WATER, MUD_MORALE, WATER_MORALE, FLARE_RADIUS, FLARE_HEAR, FLARE_DARKNESS, WEATHER_NAMES, MUD_IN, WATER_IN,
 } from '../weather.js';
 
 /** Material fuer eine Entwaesserung (Lattenrost, Pumpe) */
@@ -67,6 +67,7 @@ function runWeather(ctx) {
   w.fog = w.fog ?? (w.kind === 'fog' ? 0.8 : 0);
   const prevWet = prev.wet ?? 0;
   w.wet = stepWet(prevWet, w.kind, s.night);
+  if (w.wet > 0) w.wasWet = true;
   s.weather = w;
   if (w.kind !== prevKind || w.wet !== prevWet) {
     ctx.emit('weather', {
@@ -88,7 +89,7 @@ function runWeather(ctx) {
     else patchCell(s, p.x, p.y, { water: after });
     if (after >= 2 && before < 2) {
       const tr = trenchOf(s, map, p.x, p.y);
-      (flooded[tr?.side === 'enemy' ? 'enemy' : 'own']).push({ ...p, sink: isSink(map, p.x, p.y) });
+      if (tr?.side === 'own' || tr?.side === 'enemy') flooded[tr.side].push({ ...p, sink: isSink(map, p.x, p.y) });
     }
   }
   for (const side of ['a', 'b']) {
@@ -97,7 +98,7 @@ function runWeather(ctx) {
     const first = list.find((c) => c.sink) ?? list[0];
     ctx.emit('flood', {
       side, secret: true, cells: list.length,
-      reason: `Wasser steht in ${list.length} ${list.length === 1 ? 'Grabenfeld' : 'Grabenfeldern'}, zuerst in der Senke bei ${cellLabel(first.x, first.y)}. Entwässern hilft.`,
+      reason: `Wasser steht in ${list.length} ${list.length === 1 ? 'Grabenfeld' : 'Grabenfeldern'}, ${first.sink ? 'zuerst in der Senke' : 'am tiefsten'} bei ${cellLabel(first.x, first.y)}. Entwässern hilft.`,
       at: { x: first.x, y: first.y },
     });
   }
@@ -109,7 +110,7 @@ function runWeather(ctx) {
     const loss = (MUD_MORALE[m] ?? 0) + (WATER_MORALE[water] ?? 0);
     if (!loss) continue;
     g.morale = Math.max(0, g.morale - loss);
-    const what = water >= 2 ? `steht ${WATER_WORDS[water]}` : `liegt ${MUD_IN[m]}`;
+    const what = water >= 2 ? `steht ${WATER_IN[water]}` : `liegt ${MUD_IN[m]}`;
     ctx.emit('mud_morale', {
       side: g.side, group: g.id, secret: true, minor: true, amount: loss,
       reason: `${name(g)} ${what} (${cellLabel(g.pos.x, g.pos.y)}): Moral sinkt um ${loss}.`,
@@ -118,7 +119,11 @@ function runWeather(ctx) {
   }
 }
 
-registerPhase({ id: 'weather', kind: 'position', order: ORDER.position.weather, run: runWeather });
+// Das Wetter der naechsten zwoelf Stunden wird am Ende der Stellungsrunde gewuerfelt (kurz vor der Uhr), damit der
+// Spieler beim Planen schon das Wetter und den Schlamm sieht, die in der Runde gelten (Plan 7.7: "Der Spieler sieht
+// beim Planen das, was gilt"). Abweichung von Plan 10.6 Schritt 2, wo es am Anfang steht.
+export const WEATHER_ORDER = ORDER.position.clock - 5;
+registerPhase({ id: 'weather', kind: 'position', order: WEATHER_ORDER, run: runWeather });
 
 // Schlamm bremst jede Bewegung (Plan 4.1 Nr. 6): Zusatzkosten je Feld, auch in der Vorschau
 addStepCostRule((state, map, p) => mudMoveCost(state, map, p.x, p.y));
@@ -196,7 +201,7 @@ function runFlares(ctx) {
   for (const o of ctx.ordersOfType('flare')) {
     const g = ctx.group(o.group);
     if (!g || g.status === 'lost') continue;
-    add({ x: o.target.x, y: o.target.y, r: FLARE_RADIUS, side: g.side, auto: false });
+    add({ x: o.target.x, y: o.target.y, r: FLARE_RADIUS, side: g.side, auto: false, turn: ctx.turn });
     ctx.emit('flare', {
       side: g.side, group: g.id, public: true, target: { ...o.target },
       reason: `Leuchtkugel über ${cellLabel(o.target.x, o.target.y)}. Für einen Augenblick ist es taghell.`,
@@ -216,7 +221,7 @@ function runFlares(ctx) {
       if (!near.length) continue;
       if (ctx.rng() >= HEAR_CHANCE) continue;
       n++;
-      add({ x: m.pos.x, y: m.pos.y, r: FLARE_RADIUS, side, auto: true });
+      add({ x: m.pos.x, y: m.pos.y, r: FLARE_RADIUS, side, auto: true, turn: ctx.turn });
       ctx.emit('flare', {
         side, public: true, auto: true, target: { ...m.pos },
         reason: `Posten hören Bewegung und schießen eine Leuchtkugel über ${cellLabel(m.pos.x, m.pos.y)}.`,

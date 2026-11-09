@@ -227,7 +227,10 @@ test('Sichtweite nachts: Dunkelheit kuerzt sie auf 4, Nebel kuerzt am Tag, Optik
   assert.equal(weatherSight(s.weather), 0.55);
   assert.equal(sightRange(map, viewer, { x: 8, y: 3 }, darknessOf(s)), 6, 'Nebel: 12 * 0,55');
   assert.equal(sightDarkness(0, { kind: 'clear' }), 0);
-  assert.equal(sightDarkness(1, { kind: 'fog', fog: 0.9 }), 1);
+  // Nebel bei Nacht sieht weniger als eine klare Nacht
+  assert.ok(sightDarkness(1, { kind: 'fog', fog: 0.9 }) > 1);
+  s.night = true;
+  assert.equal(sightRange(map, viewer, { x: 8, y: 3 }, darknessOf(s)), 2, 'Nacht und Nebel: 12 * 0,4 * 0,55');
 });
 
 // ---------- Leuchtkugeln ----------
@@ -250,16 +253,20 @@ test('Leuchtkugel nur nachts, erhellt einen Kreis und verraet Bewegung darin', (
   const lit = resolveTurn(s, [{ group: 'a01', type: 'flare', target: { x: 11, y: 3 } }], ordersB, 7, 1, { map });
   const b = getGroup(lit.state, 'b01');
   assert.ok(lit.state.flares.some((f) => f.x === 11 && f.y === 3 && f.r === FLARE_RADIUS));
-  assert.ok(visibleEnemies(lit.state, map, 'a').includes('b01'), 'im Licht gesehen');
-  assert.ok(viewFor(lit.state, lit.log, 'a', { map }).groups.some((g) => g.id === 'b01'));
+  // In der Runde gesehen: Aufklaerung hat b01 im Licht erfasst
+  assert.equal(lit.state.sides.a.intel.lastSeen.b01?.turn, 2, 'im Licht gesehen (Alter 0 zu Beginn der naechsten Runde)');
+  const during = { ...lit.state, turn: 1 };
+  assert.ok(visibleEnemies(during, map, 'a').includes('b01'));
+  // Beim Planen der naechsten Runde ist die Leuchtkugel erloschen: b01 nur noch als Geist
+  assert.ok(!visibleEnemies(lit.state, map, 'a').includes('b01'));
+  assert.ok(viewFor(lit.state, lit.log, 'a', { map }).ghosts.some((g) => g.id === 'b01'));
   assert.ok(lit.log.some((e) => e.type === 'flare_exposed' && e.group === 'b01'));
   assert.ok(lit.log.some((e) => e.type === 'flare' && e.side === 'a'));
   // Treffer im Licht wie am Tag
   const a = getGroup(lit.state, 'a01');
-  const pLit = fireOdds(lit.state, map, a, b.pos, 'b').p;
-  const noFlare = { ...lit.state, flares: [] };
-  assert.ok(pLit > fireOdds(noFlare, map, a, b.pos, 'b').p);
-  if (!dark.state.flares.length) assert.ok(!visibleEnemies(dark.state, map, 'a').includes('b01'));
+  const pLit = fireOdds(during, map, a, b.pos, 'b').p;
+  assert.ok(pLit > fireOdds(lit.state, map, a, b.pos, 'b').p, 'naechste Runde wieder Nachtchance');
+  if (!dark.state.flares.length) assert.equal(dark.state.sides.a.intel.lastSeen.b01, undefined);
   // naechste Runde: neue Leuchtkugeln, alte sind erloschen
   const next = resolveTurn(lit.state, [], [], 7, 2, { map });
   assert.ok(!next.state.flares.some((f) => !f.auto));
@@ -295,4 +302,12 @@ test('Posten schiessen nachts selbst eine Leuchtkugel, wenn sie Bewegung hoeren 
   day.night = false;
   assert.equal(resolveTurn(day, [], ordersB, 7, 1, { map }).state.flares.length, 0);
   assert.ok(fired >= 0);
+});
+
+test('Wetter der naechsten Runde steht schon beim Planen fest: Wetterphase am Ende der Stellungsrunde', async () => {
+  const { phasesFor } = await import('../js/phases/registry.js');
+  const ids = phasesFor('position').map((p) => p.id);
+  assert.ok(ids.indexOf('weather') > ids.indexOf('move'), 'nach der Bewegung');
+  assert.ok(ids.indexOf('weather') < ids.indexOf('clock'), 'vor der Uhr');
+  assert.ok(!phasesFor('battle').some((p) => p.id === 'weather'), 'Gefechtsrunden erben das Wetter');
 });

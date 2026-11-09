@@ -148,10 +148,11 @@ export function waterGain(state, map, x, y, kind) {
   return base;
 }
 
-/** Wasser laeuft ab: ohne Regen eine Stufe je Runde, entwaessert zwei */
+/** Wasser laeuft ab: ohne Regen eine Stufe je Runde; entwaessert pumpt die Pumpe zwei, auch bei Regen noch eine */
 export function waterLoss(state, x, y, kind) {
-  if (RAIN_UNITS[kind]) return 0;
-  return isDrained(state, x, y) ? 2 : 1;
+  const drained = isDrained(state, x, y);
+  if (RAIN_UNITS[kind]) return drained ? 1 : 0;
+  return drained ? 2 : 1;
 }
 
 /**
@@ -181,6 +182,8 @@ export function mudAt(state, map, x, y) {
 
 export const MUD_WORDS = ['fest', 'aufgeweicht', 'Schlamm', 'tiefer Schlamm'];
 export const WATER_WORDS = ['trocken', 'Pfützen', 'knöcheltief Wasser', 'knietief Wasser'];
+/** "steht ..." */
+export const WATER_IN = ['im Trockenen', 'in Pfützen', 'knöcheltief im Wasser', 'knietief im Wasser'];
 /** "liegt ..." */
 export const MUD_IN = ['auf festem Boden', 'auf aufgeweichtem Boden', 'im Schlamm', 'im tiefen Schlamm'];
 
@@ -212,7 +215,8 @@ export function weatherSight(weather) {
 export function sightDarkness(darkness, weather) {
   const d = clamp(Number(darkness) || 0, 0, 1);
   const vis = (1 - 0.6 * d) * weatherSight(weather);
-  return clamp((1 - vis) / 0.6, 0, 1);
+  // Kann bei Nacht und Nebel ueber 1 liegen: rules.visibilityFromDarkness rechnet das bis Sicht 0 zurueck
+  return clamp((1 - vis) / 0.6, 0, 1 / 0.6);
 }
 
 /** Erhellt eine Leuchtkugel dieser Runde das Feld p? Liefert die Leuchtkugel oder null. */
@@ -220,6 +224,8 @@ export function flareAt(state, p) {
   const list = state?.flares;
   if (!Array.isArray(list) || !list.length || !p) return null;
   for (const f of list) {
+    // Nur in der Runde, in der sie geschossen wurde; beim Planen der naechsten Runde ist sie erloschen
+    if (f.turn !== undefined && f.turn !== state.turn) continue;
     const dx = p.x - f.x, dy = p.y - f.y;
     if (dx * dx + dy * dy <= f.r * f.r) return f;
   }

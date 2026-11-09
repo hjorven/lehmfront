@@ -237,7 +237,8 @@ export function inCone(from, aim, p, width, range = Infinity) {
 }
 
 /** Sichtlinie fuer die Anzeige beim Zeigen: { from, to, blockedAt, d, range, visible } */
-export function sightLine(map, viewer, p, darkness) {
+export function sightLine(map, viewer, p, darkness, state = null) {
+  darkness = darknessAtCell(state, p, darkness);
   const d = distance(viewer.pos, p);
   const range = sightRange(map, viewer, p, darkness);
   const los = hasTerrain(map) && d > 1 ? lineOfSight(map, viewer.pos, p, { eye: 1, target: 1 }) : { visible: true, blockedAt: null };

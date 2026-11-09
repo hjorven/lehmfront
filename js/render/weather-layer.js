@@ -94,11 +94,16 @@ export function createWeatherLayer(canvas, { map, seed = 1, getCamera, getTheme,
     mud = [];
     water = [];
     fogHoles = [];
+    stainKey = '';
+    fogKey = '';
     if (!state) return;
+    const ownMapSide = side === 'a' ? 'own' : 'enemy';
     for (const c of map.cells) {
       const m = mudAt(state, map, c.x, c.y);
       if (m > 0) mud.push({ x: c.x, y: c.y, m });
-      if (trenchOf(state, map, c.x, c.y)) {
+      // Wasser und Lattenrost nur in eigenen Graeben: was im feindlichen Graben steht, weiss man nicht
+      const tr = trenchOf(state, map, c.x, c.y);
+      if (tr && tr.side === ownMapSide) {
         const w = waterAt(state, c.x, c.y), dr = isDrained(state, c.x, c.y);
         if (w || dr) water.push({ x: c.x, y: c.y, w, dr });
       }
@@ -146,44 +151,67 @@ export function createWeatherLayer(canvas, { map, seed = 1, getCamera, getTheme,
     return { x0: cam.x - hw - 2, y0: cam.y - hh - 2, x1: cam.x + hw + 2, y1: cam.y + hh + 2 };
   }
 
-  function drawStains(cam, th, wet, raining) {
+  function renderStains(g, cam, th, wet, raining) {
     const n = stainCount(state.weather);
     const list = stains.slice(0, n).concat(dropStains);
     // Getrocknet: nur noch blasse Raender der ersten Flecken
     const dry = wet === 0 && !raining;
-    const shown = dry ? stains.slice(0, 6) : list;
+    const shown = dry ? (state.weather?.wasWet ? stains.slice(0, 6) : []) : list;
     if (!shown.length) return;
+    applyCameraTransform(g, cam, dpr);
     // Tinte zerlaeuft: statische Karte an den Flecken leicht nach unten versetzt nachdrucken
     if (!dry && staticCanvas && staticCanvas.width) {
-      ctx.save();
-      ctx.beginPath();
-      for (const s of list) tracePoly(ctx, s.pts);
-      ctx.clip();
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
-      ctx.globalAlpha = 0.4;
-      ctx.drawImage(staticCanvas, 0, 1.5 * dpr);
-      ctx.globalAlpha = 0.25;
-      ctx.drawImage(staticCanvas, 0.6 * dpr, 3.5 * dpr);
-      ctx.restore();
-      applyCameraTransform(ctx, cam, dpr);
+      g.save();
+      g.beginPath();
+      for (const s of list) tracePoly(g, s.pts);
+      g.clip();
+      g.setTransform(1, 0, 0, 1, 0, 0);
+      g.globalAlpha = 0.4;
+      g.drawImage(staticCanvas, 0, 1.5 * dpr);
+      g.globalAlpha = 0.25;
+      g.drawImage(staticCanvas, 0.6 * dpr, 3.5 * dpr);
+      g.restore();
+      applyCameraTransform(g, cam, dpr);
     }
     const px = 1 / cam.zoom;
-    ctx.save();
+    g.save();
     for (const s of shown) {
-      ctx.beginPath();
-      tracePoly(ctx, s.pts);
+      g.beginPath();
+      tracePoly(g, s.pts);
       if (!dry) {
-        ctx.fillStyle = rgba(th.wetPaper, th.dark ? 0.4 : 0.35);
-        ctx.fill();
-        ctx.fillStyle = rgba(th.stain, th.dark ? 0.1 : 0.08);
-        ctx.fill();
+        g.fillStyle = rgba(th.wetPaper, th.dark ? 0.4 : 0.35);
+        g.fill();
+        g.fillStyle = rgba(th.stain, th.dark ? 0.1 : 0.08);
+        g.fill();
       }
-      ctx.beginPath();
-      tracePoly(ctx, s.ring ?? s.pts);
-      ctx.strokeStyle = rgba(th.stain, dry ? 0.15 : th.dark ? 0.6 : 0.5);
-      ctx.lineWidth = Math.max(0.03, 1.6 * px);
-      ctx.stroke();
+      g.beginPath();
+      tracePoly(g, s.ring ?? s.pts);
+      g.strokeStyle = rgba(th.stain, dry ? 0.15 : th.dark ? 0.6 : 0.5);
+      g.lineWidth = Math.max(0.03, 1.6 * px);
+      g.stroke();
     }
+    g.restore();
+  }
+
+  // Flecken und zerlaufene Tinte sind teuer (Clip, zwei Kopien der Karte): zwischengespeichert, neu nur wenn sich
+  // Kamera, Groesse, Tageszeit oder die Flecken aendern. Nach einer Aenderung zwei Bilder lang neu, damit die
+  // statische Karte sicher fertig gezeichnet ist, bevor ihre Tinte kopiert wird.
+  let stainCv = null, stainKey = '', stainFresh = 0;
+  function drawStains(cam, th, wet, raining) {
+    const key = [cam.x, cam.y, cam.zoom, canvas.width, canvas.height, th.darkness, wet, raining, stainCount(state.weather), dropStains.length, !!state.weather?.wasWet].join('|');
+    if (key !== stainKey) { stainKey = key; stainFresh = 2; }
+    if (!stainCv) stainCv = typeof OffscreenCanvas !== 'undefined' ? new OffscreenCanvas(1, 1) : document.createElement('canvas');
+    if (stainFresh > 0) {
+      stainFresh--;
+      if (stainCv.width !== canvas.width || stainCv.height !== canvas.height) { stainCv.width = canvas.width; stainCv.height = canvas.height; }
+      const g = stainCv.getContext('2d');
+      g.setTransform(1, 0, 0, 1, 0, 0);
+      g.clearRect(0, 0, stainCv.width, stainCv.height);
+      renderStains(g, cam, th, wet, raining);
+    }
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.drawImage(stainCv, 0, 0);
     ctx.restore();
   }
 
@@ -199,7 +227,8 @@ export function createWeatherLayer(canvas, { map, seed = 1, getCamera, getTheme,
         if (c.m !== m || c.x < rect.x0 || c.x > rect.x1 || c.y < rect.y0 || c.y > rect.y1) continue;
         const h = hashSeed(c.x, c.y, 77);
         const strong = c.m > general;
-        if (!strong && (h & 255) >= 40 * m) continue;
+        // Leichte allgemeine Naesse nicht zeichnen (sonst rauscht die ganze Karte), ab Stufe 2 locker
+        if (!strong && (general < 2 || (h & 255) >= 30 * m)) continue;
         if (!fine) { ctx.rect(c.x, c.y, 1, 1); continue; }
         const dashes = strong ? m : 1;
         for (let i = 0; i < dashes; i++) {
@@ -315,11 +344,27 @@ export function createWeatherLayer(canvas, { map, seed = 1, getCamera, getTheme,
     if (w?.kind !== 'fog') return;
     const dens = Math.max(0.3, Math.min(1, w.fog ?? 0.8));
     if (!fogCv) fogCv = typeof OffscreenCanvas !== 'undefined' ? new OffscreenCanvas(1, 1) : document.createElement('canvas');
-    if (fogCv.width !== canvas.width || fogCv.height !== canvas.height) { fogCv.width = canvas.width; fogCv.height = canvas.height; }
+    // Nebel ist weich: halbe Aufloesung genuegt, neu gerechnet hoechstens alle 120 ms oder bei Kamera/Tageszeit
+    const fw = Math.max(1, Math.ceil(canvas.width / 2)), fh = Math.max(1, Math.ceil(canvas.height / 2));
+    const key = [cam.x, cam.y, cam.zoom, fw, fh, th.darkness, dens, fogHoles.length].join('|');
+    if (key !== fogKey || now - fogAt >= 120) {
+      fogKey = key;
+      fogAt = now;
+      renderFog(cam, th, now, dens, fw, fh);
+    }
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.drawImage(fogCv, 0, 0, canvas.width, canvas.height);
+    ctx.restore();
+  }
+
+  let fogKey = '', fogAt = -1e9;
+  function renderFog(cam, th, now, dens, fw, fh) {
+    if (fogCv.width !== fw || fogCv.height !== fh) { fogCv.width = fw; fogCv.height = fh; }
     const f = fogCv.getContext('2d');
     f.setTransform(1, 0, 0, 1, 0, 0);
-    f.clearRect(0, 0, fogCv.width, fogCv.height);
-    applyCameraTransform(f, cam, dpr);
+    f.clearRect(0, 0, fw, fh);
+    applyCameraTransform(f, cam, dpr / 2);
     const rect = visibleRect(cam);
     f.fillStyle = rgba(th.fog, (th.dark ? 0.55 : 0.7) * dens);
     f.fillRect(rect.x0, rect.y0, rect.x1 - rect.x0, rect.y1 - rect.y0);
@@ -350,10 +395,6 @@ export function createWeatherLayer(canvas, { map, seed = 1, getCamera, getTheme,
       f.fill();
     }
     f.globalCompositeOperation = 'source-over';
-    ctx.save();
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.drawImage(fogCv, 0, 0);
-    ctx.restore();
   }
 
   function drawRain(cam, th, now) {
