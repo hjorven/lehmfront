@@ -191,7 +191,8 @@ function runMelee(ctx) {
     let tail;
     if (won && captured && wasDugout) tail = `Der Unterstand wird ausgehoben, ${captured} Mann geraten in Gefangenschaft.`;
     else if (won && captured) tail = `${name(def)} ist eingeschlossen, ${captured} Mann geraten in Gefangenschaft.`;
-    else if (won) tail = `Das Feld fällt, ${name(def)} weicht nach ${cellLabel(retreatTo.x, retreatTo.y)} aus.`;
+    else if (won && retreatTo) tail = `Das Feld fällt, ${name(def)} weicht nach ${cellLabel(retreatTo.x, retreatTo.y)} aus.`;
+    else if (won) tail = `Das Feld fällt, von ${name(def)} steht niemand mehr.`; // Verteidiger im Nahkampf aufgerieben
     else tail = 'Der Angriff wird abgewiesen, die Angreifer liegen vor dem Feld.';
     ctx.emit('melee', {
       side: atkGroups[0].side, group: atkGroups[0].id, target: def.id, public: true, outcome, chance: r2(odds.p),
