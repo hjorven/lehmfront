@@ -1,0 +1,36 @@
+{
+  "id": "akt1-m1",
+  "name": "Der erste Spatenstich",
+  "map": "akt1-m1",
+  "startHour": 6,
+  "turnKind": "position",
+  "weather": { "kind": "clear", "fixed": true },
+  "mission": {
+    "id": "a1m1",
+    "survey": true,
+    "hints": ["hinweis.graben", "hinweis.feuerrichtung", "hinweis.laengsfeuer", "hinweis.runde", "hinweis.bericht"],
+    "lask": [{ "from": 1, "posture": "halten" }]
+  },
+  "sides": {
+    "a": {
+      "faction": "kaldern",
+      "groups": [
+        { "type": "rifles", "pos": { "x": 22, "y": 10 }, "morale": 70, "leader": { "name": "Otto Harms", "home": "Ostmoor" } },
+        { "type": "rifles", "pos": { "x": 22, "y": 18 }, "morale": 68 },
+        { "type": "pioneers", "pos": { "x": 22, "y": 22 }, "morale": 72, "leader": { "name": "Swantje Fedders", "home": "Grauwarf" } },
+        { "type": "rifles", "pos": { "x": 22, "y": 30 }, "morale": 66 }
+      ]
+    },
+    "b": {
+      "faction": "morrow",
+      "control": "ai",
+      "ai": { "doctrine": "masse", "difficulty": "rekrut" },
+      "artillery": { "batteries": [] },
+      "groups": [
+        { "type": "rifles", "pos": { "x": 37, "y": 11 } },
+        { "type": "mg", "pos": { "x": 37, "y": 20 } },
+        { "type": "rifles", "pos": { "x": 37, "y": 29 } }
+      ]
+    }
+  }
+}

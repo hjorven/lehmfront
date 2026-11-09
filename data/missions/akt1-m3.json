@@ -1,0 +1,193 @@
+{
+  "id": "akt1-m3",
+  "name": "Zwölf Loren",
+  "map": "akt1-m3",
+  "startHour": 6,
+  "turnKind": "position",
+  "weather": {
+    "kind": "overcast"
+  },
+  "mission": {
+    "id": "a1m3",
+    "hints": [
+      "hinweis.lorenplan"
+    ],
+    "lask": [
+      {
+        "from": 1,
+        "posture": "halten"
+      }
+    ],
+    "fire": [
+      {
+        "from": 2,
+        "to": 5,
+        "plan": {
+          "id": "gleis",
+          "kind": "harass",
+          "batteries": [
+            "mb1"
+          ],
+          "target": {
+            "x": 15,
+            "y": 21
+          }
+        }
+      }
+    ]
+  },
+  "sides": {
+    "a": {
+      "faction": "kaldern",
+      "supplies": {
+        "ammo": 24,
+        "food": 30,
+        "material": 20,
+        "carts": 12,
+        "cartsTotal": 12
+      },
+      "supply": {
+        "sections": {
+          "A": {
+            "ammo": 2,
+            "food": 3,
+            "material": 0,
+            "wounded": {}
+          },
+          "B": {
+            "ammo": 1,
+            "food": 2,
+            "material": 0,
+            "wounded": {
+              "a03": 2
+            }
+          },
+          "C": {
+            "ammo": 2,
+            "food": 0,
+            "material": 0,
+            "wounded": {}
+          }
+        }
+      },
+      "groups": [
+        {
+          "type": "mg",
+          "pos": {
+            "x": 22,
+            "y": 6
+          },
+          "morale": 64,
+          "leader": {
+            "name": "Dirk Lohmann",
+            "home": "Kelling"
+          }
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 22,
+            "y": 11
+          },
+          "morale": 70,
+          "leader": {
+            "name": "Otto Harms",
+            "home": "Ostmoor"
+          }
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 23,
+            "y": 16
+          },
+          "morale": 62
+        },
+        {
+          "type": "pioneers",
+          "pos": {
+            "x": 22,
+            "y": 22
+          },
+          "morale": 66,
+          "leader": {
+            "name": "Swantje Fedders",
+            "home": "Grauwarf"
+          }
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 22,
+            "y": 29
+          },
+          "morale": 58
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 22,
+            "y": 35
+          },
+          "morale": 60
+        }
+      ],
+      "etappe": false
+    },
+    "b": {
+      "faction": "morrow",
+      "control": "ai",
+      "ai": {
+        "doctrine": "masse",
+        "difficulty": "rekrut"
+      },
+      "artillery": {
+        "batteries": [
+          {
+            "id": "mb1",
+            "type": "feldhaubitzen",
+            "x": 52,
+            "y": 29,
+            "w": 2,
+            "h": 2,
+            "label": "Batterie Morrow"
+          }
+        ],
+        "exchange": {
+          "x": 48,
+          "y": 15
+        }
+      },
+      "groups": [
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 37,
+            "y": 8
+          }
+        },
+        {
+          "type": "mg",
+          "pos": {
+            "x": 36,
+            "y": 16
+          }
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 37,
+            "y": 24
+          }
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 37,
+            "y": 33
+          }
+        }
+      ]
+    }
+  }
+}

@@ -10,6 +10,7 @@ import './fire.js';
 import './hold.js';
 import './intel.js';
 import './melee.js';
+import './mission.js';
 import './morale.js';
 import './move.js';
 import './rebuild.js';

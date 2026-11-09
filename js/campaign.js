@@ -400,8 +400,9 @@ export function startAxes(state, side = 'a') {
 const judges = new Map();
 
 /**
- * Missionsziel anmelden (P16 ff.): fn({ state, rounds, side, counts }) -> { outcome: 'sieg'|'niederlage', orderMet? } | null.
+ * Missionsziel anmelden (P16 ff.): fn({ state, rounds, side, counts, final, map }) -> { outcome: 'sieg'|'niederlage', orderMet? } | null.
  * null heisst "noch nicht entschieden" (die Mission laeuft weiter); beim Beenden gilt dann die Standardwertung.
+ * final: die Spielerin meldet den Einsatz selbst. map: die geladene Grundkarte (fehlt, wenn der Aufrufer sie nicht hat).
  */
 export function registerMissionJudge(mission, fn) {
   judges.set(mission, fn);
@@ -421,7 +422,7 @@ export function defaultJudge({ rounds, side }) {
 }
 
 /** Ausgang einer Mission: angemeldetes Ziel, sonst Standardwertung. final = true beim Beenden durch die Spielerin. */
-export function judgeMission(mission, { state, rounds, side = 'a', final = false }) {
+export function judgeMission(mission, { state, rounds, side = 'a', final = false, map = null }) {
   const counts = missionCounts(rounds, side);
   if (counts.mutiny || state?.sides?.[side]?.mutiny) return { outcome: 'niederlage', orderMet: false, why: 'Meuterei', done: true };
   if (state?.result) {
@@ -433,7 +434,7 @@ export function judgeMission(mission, { state, rounds, side = 'a', final = false
   if (state?.groups?.length && !alive(side)) return { outcome: 'niederlage', orderMet: false, why: 'Abschnitt aufgerieben', done: true };
   if (state?.groups?.length && !alive(side === 'a' ? 'b' : 'a')) return { outcome: 'sieg', orderMet: true, why: 'Gegner aufgerieben', done: true };
   const fn = judges.get(mission);
-  const r = fn ? fn({ state, rounds, side, counts }) : null;
+  const r = fn ? fn({ state, rounds, side, counts, final, map }) : null;
   if (r) return { ...r, done: true };
   if (!final) return null;
   return { ...defaultJudge({ rounds, side }), done: true };
