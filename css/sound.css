@@ -1,0 +1,20 @@
+/* Klang-Einstellungen (P19). Farben nur aus den Token in css/style.css. */
+.snd-btn small{font:11px var(--font-num);color:var(--ink2);font-weight:400}
+.snd-pop{padding:10px 12px 12px;width:236px}
+.snd-pop[hidden]{display:none}
+.snd-panel{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--ink)}
+.snd-state{margin:0 0 2px;font:12px var(--font-num);color:var(--ink2)}
+.snd-row{display:grid;grid-template-columns:1fr auto;align-items:center;gap:0 8px}
+.snd-row output{font:12px var(--font-num);color:var(--ink2)}
+.snd-row input{grid-column:1 / -1;width:100%;min-height:30px;margin:0;accent-color:var(--ink);background:none}
+.snd-toggles{display:flex;gap:6px;margin-top:4px}
+.snd-toggles .btn{flex:1;min-width:0 !important;justify-content:center;min-height:36px;font-size:13px}
+.snd-toggles .btn[aria-pressed="true"]{background:var(--ink);color:var(--card);border-color:var(--ink)}
+.snd-card{display:none}
+.snd-card .k{display:block;padding:0 0 4px}
+@media (max-width:699px){
+  .snd-btn,.snd-pop{display:none !important}
+  .snd-card{display:block;padding:8px 10px 10px}
+  .snd-row input{min-height:40px}
+  .snd-toggles .btn{min-height:44px}
+}

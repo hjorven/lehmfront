@@ -53,3 +53,22 @@ Signalweg: `sfx`, `ambience`, `music` -> Gehoer (Tiefpass) -> `master` -> Duckin
 Der nahe Einschlag selbst und das Ohrensausen laufen am Gehoer vorbei.
 
 Nach einer Unterbrechung (iOS-Anruf, Hintergrund) lauscht die Engine wieder auf eine Geste und setzt beim Zurueckkehren in den Tab fort.
+
+## Klang im Spiel (Paket P19)
+
+- `cues.js` (rein, getestet in `test/cues.test.js`): welches Ereignis wie klingt, Kappung (hoechstens 5 Klaenge je Schwung, 2 gleiche), Stereo nach `at.x`, Grundton der Front `ambienceFor({ darkness, weather, kind, log, side })`.
+- `director.js`: spielt ab. `cueEvents(events, { side, state })`, `cueSection(key)`, `frontAmbience({ state, darkness, log, side })`, `hushFront()`, `paperHooks(extra)` fuer die Papierebene.
+- Eingehaengt: Phasenfilm (`js/ui/film.js`, neue Telegrammzeilen klingen nur beim Abspielen, nicht beim Scrubbing; Uhrphase tickt), Gefecht (Grundton nach Tageszeit, Wetter und letzter Runde, Pfeife beim Sturm nach dem Halten-Ring, Musik), Papier (Anschlag, Glocke, Stempel, Rascheln), Etappe (Bauen, Reparieren, Belohnung, neue Runde mit Lore).
+- Regler: `js/ui/sound.js` (`mountSoundControls({ bar, sheet })` fuer Knopf plus Handy-Karte, `soundPanel()` fuer das Einstellungsmenue aus P18).
+
+### Ereignis-Haken fuer neue Mechanik
+
+Ein Paket mit neuen Ereignissen meldet den Klang in seinem eigenen Modul an, ohne `cues.js` zu aendern:
+
+```js
+import { registerCue, shellCue } from '../audio/cues.js';
+registerCue('wire_cut', (e, ctx) => [{ name: 'pencil', opts: { count: 2, intensity: 0.4 } }]);
+registerCue('barrage', (e, ctx) => shellCue(e, ctx, 0.7));   // nah an eigenen Gruppen: naher Einschlag mit Taubheit
+```
+
+`ctx = { side, width, own }`. Rueckgabe: Liste `{ name, opts?, delay? }` mit einem Klang aus der Tabelle oben oder `'hush'`. Vorbelegt sind schon `assault`, `artillery`, `barrage`, `shell`, `shelling`, `impact`, `mine`, `flare`, `supply`, `cart`, `lore`, `carts_arrived`, `weather`; wer andere Namen nimmt, meldet sie an oder ersetzt die Vorbelegung. Phasen bleiben rein: `registerCue` gehoert in eine Datei unter `js/ui/` oder `js/audio/`, nicht in `js/phases/*` (dort sind nur reine Regeln erlaubt). Damit die Anmeldung geladen wird, die Datei dort importieren, wo das Paket ohnehin sein Werkzeug oder Overlay anmeldet (z. B. `js/ui/tools/<name>.js`).

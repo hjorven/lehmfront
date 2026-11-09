@@ -17,11 +17,13 @@ import {
 import { createMapLayer, sheetBounds, FONTS } from '../render/map-layer.js';
 import { drawBattle, hitUnit, unitBox } from '../render/units-layer.js';
 import { playSfx, audio } from '../audio/engine.js';
+import { frontAmbience } from '../audio/director.js';
+import { mountSoundControls } from '../ui/sound.js';
 import { planOrders } from '../ai/dummy.js';
 import {
   createOrderBook, setOrder, clearOrder, undo, canUndo, listOrders, orderOf, seal, nextRound,
 } from '../ui/orderbook.js';
-import { summarize, checklist } from '../ui/summary.js';
+import { summarize, checklist, HOLD_TYPES } from '../ui/summary.js';
 import { allTools, toolByKey, usable } from '../ui/tools.js';
 import '../ui/tools/index.js';
 import { overlaySlots } from '../ui/overlays.js';
@@ -207,6 +209,8 @@ export async function mount(root, params) {
     onCheck: (i) => { const c = hud.checkAt(i); if (c?.group) select(c.group, { center: true }); else if (c?.at) centerOn(cam, c.at.x + 0.5, c.at.y + 0.5); refresh(); },
     onToggleSheet: () => { root.classList.toggle('sheet-open'); hud.setSheet(root.classList.contains('sheet-open')); },
   });
+  // Klang (P19): Knopf rechts, auf dem Handy als Karte in der Seitenleiste
+  mountSoundControls({ bar: ui.querySelector('.hud-right'), sheet: ui.querySelector('.hud-sheet') });
   const toolbar = createToolbar(ui, {
     onTool: (id, disabled) => {
       const def = allTools().find((t) => t.id === id);
@@ -506,8 +510,11 @@ export async function mount(root, params) {
   }
 
   function commitSide() {
+    // Sturm: nach dem Halten des Rings geht die Pfeife
+    const storm = listOrders(book, side).some((o) => HOLD_TYPES.has(o.type));
     book = seal(book, side);
     playSfx('stamp');
+    if (storm) playSfx('whistle', { delay: 0.45 });
     selectedId = null;
     hoverSight = null;
     closeList();
@@ -566,6 +573,9 @@ export async function mount(root, params) {
     modalOpen = false;
     root.classList.remove('filming');
     report.setFilmActive(false);
+    // Grundton der Front nach der Runde: Tageszeit, Wetter, wie heftig es war
+    // (nur was die eigene Seite mitbekommt: fremde, ungesehene Gefechte verraten sich nicht im Klang)
+    frontAmbience({ state, darkness, log: viewFor(state, lastLog, side, env).log, side });
     if (state.result && !filmReplay) flash(state.result.reason);
     refresh();
     drawDynNow();
@@ -866,6 +876,9 @@ export async function mount(root, params) {
   onThemeChange((th) => { darkness = th.darkness; layer.invalidate(); drawDyn(); });
   new ResizeObserver(resize).observe(root);
   audio.init?.();
+  // Grundton der Front und karge Musik; beides wartet still auf das erste Tippen
+  frontAmbience({ state, darkness, side });
+  audio.startMusic();
   resize();
   refresh();
   layer.drawNow();
