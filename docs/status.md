@@ -44,6 +44,18 @@ Jeder Thread traegt hier nach dem Merge ein, was fertig ist und was offen bleibt
   - Erste Bewegungsphase `js/phases/move.js`: Bewegen (Gefecht, speed Felder) und Verlegen (Stellung, speed x 4 Felder, nur hinter der eigenen Linie), besetzte Felder halten an, Rest läuft als Befehl in der nächsten Runde weiter.
   - Dynamische Ebene `js/render/units-layer.js`: Gruppensymbole wie im Mockup, Bleistiftpfeile (diese Runde durchgezogen, Rest gestrichelt), Zielvorschau, Fragezeichen an Gruppen ohne Befehl.
   - Demo-Zustände für Screenshots: `&demo=befehle|liste|radial|zusammenfassung|sturm|bericht|uebergabe|zeichnen|overlays`, außerdem `&mode=hotseat`, `&kind=battle`, `&night=0..1`, `&seed=`.
+- P07 Phasenfilm und Telegramm:
+  - `js/film.js` (rein): `planFilm(input, result, side)` teilt eine aufgelöste Runde in Abschnitte nach den Abteilungen aus `ORDER` (Reiter „Bewegung“, „Feuer“, „Uhr“ ...), Abschnitte ohne sichtbares Ereignis fallen weg. `replayTo(input, n)` rechnet den Zustand nach n Phasen aus dem Startzustand neu (Scrubbing ohne gespeicherte Zwischenstände), `tracksBetween`/`trackPos` liefern die gegangenen Wege, `transitionAt` die letzte Sekunde, `clockDuring` die mitlaufende Spieluhr.
+  - `js/archive.js` (rein): Protokoll-Archiv der Mission, je Runde Startzustand, Befehle beider Seiten, Seed und Protokoll. Jede alte Runde lässt sich als Film neu rechnen.
+  - Oberfläche: `js/ui/film.js` (Filmleiste mit Phasenreitern, Weiter pro Phase, Durchlaufen, Überspringen, Zeitleiste, Tasten Enter/Leertaste, Esc, Pfeile), `js/ui/telegram.js` (Fernschreiberstreifen Stil 03, Klick springt zum Ort und im Film zum Zeitpunkt), `js/ui/archive.js` (Aktenordner „Protokoll“, Taste P), `js/render/film-layer.js` (Geist am Ausgangsort und Bleistiftspur). Ersetzt das Meldungen-Kärtchen aus P03.
+  - Demo-Zustände: `?scene=gefecht&demo=film|telegramm|archiv`.
+
+### Für die nächsten Pakete (nach P07)
+
+- Tag-Nacht-Optik (P10): `setTransitionHook(({ t, from, to }) => ...)` aus `js/ui/film.js`. Wird in der letzten Sekunde des Films mit t 0..1 gerufen (beim Zurückspulen auch rückwärts), `from`/`to` sind die Dunkelheit vor und nach der Runde. Standard ist `applyTheme(themeAt(...))`.
+- Neue Phasen bekommen automatisch einen Reiter, sobald sie sichtbare Ereignisse melden. Der Name kommt aus `SECTION_LABELS` in `js/film.js` (nach der `ORDER`-Abteilung). Bewegung im Film braucht nichts: Positionen werden zwischen den Zwischenständen gezogen; liefert ein Ereignis `from`, `to`, `steps` und der Befehl `path`, läuft die Gruppe den echten Weg.
+- Rote Zeilen im Telegramm: Ereignistypen in `WARN_TYPES` (`js/film.js`) oder `blocked: true`; graue Zeilen: `minor: true`.
+- Statistiken für Texte (T1 `wann.werte`) und Erfahrungsberichte (P14) können aus `archive.rounds[].log` gezählt werden.
 
 - P05 Feuer, Sicht, Nebel des Krieges:
   - `js/sight.js` (rein): Sichtweite (Tag 12 Felder, Beobachter 14, Höhe +1 je Stufe, Beobachter +3), Dunkelheit über `visibilityFromDarkness`, Deckung verbirgt (zwei Drittel Sichtweite, solange die Gruppe sich nicht bewegt), Mündungsfeuer verrät auch nachts, Unterstand sieht und wird nur aus dem Nachbarfeld gesehen. `coverAt` (Graben aus `state.cells` vor der Karte, eroberter Graben halb), `sectorOf`/`inCone` (MG-Kegel ohne Winkelfunktionen), `visibleEnemies`, `visibleCells`, `sightLine`.
@@ -104,6 +116,9 @@ Jeder Thread traegt hier nach dem Merge ein, was fertig ist und was offen bleibt
 - P03: Doppelklick zum Zoomen löst in der Zielwahl auch ein Antippen aus (Ziel wird gesetzt, Strg+Z nimmt es zurück). Antippen und Doppelklick werden nicht mit Verzögerung getrennt, damit das Antippen sofort reagiert.
 - P03: Im Hotseat bleiben die Kartenfarben fest (Kaldern blau, Morrow rot); die Seite b plant also mit roten Symbolen. Der Nebel gilt pro planender Seite.
 - P03: Die Bewegungsregeln sind eine erste Fassung (keine Begegnungen, kein Draht-Abbremsen außer über die Feldkosten); Verlegen in Stellungsrunden darf nicht ins Niemandsland.
+- P07: Das Archiv lebt nur im Speicher der Szene; Speichern und Laden (P18) muss `archive` mitnehmen (reines JSON, die Karte steckt nicht darin). Pro Runde liegt der ganze Startzustand drin, bei sehr langen Missionen wird das groß.
+- P07: Ein Film rechnet je Abschnitt eine Teilrunde neu (heute 2 bis 3). Mit vielen Phasen und großen Karten sollte P21 messen, ob das auf schwachen Handys flüssig bleibt.
+- P07: Der Gegner bekommt im Film nur Ereignisse, die er sieht (`viewFor`); feindliche Gruppen erscheinen, sobald sie im Zwischenstand sichtbar sind.
 - P03: Die Szene nutzt `requestAnimationFrame` und `performance.now()` nur für Optik (Bleistift, Ring); die Spiellogik bleibt rein.
 
 - P05: Sicht- und Schussweite sind Chebyshev-Abstand (Quadrat), nur der MG-Kegel ist rund wie gezeichnet. Niedergehaltene Gruppen feuern auf ausdrücklichen Befehl weiter (mit Zittern), nur nicht von selbst. Geister in Gräben werden erst aus dem Nachbarfeld ausradiert (ein Unterstand kann eine Gruppe verbergen).
@@ -145,6 +160,7 @@ Stand 2026-11-08, von Jorven bestaetigt:
 - P03: Langer Druck öffnet das radiale Menü auch mit der Maus, zusätzlich Rechtsklick. Der Finger kann vom Druckpunkt direkt zum Befehl gleiten und loslassen (Marking-Menü), Antippen geht ebenso.
 - P03: „Bewegen“ ist ein Werkzeug für beide Rundenarten: in Stellungsrunden wird daraus „Verlegen“ (redeploy), in Gefechtsrunden „Bewegen“ (move). Unfertige Wege laufen als Befehl weiter („läuft weiter“ in der Befehlsliste).
 - P03: Gruppen ohne Befehl tragen auf der Karte ein Bleistift-Fragezeichen; der Plan nennt das nur in der Checkliste.
+- P07: „Überspringen“ springt nicht ans Ende, sondern in die letzte Sekunde: der Tag-Nacht-Wechsel läuft immer sichtbar ab. Jede Telegrammzeile trägt eine Zeitgruppe, Phase und Feld („0750 BEWEGUNG · FELD 25/10“) und endet mit STOP. Das Protokoll zeigt alte Runden als Durchschläge in Kopierstift-Farbe.
 - P03: Nach der Runde zeigt ein schlichtes Meldungen-Kärtchen alle Begründungen (Klick springt zum Ort), bis P07 das Telegramm bringt.
 - P05: Der Nebel des Krieges braucht kein eigenes Grau: Feinde, die man nicht sieht, bleiben als Bleistiftskizze stehen, die jede Runde blasser und lückenhafter wird, als würde jemand radieren. Ist der Platz wieder einsehbar und leer, wird die Skizze ausradiert (Meldung im Protokoll).
 - P05: MG-Trupps bekommen statt „Feuern“ einen dauerhaften Feuersektor (Befehl `sector`, auch in Stellungsrunden), den sie im Gefecht selbst bestreichen. Mündungsfeuer verrät die Stellung auch nachts.

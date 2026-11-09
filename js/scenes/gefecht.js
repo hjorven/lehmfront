@@ -8,7 +8,7 @@ import { resolveTurn } from '../resolve.js';
 import { viewFor } from '../view.js';
 import { sightLine, coverAt, PINNED, darknessOf } from '../sight.js';
 import { faction } from '../config/factions.js';
-import { themeAt, applyTheme, currentTheme, onThemeChange, animateDarkness } from '../theme.js';
+import { themeAt, applyTheme, currentTheme, onThemeChange } from '../theme.js';
 import {
   createCamera, resizeCamera, attachCameraControls, screenToWorld, worldToScreen, centerOn, fitZoom,
 } from '../render/camera.js';
@@ -35,7 +35,14 @@ import { createToolbar } from '../ui/toolbar.js';
 import { createShield } from '../ui/shield.js';
 import { createRadial } from '../ui/radial.js';
 import { createOrderList } from '../ui/orderlist.js';
-import { showSummary, showHandover, createReport } from '../ui/commit.js';
+import { showSummary, showHandover } from '../ui/commit.js';
+import { planFilm, replayTo } from '../film.js';
+import { createArchive, archiveRound, inputOf, entryTitle } from '../archive.js';
+import { phasesFor } from '../phases/registry.js';
+import { createFilmPlayer } from '../ui/film.js';
+import { createTelegram } from '../ui/telegram.js';
+import { createArchiveView } from '../ui/archive.js';
+import { drawFilmTrails } from '../render/film-layer.js';
 
 const num = (v, d) => (v === null || v === '' || !Number.isFinite(Number(v)) ? d : Number(v));
 const LONG_PRESS_MS = 430;
@@ -48,6 +55,7 @@ export async function mount(root, params) {
   const [mapJson] = await Promise.all([
     fetchJson(`data/maps/${scenario.map}.json`),
     ensureCss('css/gefecht.css'),
+    ensureCss('css/film.css'),
     Promise.all(['16px "Special Elite"', '16px "IBM Plex Mono"', '700 16px "IBM Plex Mono"', '700 16px "Caveat"', '16px "IBM Plex Sans"', '700 16px "IBM Plex Sans"']
       .map((f) => document.fonts.load(f))).catch(() => {}),
   ]);
@@ -68,6 +76,10 @@ export async function mount(root, params) {
   let overlaysOn = new Set();
   let transient = null;         // { text, tone, until }
   let lastLog = [];
+  let lastRound = null;         // { input, result } der zuletzt aufgeloesten Runde (Phasenfilm)
+  let archive = createArchive(scenId);
+  let filmFrame = null;         // Bild des laufenden Phasenfilms, sonst null
+  let pendingDark = null;       // { from, to }: Tag-Nacht-Uebergang, den der naechste Film zeigt
   let helpShown = false;
   let suppressTap = false;
   let modalOpen = false;
@@ -134,6 +146,7 @@ export async function mount(root, params) {
     dynPending = requestAnimationFrame(() => { dynPending = 0; drawDynNow(); });
   }
   function drawDynNow() {
+    if (filmFrame) { drawFilmNow(); placeShield(); return; }
     const { groups, ghosts } = shownGroups();
     const orders = new Map(ordersNow().map((o) => [o.group, o]));
     const reach = new Map();
@@ -150,6 +163,16 @@ export async function mount(root, params) {
       overlays: overlaySlots().filter((o) => overlaysOn.has(o.slot) && o.draw),
     });
     placeShield();
+  }
+
+  // Phasenfilm: Zwischenstand aus dem Film, Spuren als Overlay unter den Gruppen
+  function drawFilmNow() {
+    const fr = filmFrame;
+    const groups = fr.groups.map((g) => ({ ...g, mark: groupMark(fr.state, g) }));
+    drawBattle(dctx, cam, dpr, currentTheme(), {
+      state: fr.state, map, side, groups, ghosts: [], orders: new Map(), selectedId, planning: false,
+      overlays: [{ draw: (ctx, o) => drawFilmTrails(ctx, o, fr.trails) }],
+    });
   }
 
   // ---------- Oberflaeche ----------
@@ -175,8 +198,36 @@ export async function mount(root, params) {
     onClear: (id) => { book = clearOrder(book, side, id); playSfx('paper'); refresh(); },
     onClose: () => closeList(),
   });
-  const report = createReport(ui, {
-    onJump: (l) => { if (l?.at) { centerOn(cam, l.at.x + 0.5, l.at.y + 0.5, Math.max(cam.zoom, narrow() ? 26 : 22)); if (l.group) selectedId = l.group; onCamera(); refresh(); } },
+  // Telegramm, Phasenfilm und Protokoll-Archiv (P07)
+  function jumpTo(l) {
+    if (!l?.at) return;
+    // Auf dem Handy deckt das Protokoll die Karte ganz ab: erst schliessen, dann springen
+    if (archiveView.open && narrow()) closeArchive();
+    centerOn(cam, l.at.x + 0.5, l.at.y + 0.5 + (narrow() ? 3 : 0), Math.max(cam.zoom, narrow() ? 26 : 22));
+    if (player.open) player.seek(l.time);
+    else if (l.group && !archiveView.open) selectedId = l.group;
+    playSfx('paper', { intensity: 0.25 });
+    onCamera();
+    refresh();
+  }
+  const report = createTelegram(ui, {
+    onJump: jumpTo,
+    onFilm: () => { if (lastRound) startFilm(lastRound.input, lastRound.result, { title: filmTitle(lastRound.input.state) }); },
+    onArchive: () => openArchive(),
+  });
+  const player = createFilmPlayer(ui, {
+    onFrame: (fr) => { filmFrame = fr; drawDyn(); },
+    onLines: (n, typing) => report.setCount(n, typing),
+    onEnd: () => endFilm(),
+  });
+  const archiveView = createArchiveView(ui, {
+    onJump: jumpTo,
+    onReplay: (entry) => {
+      archiveView.hide();
+      const input = inputOf(entry, env);
+      startFilm(input, replayTo(input, phasesFor(entry.kind, env.phases).length), { title: entryTitle(entry) + ' · Protokoll', replay: true });
+    },
+    onClose: () => closeArchive(),
   });
   const radial = createRadial(ui, {
     onPick: (it) => { radial.hide(); dynCv.focus({ preventScroll: true }); if (it.id === '__clear') { book = clearOrder(book, side, it.group); refresh(); } else startTool(it.def, getGroup(state, it.group)); },
@@ -259,7 +310,7 @@ export async function mount(root, params) {
   function updateShield() {
     const g = selectedId ? getGroup(state, selectedId) : null;
     const visible = g && shownGroups().groups.some((x) => x.id === g.id);
-    if (!g || !visible || g.status === 'lost' || radial.open) { shield.hide(); return; }
+    if (!g || !visible || g.status === 'lost' || radial.open || filmFrame) { shield.hide(); return; }
     if (g.side !== side) {
       shield.show(`<header><b>Feind</b><span>${esc(typeName(g))}</span></header>
         <div class="rows"><div><span>Feld</span><b>${cellLabel(g.pos.x, g.pos.y)}</b></div><div><span>Deckung</span><b>${esc(coverAt(state, map, g.pos, g.side).label)}</b></div></div>
@@ -387,6 +438,7 @@ export async function mount(root, params) {
   function toggleList() { if (orderList.open) closeList(); else openList(); }
   function openList() {
     report.hide();
+    if (archiveView.open) closeArchive(false);
     updateList();
     orderList.show();
     root.classList.add('list-open');
@@ -445,28 +497,88 @@ export async function mount(root, params) {
     resolveNow();
   }
 
-  // Meldungen der letzten Runde fuer die planende Seite, jede Seite sieht nur ihre eigenen (Hotseat)
+  // Nach der Runde: Phasenfilm mit Telegramm fuer die planende Seite, jede Seite sieht nur ihr eigenes (Hotseat)
   let reportDue = new Set();
-  let lastTurn = 0;
+  const filmTitle = (st) => roundTitle(st);
   function showReport() {
     reportDue.delete(side);
-    const v = viewFor(state, lastLog, side, env);
-    const lines = v.log.filter((e) => e.phase !== 'orders' || e.side === side).map((e) => ({
-      text: e.reason, at: e.at, group: e.side === side ? e.group : null,
-      tone: e.type === 'order_invalid' || e.blocked ? 'warn' : e.type === 'hold' ? 'quiet' : '',
-    }));
-    report.show(`Meldungen · Runde ${lastTurn}`, lines.slice(0, 12));
-    if (state.result) flash(state.result.reason);
+    if (!lastRound) return;
+    const tr = pendingDark;
+    pendingDark = null;
+    startFilm(lastRound.input, lastRound.result, { title: filmTitle(lastRound.input.state), transition: tr });
+  }
+
+  function startFilm(input, result, { title, transition = null, replay = false, start = 0, paused = false }) {
+    const film = planFilm(input, result, side);
+    cancelTool(false);
+    radial.hide();
+    closeList();
+    archiveView.hide();
+    selectedId = null;
+    modalOpen = true;
+    root.classList.add('filming');
+    report.show({ title: `Telegramm · ${title}`, sub: `${film.lines.length} ${film.lines.length === 1 ? 'Zeile' : 'Zeilen'}`, lines: film.lines });
+    report.setFilmActive(true);
+    filmReplay = replay;
+    player.play(film, input, result, side, { title, transition, start, paused });
+    refresh();
+  }
+
+  let filmReplay = false;
+  function endFilm() {
+    filmFrame = null;
+    modalOpen = false;
+    root.classList.remove('filming');
+    report.setFilmActive(false);
+    if (state.result && !filmReplay) flash(state.result.reason);
+    refresh();
+    drawDynNow();
+    dynCv.focus({ preventScroll: true });
+  }
+
+  function openArchive() {
+    if (player.open) return;
+    if (archiveView.open) { closeArchive(); return; }
+    const rounds = archive.rounds.map((e) => {
+      const key = e.turn + side;
+      if (!archiveLines.has(key)) {
+        const input = inputOf(e, env);
+        archiveLines.set(key, planFilm(input, replayTo(input, phasesFor(e.kind, env.phases).length), side).lines);
+      }
+      const film = { lines: archiveLines.get(key) };
+      return {
+        entry: e, title: entryTitle(e), short: `R${e.turn}`,
+        sub: `${clockText(e.clock)} bis ${clockText(e.endClock)} Uhr · ${film.lines.length} Zeilen`, lines: film.lines,
+      };
+    });
+    cancelTool(false);
+    closeList();
+    report.hide();
+    modalOpen = true;
+    archiveView.show(rounds);
+    playSfx('paper', { intensity: 0.5 });
+    refresh();
+  }
+
+  const archiveLines = new Map(); // Telegrammzeilen alter Runden je Seite, einmal gerechnet
+  function closeArchive(focusMap = true) {
+    archiveView.hide();
+    modalOpen = false;
+    refresh();
+    if (focusMap) dynCv.focus({ preventScroll: true });
   }
 
   function resolveNow() {
     const ordersA = listOrders(book, 'a');
     const ordersB = humans.includes('b') ? listOrders(book, 'b') : planOrders(viewFor(state, [], 'b', env), { map, seed });
+    const input = { state, ordersA, ordersB, seed, turn: state.turn, env };
     const r = resolveTurn(state, ordersA, ordersB, seed, state.turn, env);
     const before = state;
     state = r.state;
     hoverSight = null;
     lastLog = r.log;
+    lastRound = { input, result: r };
+    archive = archiveRound(archive, input, r);
     // Unvollendete Wege laufen als Befehl weiter, solange die Rundenart passt
     const carry = { a: [], b: [] };
     for (const e of r.log) {
@@ -479,25 +591,21 @@ export async function mount(root, params) {
     book = nextRound(book, carry);
     side = humans[0];
     playSfx('clock-lock');
+    // Der Tag-Nacht-Uebergang laeuft in der letzten Sekunde des Films (Plan 7.7)
     const target = forcedDark ?? darknessAt(state.clock, state.turnKind, state.night);
-    if (target !== darkness) {
-      if (reducedMotion() || params.has('demo')) applyTheme(themeAt(target));
-      else animateDarkness(darkness, target, { duration: 2200 });
-    }
+    pendingDark = target !== darkness ? { from: darkness, to: target } : null;
     reportDue = new Set(humans);
-    lastTurn = before.turn;
     if (humans.length > 1) {
       modalOpen = true;
       refresh();
       showHandover(ui, {
         title: `Runde ${before.turn} ausgeführt`,
-        text: `Die Meldungen liegen bereit. ${faction(state.sides[side].faction).name} plant als Nächstes.`,
+        text: `Das Telegramm liegt bereit. ${faction(state.sides[side].faction).name} sieht zuerst den Film der Runde.`,
         button: `Weiter als ${faction(state.sides[side].faction).short}`,
         onGo: () => { modalOpen = false; homeView(); onCamera(); showReport(); refresh(); },
       });
     } else {
       showReport();
-      refresh();
     }
   }
 
@@ -676,6 +784,7 @@ export async function mount(root, params) {
     if (e.key === ' ' && !onButton) { e.preventDefault(); if (!tool) nextIdle(); return; }
     if (e.key === 'Enter' && !onButton) { e.preventDefault(); openSummary(); return; }
     if (/^[1-4]$/.test(e.key)) { toggleOverlay(Number(e.key)); return; }
+    if ((e.key === 'p' || e.key === 'P') && !toolByKey(e.key)) { e.preventDefault(); openArchive(); return; }
     if (e.key.length === 1) {
       const def = toolByKey(e.key);
       if (!def) return;
@@ -729,6 +838,8 @@ export async function mount(root, params) {
     list: () => openList(),
     overlay: (slot) => toggleOverlay(slot),
     commit: () => commitSide(),
+    get player() { return player; },
+    archive: () => openArchive(),
     finishAnim: () => { anim = null; drawDynNow(); },
   };
   window.__gefecht = api;
@@ -749,10 +860,28 @@ export async function mount(root, params) {
       state.turnKind = 'battle'; state.battle = { round: 1 };
       book = setOrder(book, side, { group: own[0].id, type: 'assault', path: [{ x: own[0].pos.x + 1, y: own[0].pos.y }] });
       api.summary(0.62);
-    } else if (demo === 'bericht') {
+    } else if (demo === 'film' || demo === 'telegramm' || demo === 'bericht' || demo === 'archiv') {
+      // P07: Film mitten in der Bewegung angehalten, Telegramm nach dem Film, Protokoll nach zwei Runden
       plan();
       commitSide();
-      if (humans.length === 1) { api.select(own[0].id); api.finishAnim(); }
+      if (demo === 'archiv') {
+        player.seek(1e9); player.next();
+        book = setOrder(book, side, { group: own[1].id, type: 'redeploy', path: pathTo(own[1], 22, 24) });
+        commitSide();
+        player.seek(1e9); player.next();
+        report.finishTyping();
+        openArchive();
+      } else if (!lastRound) {
+        // Hotseat: die Runde ist erst nach beiden Seiten aufgeloest
+      } else if (demo === 'film') {
+        const fl = planFilm(lastRound.input, lastRound.result, side);
+        const mv = fl.sections.find((x) => x.key === 'movement');
+        player.seek(mv.start + mv.dur * 0.45);
+      } else {
+        player.seek(1e9); player.next();
+        report.finishTyping();
+        if (humans.length === 1) api.select(own[0].id);
+      }
     } else if (demo === 'uebergabe') { plan(); commitSide(); }
     else if (demo === 'zeichnen') {
       api.select(own[1].id);

@@ -1,0 +1,109 @@
+/* P07: Phasenfilm, Telegramm (Stil 03 Feldtelegramm) und Protokoll-Archiv. Farben nur ueber Variablen. */
+
+/* Waehrend des Films: Werkzeuge, Checkliste und Hinweis treten zurueck */
+.gefecht.filming .bottom,.gefecht.filming .check,.gefecht.filming .hint,.gefecht.filming .shield{display:none !important}
+.gefecht.filming .g-dyn{cursor:grab}
+
+/* ---------- Filmleiste (Bild feature-02) ---------- */
+.film{position:absolute;left:12px;right:384px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:3;padding:8px 10px 10px;display:flex;flex-direction:column;gap:8px;pointer-events:auto}
+.film[hidden]{display:none}
+.film-head{display:flex;align-items:baseline;gap:12px;min-width:0}
+.film-title{font:400 16px/1.2 var(--font-head);white-space:nowrap}
+.film-phase{font-size:13px;color:var(--ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-right:auto}
+.film-clock{font:700 16px var(--font-num);padding:2px 8px;border:var(--border);border-radius:var(--radius)}
+.film-tabs{display:flex;border:var(--border);border-radius:var(--radius);overflow-x:auto;scrollbar-width:none}
+.film-tabs::-webkit-scrollbar{display:none}
+.film-tab{flex:1 0 auto;min-height:36px;padding:4px 14px;background:var(--card);color:var(--ink);border:0;border-right:var(--border);font:13.5px var(--font-ui)}
+.film-tab:last-child{border-right:0}
+.film-tab:hover{background:var(--track)}
+.film-tab.on{flex-grow:3;background:var(--ink);color:var(--card);font-weight:700}
+.film-tab.end{color:var(--ink2)}
+.film-ctrl{display:flex;align-items:center;gap:10px}
+.film-ctrl .btn{gap:8px;min-height:40px;padding:6px 14px;font-weight:700;white-space:nowrap}
+.film-ctrl .play{min-width:112px;justify-content:center}
+.film-ctrl .auto[aria-pressed="true"]{background:var(--track);border-color:var(--ink)}
+.film-ctrl .auto{font-weight:400}
+.film-ctrl .skip{font-weight:400}
+.scrub{flex:1;min-width:60px;height:28px;margin:0;accent-color:var(--own);background:none}
+
+/* ---------- Telegramm ---------- */
+.telegram{position:absolute;right:12px;bottom:calc(76px + env(safe-area-inset-bottom));width:360px;max-height:min(420px,calc(100% - 220px));display:flex;flex-direction:column;z-index:2;border-top:3px double var(--line)}
+.telegram.in-film{bottom:calc(10px + env(safe-area-inset-bottom));max-height:min(460px,calc(100% - 200px))}
+.telegram[hidden]{display:none}
+.telegram header{display:flex;align-items:baseline;gap:10px;padding:9px 12px;border-bottom:var(--border)}
+.telegram header b{font:400 16px var(--font-head)}
+.telegram .sub{color:var(--ink2);font-size:12.5px;margin-right:auto}
+.telegram ol,.archive ol{list-style:none;margin:0;padding:0;overflow:auto}
+.telegram li,.archive li{border-bottom:1px dotted var(--line);border-left:4px solid var(--own)}
+.telegram li:last-child,.archive li:last-child{border-bottom:0}
+.telegram li.warn,.archive li.warn{border-left-color:var(--danger)}
+.telegram li.quiet,.archive li.quiet{border-left-color:var(--line)}
+.telegram li button,.archive li button{display:block;width:100%;padding:6px 12px 7px;background:none;border:0;text-align:left;color:var(--ink)}
+.telegram li button:hover,.archive li button:hover{background:var(--track)}
+.telegram li{transform:translateX(var(--dx,0)) rotate(var(--rot,0deg))}
+.tg-head{display:block;font:11px/1.3 var(--font-num);letter-spacing:.06em;color:var(--ink2)}
+.tg-text{display:block;font:14px/1.38 var(--font-head);min-height:1.38em}
+.telegram li.quiet .tg-text{color:var(--ink2)}
+.telegram li.cur .tg-text::after{content:"";display:inline-block;width:.55em;height:1em;margin-left:1px;vertical-align:-2px;background:var(--ink);animation:tg-caret .5s steps(1) infinite}
+@keyframes tg-caret{50%{opacity:0}}
+.tg-empty{margin:0;padding:10px 12px;font:14px var(--font-head);color:var(--ink2)}
+.tg-empty[hidden]{display:none}
+.telegram footer{display:flex;gap:8px;padding:8px 10px;border-top:var(--border)}
+.telegram footer .btn{flex:1;justify-content:center;gap:8px;min-height:40px;padding:6px 10px;font-size:13.5px}
+.telegram.in-film footer{display:none}
+
+/* ---------- Protokoll-Archiv: Aktenordner mit Registern, Zeilen als Durchschlag ---------- */
+.archive{position:absolute;left:12px;top:12px;bottom:calc(12px + env(safe-area-inset-bottom));width:min(560px,calc(100% - 24px));display:flex;flex-direction:column;z-index:5}
+.archive[hidden]{display:none}
+.archive header{display:flex;align-items:baseline;gap:10px;padding:9px 12px;border-bottom:var(--border)}
+.archive header b{font:400 17px var(--font-head)}
+.archive .sub{color:var(--ink2);font-size:12.5px;margin-right:auto}
+.ar-body{display:flex;flex:1;min-height:0}
+.ar-tabs{display:flex;flex-direction:column;gap:4px;padding:10px 0 10px 8px;overflow-y:auto;border-right:var(--border)}
+.ar-tab{min-width:52px;min-height:40px;padding:4px 10px;background:var(--paper);color:var(--ink);border:var(--border);border-right:0;border-radius:var(--radius) 0 0 var(--radius);font:700 13px var(--font-num)}
+.ar-tab.on{background:var(--card);color:var(--ink);margin-right:-1px;position:relative}
+.ar-page{flex:1;display:flex;flex-direction:column;min-width:0;padding:10px 12px 12px;gap:8px;overflow:hidden}
+.ar-title{display:flex;flex-direction:column}
+.ar-title b{font:400 16px var(--font-head)}
+.ar-title span{font-size:12.5px;color:var(--ink2)}
+/* Durchschlag: Kopierstift-Farbe, leicht unscharf */
+.archive .tg-text{color:color-mix(in srgb,var(--own) 55%,var(--ink));text-shadow:0 0 .6px color-mix(in srgb,var(--own) 55%,var(--ink))}
+.archive ol{flex:1;border:var(--border)}
+.ar-film{align-self:flex-start;font-weight:700}
+.ar-none{color:var(--ink2)}
+
+@media (max-width:699px){
+  .film{left:8px;right:8px;bottom:calc(8px + env(safe-area-inset-bottom));padding:6px 8px 8px;gap:6px}
+  .film-title{font-size:14px}
+  .film-tab{min-height:36px;padding:4px 10px;font-size:12.5px}
+  .film-tab.on{flex-grow:1}
+  .film-ctrl{gap:6px}
+  .film-ctrl .btn{min-height:44px;padding:6px 10px}
+  .film-ctrl .play{min-width:84px}
+  .film-ctrl .auto{display:none}
+  .film-ctrl .skip kbd{display:none}
+  .telegram{left:8px;right:8px;width:auto;bottom:calc(80px + env(safe-area-inset-bottom));max-height:42%}
+  .telegram.in-film{bottom:calc(150px + env(safe-area-inset-bottom));max-height:30%}
+  .archive{left:8px;right:8px;top:calc(8px + env(safe-area-inset-top));width:auto}
+  .ar-tab{min-width:46px;min-height:44px}
+}
+@media (prefers-reduced-motion:reduce){
+  .telegram li.cur .tg-text::after{animation:none}
+}
+/* Kopf der laufenden Planung ausblenden: der Film zeigt seine eigene Runde */
+.gefecht.filming .round,.gefecht.filming .hud-right,.gefecht.filming .strip-round{visibility:hidden}
+/* Mittlere Breiten (Tablet, Handy quer): Filmleiste ueber die ganze Breite, Telegramm darueber */
+@media (min-width:700px) and (max-width:1099px){
+  .film{right:12px}
+  .telegram.in-film{bottom:calc(160px + env(safe-area-inset-bottom));max-height:calc(100% - 250px)}
+}
+@media (max-height:500px) and (min-width:700px){
+  .telegram.in-film{max-height:calc(100% - 150px);top:12px;bottom:auto}
+  .film{left:12px;right:384px;bottom:8px;gap:6px;padding:6px 8px 8px}
+  .film-ctrl .auto,.film-ctrl kbd{display:none}
+  .film-tab{min-height:32px}
+}
+/* Ohne Tastatur keine Tastenhinweise */
+@media (hover:none){
+  .tg-archive kbd,.film-ctrl .skip kbd{display:none}
+}
