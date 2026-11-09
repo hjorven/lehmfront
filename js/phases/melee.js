@@ -12,6 +12,7 @@
 // - Verliert der Angreifer, bleibt er liegen, wird niedergehalten und versucht es mit dem Rest des Weges erneut.
 // Jede Begegnung meldet 'melee' (oeffentlich, Begruendung mit den Gruenden) und 'losses' (fuer die Sanitaetskette).
 import { registerPhase, ORDER } from './registry.js';
+import { factorFor } from '../modifiers.js';
 import { cellLabel, distance, enterCost } from '../map.js';
 import { trenchAt } from '../sight.js';
 import { captureTrench } from '../trench.js';
@@ -54,9 +55,11 @@ export function defenseFactor(state, map, def) {
 export function meleeOdds(state, map, attackers, def) {
   // Erfahrungsbericht Grabenkeulen (P14): Kampfkraft im Nahkampf
   const club = (g) => (hasReport(state, g.side, 'grabenkeulen') ? REPORT_EFFECTS.grabenkeulen.meleePct / 100 : 1);
-  const A = attackers.reduce((s, a) => s + meleePower(a.g) * club(a.g) * (a.assault ? ASSAULT_DASH : 1), 0);
+  // P23: Offiziere, Veteranen, Doktrinen (js/modifiers.js)
+  const mod = (g, defending) => factorFor('melee', { state, map, group: g, night: !!state?.night, defending });
+  const A = attackers.reduce((s, a) => s + meleePower(a.g) * club(a.g) * mod(a.g, false) * (a.assault ? ASSAULT_DASH : 1), 0);
   const d = defenseFactor(state, map, def);
-  const D = meleePower(def) * club(def) * d.factor;
+  const D = meleePower(def) * club(def) * mod(def, true) * d.factor;
   const p = A + D > 0 ? A / (A + D) : 0.5;
   return { p: Math.max(0.05, Math.min(0.95, p)), A, D, why: d.why };
 }

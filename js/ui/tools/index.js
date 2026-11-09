@@ -11,4 +11,5 @@ import './move.js';
 import './rebuild.js';
 import './relieve.js';
 import './supply.js';
+import './underground.js';
 import './wire.js';

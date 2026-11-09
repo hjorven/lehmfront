@@ -1,0 +1,355 @@
+{
+  "id": "akt2-m5-angriff",
+  "name": "Morgennebel",
+  "map": "huegel214",
+  "act": 2,
+  "features": [
+    "officers",
+    "sap",
+    "raid"
+  ],
+  "startHour": 6,
+  "turnKind": "position",
+  "weather": {
+    "kind": "fog",
+    "fog": 0.9,
+    "wet": 2
+  },
+  "cells": [
+    {
+      "x": 30,
+      "y": 21,
+      "trench": {
+        "side": "own",
+        "kind": "comm",
+        "level": 1,
+        "facing": "E",
+        "sap": true
+      }
+    },
+    {
+      "x": 31,
+      "y": 21,
+      "trench": {
+        "side": "own",
+        "kind": "comm",
+        "level": 1,
+        "facing": "E",
+        "sap": true
+      }
+    },
+    {
+      "x": 32,
+      "y": 21,
+      "trench": {
+        "side": "own",
+        "kind": "comm",
+        "level": 1,
+        "facing": "E",
+        "sap": true
+      }
+    },
+    {
+      "x": 33,
+      "y": 21,
+      "trench": {
+        "side": "own",
+        "kind": "comm",
+        "level": 1,
+        "facing": "E",
+        "sap": true
+      }
+    },
+    {
+      "x": 34,
+      "y": 21,
+      "trench": {
+        "side": "own",
+        "kind": "comm",
+        "level": 1,
+        "facing": "E",
+        "sap": true
+      }
+    },
+    {
+      "x": 35,
+      "y": 21,
+      "trench": {
+        "side": "own",
+        "kind": "comm",
+        "level": 1,
+        "facing": "E",
+        "sap": true
+      }
+    },
+    {
+      "x": 38,
+      "y": 18,
+      "wire": null
+    },
+    {
+      "x": 38,
+      "y": 19,
+      "wire": null
+    },
+    {
+      "x": 38,
+      "y": 20,
+      "wire": null
+    },
+    {
+      "x": 38,
+      "y": 21,
+      "wire": null
+    }
+  ],
+  "sides": {
+    "a": {
+      "faction": "kaldern",
+      "supplies": {
+        "carts": 4,
+        "cartsTotal": 6
+      },
+      "artillery": {
+        "lines": [
+          {
+            "id": "k4",
+            "to": "batterie1",
+            "points": [
+              [
+                15,
+                12
+              ],
+              [
+                13,
+                20
+              ],
+              [
+                12,
+                28
+              ]
+            ]
+          },
+          {
+            "id": "k5",
+            "to": "B-Stelle Mitte",
+            "points": [
+              [
+                15,
+                12
+              ],
+              [
+                20,
+                15.5
+              ],
+              [
+                24,
+                15.5
+              ]
+            ]
+          }
+        ]
+      },
+      "ai": {
+        "goals": {
+          "attack": {
+            "x": 40,
+            "y": 19
+          }
+        }
+      },
+      "groups": [
+        {
+          "type": "stormtroops",
+          "pos": {
+            "x": 35,
+            "y": 21
+          },
+          "morale": 76,
+          "experience": 2,
+          "officer": {
+            "id": "vell",
+            "name": "Jost Vell",
+            "rank": "Leutnant",
+            "home": "Haverstadt",
+            "skill": "sturm"
+          }
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 34,
+            "y": 21
+          },
+          "morale": 70
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 33,
+            "y": 21
+          },
+          "morale": 68
+        },
+        {
+          "type": "pioneers",
+          "pos": {
+            "x": 32,
+            "y": 21
+          },
+          "morale": 68,
+          "leader": {
+            "name": "Swantje Fedders",
+            "home": "Grauwarf"
+          }
+        },
+        {
+          "type": "mg",
+          "pos": {
+            "x": 30,
+            "y": 18
+          },
+          "morale": 66
+        },
+        {
+          "type": "medics",
+          "pos": {
+            "x": 30,
+            "y": 21
+          },
+          "morale": 70
+        },
+        {
+          "type": "observers",
+          "pos": {
+            "x": 29,
+            "y": 16
+          },
+          "morale": 66
+        }
+      ]
+    },
+    "b": {
+      "faction": "morrow",
+      "control": "ai",
+      "ai": {
+        "doctrine": "nacht",
+        "difficulty": "veteran"
+      },
+      "supplies": {
+        "carts": 3,
+        "cartsTotal": 5
+      },
+      "artillery": {
+        "exchange": {
+          "x": 52,
+          "y": 19
+        },
+        "batteries": [
+          {
+            "id": "mb1",
+            "type": "feldhaubitzen",
+            "x": 54,
+            "y": 9,
+            "w": 2,
+            "h": 2,
+            "label": "Batterie Morrow 1"
+          },
+          {
+            "id": "mb2",
+            "type": "feldhaubitzen",
+            "x": 54,
+            "y": 27,
+            "w": 2,
+            "h": 2,
+            "label": "Batterie Morrow 2"
+          }
+        ],
+        "lines": [
+          {
+            "id": "m1",
+            "to": "Abschnitt Hügel",
+            "points": [
+              [
+                52,
+                19
+              ],
+              [
+                47,
+                18
+              ],
+              [
+                45,
+                18
+              ]
+            ]
+          },
+          {
+            "id": "m3",
+            "to": "mb1",
+            "points": [
+              [
+                52,
+                19
+              ],
+              [
+                54,
+                10
+              ]
+            ]
+          },
+          {
+            "id": "m4",
+            "to": "mb2",
+            "points": [
+              [
+                52,
+                19
+              ],
+              [
+                54,
+                27
+              ]
+            ]
+          }
+        ]
+      },
+      "groups": [
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 40,
+            "y": 19
+          },
+          "strength": 7,
+          "morale": 55,
+          "fatigue": 40
+        },
+        {
+          "type": "mg",
+          "pos": {
+            "x": 40,
+            "y": 24
+          },
+          "strength": 5,
+          "morale": 55,
+          "fatigue": 40
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 45,
+            "y": 17
+          }
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 45,
+            "y": 23
+          }
+        }
+      ]
+    }
+  }
+}

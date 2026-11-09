@@ -85,9 +85,9 @@ test('ID-Vergleich ohne Locale, Feldzustand sortiert', () => {
 
 test('Konfiguration: Release-1.0-Einheiten befuellt, spaetere vorbereitet', () => {
   const on = Object.values(UNIT_TYPES).filter((u) => u.enabled).map((u) => u.id).sort();
-  assert.deepEqual(on, ['medics', 'mg', 'mortar', 'observers', 'pioneers', 'rifles', 'runners']);
+  assert.deepEqual(on, ['listeners', 'medics', 'mg', 'mortar', 'observers', 'pioneers', 'rifles', 'runners', 'snipers', 'stormtroops']);
   for (const u of Object.values(UNIT_TYPES)) {
-    assert.equal(u.enabled, u.release === '1.0', u.id);
+    assert.equal(u.enabled, u.release === '1.0' || u.release === '1.2', u.id); // 1.2: Akt 2 (P23)
     for (const k of ['range', 'shots', 'suppressionPerShot', 'digRate', 'speed']) assert.equal(typeof u[k], 'number', u.id + '.' + k);
     assert.ok(u.size[0] <= u.size[1]);
   }

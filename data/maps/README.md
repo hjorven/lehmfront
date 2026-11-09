@@ -27,4 +27,6 @@ Die Asse-Karte wird erzeugt, nicht von Hand geschrieben:
 node tools/maps/asse.mjs
 ```
 
+Die Karte Hügel 214 (Akt 2) entsteht ebenso mit `node tools/maps/huegel214.mjs`, ihre Szenarien mit `node tools/scenarios/akt2.mjs`; `test/akt2.test.js` prüft beide.
+
 Ein Test (`test/map.test.js`) prüft, dass die Datei einem neuen Lauf des Generators entspricht. Wer die Karte ändert, ändert den Generator und lässt ihn laufen.

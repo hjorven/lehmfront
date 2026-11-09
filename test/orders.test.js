@@ -51,6 +51,7 @@ test('Fremde, unbekannte und doppelte Befehle', () => {
 
 test('Nachtbefehl geht nachts, Befehle sind unabhaengig von der Eingabereihenfolge', () => {
   const night = { ...structuredClone(s), night: true };
+  night.groups.find((g) => g.id === 'a01').type = 'stormtroops'; // Stosstrupp nur fuer Stosstrupps (P23)
   assert.equal(validateOrder({ group: 'a01', type: 'raid', target: { x: 10, y: 3 } }, night, 'a'), null);
   const list = [{ group: 'a03', type: 'hold' }, { group: 'a01', type: 'dig', path: [{ x: 3, y: 3 }] }];
   assert.deepEqual(normalizeOrders(s, 'a', list), normalizeOrders(s, 'a', [...list].reverse()));

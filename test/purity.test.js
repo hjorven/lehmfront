@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 
 const root = new URL('../js/', import.meta.url);
-const files = ['rules.js', 'resolve.js', 'state.js', 'orders.js', 'view.js', 'events.js', 'map.js', 'supply.js', 'artillery.js', 'etappe.js', 'sight.js', 'weather.js', 'ui/daytime.js', 'film.js', 'archive.js', 'trench.js', 'morale.js', 'audio/cues.js', 'letters.js', 'ai.js', 'ai/match.js', 'ai/notes.js', 'config/doctrines.js', 'mapgen.js', 'placenames.js', 'modes/skirmish.js', 'modes/endless.js', 'config/seasons.js', 'config/battlemaps.js', 'campaign.js', 'config/reports.js', 'missions/goals.js', 'missions/script.js', 'missions/akt1.js', 'missions/run.js']
+const files = ['rules.js', 'resolve.js', 'state.js', 'orders.js', 'view.js', 'events.js', 'map.js', 'supply.js', 'artillery.js', 'etappe.js', 'sight.js', 'weather.js', 'ui/daytime.js', 'film.js', 'archive.js', 'trench.js', 'morale.js', 'audio/cues.js', 'letters.js', 'ai.js', 'ai/match.js', 'ai/notes.js', 'config/doctrines.js', 'mapgen.js', 'placenames.js', 'modes/skirmish.js', 'modes/endless.js', 'config/seasons.js', 'config/battlemaps.js', 'campaign.js', 'config/reports.js', 'missions/goals.js', 'missions/script.js', 'missions/akt1.js', 'missions/run.js', 'underground.js', 'veterans.js', 'modifiers.js', 'harm.js', 'ai/blocks.js', 'ai/akt2.js', 'ai/mission-match.js', 'config/akt2.js', 'config/missions-akt2.js']
   .filter((f) => existsSync(new URL(f, root)))
   .concat(readdirSync(new URL('phases/', root)).filter((f) => f.endsWith('.js')).map((f) => 'phases/' + f))
   .concat(readdirSync(new URL('narrative/', root)).filter((f) => f.endsWith('.js')).map((f) => 'narrative/' + f));

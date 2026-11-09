@@ -1,0 +1,469 @@
+{
+  "id": "akt2-m6",
+  "name": "Der Trichter",
+  "map": "huegel214",
+  "act": 2,
+  "features": [
+    "officers",
+    "sap",
+    "tunnel"
+  ],
+  "startHour": 6,
+  "turnKind": "position",
+  "weather": {
+    "kind": "overcast",
+    "wet": 2
+  },
+  "cells": [
+    {
+      "x": 30,
+      "y": 21,
+      "trench": {
+        "side": "own",
+        "kind": "comm",
+        "level": 1,
+        "facing": "E",
+        "sap": true
+      }
+    },
+    {
+      "x": 31,
+      "y": 21,
+      "trench": {
+        "side": "own",
+        "kind": "comm",
+        "level": 1,
+        "facing": "E",
+        "sap": true
+      }
+    },
+    {
+      "x": 32,
+      "y": 21,
+      "trench": {
+        "side": "own",
+        "kind": "comm",
+        "level": 1,
+        "facing": "E",
+        "sap": true
+      }
+    },
+    {
+      "x": 33,
+      "y": 21,
+      "trench": {
+        "side": "own",
+        "kind": "comm",
+        "level": 1,
+        "facing": "E",
+        "sap": true
+      }
+    },
+    {
+      "x": 34,
+      "y": 21,
+      "trench": {
+        "side": "own",
+        "kind": "comm",
+        "level": 1,
+        "facing": "E",
+        "sap": true
+      }
+    },
+    {
+      "x": 35,
+      "y": 21,
+      "trench": {
+        "side": "own",
+        "kind": "comm",
+        "level": 1,
+        "facing": "E",
+        "sap": true
+      }
+    },
+    {
+      "x": 39,
+      "y": 17,
+      "crater": 1,
+      "mud": 1,
+      "trichter": "b0",
+      "trench": null
+    },
+    {
+      "x": 40,
+      "y": 17,
+      "crater": 1,
+      "mud": 1,
+      "trichter": "b0",
+      "trench": null
+    },
+    {
+      "x": 41,
+      "y": 17,
+      "crater": 1,
+      "mud": 1,
+      "trichter": "b0",
+      "trench": null
+    },
+    {
+      "x": 39,
+      "y": 18,
+      "crater": 1,
+      "mud": 1,
+      "trichter": "b0",
+      "trench": null
+    },
+    {
+      "x": 40,
+      "y": 18,
+      "crater": 2,
+      "mud": 2,
+      "trichter": "b0",
+      "trench": null
+    },
+    {
+      "x": 41,
+      "y": 18,
+      "crater": 1,
+      "mud": 1,
+      "trichter": "b0",
+      "trench": null
+    },
+    {
+      "x": 39,
+      "y": 19,
+      "crater": 1,
+      "mud": 1,
+      "trichter": "b0",
+      "trench": null
+    },
+    {
+      "x": 40,
+      "y": 19,
+      "crater": 1,
+      "mud": 1,
+      "trichter": "b0",
+      "trench": null
+    },
+    {
+      "x": 41,
+      "y": 19,
+      "crater": 1,
+      "mud": 1,
+      "trichter": "b0",
+      "trench": null
+    },
+    {
+      "x": 38,
+      "y": 17,
+      "wire": null
+    },
+    {
+      "x": 38,
+      "y": 18,
+      "wire": null
+    },
+    {
+      "x": 38,
+      "y": 19,
+      "wire": null
+    }
+  ],
+  "sides": {
+    "a": {
+      "faction": "kaldern",
+      "supplies": {
+        "carts": 4,
+        "cartsTotal": 6
+      },
+      "artillery": {
+        "lines": [
+          {
+            "id": "k4",
+            "to": "batterie1",
+            "points": [
+              [
+                15,
+                12
+              ],
+              [
+                13,
+                20
+              ],
+              [
+                12,
+                28
+              ]
+            ]
+          },
+          {
+            "id": "k5",
+            "to": "B-Stelle Mitte",
+            "points": [
+              [
+                15,
+                12
+              ],
+              [
+                20,
+                15.5
+              ],
+              [
+                24,
+                15.5
+              ]
+            ]
+          }
+        ]
+      },
+      "ai": {
+        "goals": {
+          "attack": {
+            "x": 40,
+            "y": 18
+          },
+          "crater": [
+            {
+              "x": 39,
+              "y": 17
+            },
+            {
+              "x": 40,
+              "y": 17
+            },
+            {
+              "x": 41,
+              "y": 17
+            },
+            {
+              "x": 39,
+              "y": 18
+            },
+            {
+              "x": 40,
+              "y": 18
+            },
+            {
+              "x": 41,
+              "y": 18
+            },
+            {
+              "x": 39,
+              "y": 19
+            },
+            {
+              "x": 40,
+              "y": 19
+            },
+            {
+              "x": 41,
+              "y": 19
+            }
+          ]
+        }
+      },
+      "groups": [
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 34,
+            "y": 21
+          },
+          "morale": 70,
+          "officer": {
+            "id": "vell",
+            "name": "Jost Vell",
+            "rank": "Leutnant",
+            "home": "Haverstadt",
+            "skill": "sturm",
+            "protect": true
+          }
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 33,
+            "y": 21
+          },
+          "morale": 68
+        },
+        {
+          "type": "pioneers",
+          "pos": {
+            "x": 35,
+            "y": 21
+          },
+          "morale": 70,
+          "leader": {
+            "name": "Swantje Fedders",
+            "home": "Grauwarf"
+          }
+        },
+        {
+          "type": "mg",
+          "pos": {
+            "x": 30,
+            "y": 18
+          },
+          "morale": 66
+        },
+        {
+          "type": "stormtroops",
+          "pos": {
+            "x": 32,
+            "y": 21
+          },
+          "morale": 72,
+          "experience": 2
+        },
+        {
+          "type": "observers",
+          "pos": {
+            "x": 29,
+            "y": 16
+          },
+          "morale": 66
+        },
+        {
+          "type": "medics",
+          "pos": {
+            "x": 30,
+            "y": 21
+          },
+          "morale": 70
+        }
+      ]
+    },
+    "b": {
+      "faction": "morrow",
+      "control": "ai",
+      "ai": {
+        "doctrine": "nacht",
+        "difficulty": "veteran"
+      },
+      "supplies": {
+        "carts": 3,
+        "cartsTotal": 5
+      },
+      "artillery": {
+        "exchange": {
+          "x": 52,
+          "y": 19
+        },
+        "batteries": [
+          {
+            "id": "mb1",
+            "type": "feldhaubitzen",
+            "x": 54,
+            "y": 9,
+            "w": 2,
+            "h": 2,
+            "label": "Batterie Morrow 1"
+          },
+          {
+            "id": "mb2",
+            "type": "feldhaubitzen",
+            "x": 54,
+            "y": 27,
+            "w": 2,
+            "h": 2,
+            "label": "Batterie Morrow 2"
+          }
+        ],
+        "lines": [
+          {
+            "id": "m1",
+            "to": "Abschnitt Hügel",
+            "points": [
+              [
+                52,
+                19
+              ],
+              [
+                47,
+                18
+              ],
+              [
+                45,
+                18
+              ]
+            ]
+          },
+          {
+            "id": "m3",
+            "to": "mb1",
+            "points": [
+              [
+                52,
+                19
+              ],
+              [
+                54,
+                10
+              ]
+            ]
+          },
+          {
+            "id": "m4",
+            "to": "mb2",
+            "points": [
+              [
+                52,
+                19
+              ],
+              [
+                54,
+                27
+              ]
+            ]
+          }
+        ]
+      },
+      "groups": [
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 41,
+            "y": 14
+          },
+          "strength": 7,
+          "morale": 50,
+          "fatigue": 30
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 41,
+            "y": 23
+          },
+          "strength": 7,
+          "morale": 50,
+          "fatigue": 30
+        },
+        {
+          "type": "mg",
+          "pos": {
+            "x": 46,
+            "y": 22
+          },
+          "strength": 4
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 46,
+            "y": 20
+          },
+          "strength": 8
+        },
+        {
+          "type": "stormtroops",
+          "pos": {
+            "x": 45,
+            "y": 14
+          }
+        }
+      ]
+    }
+  }
+}

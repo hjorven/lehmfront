@@ -13,6 +13,7 @@
 //   bevor der Sturm ankommt.
 // Zustand je Gruppe: inDugout (bool), dugout: 'in' | 'leaving' | undefined.
 import { registerPhase, ORDER } from './registry.js';
+import { flagFor } from '../modifiers.js';
 import { registerOrderValidator } from '../orders.js';
 import { cellLabel } from '../map.js';
 import { trenchAt, PINNED } from '../sight.js';
@@ -64,6 +65,11 @@ function runDugout(ctx) {
           delete g.dugout;
           ev('dugout_out', `${name} ist oben und steht an der Brustwehr.`, { minor: false });
         }
+      } else if (!stay && flagFor('exit', { state: ctx.state, group: g })) {
+        // P23: wachsame Gruppen (Veteranen) sind sofort oben
+        g.inDugout = false;
+        delete g.dugout;
+        ev('dugout_out', `${name} ist sofort oben: die Gruppe schläft mit dem Gewehr im Arm.`, { minor: false });
       } else if (!stay) {
         g.dugout = 'leaving';
         ev('dugout_leave', `${name} kommt aus dem Unterstand. Bis alle an der Brustwehr stehen, vergeht eine Runde.`);

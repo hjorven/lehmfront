@@ -18,6 +18,7 @@ export const ORDER_TYPES = {
   etappe:      { id: 'etappe',      label: 'Etappe',          kind: 'position', target: null, scope: 'side' },
   fire_plan:   { id: 'fire_plan',   label: 'Feuerplan',       kind: 'position', target: null, scope: 'side' },
   harass:      { id: 'harass',      label: 'Störfeuer',       kind: 'position', target: 'cell' },
+  sap:         { id: 'sap',         label: 'Sappe',           kind: 'position', target: 'path' },
   tunnel:      { id: 'tunnel',      label: 'Stollen',         kind: 'position', target: 'path' },
   raid:        { id: 'raid',        label: 'Stoßtrupp',       kind: 'position', target: 'cell', night: true },
   attack:      { id: 'attack',      label: 'Angriff ansetzen', kind: 'position', target: 'path' },

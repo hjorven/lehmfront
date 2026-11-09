@@ -14,6 +14,7 @@ import { playSfx } from '../../audio/engine.js';
 import { esc, ensureCss } from '../dom.js';
 import { loadCampaign, loadMissionStart, saveMissionReturn } from './store.js';
 import '../../missions/index.js'; // Missionsziele der Akte (P16 ff.)
+import { prepareMission } from '../../config/missions.js'; // Missionsziele (registerMissionJudge) und Vorbereitung
 
 // Klang der neuen Ereignisse im Phasenfilm
 registerCue('mutiny', () => [{ name: 'hush' }, { name: 'paper', opts: { intensity: 0.6 }, delay: 0.4 }]);
@@ -99,7 +100,7 @@ export function campaignMission(params) {
     campaign,
     prepare(state, map = null) {
       mapRef = map;
-      const s = applyCampaignToState(state, { ...campaign, mission }, side);
+      const s = prepareMission(mission, applyCampaignToState(state, { ...campaign, mission }, side), campaign, side);
       startValues = startAxes(s, side);
       return s;
     },

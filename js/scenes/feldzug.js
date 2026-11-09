@@ -136,7 +136,7 @@ export async function mount(root, params) {
     if (!c.ended) {
       let map = null;
       try {
-        const scen = await fetchJson(`data/scenarios/${scenarioForMission(ret.mission)}.json`);
+        const scen = await fetchJson(`data/scenarios/${scenarioForMission(ret.mission, campaign)}.json`);
         map = loadMap(await fetchJson(`data/maps/${scen.map}.json`));
       } catch { map = null; }
       const r = await playInterlude({
@@ -204,7 +204,7 @@ export async function mount(root, params) {
         campaign = stampOrder(campaign, m, 'befolgen', order);
       }
       const seed = missionSeed(campaign, m);
-      const scenario = scenarioForMission(m);
+      const scenario = scenarioForMission(m, campaign);
       campaign = { ...campaign, fresh: [], reply: null };
       save(campaign);
       saveMissionStart({ mission: m, seed, scenario });
