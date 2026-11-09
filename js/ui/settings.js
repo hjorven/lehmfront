@@ -29,7 +29,7 @@ const LABELS = {
 };
 
 // Feste Tasten (Plan 7.6); die Werkzeuge melden ihre Tasten selbst im Register an
-const FIXED_KEYS = [
+export const FIXED_KEYS = [
   ['Gefecht', [
     ['Leertaste', 'nächste Gruppe ohne Befehl'],
     ['Enter', 'Runde ausführen (Übersicht)'],
@@ -51,7 +51,7 @@ const FIXED_KEYS = [
 ];
 
 // Gegenstuecke der Tasten fuer Touch (Handy, Tablet)
-const TOUCH = [
+export const TOUCH = [
   ['Gruppe antippen', 'wählen; Befehl unten in der Werkzeugreihe'],
   ['Lang drücken', 'Befehle der Gruppe im Kreis'],
   ['Ziel antippen', 'vormerken (Bleistift), noch einmal antippen setzt den Befehl'],
@@ -306,7 +306,8 @@ export function openSettings({ tab = 'akten', game = null, container = document.
     const block = (title, rows) => `<section class="set-keys"><h3>${esc(title)}</h3><dl>${rows.map(([k, v]) =>
       `<div><dt>${k.split(' ').map((p) => (/^(oder|bis|und|\+)$/.test(p) ? esc(p) : `<kbd>${esc(p)}</kbd>`)).join(' ')}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl></section>`;
     panel.innerHTML = block('Befehle', tools) + FIXED_KEYS.map(([t, rows]) => block(t, rows)).join('')
-      + `<section class="set-keys"><h3>Mit dem Finger</h3><dl>${TOUCH.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl></section>`;
+      + `<section class="set-keys"><h3>Mit dem Finger</h3><dl>${TOUCH.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl></section>`
+      + '<p class="set-hand"><a class="btn" href="?scene=handbuch" target="_blank" rel="noopener">Handbuch: alle Begriffe erklärt</a></p>';
   }
 
   // ---------- Ereignisse ----------

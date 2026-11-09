@@ -20,6 +20,7 @@
   <p class="sub">Ein Frontabschnitt an der Asse. Jeder Meter Graben ist erkämpft.</p>
   <nav class="menu-list" aria-label="Hauptmenü">
     <a class="btn" href="?scene=gefecht" id="menu-weiter" hidden>Weiterspielen <small></small></a>
+    <a class="btn menu-drill" href="?scene=gefecht&amp;karte=asse&amp;ki=rekrut&amp;runden=0&amp;seed=1917&amp;ausbildung=1" id="menu-drill">Grundausbildung <small>erste Schritte, zehn Minuten</small><span class="menu-new" hidden>Neu hier? Hier anfangen.</span></a>
     <a class="btn" href="?scene=feldzug">Kampagne <small>die Asse, Akt 1 bis 4</small></a>
     <a class="btn" href="?scene=gefecht-frei">Gefecht frei <small>vier Karten oder Zufall</small></a>
     <a class="btn" href="?scene=tageslage" id="menu-tageslage">Tageslage <small>für alle dieselbe</small></a>
@@ -30,7 +31,10 @@
     <a class="btn" href="?scene=puzzle">Lehrgang <small>zwölf Puzzle-Lagen</small></a>
     <a class="btn" href="?scene=werkstatt">Werkstatt <small>Stellungen und eigene Lagen</small></a>
   </nav>
-  <button type="button" class="btn menu-akte" id="menu-akte" aria-haspopup="dialog">Dienstbuch <small>Spielstände, Klang, Darstellung</small></button>
+  <div class="menu-more">
+    <button type="button" class="btn menu-akte" id="menu-akte" aria-haspopup="dialog">Dienstbuch <small>Spielstände, Klang</small></button>
+    <a class="btn menu-akte menu-hand" href="?scene=handbuch">Handbuch <small>Begriffe, Tasten</small></a>
+  </div>
   <button type="button" class="menu-sound" id="menu-sound" aria-pressed="false">Ton: tippen zum Wecken</button>
 </main>
 <div class="version" id="version"></div>

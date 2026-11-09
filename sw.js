@@ -7,7 +7,7 @@
 // VERSION haengt an der Liste: neue oder entfernte Dateien ergeben einen neuen Cache und den Update-Hinweis.
 
 // precache:start
-const VERSION = 'af7d03cc';
+const VERSION = '8c11a848';
 const FILES = [
   'assets/fonts/caveat-latin-400-normal.woff2',
   'assets/fonts/caveat-latin-700-normal.woff2',
@@ -20,6 +20,7 @@ const FILES = [
   'assets/icons/lehmfront-512-maskable.png',
   'assets/icons/lehmfront-512.png',
   'css/debug-state.css',
+  'css/drill.css',
   'css/einstellungen.css',
   'css/etappe-window.css',
   'css/etappe3d.css',
@@ -30,6 +31,7 @@ const FILES = [
   'css/frontabschnitt.css',
   'css/gefecht.css',
   'css/graben.css',
+  'css/handbuch.css',
   'css/karte.css',
   'css/kartefrei.css',
   'css/klang.css',
@@ -157,8 +159,10 @@ const FILES = [
   'js/config/buildings.js',
   'js/config/campaign-map.js',
   'js/config/doctrines.js',
+  'js/config/drill.js',
   'js/config/factions.js',
   'js/config/grounds.js',
+  'js/config/handbook.js',
   'js/config/missions-akt2.js',
   'js/config/missions-akt3.js',
   'js/config/missions-akt4.js',
@@ -280,6 +284,7 @@ const FILES = [
   'js/scenes/frontabschnitt.js',
   'js/scenes/gefecht-frei.js',
   'js/scenes/gefecht.js',
+  'js/scenes/handbuch.js',
   'js/scenes/karte.js',
   'js/scenes/klang.js',
   'js/scenes/papier.js',
@@ -304,6 +309,7 @@ const FILES = [
   'js/ui/commit.js',
   'js/ui/daytime.js',
   'js/ui/dom.js',
+  'js/ui/drill.js',
   'js/ui/endless/store.js',
   'js/ui/endless/week.js',
   'js/ui/etappe-window.js',

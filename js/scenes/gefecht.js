@@ -77,6 +77,7 @@ import { setupOnline, attachMatch, brokenText, blockMatch, telegramLines } from 
 import { attachLageRules } from '../ui/lage-rules.js';
 import { createKoop } from '../ui/koop.js';
 import { marginNotes, marginOverlay } from '../ui/margin-notes.js';
+import { attachDrill } from '../ui/drill.js';
 
 const num = (v, d) => (v === null || v === '' || !Number.isFinite(Number(v)) ? d : Number(v));
 const LONG_PRESS_MS = 430;
@@ -1339,6 +1340,11 @@ export async function mount(root, params) {
     get plannerWindow() { return plannerWindow; },
   };
   window.__gefecht = api;
+  // Grundausbildung: Zettel mit Schritten fuer Anfaenger (js/ui/drill.js, Schritte in js/config/drill.js)
+  if (params.has('ausbildung') && !params.has('demo')) {
+    const at = Number(params.get('ausbildung'));
+    api.drill = attachDrill({ ui, root, api, startAt: Number.isInteger(at) && at > 1 ? at - 1 : null });
+  }
   const demo = params.get('demo');
   if (demo) {
     const own = groupsOf(state, side);

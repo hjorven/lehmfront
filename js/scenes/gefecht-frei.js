@@ -12,6 +12,7 @@ import { DIFFICULTIES } from '../config/doctrines.js';
 import { FACTION_IDS, DIFFICULTY_IDS, mapJsonFor, otherFaction } from '../modes/skirmish.js';
 import { esc, ensureCss } from '../ui/dom.js';
 import { audio, playSfx } from '../audio/engine.js';
+import { readDrill } from '../config/drill.js';
 
 const DIFF_TEXT = {
   rekrut: 'sieht wenig, schätzt grob, verschläft Befehle',
@@ -40,11 +41,13 @@ export async function mount(root, params) {
   applyTheme(themeAt(dark ? 1 : 0));
   audio.init();
 
+  const novice = !readDrill()?.done;
   const choice = {
     map: ['zufall', ...BATTLE_MAPS.map((m) => m.id)].includes(params.get('karte')) ? params.get('karte') : 'velde',
     mapSeed: (num(params.get('kseed'), 0) >>> 0) || newSeed(),
     faction: FACTION_IDS.includes(params.get('fraktion')) ? params.get('fraktion') : 'kaldern',
-    difficulty: DIFFICULTY_IDS.includes(params.get('ki')) ? params.get('ki') : 'veteran',
+    // Wer die Grundausbildung noch nicht beendet hat, beginnt gegen den Rekruten
+    difficulty: DIFFICULTY_IDS.includes(params.get('ki')) ? params.get('ki') : novice ? 'rekrut' : 'veteran',
     rounds: ROUNDS.some((r) => r.n === num(params.get('runden'), -1)) ? num(params.get('runden'), 14) : 14,
   };
 
@@ -66,7 +69,7 @@ export async function mount(root, params) {
         <div class="mb-seed"${choice.map === 'zufall' ? '' : ' hidden'}><input type="text" inputmode="numeric" maxlength="9" aria-label="Seed der Zufallskarte" value="${choice.mapSeed}"><button type="button" class="btn mb-roll">Neu würfeln</button></div>
       </fieldset>
       <fieldset class="mb-field"><legend>${hotseat ? 'Im Westen führt' : 'Du führst'}</legend><div class="mb-opts">${radio('fraktion', FACTION_IDS.map((id) => ({ id, label: FACTIONS[id].name, sub: id === 'kaldern' ? 'wenige Leute, präzise Artillerie' : 'große Gruppen, zäh, Artillerie streut' })), choice.faction)}</div></fieldset>
-      ${hotseat ? '' : `<fieldset class="mb-field"><legend>Gegner</legend><div class="mb-opts">${radio('ki', DIFFICULTY_IDS.map((id) => ({ id, label: DIFFICULTIES[id].label, sub: DIFF_TEXT[id] })), choice.difficulty)}</div></fieldset>`}
+      ${hotseat ? '' : `<fieldset class="mb-field"><legend>Gegner</legend><div class="mb-opts">${radio('ki', DIFFICULTY_IDS.map((id) => ({ id, label: DIFFICULTIES[id].label, sub: DIFF_TEXT[id] + (novice && id === 'rekrut' ? '. Für den Anfang' : '') })), choice.difficulty)}</div></fieldset>`}
       <fieldset class="mb-field"><legend>Dauer</legend><div class="mb-opts">${radio('runden', ROUNDS.map((r) => ({ id: r.n, label: r.label, sub: r.sub })), choice.rounds)}</div></fieldset>
       <div class="mb-go">
         <div class="mb-sigline">gez.<span class="mb-sig" aria-hidden="true"></span></div>

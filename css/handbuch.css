@@ -1,0 +1,25 @@
+/* Handbuch (js/scenes/handbuch.js): gedruckte Dienstvorschrift, Stil 03 */
+body[data-scene="handbuch"]{overflow:auto;height:auto;min-height:100%}
+.hb{max-width:880px;margin:0 auto;padding:28px 20px calc(40px + env(safe-area-inset-bottom));color:var(--ink)}
+.hb-head{border-bottom:2px solid var(--ink);padding-bottom:16px;margin-bottom:8px}
+.hb-k{margin:0;font:500 12px/1.3 var(--font-num);letter-spacing:.06em;text-transform:uppercase;color:var(--ink2)}
+.hb h1{margin:4px 0 8px;font:400 clamp(34px,7vw,52px)/1 var(--font-head)}
+.hb-intro{margin:0 0 14px;font:400 17px/1.5 var(--font-head);max-width:62ch}
+.hb-toc{display:flex;flex-wrap:wrap;gap:6px 14px;margin:0 0 14px}
+.hb-toc a{color:var(--ink);font:600 14px/1.2 var(--font-ui);text-decoration:underline;text-underline-offset:3px;min-height:32px;display:inline-flex;align-items:center}
+.hb-actions,.hb-foot{display:flex;flex-wrap:wrap;gap:8px;margin:0}
+.hb-actions .btn,.hb-foot .btn{min-height:44px;display:inline-flex;align-items:center;padding:0 16px}
+.hb-go{font-weight:700}
+.hb-part{padding:22px 0 8px;border-bottom:1px dashed var(--line)}
+.hb-part h2{margin:0 0 12px;font:400 24px/1.2 var(--font-head)}
+.hb-part h3{margin:16px 0 6px;font:600 12px/1.2 var(--font-ui);letter-spacing:.06em;text-transform:uppercase;color:var(--ink2)}
+.hb-steps,.hb-tips{margin:0;padding-left:1.4em;display:grid;gap:8px;font:400 16px/1.5 var(--font-ui)}
+.hb-steps b{font-weight:700}
+.hb-note{margin:12px 0 0;font:600 19px/1.3 var(--font-hand);color:var(--ink2)}
+.hb-dl{margin:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,380px),1fr));gap:10px 24px}
+.hb-dl div{break-inside:avoid}
+.hb-dl dt{font:700 15px/1.3 var(--font-ui)}
+.hb-dl dd{margin:2px 0 0;font:400 15px/1.45 var(--font-ui);color:var(--ink)}
+.hb-sign{text-align:right;font:600 21px/1.2 var(--font-hand);color:var(--ink2);margin:12px 0 0}
+.hb-foot{padding-top:20px}
+@media print{.hb-actions,.hb-foot,.hb-toc{display:none}}

@@ -132,6 +132,7 @@ if (scene) {
   showImprint();
   menuSound();
   menuToday();
+  menuDrill();
   import('./ui/menu-akte.js').then((m) => m.mountMenuAkte(params)).catch((e) => console.error(e));
 }
 
@@ -177,6 +178,21 @@ function showImprint() {
   el.textContent = `${head} · berichtigt bis ${when}`;
   if (days >= 14) el.title = `Seit ${days} Tagen nicht nachgetragen. Die Front hat nicht gewartet.`;
   el.classList.toggle('stale', days >= 14);
+}
+
+// Grundausbildung: wer sie noch nicht beendet hat (und noch keinen Feldzug hat), sieht einen Bleistiftvermerk
+function menuDrill() {
+  const a = document.getElementById('menu-drill');
+  if (!a) return;
+  let done = false, played = false;
+  try {
+    done = !!JSON.parse(localStorage.getItem('lehmfront.ausbildung') ?? 'null')?.done;
+    played = !!localStorage.getItem(CAMPAIGN_KEY);
+  } catch { /* ohne Speicher */ }
+  if (done) a.querySelector('small').textContent = 'abgeschlossen, jederzeit wiederholen';
+  const fresh = !done && !played;
+  a.classList.toggle('new', fresh);
+  a.querySelector('.menu-new').hidden = !fresh;
 }
 
 // Tageslage im Menue: heutiges Datum und der beste Eintrag im Wachbuch dieses Geraets

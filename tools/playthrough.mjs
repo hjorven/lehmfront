@@ -40,6 +40,7 @@ const MODES = [
   { id: 'akt4-tag', path: '/?scene=gefecht&scenario=akt4-m6-waffenstillstand&seed=6' },
   { id: 'endlos', path: '/?scene=gefecht&endlos=1&karte=velde&seed=8' },
   { id: 'puzzle', path: '/?scene=gefecht&puzzle=01-laengsfeuer' },
+  { id: 'ausbildung', path: '/?scene=gefecht&karte=asse&ki=rekrut&runden=0&seed=1917&ausbildung=1' },
   { id: 'koop', path: '/?scene=gefecht&karte=kraehenholz&seed=9&mode=koop&runden=6' },
 ];
 const only = opt('only', null);
