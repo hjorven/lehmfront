@@ -1,7 +1,8 @@
 // Werkzeug-Register (Plan 7.2, 7.6). Mechanik-Pakete melden ihre Befehle als Werkzeuge an, die Werkzeugreihe,
 // das radiale Menue und die Tastatur lesen nur dieses Register.
 //
-// Werkzeug: { id, key, label, icon, order?, canUse(group, state, env) -> true | false | 'Grund', begin(ctx) }
+// Werkzeug: { id, key, label, icon, order?, needsGroup?, canUse(group, state, env) -> true | false | 'Grund', begin(ctx) }
+//   needsGroup: false = Befehl der ganzen Seite (Lorenplan); canUse bekommt dann eventuell group = null
 //   key: eine Taste (Plan 7.6: G U B F H D L), icon: SVG-Pfad(e) im 24er-Raster als String (stroke, currentColor)
 //   begin(ctx) startet den Befehl. ctx (vom Gefechtsbildschirm):
 //     group, state, map, side            gewaehlte Gruppe und Lage (nur lesen)
@@ -10,6 +11,10 @@
 //                                        Zielwahl auf der Karte; preview zeichnet Vorschau und Text im Schild
 //     hint(text)                         Hinweis-Kaertchen setzen
 //     cancel()                           Werkzeug beenden
+//   Fuer Seitenbefehle (needsGroup: false) zusaetzlich:
+//     ui                                 Element fuer eigene Fenster
+//     plans() / setSidePlan(order)       Seitenbefehle dieser Runde lesen und setzen ({ type, ... })
+//     setModal(bool)                     Karte sperren, solange ein Fenster offen ist
 const tools = new Map();
 
 export function registerTool(tool) {
@@ -41,7 +46,7 @@ export function toolByKey(key) {
 
 /** Nutzbarkeit fuer eine Gruppe: { ok, why } */
 export function usable(tool, group, state, env = {}) {
-  if (!group) return { ok: false, why: 'Erst eine Gruppe wählen' };
+  if (!group && tool.needsGroup !== false) return { ok: false, why: 'Erst eine Gruppe wählen' };
   let r;
   try { r = tool.canUse(group, state, env); } catch (err) { r = err.message; }
   if (r === true) return { ok: true, why: '' };

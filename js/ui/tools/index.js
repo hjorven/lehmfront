@@ -2,3 +2,4 @@
 import './fire.js';
 import './hold.js';
 import './move.js';
+import './supply.js';

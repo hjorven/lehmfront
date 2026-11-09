@@ -50,6 +50,7 @@ export function resolveTurn(state, ordersA, ordersB, seed, turn, env = {}) {
   const b = normalizeOrders(draft, 'b', ordersB, env);
   log.push(...a.events, ...b.events);
   const orders = { a: a.orders, b: b.orders };
+  const plans = { a: a.plans ?? {}, b: b.plans ?? {} };
   const all = [...a.orders, ...b.orders].sort((p, q) => compareId(p.group, q.group));
   const byGroup = new Map(all.map((o) => [o.group, o]));
 
@@ -62,12 +63,14 @@ export function resolveTurn(state, ordersA, ordersB, seed, turn, env = {}) {
       map: env.map ?? null,
       state: draft,
       orders,
+      plans,
       allOrders: all,
       log,
       rng: rngForPhase(seed, turn, phase.id),
       phase: phase.id,
       orderFor: (groupId) => byGroup.get(groupId) ?? null,
       ordersOfType: (type) => all.filter((o) => o.type === type),
+      planOf: (side, type) => plans[side]?.[type] ?? null,
       groups: (side = null) => groupsOf(draft, side),
       group: (id) => getGroup(draft, id),
       emit: (type, fields) => {

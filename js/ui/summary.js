@@ -1,7 +1,7 @@
 // Zusammenfassung vor "Runde ausfuehren" und Rundenende-Checkliste (Plan 3.4, 7.3). Rein, ohne DOM.
 // Mechanik-Pakete melden eigene Pruefpunkte an: registerCheck(id, fn), fn(ctx) -> [{ tone, text, group?, at? }].
-//   ctx = { state, side, orders (nur gesetzte), map }
-//   tone: 'warn' (rot, etwas fehlt) oder 'ok' (blau, alles gut). Beispiele: P08 "abgeschnitten", P09 "Leitung unterbrochen".
+//   ctx = { state, side, orders (nur gesetzte), map, plans (Seitenbefehle dieser Runde nach Art, z. B. supply_plan) }
+//   tone: 'warn' (rot, etwas fehlt) oder 'ok' (blau, alles gut). summary: true = auch in der Zusammenfassung zeigen. Beispiele: P08 "abgeschnitten", P09 "Leitung unterbrochen".
 import { groupsOf, getGroup } from '../state.js';
 import { ORDER_TYPES } from '../config/orders.js';
 import { groupName } from './labels.js';
@@ -66,7 +66,7 @@ export const HOLD_TYPES = new Set(['assault']);
  * Zusammenfassung fuer den Commit.
  * Liefert { lines: [{ tone, count, text }], needsHold, count, warnings }.
  */
-export function summarize({ state, side, orders, map = null }) {
+export function summarize({ state, side, orders, map = null, plans = {} }) {
   const byType = new Map();
   for (const o of orders) {
     if (!byType.has(o.type)) byType.set(o.type, []);
@@ -90,7 +90,9 @@ export function summarize({ state, side, orders, map = null }) {
   if (idle.length) {
     lines.push({ tone: 'warn', count: String(idle.length), text: `${idle.length === 1 ? 'Gruppe' : 'Gruppen'} ohne Befehl (${idle.map((g) => groupName(state, g)).join(', ')}), ${idle.length === 1 ? 'hält' : 'halten'}` });
   }
-  const warnings = checklist({ state, side, orders, map }).filter((c) => c.tone === 'warn' && c.check !== 'ohne-befehl');
+  const checks = checklist({ state, side, orders, map, plans });
+  for (const c of checks) if (c.summary && c.tone !== 'warn') lines.push({ tone: 'own', count: '·', text: c.text });
+  const warnings = checks.filter((c) => c.tone === 'warn' && c.check !== 'ohne-befehl');
   for (const w of warnings) lines.push({ tone: 'warn', count: '!', text: w.text });
   if (!lines.length) lines.push({ tone: 'own', count: '0', text: 'Keine Gruppen' });
   return { lines, needsHold: orders.some((o) => HOLD_TYPES.has(o.type)), count: orders.length, warnings };

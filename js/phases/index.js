@@ -4,3 +4,4 @@ import './fire.js';
 import './hold.js';
 import './intel.js';
 import './move.js';
+import './supply.js';

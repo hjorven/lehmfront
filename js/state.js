@@ -149,6 +149,7 @@ export function createInitialState(map, scenario, seed) {
       trust: s.trust ?? 50,
       control: s.control ?? 'human',
     };
+    if (s.supply) sides[side].supply = structuredClone(s.supply); // Versorgung der Front (js/supply.js)
     const used = new Set();
     (s.groups ?? []).forEach((spec, i) => {
       if (!inBounds(map, spec.pos)) throw new Error(`Gruppe ${i} von Seite ${side} steht ausserhalb der Karte`);

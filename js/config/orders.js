@@ -2,6 +2,8 @@
 // kind: in welcher Rundenart der Befehl erlaubt ist.
 // target: 'cell' = braucht ein Zielfeld {x,y}; 'path' = braucht einen Weg [{x,y},...]; null = kein Ziel.
 // night: nur nachts erlaubt.
+// scope: 'side' = Befehl der ganzen Seite ohne Gruppe (Lorenplan). Hoechstens einer je Art und Seite;
+//   die Phase liest ihn mit ctx.planOf(side, type).
 
 export const ORDER_TYPES = {
   hold:        { id: 'hold',        label: 'Halten',          kind: 'both',     target: null },
@@ -11,7 +13,7 @@ export const ORDER_TYPES = {
   rebuild:     { id: 'rebuild',     label: 'Umbauen',         kind: 'position', target: 'path' },
   wire:        { id: 'wire',        label: 'Draht',           kind: 'position', target: 'path' },
   relieve:     { id: 'relieve',     label: 'Ablösen',         kind: 'position', target: null },
-  supply_plan: { id: 'supply_plan', label: 'Lorenplan',       kind: 'position', target: null },
+  supply_plan: { id: 'supply_plan', label: 'Lorenplan',       kind: 'position', target: null, scope: 'side' },
   fire_plan:   { id: 'fire_plan',   label: 'Feuerplan',       kind: 'position', target: null },
   harass:      { id: 'harass',      label: 'Störfeuer',       kind: 'position', target: 'cell' },
   tunnel:      { id: 'tunnel',      label: 'Stollen',         kind: 'position', target: 'path' },

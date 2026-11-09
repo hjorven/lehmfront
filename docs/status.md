@@ -64,6 +64,16 @@ Jeder Thread traegt hier nach dem Merge ein, was fertig ist und was offen bleibt
   - `js/phases/intel.js`: Aufklärung je Seite in `state.sides[side].intel.lastSeen`; Geister werden ausradiert, wenn man ihr Feld genau sieht und niemand mehr dort ist, oder nach 8 Runden vergessen. Szenarien können Anfangswissen mitgeben (`sides.x.intel`, siehe `data/scenarios/asse-frei.json`).
   - Werkzeug Feuern (F): Vorschau mit Sichtlinie, Trefferchance, Deckung, erwarteten Verlusten; bei MG-Trupps Feuersektor mit Kegel-Vorschau. Sichtlinie der gewählten Gruppe beim Zeigen mit der Maus. Bedrohungs-Overlay (Taste 2): bekannte MG-Kegel schraffiert, zuletzt gesehene Bewegung mit Richtung und Alter, Quelle (Luftbild, Grabenspiegel). Sicht-Overlay (3) nutzt jetzt dieselbe Regel.
   - Demos: `?scene=gefecht&demo=feuer|sektor|feuerrunde|bedrohung|sichtlinie`.
+- P08 Versorgung: `js/supply.js` (rein), `js/config/supply.js`, Phase `js/phases/supply.js` (Stellungsrunde, Schritt 7).
+  - Depot (`supplies.ammo/food/material`) bekommt je Stellungsrunde Nachschub (`supplies.income`, sonst `DEFAULT_INCOME`). Die Feldbahn fährt `supplies.cartsTotal` Loren (6 Einheiten je Lore).
+  - Front in Abschnitte A, B, C (Bänder von Nord nach Süd, `map.supply.sections` ändert die Zahl). Jeder Abschnitt hat einen eigenen Vorrat in `state.sides[s].supply.sections[id]` und verbraucht je Gruppe 2 Verpflegung und 1 Munition pro Stellungsrunde.
+  - Netz: Depot, Gleis, Laufgraben (Träger überbrücken 2 Felder). Unterbrochen durch `state.cells[k].railBroken`, `trenchBlocked`, Feinde im Graben oder ein beschädigtes Depot (`buildingDamaged`). Abgeschnittene Abschnitte bekommen nichts, zehren vom Vorrat, dann eiserne Ration, dann sinkt die Moral immer schneller.
+  - Sanitätskette: Verwundete warten im Abschnitt (`addWounded`), fahren auf den Loren zurück (1 je beladener Lore, 4 je Sanitätslore, Bericht `sanitaetsloren` verdoppelt), heilen im Verbandsplatz (2 Runden), Lazarett (3) oder ohne beides (5) und kehren zur Gruppe zurück; je 4 Rückkehrer +1 Erfahrung. Ohne Sanitäter im Abschnitt stirbt jeder Wartende mit 20 Prozent, jede wartende Stelle kostet Vertrauen.
+  - Lorenplan als Seitenbefehl `{ type: 'supply_plan', wagons: [{ load, to }] }` (neu: `scope: 'side'` in `js/config/orders.js`, `normalizeOrders` liefert `plans`, Phasen lesen `ctx.planOf(side, type)`). Ohne neuen Plan gilt der letzte, in der ersten Runde ein Vorschlag (`suggestPlan`).
+  - Fenster „Lorenplan“ als Zug (`js/ui/lorenplan.js`, Werkzeug L, auch ohne gewählte Gruppe): Antippen des Wagens wechselt die Ladung (MUN, VERPF, MAT, Sanitätslore, frei), der Kreis das Ziel. Abschnittskärtchen zeigen Lieferung, Reichweite in Runden, Verwundete, Bruchstelle. V = Vorschlag, Enter übernimmt, Esc verwirft.
+  - Overlay 1 Versorgung: Loren als fließende Punkte entlang des Wegs, Verwundete als rote Kreuze zurück, abgeschnittene Abschnitte rot und knappe ocker schraffiert, Bruchstellen mit Kreuz und „Weg zu“.
+  - Prüfpunkt „versorgung“ (abgeschnitten, Vorrat reicht nicht bis morgen, Verwundete ohne Lore) und eine Zeile in der Zusammenfassung. Demo: `?scene=gefecht&demo=lorenplan` und `&demo=versorgung`.
+  - Überraschung: Die Wagen tragen Kreideaufschriften („für Janssen“, „holt 3 Verw.“), kommt eine Lore nicht durch, steht „Weg zu“ durchgestrichen auf der Bordwand.
 
 ### Für die nächsten Pakete (P03, P10)
 
@@ -90,6 +100,10 @@ Jeder Thread traegt hier nach dem Merge ein, was fertig ist und was offen bleibt
 - P12: `losses`- und `suppressed`-Ereignisse und `g.underFire` sind die Haken für Moralproben.
 
 ## Offen und bekannte Macken
+
+- P08: Für andere Pakete: `addWounded(state, map, side, at, n, groupId)` (P05/P06/P09 melden Verwundete), `takeStock(state, map, side, sectionId, res, n)` (P04 Material, P05 Munition), `group.ammoLow` (Feuer schwächer), `trenchAt` liest neue Gräben aus `state.cells[k].trench`. Die Phase `casualties` macht aus jedem Ereignis `losses` (P05 Feuer, später Nahkampf und Artillerie) zu 60 Prozent Verwundete, die im Abschnitt auf eine Lore warten; die anderen gelten als gefallen.
+- P08: Die Gegenseite auf der Asse-Karte hat kein Depot und gilt als versorgt (`abstract`). Die Etappe aus P11 sollte Kapazität (`cartsTotal`) und Nachschub (`income`) aus `etappeYield` setzen; bisher stammen sie aus dem Szenario.
+- P08: Mengen (6 je Lore, Verbrauch, Sterberate, Heilzeiten) sind geschätzt, Balancing in P21. `state.fallen` bekommt Einträge `{ side, group, leader, count, turn, cause: 'wounds', at }` ohne Einzelnamen.
 
 - T2: Die Texte sind Daten; Einhaengen machen P14/P15 (Ablauf), P22 (Endlos), P24/P26 (Akt 3 und 4, Enden). Offen: Harms und Vell kommen in den Missionen von Akt 3 und 4 kaum vor (nur Briefe und a4m4); wer mag, ergaenzt Briefing-Varianten. Die Auslöser der Erfolge sind nur in Worten beschrieben, Zaehler legt P14 fest.
 
@@ -164,3 +178,6 @@ Stand 2026-11-08, von Jorven bestaetigt:
 - P03: Nach der Runde zeigt ein schlichtes Meldungen-Kärtchen alle Begründungen (Klick springt zum Ort), bis P07 das Telegramm bringt.
 - P05: Der Nebel des Krieges braucht kein eigenes Grau: Feinde, die man nicht sieht, bleiben als Bleistiftskizze stehen, die jede Runde blasser und lückenhafter wird, als würde jemand radieren. Ist der Platz wieder einsehbar und leer, wird die Skizze ausradiert (Meldung im Protokoll).
 - P05: MG-Trupps bekommen statt „Feuern“ einen dauerhaften Feuersektor (Befehl `sector`, auch in Stellungsrunden), den sie im Gefecht selbst bestreichen. Mündungsfeuer verrät die Stellung auch nachts.
+- P08: Lorenplan ist ein Befehl der ganzen Seite (kein Gruppenbefehl) und gilt weiter, bis er geändert wird. Neben Munition, Verpflegung und Material gibt es die Sanitätslore (fährt leer, holt vier Verwundete) und „frei“ (Lore bleibt stehen). Beladene Loren nehmen auf dem Rückweg einen Verwundeten mit.
+- P08: Abschnitte sind gleich hohe Bänder von Nord nach Süd; Gleis, Depot und Laufgraben dürfen bis zu zwei Felder auseinanderliegen (Träger), weil die Asse-Karte keine durchgehende Verbindung zeichnet.
+- P08: Ohne eigene Bruchstellen-Grafik auf der Karte: Das Versorgungs-Overlay markiert verschüttete Gräben und zerschossene Gleise mit rotem Kreuz und schreibt „Weg zu“ an die Stelle.
