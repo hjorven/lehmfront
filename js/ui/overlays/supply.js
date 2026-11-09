@@ -7,12 +7,13 @@ import { currentWagons } from '../tools/supply.js';
 
 const cache = new WeakMap();
 
+// Rechnung nur neu, wenn sich Zustand, Seite oder der Plan dieser Runde aendern (nicht in jedem Bild)
 function model(map, state, side, plans) {
-  const wagons = currentWagons(map, state, side, plans);
-  const k = side + JSON.stringify(wagons);
+  const k = side + JSON.stringify(plans?.supply_plan ?? null);
   const hit = cache.get(state);
   if (hit && hit.k === k) return hit.m;
-  const m = { net: supplyNetwork(map, state, side), pv: planPreview(map, state, side, wagons) };
+  const wagons = currentWagons(map, state, side, plans);
+  const m = { net: supplyNetwork(map, state, side, { fog: true }), pv: planPreview(map, state, side, wagons, { fog: true }) };
   cache.set(state, { k, m });
   return m;
 }
@@ -45,6 +46,26 @@ function hatch(ctx, x, y, px) {
 function cross(ctx, x, y, r) {
   ctx.moveTo(x - r, y - r); ctx.lineTo(x + r, y + r);
   ctx.moveTo(x + r, y - r); ctx.lineTo(x - r, y + r);
+}
+
+// Schild neben dem Anker: erst zur eigenen Etappe hin, dann darueber oder darunter, wo kein Gebaeude liegt
+function placeTag(map, a, w, h, side) {
+  const dir = side === 'a' ? -1 : 1;
+  const tries = [0, -1.8, 1.8, -3.6, 3.6];
+  for (const dy of tries) {
+    const x = dir < 0 ? a.x + 0.5 - w - 0.8 : a.x + 1.3;
+    const y = a.y + 0.5 + dy;
+    if (x < 0 || x + w > map.width) continue;
+    let hit = false;
+    for (let cy = Math.floor(y - h / 2); cy <= Math.floor(y + h / 2) && !hit; cy++) {
+      for (let cx = Math.floor(x); cx <= Math.floor(x + w) && !hit; cx++) {
+        const c = cy >= 0 && cy < map.height && cx >= 0 && cx < map.width ? map.cells[cy * map.width + cx] : null;
+        if (c?.building) hit = true;
+      }
+    }
+    if (!hit) return { x, y };
+  }
+  return { x: Math.max(0, Math.min(map.width - w, a.x + 0.5 - w - 0.8)), y: a.y + 0.5 };
 }
 
 registerOverlay({
@@ -159,7 +180,7 @@ registerOverlay({
         ? `${sec.id}  Verpf ${r(p.rounds.food)} · Mun ${r(p.rounds.ammo)}${p.woundedLeft ? `  +${p.woundedLeft}` : ''}`
         : `${sec.id}  abgeschnitten${p.wounded ? `  +${p.wounded}` : ''}`;
       const w = ctx.measureText(txt).width + fs;
-      const x = a.x + 0.5 - (side === 'a' ? w + 0.8 : -0.8), y = a.y + 0.5;
+      const { x, y } = placeTag(map, a, w, fs * 1.6, side);
       ctx.globalAlpha = 0.94;
       ctx.fillStyle = theme.card ?? theme.paper;
       ctx.fillRect(x, y - fs * 0.8, w, fs * 1.6);
@@ -172,7 +193,9 @@ registerOverlay({
       if (!sec.connected && sec.cutAt) {
         ctx.font = `700 ${fs * 1.5}px "Caveat", cursive`;
         ctx.fillStyle = theme.danger;
-        ctx.fillText('Weg zu', sec.cutAt.x + 1, sec.cutAt.y - 0.2);
+        const ww = ctx.measureText('Weg zu').width;
+        // zur eigenen Etappe hin schreiben, dort ist Platz und der Kartenrand weit weg
+        ctx.fillText('Weg zu', side === 'a' ? sec.cutAt.x - ww - 0.1 : sec.cutAt.x + 1.1, sec.cutAt.y + 1.4);
         ctx.font = `700 ${fs}px "IBM Plex Mono", monospace`;
       }
     }

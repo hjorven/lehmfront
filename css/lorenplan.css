@@ -1,5 +1,7 @@
 /* Lorenplan als Zug (Plan 7.4, Bild feature-04). Farben nur aus den Theme-Variablen. */
 .lorenplan{width:min(980px,100%);display:flex;flex-direction:column;max-height:100%;overflow:hidden}
+.lorenplan:focus{outline:none}
+.lp-body{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain}
 .lp-head{display:flex;align-items:baseline;gap:12px;padding:12px 16px 8px;border-bottom:var(--border)}
 .lp-head b{font:400 22px/1.1 var(--font-head)}
 .lp-sub{color:var(--ink2);font-size:13px;margin-right:auto}
@@ -80,7 +82,8 @@
   .loco{padding:0 6px 20px;font-size:12px}
   .loco b{font-size:13px}
   .wagon .w-body{font-size:15px;inset:5px 5px 28px}
-  .chalk{font-size:15px}
+  .w-to{width:40px;height:40px;top:-20px;right:-14px}
+  .chalk{font-size:14px;padding:0 2px}
   .lp-cards{grid-template-columns:1fr 1fr;gap:8px;padding:12px 12px 2px}
   .lp-card{padding:7px 9px 8px;font-size:13px}
   .lp-ct{font-size:15px}

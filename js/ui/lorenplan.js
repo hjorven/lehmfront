@@ -46,10 +46,10 @@ export function openLorenplan(root, { map, state, side, wagons, onApply, onClose
 
   const back = document.createElement('div');
   back.className = 'modal-back lorenplan-back';
-  back.innerHTML = `<section class="modal card lorenplan" role="dialog" aria-modal="true" aria-labelledby="lp-title">
+  back.innerHTML = `<section class="modal card lorenplan" tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="lp-title">
     <header class="lp-head"><b id="lp-title">Lorenplan</b><span class="lp-sub"></span>
       <button type="button" class="x" aria-label="Schließen ohne Übernehmen">×</button></header>
-    <div class="lp-scroll">
+    <div class="lp-body"><div class="lp-scroll">
       <div class="lp-yard">
         <div class="lp-stations" aria-hidden="true"></div>
         <ol class="lp-train" aria-label="Zug der Feldbahn"></ol>
@@ -57,7 +57,7 @@ export function openLorenplan(root, { map, state, side, wagons, onApply, onClose
       </div>
     </div>
     <div class="lp-cards"></div>
-    <p class="lp-note"></p>
+    <p class="lp-note"></p></div>
     <footer class="lp-foot">
       <button type="button" class="btn lp-suggest" aria-keyshortcuts="V">Vorschlag <small>V</small></button>
       <span class="lp-gap"></span>
@@ -81,7 +81,7 @@ export function openLorenplan(root, { map, state, side, wagons, onApply, onClose
   }
 
   function render(focus) {
-    const pv = planPreview(map, state, side, slots.filter(Boolean));
+    const pv = planPreview(map, state, side, slots.filter(Boolean), { fog: true });
     const secById = new Map(pv.sections.map((s) => [s.id, s]));
     // Planwagen den Plaetzen zuordnen (Luecken ueberspringen)
     let k = 0;
@@ -109,7 +109,7 @@ export function openLorenplan(root, { map, state, side, wagons, onApply, onClose
 
     $('.lp-cards').innerHTML = pv.sections.map((s) => {
       const parts = ['ammo', 'food', 'material'].map((r) => [r, s.delivered[r] ? Math.ceil(s.delivered[r] / CART_LOAD) : 0])
-        .filter(([, c]) => c).map(([r, c]) => `${c} ${RES[r]}`);
+        .filter(([, c]) => c).map(([r, c]) => `${c} ${c === 1 ? 'Lore' : 'Loren'} ${RES[r]}`);
       const blocked = s.blockedCarts ? `<p class="bad">${pl(s.blockedCarts, 'Lore kommt', 'Loren kommen')} nicht durch</p>` : '';
       const cut = s.connected ? '' : `<p class="bad cut">Abgeschnitten${s.cutAt ? ' bei ' + cellLabel(s.cutAt.x, s.cutAt.y) : ''}: ${esc(s.cutWhy)}</p>`;
       const rounds = s.upkeep.groups
@@ -165,12 +165,18 @@ export function openLorenplan(root, { map, state, side, wagons, onApply, onClose
   $('.lp-apply').addEventListener('click', () => close(true));
   $('.lp-suggest').addEventListener('click', () => suggest());
   function suggest() {
-    const s = suggestPlan(map, state, side);
+    const s = suggestPlan(map, state, side, { fog: true });
     slots = Array.from({ length: cap }, (_, i) => s[i] ?? null);
     render();
   }
 
-  back.addEventListener('pointerdown', (e) => { if (e.target === back) close(false); });
+  // Tippen neben das Fenster verwirft nur, solange nichts geaendert wurde (Handy: Blatt liegt unten)
+  const start = JSON.stringify(slots);
+  back.addEventListener('pointerdown', (e) => {
+    if (e.target === back) { if (JSON.stringify(slots) === start) close(false); return; }
+    // Fokus im Fenster halten, sonst kommen Esc, Enter und V nicht mehr an
+    if (!e.target.closest('button')) setTimeout(() => { if (!box.contains(document.activeElement)) box.focus({ preventScroll: true }); }, 0);
+  });
   back.addEventListener('keydown', (e) => {
     if (e.repeat && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); e.stopPropagation(); return; }
     if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); close(false); return; }

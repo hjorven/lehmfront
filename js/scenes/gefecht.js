@@ -145,6 +145,7 @@ export async function mount(root, params) {
 
   // ---------- Zeichnen ----------
   let dynPending = 0;
+  let animTimer = 0;
   function drawDyn() {
     if (dynPending) return;
     dynPending = requestAnimationFrame(() => { dynPending = 0; drawDynNow(); });
@@ -170,7 +171,10 @@ export async function mount(root, params) {
     });
     placeShield();
     // Bewegte Overlays (Loren im Versorgungs-Overlay) zeichnen weiter, solange sie an sind
-    if (!reducedMotion() && !params.has('demo') && activeOverlays().some((o) => o.animated)) drawDyn();
+    // gedrosselt auf etwa 30 Bilder je Sekunde, angehalten, solange ein Fenster offen ist
+    if (!animTimer && !modalOpen && !reducedMotion() && !params.has('demo') && activeOverlays().some((o) => o.animated)) {
+      animTimer = setTimeout(() => { animTimer = 0; drawDyn(); }, 33);
+    }
   }
 
   function activeOverlays() {

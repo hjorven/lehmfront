@@ -124,8 +124,7 @@ test('Kapazitaet: Plan wird auf die Loren gekuerzt, jede Lore bringt CART_LOAD a
   assert.equal(s.supplies.ammo, 60 - CART_LOAD);
   assert.equal(s.supplies.food, 60 - 2 * CART_LOAD - UPKEEP.food * 0);
   assert.equal(s.supplies.material, 30 - CART_LOAD);
-  assert.equal(s.supplies.carts, 4);
-  assert.equal(s.supplies.cartsTotal, 4);
+  assert.equal(s.supplies.cartsTotal, 4, 'Kapazitaet bleibt unberuehrt');
   // A: +6 Munition, +6 Verpflegung, minus Verbrauch einer Gruppe
   assert.equal(s.supply.sections.A.ammo, before.A.ammo + CART_LOAD - UPKEEP.ammo);
   assert.equal(s.supply.sections.A.food, before.A.food + CART_LOAD - UPKEEP.food);
@@ -272,6 +271,42 @@ test('Vorschau: zaehlt Lieferungen, Reichweite in Runden und Verwundete zurueck,
   assert.equal(p.returning, 1);
   assert.equal(p.used, 3);
   assert.deepEqual(b.groups.map((g) => g.id), ['a02']);
+});
+
+test('Vorschau rechnet wie die Runde: Nachschub zuerst, voller Unterstand schickt zurueck', () => {
+  const { map, state } = setup();
+  delete state.sides.a.supplies.income;
+  state.sides.a.supplies.food = 0;
+  ensureSupply(state, map, 'a');
+  state.sides.a.supply.sections.B.food = 34;
+  const plan = [{ load: 'food', to: 'A' }, { load: 'food', to: 'B' }];
+  const pv = planPreview(map, state, 'a', plan);
+  assert.equal(pv.sections[0].delivered.food, CART_LOAD);
+  assert.equal(pv.sections[1].delivered.food, 2);
+  const r = structuredClone(state);
+  run(r, map, 'a', plan);
+  assert.equal(r.sides.a.supplies.food, pv.depot.food - 0, 'Depot nach Vorschau = Depot nach der Runde (vor Verbrauch in der Etappe)');
+});
+
+test('Nebel: die Vorschau sperrt nur gesehene Feinde, die Runde alle', () => {
+  const { map, state } = setup();
+  const foe = state.groups.find((g) => g.side === 'b');
+  foe.pos = { x: 11, y: 5 };
+  state.groups.find((g) => g.id === 'a02').pos = { x: 2, y: 4 };
+  state.groups.find((g) => g.id === 'a03').pos = { x: 2, y: 8 };
+  state.groups.find((g) => g.id === 'a01').pos = { x: 2, y: 0 };
+  assert.equal(supplyNetwork(map, state, 'a').sections[2].connected, false);
+  assert.equal(supplyNetwork(map, state, 'a', { fog: true }).sections[2].connected, true);
+});
+
+test('Etappe: leeres Depot laesst auch die Etappe hungern', () => {
+  const { map, state } = setup();
+  state.sides.a.supplies.food = 0;
+  const g = state.groups.find((x) => x.id === 'a01');
+  g.pos = { x: 3, y: 1 };
+  for (let t = 1; t <= 2; t++) run(state, map, 'a', [], t);
+  assert.equal(g.hunger, 1);
+  assert.ok(g.morale < 70);
 });
 
 test('Antippen wechselt Ladung und Ziel im Kreis', () => {

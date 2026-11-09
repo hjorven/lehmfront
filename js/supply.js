@@ -25,6 +25,7 @@ import {
   DEFAULT_INCOME, WOUNDED_PER_CART, WOUNDED_PER_MEDIC_CART, WAITING_DEATH_PERCENT, TRUST_PER_WAITING_SECTION,
   MAX_TRUST_LOSS, HEAL_TURNS, VETERANS_PER_XP, BUILDING_ROLES, LINK, DEFAULT_SECTIONS, SECTION_LETTERS,
 } from './config/supply.js';
+import { seesPoint } from './view.js';
 
 const key = (x, y) => x + ',' + y;
 const cmp = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
@@ -108,9 +109,14 @@ function hasDepotOnMap(map, side) {
 
 // ---------------------------------------------------------------- Netz
 
-function enemyAt(state, side) {
+// fog: nur Feinde, die die Seite sieht (Vorschau im Fenster, Overlay, Pruefpunkt). Die Aufloesung kennt alle.
+function enemyAt(state, side, fog = false) {
   const s = new Set();
-  for (const g of state.groups) if (g.side !== side && g.status !== 'lost') s.add(key(g.pos.x, g.pos.y));
+  for (const g of state.groups) {
+    if (g.side === side || g.status === 'lost') continue;
+    if (fog && !seesPoint(state, side, g.pos)) continue;
+    s.add(key(g.pos.x, g.pos.y));
+  }
   return s;
 }
 
@@ -118,9 +124,9 @@ function enemyAt(state, side) {
  * Breitensuche Depot -> Gleis -> Graben. ignoreBreaks: Brueche zaehlen nicht (fuer die Suche nach der Bruchstelle).
  * Liefert { nodes: Map(key -> { x, y, kind: 'depot'|'rail'|'trench', parent }), order: [key] }.
  */
-function searchNetwork(map, state, side, { ignoreBreaks = false } = {}) {
+function searchNetwork(map, state, side, { ignoreBreaks = false, fog = false } = {}) {
   const ms = mapSide(side);
-  const foes = enemyAt(state, side);
+  const foes = enemyAt(state, side, fog);
   const nodes = new Map();
   const order = [];
   const queue = [];
@@ -186,12 +192,12 @@ function targetIn(nodes, order, sec) {
   return best;
 }
 
-function blockedWhy(map, state, side, p) {
+function blockedWhy(map, state, side, p, fog) {
   const sc = state.cells?.[key(p.x, p.y)];
   if (p.kind === 'rail' && !railAt(map, state, p.x, p.y)) return 'Gleis zerschossen';
   if (p.kind === 'trench') {
     if (sc?.trenchBlocked) return 'Laufgraben verschüttet';
-    if (enemyAt(state, side).has(key(p.x, p.y))) return 'Feind im Graben';
+    if (enemyAt(state, side, fog).has(key(p.x, p.y))) return 'Feind im Graben';
     if (!trenchAt(map, state, p.x, p.y)) return 'Graben eingeebnet';
   }
   if (p.kind === 'depot') return 'Depot getroffen';
@@ -201,9 +207,9 @@ function blockedWhy(map, state, side, p) {
 /**
  * Versorgungsnetz einer Seite. Liefert pro Abschnitt { id, label, y0, y1, connected, route: [{x,y,kind}],
  * cutAt: {x,y} | null, cutWhy, anchor: {x,y} }. Ohne Depot auf der Karte gilt die Seite als versorgt
- * (abstract: true), z. B. fuer den Gegner auf der Asse-Karte.
+ * (abstract: true), z. B. fuer den Gegner auf der Asse-Karte. opts.fog: nur gesehene Feinde sperren (Anzeige).
  */
-export function supplyNetwork(map, state, side) {
+export function supplyNetwork(map, state, side, { fog = false } = {}) {
   const sections = sectionsOf(map);
   if (!hasDepotOnMap(map, side)) {
     return {
@@ -211,7 +217,7 @@ export function supplyNetwork(map, state, side) {
       sections: sections.map((s) => ({ ...s, connected: true, route: [], cutAt: null, cutWhy: null, anchor: frontAnchor(map, state, side, s) })),
     };
   }
-  const live = searchNetwork(map, state, side);
+  const live = searchNetwork(map, state, side, { fog });
   let ghost = null;
   const out = sections.map((s) => {
     const t = targetIn(live.nodes, live.order, s);
@@ -225,7 +231,7 @@ export function supplyNetwork(map, state, side) {
     const route = pathTo(ghost.nodes, g);
     let cutAt = null, cutWhy = null;
     for (const p of route) {
-      const why = blockedWhy(map, state, side, p);
+      const why = blockedWhy(map, state, side, p, fog);
       if (why && !live.nodes.has(key(p.x, p.y))) { cutAt = { x: p.x, y: p.y }; cutWhy = why; break; }
     }
     return { ...s, connected: false, route, cutAt, cutWhy: cutWhy ?? 'keine Verbindung', anchor: route[route.length - 1] };
@@ -278,10 +284,13 @@ export function woundedCount(section) {
   return n;
 }
 
-/** Loren je Stellungsrunde (Kapazitaet der Feldbahn) */
+/**
+ * Loren je Stellungsrunde (Kapazitaet der Feldbahn): supplies.cartsTotal. Pakete, die Kapazitaet nehmen
+ * oder geben (P09 Feldbahn zerschossen, P11 Etappe), aendern cartsTotal. supplies.carts ist nur Anzeige.
+ */
 export function capacityOf(state, side) {
   const s = state.sides[side]?.supplies ?? {};
-  const n = s.cartsTotal ?? s.carts ?? DEFAULT_CARTS;
+  const n = s.cartsTotal ?? DEFAULT_CARTS;
   return Math.max(0, Math.floor(n));
 }
 
@@ -338,10 +347,10 @@ export function upkeepOf(map, state, side, sec) {
  * Vorschlag fuer einen Lorenplan: Wagen gehen dorthin, wo der Vorrat am kuerzesten reicht.
  * Wartende Verwundete bekommen eine Sanitaetslore. Abgeschnittene Abschnitte werden ausgelassen.
  */
-export function suggestPlan(map, state, side) {
+export function suggestPlan(map, state, side, opts = {}) {
   const cap = capacityOf(state, side);
   const sup = supplyOf(state, map, side);
-  const net = supplyNetwork(map, state, side);
+  const net = supplyNetwork(map, state, side, opts);
   const reach = net.sections.filter((s) => s.connected);
   const plan = [];
   if (!reach.length || !cap) return plan;
@@ -352,7 +361,7 @@ export function suggestPlan(map, state, side) {
     if (plan.length >= cap - 1) break;
     if (woundedCount(sup.sections[s.id]) >= 2) plan.push({ load: 'medic', to: s.id });
   }
-  const depot = { ...(state.sides[side].supplies ?? {}) };
+  const depot = depotAfterIncome(state, map, side);
   let guard = 0;
   while (plan.length < cap && guard++ < 64) {
     let best = null, bestScore = Infinity;
@@ -383,24 +392,36 @@ export function suggestPlan(map, state, side) {
 }
 
 /** Lorenplan, der gilt, wenn diese Runde keiner kommt: der letzte, sonst ein Vorschlag */
-export function standingPlan(map, state, side) {
+export function standingPlan(map, state, side, opts = {}) {
   const ids = sectionsOf(map).map((s) => s.id);
   const last = state.sides[side]?.supply?.plan;
   if (Array.isArray(last) && last.length) return normalizePlan(last, capacityOf(state, side), ids);
-  return suggestPlan(map, state, side);
+  return suggestPlan(map, state, side, opts);
+}
+
+/** Depot nach dem Nachschub dieser Runde (so rechnet die Runde, bevor die Loren fahren) */
+export function depotAfterIncome(state, map, side) {
+  const st = state.sides[side]?.supplies ?? {};
+  const out = { ...st };
+  if (!hasDepotOnMap(map, side) || buildingsWithRole(map, state, side, 'depot').length) {
+    const income = { ...DEFAULT_INCOME, ...(st.income ?? {}) };
+    for (const res of RESOURCES) out[res] = (out[res] ?? 0) + (income[res] ?? 0);
+  }
+  return out;
 }
 
 /**
  * Vorschau fuer das Lorenplan-Fenster (rein): was kommt je Abschnitt an, wie lange reicht der Vorrat danach,
- * wie viele Verwundete fahren zurueck. Rechnet mit dem Depotbestand, ohne Nachschub dieser Runde.
+ * wie viele Verwundete fahren zurueck. Rechnet wie die Runde: erst Nachschub ins Depot, dann die Loren,
+ * was vorn keinen Platz hat, faehrt zurueck. opts.fog: nur gesehene Feinde sperren.
  */
-export function planPreview(map, state, side, wagons) {
+export function planPreview(map, state, side, wagons, opts = {}) {
   const cap = capacityOf(state, side);
   const ids = sectionsOf(map).map((s) => s.id);
   const plan = normalizePlan(wagons, cap, ids);
   const sup = supplyOf(state, map, side);
-  const net = supplyNetwork(map, state, side);
-  const depot = { ...(state.sides[side].supplies ?? {}) };
+  const net = supplyNetwork(map, state, side, opts);
+  const depot = depotAfterIncome(state, map, side);
   const sections = net.sections.map((s) => ({
     id: s.id, label: s.label, connected: s.connected, cutAt: s.cutAt, cutWhy: s.cutWhy, anchor: s.anchor,
     delivered: { ammo: 0, food: 0, material: 0 }, carts: 0, medicCarts: 0, blockedCarts: 0,
@@ -417,8 +438,9 @@ export function planPreview(map, state, side, wagons) {
     if (!blocked) {
       if (res) {
         amount = Math.min(CART_LOAD, Math.max(0, depot[res] ?? 0));
-        depot[res] = (depot[res] ?? 0) - amount;
-        s.delivered[res] += amount;
+        const put = Math.max(0, Math.min(STOCK_CAP[res] - s.stock[res] - s.delivered[res], amount));
+        depot[res] = (depot[res] ?? 0) - put;
+        s.delivered[res] += put;
         empty = amount === 0;
         s.carts++;
       } else s.medicCarts++;
@@ -518,16 +540,12 @@ export function runSupplySide(state, side, ctx) {
   const cap = capacityOf(state, side);
 
   // 1. Nachschub von hinten
-  const income = { ...DEFAULT_INCOME, ...(depotSt.income ?? {}) };
-  if (depot || net.abstract) {
-    for (const res of RESOURCES) depotSt[res] = (depotSt[res] ?? 0) + (income[res] ?? 0);
-  }
+  const filled = depotAfterIncome(state, map, side);
+  for (const res of RESOURCES) depotSt[res] = filled[res] ?? 0;
 
   // 2. Lorenplan
   const plan = ctx.plan ? normalizePlan(ctx.plan, cap, ids) : standingPlan(map, state, side);
   sup.plan = plan.map((w) => ({ ...w }));
-  depotSt.carts = plan.length;
-  depotSt.cartsTotal = cap;
   const got = {};
   for (const id of ids) got[id] = { ammo: 0, food: 0, material: 0, carts: 0, blocked: 0, back: 0, medic: 0 };
   const emptyRes = new Set();
@@ -655,7 +673,17 @@ export function runSupplySide(state, side, ctx) {
   // Etappe isst am Depot
   for (const g of etappeGroups(map, state, side)) {
     g.hunger ??= 0;
-    if ((depotSt.food ?? 0) >= UPKEEP.food) { depotSt.food -= UPKEEP.food; g.hunger = 0; }
+    g.rations ??= IRON_RATIONS;
+    if ((depotSt.food ?? 0) >= UPKEEP.food) { depotSt.food -= UPKEEP.food; g.hunger = 0; continue; }
+    depotSt.food = 0;
+    if (g.rations > 0) { g.rations--; continue; }
+    g.hunger++;
+    g.morale = Math.max(0, g.morale - (2 + 2 * g.hunger));
+    emit('hunger', {
+      side, secret: true, group: g.id, hunger: g.hunger,
+      reason: `Gruppe ${surname(g.leader?.name)} hungert in der Etappe seit ${plural(g.hunger, 'Runde', 'Runden')}: das Depot ist leer. Moral sinkt auf ${g.morale}.`,
+      at: g.pos,
+    });
   }
 
   // 5. Wartende Verwundete: ohne Sanitaeter sterben welche, jede wartende Stelle kostet Vertrauen

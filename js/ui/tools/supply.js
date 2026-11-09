@@ -11,7 +11,7 @@ export const TRAIN_ICON = '<path d="M3 15 H21"/><rect x="4" y="8" width="6" heig
 
 /** Wagen, die fuer die planende Seite gerade gelten: eigener Plan dieser Runde oder der stehende */
 export function currentWagons(map, state, side, plans) {
-  return plans?.supply_plan?.wagons ?? standingPlan(map, state, side);
+  return plans?.supply_plan?.wagons ?? standingPlan(map, state, side, { fog: true });
 }
 
 registerTool({
@@ -35,13 +35,13 @@ registerTool({
         onClose: () => { ctx.setModal?.(false); ctx.cancel(); },
       });
       ctx.onWindow?.(win);
-    });
+    }).catch(() => { ctx.setModal?.(false); ctx.cancel(); ctx.hint('Lorenplan konnte nicht geladen werden.'); });
   },
 });
 
 registerCheck('versorgung', ({ state, side, map, plans }) => {
   if (!map || state.turnKind !== 'position') return [];
-  const pv = planPreview(map, state, side, currentWagons(map, state, side, plans));
+  const pv = planPreview(map, state, side, currentWagons(map, state, side, plans), { fog: true });
   const out = [];
   for (const s of pv.sections) {
     if (!s.connected && s.upkeep.groups) {
