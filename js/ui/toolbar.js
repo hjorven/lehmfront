@@ -1,6 +1,7 @@
 // Werkzeugreihe unten (Plan 7.2) und Knopf "Runde ausfuehren". Liest das Werkzeug-Register.
 import { allTools } from './tools.js';
 import { esc, icon } from './dom.js';
+import { TOOL_HELP } from '../unlocks.js';
 
 const UNDO_ICON = '<path d="M9 7 L4 12 L9 17"/><path d="M4 12 H15 A5 5 0 0 1 15 22"/>';
 
@@ -59,7 +60,7 @@ export function createToolbar(root, { onTool, onUndo, onExec }) {
       const tools = narrowMq?.matches ? [...m.tools.filter((t) => t.ok), ...m.tools.filter((t) => !t.ok)] : m.tools;
       bar.innerHTML = tools.map(({ tool, ok, why }) => `<button type="button" class="tool${m.active === tool.id ? ' active' : ''}"
           data-tool="${esc(tool.id)}" aria-keyshortcuts="${esc(tool.key.toUpperCase())}" aria-pressed="${m.active === tool.id}"
-          aria-disabled="${!ok}" title="${esc(ok ? tool.label + ' (' + tool.key.toUpperCase() + ')' : why)}">
+          aria-disabled="${!ok}" title="${esc(ok ? tool.label + ' (' + tool.key.toUpperCase() + ')' + (TOOL_HELP[tool.id] ? ': ' + TOOL_HELP[tool.id] : '') : why)}">
           ${icon(tool.icon)}<span class="lbl">${esc(tool.label)}</span><kbd>${esc(tool.key.toUpperCase())}</kbd></button>`).join('')
 ;
       undo.setAttribute('aria-disabled', String(!m.canUndo));

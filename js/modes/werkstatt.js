@@ -218,7 +218,8 @@ export function docToLage(doc) {
     id: 'lage-eigen', name: doc.title || 'Eigene Lage', map: map.id,
     startHour: doc.startHour ?? 10,
     turnKind: doc.kind === 'battle' ? 'battle' : 'position',
-    weather: { kind: doc.weather ?? 'clear' },
+    // Schnee: Winter mit knöcheltiefer Decke von Anfang an
+    weather: doc.weather === 'snow' ? { kind: 'snow', season: 'winter', snow: 2 } : { kind: doc.weather ?? 'clear' },
     sides: {
       a: { faction: doc.factions?.a ?? 'kaldern', groups: doc.groups.a.map(spec) },
       b: {

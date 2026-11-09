@@ -36,3 +36,6 @@
   .dr-from{display:none}
   .sheet-open .dr-card{display:none}
 }
+/* Was der Zettel noch nicht vorgestellt hat, bleibt weg */
+.drilling:not(.dr-show-check) .hud .check,.drilling:not(.dr-show-check) .strip-warn{display:none !important}
+.drilling:not(.dr-show-lehrling) .lr-btn,.drilling:not(.dr-show-lehrling) .lr-card{display:none !important}

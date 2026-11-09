@@ -12,6 +12,7 @@
   "weather": {
     "kind": "clear",
     "season": "winter",
+    "snow": 1,
     "wind": {
       "dir": "w",
       "speed": 1

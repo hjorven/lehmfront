@@ -70,7 +70,7 @@ export function stainCount(weather) {
  * Rueckgabe: { setState(state, { side, still }), resize(w, h, dpr), invalidate(), drawNow(), destroy() }
  */
 export function createWeatherLayer(canvas, { map, seed = 1, getCamera, getTheme, staticCanvas = null }) {
-  const ctx = canvas.getContext('2d');
+  let ctx = canvas.getContext('2d');
   let dpr = 1;
   let state = null;
   let side = 'a';
@@ -399,9 +399,42 @@ export function createWeatherLayer(canvas, { map, seed = 1, getCamera, getTheme,
 
   // Schneedecke: ein heller Hauch ueber dem Papier und feine Tupfen je Feld (deterministisch), dichter mit der Stufe.
   // Felder ohne Schnee (Wasser) bleiben frei. Die Tinte darunter bleibt lesbar.
+  // Zwischenspeicher der Schneedecke (Bildschirmgroesse): neu nur bei anderer Kamera, Stufe oder Groesse
+  let snowCv = null, snowKey = '', snowCam = null, snowTimer = 0;
   function drawSnowCover(cam, th, rect) {
     const lvl = state.weather?.snow | 0;
     if (!lvl || !th.snow) return;
+    const base = [cam.zoom, lvl, canvas.width, canvas.height, th.snow, th.dark ? 1 : 0].join('|');
+    const key = base + '|' + cam.x + '|' + cam.y;
+    let dx = 0, dy = 0;
+    if (key !== snowKey || !snowCv) {
+      // Nur verschoben (gleicher Zoom): altes Bild versetzt zeigen, neu zeichnen, wenn die Karte ruht
+      if (snowCv && snowCam && snowKey.startsWith(base + '|')) {
+        dx = (snowCam.x - cam.x) * cam.zoom * dpr;
+        dy = (snowCam.y - cam.y) * cam.zoom * dpr;
+        clearTimeout(snowTimer);
+        snowTimer = setTimeout(() => { snowKey = ''; layer.invalidate(); }, 140);
+      } else {
+        snowCv ??= document.createElement('canvas');
+        snowCv.width = canvas.width; snowCv.height = canvas.height;
+        const real = ctx;
+        ctx = snowCv.getContext('2d');
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.clearRect(0, 0, snowCv.width, snowCv.height);
+        applyCameraTransform(ctx, cam, dpr);
+        paintSnowCover(th, rect, lvl);
+        ctx = real;
+        snowKey = key;
+        snowCam = { x: cam.x, y: cam.y };
+      }
+    }
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.drawImage(snowCv, dx, dy);
+    ctx.restore();
+  }
+
+  function paintSnowCover(th, rect, lvl) {
     const x0 = Math.max(0, Math.floor(rect.x0)), x1 = Math.min(map.width, Math.ceil(rect.x1));
     const y0 = Math.max(0, Math.floor(rect.y0)), y1 = Math.min(map.height, Math.ceil(rect.y1));
     ctx.save();

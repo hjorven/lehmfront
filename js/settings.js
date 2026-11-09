@@ -14,6 +14,7 @@ export const SETTING_CHOICES = {
   contrast: [false, true],              // kraeftigere Linien und Hilfstexte
   tap: ['confirm', 'direct'],           // Ziel mit dem Finger: erst vormerken, dann setzen, oder sofort setzen
   hud: ['auto', 'tidy', 'full'],        // Kaertchen im Gefecht: nach Geraet, aufgeraeumt (Kopfleiste) oder alle offen
+  orders: ['auto', 'all'],              // Befehle: Schritt fuer Schritt freischalten (js/unlocks.js) oder alle sofort
 };
 
 export const DEFAULT_SETTINGS = Object.freeze(

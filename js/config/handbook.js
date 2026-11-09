@@ -4,6 +4,9 @@
 
 export const HANDBOOK_INTRO = 'Du bist Major Ilse Brandt und führst einen Frontabschnitt an der Asse. Du planst, gräbst, versorgst und entscheidest, wann angegriffen wird. Der Stab will Gelände, deine Leute wollen leben.';
 
+/** Wie neue Befehle dazukommen */
+export const HANDBOOK_UNLOCK = 'Am Anfang gibt es nur Bewegen, Halten und Graben. Weitere Befehle kommen mit der Grundausbildung und den Missionen von Akt 1 dazu, jeder mit einem Satz Erklärung. Wer alles sofort will: Dienstbuch, Darstellung, „Befehle im Gefecht“.';
+
 /** Eine Runde in fünf Schritten */
 export const HANDBOOK_ROUND = [
   ['Lage ansehen', 'Die Karte zeigt, was deine Gruppen sehen. Rote Fragezeichen sind Feinde, die du zuletzt gesehen hast (Geister), mit Alter in Runden.'],

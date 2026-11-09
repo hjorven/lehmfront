@@ -25,7 +25,7 @@ import {
 
 const DRAFT_KEY = 'lehmfront.werkstatt.entwurf';
 const SHELF_KEY = 'lehmfront.werkstatt.v1';
-const WEATHER = [['clear', 'Klar'], ['overcast', 'Bedeckt'], ['rain', 'Regen'], ['fog', 'Nebel']];
+const WEATHER = [['clear', 'Klar'], ['overcast', 'Bedeckt'], ['rain', 'Regen'], ['fog', 'Nebel'], ['snow', 'Schnee']];
 const GOALS = [['keins', 'Kein Ziel (freies Gefecht)'], ['take', 'Nehmen'], ['hold', 'Halten'], ['destroy', 'Alle drüben aufreiben']];
 
 /** Werkzeuge: layer + Zeichen; line = als Linie mit Traversen-Option zeichnen */

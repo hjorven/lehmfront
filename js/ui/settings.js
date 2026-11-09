@@ -25,6 +25,7 @@ const LABELS = {
   signs: ['Signaturen', { false: 'nur Farbe', true: 'Farbe und Form' }, 'Gegner mit Doppelrahmen, Warnzeilen mit Zeichen. Hilft bei Farbsehschwäche.'],
   contrast: ['Kontrast', { false: 'normal', true: 'hoch' }, 'Kräftigere Linien und Hilfstexte, auch in der Dämmerung.'],
   tap: ['Ziel antippen', { confirm: 'vormerken, dann setzen', direct: 'sofort setzen' }, 'Nur mit dem Finger: Das erste Antippen zeichnet das Ziel mit Bleistift vor und zeigt Weg und Kosten, das zweite setzt den Befehl.'],
+  orders: ['Befehle im Gefecht', { auto: 'Schritt für Schritt', all: 'alle von Anfang an' }, 'Schritt für Schritt: Neue Befehle kommen mit der Grundausbildung und den Missionen von Akt 1 dazu, jeder mit einer kurzen Erklärung. Tageslage, Lehrgang und Online zeigen immer alle.'],
   hud: ['Kärtchen im Gefecht', { auto: 'nach Gerät', tidy: 'aufgeräumt', full: 'alle offen' }, 'Aufgeräumt: Vorräte, Runde und Prüfliste stecken in einer Kopfleiste, die Karte bleibt frei. Nach Gerät heißt aufgeräumt auf Tablets.'],
 };
 

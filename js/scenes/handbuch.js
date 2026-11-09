@@ -2,7 +2,7 @@
 // Dienstvorschrift (Stil 03): Eine Runde in fuenf Schritten, die Werte, Begriffe von A bis Z, Tasten, zehn
 // Ratschlaege. &teil=<id> springt zu einem Abschnitt. Inhalte: js/config/handbook.js.
 import { ensureCss, esc } from '../ui/dom.js';
-import { HANDBOOK_INTRO, HANDBOOK_ROUND, HANDBOOK_VALUES, HANDBOOK_TERMS, HANDBOOK_TIPS } from '../config/handbook.js';
+import { HANDBOOK_INTRO, HANDBOOK_UNLOCK, HANDBOOK_ROUND, HANDBOOK_VALUES, HANDBOOK_TERMS, HANDBOOK_TIPS } from '../config/handbook.js';
 import { FIXED_KEYS, TOUCH } from '../ui/settings.js';
 import { DRILL_PATH, readDrill } from '../config/drill.js';
 
@@ -42,7 +42,8 @@ export async function mount(root, params) {
     </header>
     <section id="hb-runde" class="hb-part"><h2>Eine Runde in fünf Schritten</h2>
       <ol class="hb-steps">${HANDBOOK_ROUND.map(([k, v]) => `<li><b>${esc(k)}</b> ${esc(v)}</li>`).join('')}</ol>
-      <p class="hb-note">Stellungsrunden dauern zwölf Stunden, Gefechtsrunden fünf Minuten. Tag und Nacht wechseln mit jeder Stellungsrunde.</p></section>
+      <p class="hb-note">Stellungsrunden dauern zwölf Stunden, Gefechtsrunden fünf Minuten. Tag und Nacht wechseln mit jeder Stellungsrunde.</p>
+      <p class="hb-unlock">${esc(HANDBOOK_UNLOCK)}</p></section>
     <section id="hb-werte" class="hb-part"><h2>Die Werte</h2>${dl(HANDBOOK_VALUES)}</section>
     <section id="hb-begriffe" class="hb-part"><h2>Begriffe von A bis Z</h2>${dl(HANDBOOK_TERMS)}</section>
     <section id="hb-tasten" class="hb-part"><h2>Tasten und Finger</h2>

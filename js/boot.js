@@ -2,9 +2,12 @@
 // main.js importiert diese Datei zuerst; Szenen muessen nichts dafuer tun.
 import './render/text-fix.js'; // kleine Schrift auf der skalierten Karte (Chrome)
 import { applySettings } from './settings.js';
+import { readLevel } from './unlocks.js';
 import { ensureCss, esc } from './ui/dom.js';
 
 applySettings();
+// Befehle Schritt fuer Schritt: Startstufe festlegen, bevor eine Szene Speicherstaende anlegt (Neue: 0, Bekannte: alles)
+readLevel();
 ensureCss('css/einstellungen.css');
 
 /** Kleiner Fernschreiberstreifen oben: neue Ausgabe liegt bereit */

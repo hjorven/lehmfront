@@ -141,3 +141,12 @@ test('Import lehnt zu grosse oder unvollstaendige Karten ab', () => {
   assert.throws(() => lageToDoc({ ...l, map: { ...l.map, width: 200, height: 200 } }), /zwischen 4 und/);
   assert.throws(() => lageToDoc({ ...l, map: { ...l.map, terrain: l.map.terrain.slice(1) } }), /unvollständig/);
 });
+
+test('Werkstatt: Schnee als Wetter ergibt Winter mit Schneedecke, Rückweg behält ihn', async () => {
+  const { blankDoc, docToLage, lageToDoc } = await import('../js/modes/werkstatt.js');
+  const doc = blankDoc('klein');
+  doc.weather = 'snow';
+  const lage = docToLage(doc);
+  assert.deepEqual(lage.scenario.weather, { kind: 'snow', season: 'winter', snow: 2 });
+  assert.equal(lageToDoc(lage).weather, 'snow');
+});

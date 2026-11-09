@@ -47,6 +47,7 @@ registerCheck('munition', ({ state, side }) => {
 export function checklist(ctx) {
   const out = [];
   for (const [id, fn] of checks) {
+    if (ctx.skip?.has?.(id)) continue; // Einsteiger: Pruefpunkte zu Befehlen, die es noch nicht gibt
     try {
       for (const item of fn(ctx) ?? []) out.push({ ...item, check: id });
     } catch (err) {
@@ -72,7 +73,7 @@ export const HOLD_TYPES = new Set(['assault']);
  * Zusammenfassung fuer den Commit.
  * Liefert { lines: [{ tone, count, text }], needsHold, count, warnings }.
  */
-export function summarize({ state, side, orders, map = null, plans = {}, only = null }) {
+export function summarize({ state, side, orders, map = null, plans = {}, only = null, skip = null }) {
   const byType = new Map();
   for (const o of orders) {
     if (!byType.has(o.type)) byType.set(o.type, []);
@@ -96,7 +97,7 @@ export function summarize({ state, side, orders, map = null, plans = {}, only = 
   if (idle.length) {
     lines.push({ tone: 'warn', count: String(idle.length), text: `${idle.length === 1 ? 'Gruppe' : 'Gruppen'} ohne Befehl (${idle.map((g) => groupName(state, g)).join(', ')}), ${idle.length === 1 ? 'hält' : 'halten'}` });
   }
-  const checks = checklist({ state, side, orders, map, plans, only });
+  const checks = checklist({ state, side, orders, map, plans, only, skip });
   for (const c of checks) if (c.summary && c.tone !== 'warn') lines.push({ tone: 'own', count: '·', text: c.text });
   const warnings = checks.filter((c) => c.tone === 'warn' && c.check !== 'ohne-befehl');
   for (const w of warnings) lines.push({ tone: 'warn', count: '!', text: w.text });
