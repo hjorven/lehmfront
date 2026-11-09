@@ -428,6 +428,10 @@ export function judgeMission(mission, { state, rounds, side = 'a', final = false
     const won = state.result.winner === side;
     return { outcome: won ? 'sieg' : 'niederlage', orderMet: won, why: state.result.reason, done: true };
   }
+  // Eine Seite ohne Gruppen: der Einsatz ist entschieden, auch ohne eigenes Missionsziel
+  const alive = (s) => (state?.groups ?? []).some((g) => g.side === s && g.status !== 'lost');
+  if (state?.groups?.length && !alive(side)) return { outcome: 'niederlage', orderMet: false, why: 'Abschnitt aufgerieben', done: true };
+  if (state?.groups?.length && !alive(side === 'a' ? 'b' : 'a')) return { outcome: 'sieg', orderMet: true, why: 'Gegner aufgerieben', done: true };
   const fn = judges.get(mission);
   const r = fn ? fn({ state, rounds, side, counts }) : null;
   if (r) return { ...r, done: true };

@@ -766,13 +766,13 @@ export async function mount(root, params) {
       const end = lastLog.find((e) => e.type === 'battle_end' && e.side === side);
       if (end) flash(end.reason, end.outcome === 'taken' || end.outcome === 'defended' ? '' : 'warn');
       if (pendingNote) { showNote(pendingNote); pendingNote = null; }
-      campaignRun?.afterFilm(ui);
     }
     refresh();
     if (clockSnapDue && !filmReplay) snapClock();
     drawDynNow();
     dynCv.focus({ preventScroll: true });
-    if (!filmReplay) rules.afterFilm();
+    // P14: im Einsatz aus der Kampagne meldet der Kampagnendialog das Ende (sonst die Abschlussmeldung von P17)
+    if (!filmReplay && !campaignRun?.afterFilm(ui)) rules.afterFilm();
   }
 
   function openArchive() {

@@ -15,7 +15,8 @@ Beispielstände ohne Speichern: `&demo=mitte|tief|hoch|ende`, dazu `&stempel=umd
    `js/ui/campaign/mission.js` legt Ansehen, Vertrauen, Berichte, Nachschub, Batteriemunition und Ersatz auf den
    Startzustand (`applyCampaignToState`) und zeigt „Einsatz melden“. Meuterei (Vertrauen unter 10, Phase `campaign`)
    oder ein angemeldetes Missionsziel beenden den Einsatz von selbst; der Dialog kommt erst nach dem Phasenfilm
-   (`afterRound` merkt vor, `afterFilm` zeigt). Ohne laufenden Einsatz leitet `campaign=1` zur Feldzugskarte um.
+   (`afterRound` merkt vor, `afterFilm` zeigt und ersetzt dann die Abschlussmeldung von P17). Ist eine Seite
+   aufgerieben, ist der Einsatz ebenfalls entschieden. Ohne laufenden Einsatz leitet `campaign=1` zur Feldzugskarte um.
 4. Zurück auf der Feldzugskarte: `finishMission` bucht alle Auslöser, zählt die Erfahrungsberichte, verschiebt die
    Front, dann `playInterlude` (Gefallenenliste, Post, Entscheidungen, nächstes Briefing), dann `afterInterlude`.
 5. Unter 10 Ansehen: abgelöst, unter 10 Vertrauen: Meuterei. Beides beendet den Feldzug mit den Texten

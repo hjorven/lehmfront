@@ -137,7 +137,8 @@ export function campaignMission(params) {
     },
     /** Nach dem Phasenfilm: der Enddialog (die Spielerin sieht erst, wie es ausging) */
     afterFilm(ui) {
-      if (ended || !pending || dialogOpen) return;
+      if (ended) return true;
+      if (!pending || dialogOpen) return !!pending;
       const { r, state, archive } = pending;
       const mutiny = r.why === 'Meuterei';
       dialog(ui, {
@@ -149,6 +150,7 @@ export function campaignMission(params) {
         confirm: 'Zur Feldzugskarte',
         onConfirm: () => finish(r, state, archive, ui),
       });
+      return true;
     },
   };
 }

@@ -403,6 +403,9 @@ test('Missionsziel: angemeldet, sonst Standard beim Beenden', () => {
   registerMissionJudge('a9m8', ({ counts }) => (counts.won >= 2 ? { outcome: 'sieg', orderMet: true } : null));
   assert.equal(judgeMission('a9m8', { rounds: [round([ev('breach', 'a'), ev('breach', 'a')])] }).outcome, 'sieg');
   assert.equal(judgeMission('a9m8', { rounds: [] }), null);
+  const groups = [{ id: 'a01', side: 'a', status: 'ok' }, { id: 'b01', side: 'b', status: 'lost' }];
+  assert.equal(judgeMission('a9m9', { state: { groups }, rounds: [] }).outcome, 'sieg', 'Gegner aufgerieben');
+  assert.equal(judgeMission('a9m9', { state: { groups: groups.map((g) => ({ ...g, status: g.side === 'a' ? 'lost' : 'ok' })) }, rounds: [] }).outcome, 'niederlage');
 });
 
 test('slimRounds behaelt Protokoll und Staerken, sonst nichts', () => {
