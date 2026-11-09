@@ -101,3 +101,14 @@ test('Nachnamen sind pro Seite eindeutig, solange die Liste reicht', () => {
   const sur = groupsOf(s, 'a').map((g) => g.leader.name.split(' ').slice(1).join(' '));
   assert.equal(new Set(sur).size, sur.length);
 });
+
+test('P27: feste Gruppenfuehrer im Szenario teilen ihren Nachnamen mit keinem gezogenen', () => {
+  const map = { id: 't', width: 20, height: 10 };
+  const fixed = { name: 'Wiebke Albers', home: 'Fennhusen' };
+  for (let seed = 1; seed <= 60; seed++) {
+    const groups = Array.from({ length: 7 }, (_, i) => ({ type: 'rifles', pos: { x: i, y: 1 }, ...(i === 6 ? { leader: fixed } : {}) }));
+    const st = createInitialState(map, { sides: { a: { faction: 'kaldern', groups }, b: { faction: 'morrow', groups: [] } } }, seed);
+    const last = st.groups.filter((g) => g.side === 'a').map((g) => g.leader.name.split(' ').slice(1).join(' '));
+    assert.equal(new Set(last).size, last.length, `Seed ${seed}: ${last.join(', ')}`);
+  }
+});

@@ -24,15 +24,16 @@
 .film-ctrl .auto[aria-pressed="true"]{background:var(--track);border-color:var(--ink)}
 .film-ctrl .auto{font-weight:400}
 .film-ctrl .skip{font-weight:400}
+.film-ctrl .auto .sm{display:none}
 .scrub{flex:1;min-width:60px;height:28px;margin:0;accent-color:var(--own);background:none}
 
 /* ---------- Telegramm ---------- */
 .telegram{position:absolute;right:12px;bottom:calc(76px + env(safe-area-inset-bottom));width:360px;max-height:min(420px,calc(100% - 220px));display:flex;flex-direction:column;z-index:2;border-top:3px double var(--line)}
 .telegram.in-film{bottom:calc(10px + env(safe-area-inset-bottom));max-height:min(460px,calc(100% - 200px))}
 .telegram[hidden]{display:none}
-.telegram header{display:flex;align-items:baseline;gap:10px;padding:9px 12px;border-bottom:var(--border)}
-.telegram header b{font:400 16px var(--font-head)}
-.telegram .sub{color:var(--ink2);font-size:12.5px;margin-right:auto}
+.telegram header{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:10px;row-gap:2px;padding:9px 12px;border-bottom:var(--border)}
+.telegram header b{font:400 16px var(--font-head);white-space:nowrap}
+.telegram .sub{color:var(--ink2);font-size:12.5px;margin-right:auto;white-space:nowrap}
 .telegram ol,.archive ol{list-style:none;margin:0;padding:0;overflow:auto}
 .telegram li,.archive li{border-bottom:1px dotted var(--line);border-left:4px solid var(--own)}
 .telegram li:last-child,.archive li:last-child{border-bottom:0}
@@ -80,8 +81,11 @@
   .film-ctrl{gap:6px}
   .film-ctrl .btn{min-height:44px;padding:6px 10px}
   .film-ctrl .play{min-width:84px}
-  .film-ctrl .auto{display:none}
+  .film-ctrl .auto{padding:6px 8px;font-size:12.5px}
+  .film-ctrl .auto .lg{display:none}
+  .film-ctrl .auto .sm{display:inline}
   .film-ctrl .skip kbd{display:none}
+  .scrub{min-width:40px}
   .telegram{left:8px;right:8px;width:auto;bottom:calc(80px + env(safe-area-inset-bottom));max-height:42%}
   .telegram.in-film{bottom:calc(150px + env(safe-area-inset-bottom));max-height:30%}
   .archive{left:8px;right:8px;top:calc(8px + env(safe-area-inset-top));width:auto}

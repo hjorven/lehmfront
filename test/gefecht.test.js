@@ -312,3 +312,14 @@ test('Ein Feld: Begruendung im Singular', () => {
   const r = resolveTurn(s, [{ group: 'a01', type: 'redeploy', path: [{ x: g.pos.x - 1, y: g.pos.y }] }], [], 7, 1, env);
   assert.match(r.log.find((e) => e.type === 'redeploy').reason, /verlegt 1 Feld und/);
 });
+
+test('P27: viele Gruppen ohne Befehl stehen in einer Zeile der Checkliste', async () => {
+  const { checklist } = await import('../js/ui/summary.js');
+  const { createInitialState } = await import('../js/state.js');
+  const groups = Array.from({ length: 6 }, (_, i) => ({ type: 'rifles', pos: { x: i, y: 1 } }));
+  const st = createInitialState({ id: 't', width: 10, height: 5 }, { sides: { a: { faction: 'kaldern', groups }, b: { faction: 'morrow', groups: [] } } }, 3);
+  const lines = checklist({ state: st, side: 'a', orders: [], map: null }).filter((l) => l.text.includes('ohne Befehl'));
+  assert.equal(lines.length, 1);
+  assert.match(lines[0].text, /^6 Gruppen ohne Befehl/);
+  assert.equal(lines[0].group, 'a01');
+});

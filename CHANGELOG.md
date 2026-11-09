@@ -1,5 +1,33 @@
 # Änderungen
 
+## 1.5.0 (2026-11-09)
+
+Das ganze Spiel: alle vier Akte, alle Ausbaustufen bis 1.5, online spielbar.
+
+### Neu seit 1.0.0
+
+- **Akt 3 „Materialschlacht“** (#37): Gas mit Wind und Vorhersage, Masken, Waffenruhe mit weißer Fahne, Bergen im Niemandsland, Feldgeschütz, Flammenwerfer, Flieger, Scheinbatterien und Tarnnetze. Sechs Missionen, Befehl 117 und die längste Nacht mit Varianten.
+- **Akt 4 „Das letzte Frühjahr“** (#39): Panzerwagen, Große Mine unter Hügel 214, Sprengfallen in geräumten Gräben, Pionierbrücke, Verweigerung der Truppe, der letzte Tag. Sechs Missionen und vier Enden (die Linie hält, Waffenstillstand, Durchbruch, abgelöst) mit eigener Schlusssequenz.
+- **Online** (#35, #38): Fernsprechamt mit Zweikampf über Einladungscode, Cloud-Spielstand und nachgerechneter Bestenliste der Tageslage sind live geschaltet.
+- **Tablet und Touch** (#36): Ziel mit dem Finger erst vormerken, dann bestätigen; iPad-Layout im Gefecht.
+- **README** neu geschrieben, Hauptmenü nennt Akt 1 bis 4 und das geschaltete Fernsprechamt (#40).
+
+### In 1.5.0 nachgezogen (Paket P27, Abschluss)
+
+- Dienstbuch: **Sicherung** von Feldzug, Frontabschnitt, Lehrgangsmappe, Wachbuch, Werkstatt und Einstellungen als eine Datei mit Prüfstempel, einlesbar auf einem anderen Gerät.
+- Feuern auf dem Handy rückt Gruppe und Ziele ins Bild.
+- Phasenfilm auf dem Handy: der laufende Reiter rollt ins Bild, „Phase 3 von 6“ steht im Kopf, „Ohne Halt“ (Durchlaufen) gibt es auch auf dem schmalen Schirm.
+- Telegramm-Kopf bricht nicht mehr mitten im Titel um.
+- Checkliste „Vor der Runde“: viele Gruppen ohne Befehl stehen in einer Zeile, damit andere Prüfpunkte sichtbar bleiben.
+- Feste Figuren im Szenario teilen ihren Nachnamen nicht mehr mit gezogenen Gruppenführern (vorher zwei „Gruppe Albers“ in Akt 3).
+- Werkstatt nennt mit Maus keine Fingergesten mehr; Wertungen von Tageslage und Frontabschnitt sagen „je“.
+- Durchspiel-Werkzeug `tools/playthrough.mjs` deckt Akt 3 und 4, Endlos, Puzzle und Koop ab; neues Turnier `tools/feldzug-sim.mjs` über alle Missionen von Akt 2 bis 4.
+- Überraschung: Das Titelblatt erinnert sich an den Ausgang des Feldzugs. Die Gräben im Hintergrund stehen, wie die Front am letzten Tag stand, daneben ein Bleistiftvermerk und die Zahl der Namen auf der Liste.
+
+### Bekannt
+
+Siehe `docs/status.md`, Abschnitt „Offen und bekannte Macken“.
+
 ## 1.0.0 (2026-11-09)
 
 Erste vollständige Fassung. Lehmfront läuft im Browser, ohne Installation, auch offline, auf Desktop und Handy.
@@ -45,4 +73,4 @@ Erste vollständige Fassung. Lehmfront läuft im Browser, ohne Installation, auc
 
 ### Bekannt
 
-Siehe `docs/status.md`, Abschnitt „Offen und bekannte Macken“. Akt 3 und 4 folgen in späteren Versionen.
+Siehe `docs/status.md`, Abschnitt „Offen und bekannte Macken“. Akt 3 und 4 folgten mit 1.5.0.

@@ -182,3 +182,22 @@ test('Bleistiftzittern ist deterministisch und klein', () => {
   assert.notEqual(hashSeed('asse', 1), hashSeed('asse', 2));
   assert.ok(chaikin([[0, 0], [1, 0], [1, 1]], 1).length > 3);
 });
+
+test('P27: frameCells rueckt Felder ins Bild, ohne hineinzuzoomen', async () => {
+  const { createCamera, frameCells, visibleRect } = await import('../js/render/camera.js');
+  const cam = createCamera({ bounds: { x: -2, y: -2, w: 64, h: 44 }, viewW: 390, viewH: 700 });
+  cam.zoom = 24; cam.x = 10; cam.y = 10;
+  // schon sichtbar: nichts tun
+  assert.equal(frameCells(cam, [{ x: 10, y: 10 }, { x: 11, y: 11 }]), false);
+  assert.equal(cam.x, 10);
+  // weit weg: Kamera zieht nach und zoomt hoechstens heraus
+  const moved = frameCells(cam, [{ x: 10, y: 10 }, { x: 22, y: 12 }], { pad: 1, inset: { top: 70, bottom: 190 } });
+  assert.equal(moved, true);
+  assert.ok(cam.zoom <= 24);
+  const r = visibleRect(cam);
+  for (const c of [{ x: 10, y: 10 }, { x: 22, y: 12 }]) {
+    assert.ok(c.x >= r.x && c.x + 1 <= r.x + r.w, `Feld ${c.x} waagrecht im Bild`);
+    assert.ok(c.y >= r.y && c.y + 1 <= r.y + r.h, `Feld ${c.y} senkrecht im Bild`);
+  }
+  assert.equal(frameCells(cam, []), false);
+});

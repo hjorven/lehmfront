@@ -5,6 +5,7 @@
 //   node tools/playthrough.mjs                       alle Modi, Desktop
 //   node tools/playthrough.mjs --handy --throttle 4  Handy 390 x 844, CPU 4x gedrosselt (Leistung)
 //   node tools/playthrough.mjs --only hotseat --rounds 6 --shots
+//   node tools/playthrough.mjs --only akt3-gas,akt4-kasten         mehrere Modi, durch Komma getrennt
 //
 // Startet einen eigenen Server (Port 8093, mit --port aenderbar). Die Bildzeit misst ein volles Neuzeichnen je Bild
 // (Kamera verschoben plus resize), also eher den schlechtesten Fall beim Ziehen der Karte.
@@ -31,6 +32,15 @@ const MODES = [
   { id: 'akt1', path: '/?scene=gefecht&scenario=akt1-m1&campaign=1&seed=4' },
   { id: 'feldzug', path: '/?scene=feldzug&neu=1' },
   { id: 'akt2', path: '/?scene=gefecht&scenario=akt2-m2&seed=4' },
+  // P27: das ganze Spiel (Akt 3 und 4, Endlos, Puzzle, Koop, Spiegelkarten)
+  { id: 'akt3-gas', path: '/?scene=gefecht&scenario=akt3-m2&seed=5' },
+  { id: 'akt3-walze', path: '/?scene=gefecht&scenario=akt3-m6&seed=5' },
+  { id: 'akt4-kasten', path: '/?scene=gefecht&scenario=akt4-m2&seed=6' },
+  { id: 'akt4-mine', path: '/?scene=gefecht&scenario=akt4-m3-leer&seed=6' },
+  { id: 'akt4-tag', path: '/?scene=gefecht&scenario=akt4-m6-waffenstillstand&seed=6' },
+  { id: 'endlos', path: '/?scene=gefecht&endlos=1&karte=velde&seed=8' },
+  { id: 'puzzle', path: '/?scene=gefecht&puzzle=01-laengsfeuer' },
+  { id: 'koop', path: '/?scene=gefecht&karte=kraehenholz&seed=9&mode=koop&runden=6' },
 ];
 const only = opt('only', null);
 // evaluate, das einen Seitenwechsel (Mission zu Ende, zurueck zur Feldzugskarte) als Ergebnis meldet statt zu werfen
@@ -41,7 +51,7 @@ await new Promise((r) => setTimeout(r, 600));
 const browser = await chromium.launch();
 const results = [];
 try {
-  for (const m of MODES.filter((x) => !only || x.id === only)) {
+  for (const m of MODES.filter((x) => !only || only.split(',').includes(x.id))) {
     const ctx = await browser.newContext(HANDY
       ? { viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, deviceScaleFactor: 1 }
       : { viewport: { width: 1280, height: 800 }, deviceScaleFactor: 1 });
@@ -55,12 +65,12 @@ try {
     await page.goto(`http://localhost:${PORT}${m.path}`);
     // Kampagne: Zeitungen, Briefing und Stabsbefehl durchblaettern, bis die Lagekarte steht
     const steps = [];
-    for (let k = 0; k < 60; k++) {
+    for (let k = 0; k < 150; k++) {
       await page.waitForTimeout(400);
       const did = await ev(page, () => {
         if (window.__gefecht) return null;
         const vis = [...document.querySelectorAll('button, a.btn')].filter((b) => b.offsetParent !== null && !b.disabled);
-        const pick = vis.find((b) => /^(Weiter|Zum Einsatz|Einsatz beginnen|Beginnen|Befolgen|Annehmen|Los|Zur Lage|Lesen beendet|Ablegen)/i.test(b.textContent.trim()));
+        const pick = vis.filter((b) => /^\d?(Weiter|Zum Einsatz|Einsatz beginnen|Beginnen|Befolgen|Annehmen|Los|Zur Lage|Lesen beendet|Ablegen|Abschnitt übernehmen|Zur Woche)/i.test(b.textContent.trim())).pop(); // zuletzt eingefuegte zuerst (Blaetter liegen ueber dem Formular)
         if (!pick) return '';
         pick.click();
         return pick.textContent.trim().slice(0, 30);
@@ -70,7 +80,7 @@ try {
     }
     try { await page.waitForFunction(() => !!window.__gefecht, null, { timeout: 30000 }); } catch {
       if (SHOTS) await page.screenshot({ path: `shots/durchlauf-${m.id}-haengt.png` });
-      results.push({ mode: m.id, loadMs: Date.now() - t0, rounds: 0, ended: false, avgRoundMs: 0, maxRoundMs: 0, frameMs: 0, frameP95: 0, turn: 0, errors: [...errors, 'Szene nicht geladen'] });
+      results.push({ mode: m.id, steps, loadMs: Date.now() - t0, rounds: 0, ended: false, avgRoundMs: 0, maxRoundMs: 0, frameMs: 0, frameP95: 0, turn: 0, errors: [...errors, 'Szene nicht geladen'] });
       await ctx.close();
       continue;
     }
@@ -97,6 +107,9 @@ try {
             return 'handover';
           }
           if (hand) return 'handover';
+          // P27: Koop-Uebergabe Nord an Sued (Zettel leer lassen)
+          const pass = vis('.koop-go');
+          if (pass) { pass.click(); return 'koop'; }
           const g = window.__gefecht;
           if (g.state.result || vis('.rm, .mission-end, .ms-end')) return 'ende';
           // Hotseat: nach der Uebergabe plant die andere Seite; ohne Befehle gleich weiter

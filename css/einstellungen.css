@@ -63,6 +63,7 @@ html[data-signs="on"] .telegram li.warn,html[data-signs="on"] .archive li.warn{b
 .set-note,.set-help{margin:0 0 10px;font-size:13px;line-height:1.45;color:var(--ink2)}
 .set-help{margin:6px 0 0}
 .set-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.set-sub-h{margin:18px 0 6px;font:400 15px var(--font-head);color:var(--ink)}
 .settings .btn{min-height:44px;justify-content:center;font-size:14px}
 .settings .btn.quiet{color:var(--ink2);box-shadow:none}
 .settings .btn.armed{background:var(--ink);color:var(--card);border-color:var(--ink)}

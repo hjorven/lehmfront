@@ -4,10 +4,17 @@ import { createRng } from './rng.js';
 import { audio, playSfx } from './audio/engine.js';
 import { dayKey, dayLabel } from './modes/skirmish.js';
 import { boardFor } from './modes/board.js';
+import { AFTERMATH, campaignAftermath } from './aftermath.js';
 
-export const VERSION = '1.0.0';
+export const VERSION = '1.5.0';
 const FIELD_DAY_KEY = 'lehmfront.berichtigt'; // Druckvermerk auf dem Titelblatt (P21)
 const MONTHS = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
+
+// Ueberraschung P27: das Titelblatt erinnert sich an den Ausgang des Feldzugs (js/aftermath.js)
+const CAMPAIGN_KEY = 'lehmfront-campaign';
+function readAftermath() {
+  try { return campaignAftermath(localStorage.getItem(CAMPAIGN_KEY)); } catch { return null; }
+}
 
 function drawBackground(canvas) {
   const dpr = window.devicePixelRatio || 1;
@@ -39,10 +46,13 @@ function drawBackground(canvas) {
   }
 
   // Eigener Graben als Rechteckwelle (blau), feindlicher (rot)
-  const crenel = (x0, color) => {
-    ctx.globalAlpha = 0.55;
+  const after = readAftermath();
+  const look = after ? AFTERMATH[after.ended] : { own: 'solid', enemy: 'solid' };
+  const crenel = (x0, color, how = 'solid') => {
+    ctx.globalAlpha = how === 'faint' ? 0.22 : 0.55;
     ctx.strokeStyle = color;
     ctx.lineWidth = 2;
+    ctx.setLineDash(how === 'dashed' ? [6, 7] : []);
     ctx.beginPath();
     let x = x0;
     ctx.moveTo(x, 0);
@@ -55,9 +65,26 @@ function drawBackground(canvas) {
     }
     ctx.stroke();
   };
-  crenel(w * 0.58, v('own'));
-  crenel(w * 0.86, v('enemy'));
+  crenel(w * (look.own === 'forward' ? 0.8 : 0.58), v('own'), look.own === 'forward' ? 'solid' : look.own);
+  crenel(w * 0.86, v('enemy'), look.enemy);
+  ctx.setLineDash([]);
   ctx.globalAlpha = 1;
+  if (!after) return;
+  // Bleistiftvermerk neben dem eigenen Graben, leicht schief
+  // Breit: rechts neben dem eigenen Graben, frei vom Menue. Schmal: oben ueber dem Titel.
+  const wide = w >= 900;
+  const x = wide ? w * 0.58 + 24 : 22, y = wide ? h * 0.8 : 34;
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(-0.035);
+  ctx.fillStyle = v('ink2') || v('ink');
+  ctx.globalAlpha = 0.85;
+  ctx.textAlign = 'left';
+  const size = Math.max(16, Math.min(22, w / 48));
+  ctx.font = `${size}px Caveat, cursive`;
+  ctx.fillText(look.note, 0, 0);
+  ctx.fillText(after.fallen ? `${after.fallen} ${after.fallen === 1 ? 'Name' : 'Namen'} auf der Liste.` : 'Kein Name auf der Liste.', 0, size * 1.15);
+  ctx.restore();
 }
 
 // Szenen: ?scene=<name> laedt js/scenes/<name>.js und ruft dessen mount(root, params) auf.
@@ -86,6 +113,7 @@ if (scene) {
   const canvas = document.getElementById('bg');
   const redraw = () => drawBackground(canvas);
   redraw();
+  if (readAftermath()) document.fonts?.load('20px Caveat').then(redraw).catch(() => {});
   addEventListener('resize', redraw);
   matchMedia('(prefers-color-scheme: dark)').addEventListener('change', redraw);
   showImprint();

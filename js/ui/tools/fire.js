@@ -107,8 +107,16 @@ registerTool({
       });
       return;
     }
+    // P27: sichtbare Ziele in Reichweite, damit die Szene sie auf dem Handy ins Bild rueckt
+    const v = viewFor(state, [], group.side, { map });
+    const focus = [...v.groups.filter((g) => g.side !== group.side), ...v.ghosts]
+      .map((g) => ({ x: g.pos.x, y: g.pos.y, d: distance(group.pos, g.pos) }))
+      .filter((c) => c.d <= t.range)
+      .sort((a, b) => a.d - b.d || a.y - b.y || a.x - b.x)
+      .slice(0, 3);
     ctx.pickCell({
       title: 'Feuern',
+      focus: focus.length ? [group.pos, ...focus] : null,
       hint: `Feuern: Ziel für ${groupName(state, group)} antippen. Gezeigt werden Sichtlinie, Trefferchance und erwartete Verluste.`,
       preview: (cell) => (cell ? firePreview(map, state, group, cell) : null),
       pick(cell) {

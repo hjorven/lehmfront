@@ -26,6 +26,11 @@ registerCheck('ohne-befehl', ({ state, side, orders, only = null }) => {
   // P12: Gruppen im Ruhelager ruhen mit Absicht und brauchen keinen Befehl
   const idle = groupsOf(state, side).filter((g) => (!only || only(g)) && !has.has(g.id) && g.status !== 'rest');
   if (!idle.length) return [{ tone: 'ok', text: 'Alle Gruppen haben einen Befehl' }];
+  // P27: viele Gruppen ohne Befehl in einer Zeile, sonst schiebt die Liste andere Pruefpunkte aus dem Kaertchen.
+  // Antippen springt zur ersten, die Leertaste weiter zur naechsten.
+  if (idle.length > 3) {
+    return [{ tone: 'warn', text: `${idle.length} Gruppen ohne Befehl (${idle.map((g) => groupName(state, g)).join(', ')}), sie halten`, group: idle[0].id, at: idle[0].pos }];
+  }
   return idle.map((g) => ({ tone: 'warn', text: `${groupName(state, g)} ohne Befehl`, group: g.id, at: g.pos }));
 });
 

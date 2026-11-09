@@ -161,7 +161,8 @@ export function createInitialState(map, scenario, seed) {
     if (s.supply) sides[side].supply = structuredClone(s.supply); // Versorgung der Front (js/supply.js)
     const art = initArtillery(map, s.artillery, side, f.id); // Batterien, Leitungen, Feuerplaene (js/artillery.js)
     if (art.batteries.length || art.lines.length) sides[side].artillery = art;
-    const used = new Set();
+    // P27: feste Namen aus dem Szenario (Fedders, Albers ...) gelten als vergeben, sonst zieht der Zufall denselben Nachnamen
+    const used = new Set((s.groups ?? []).map((g) => g.leader?.name).filter((n) => typeof n === 'string'));
     (s.groups ?? []).forEach((spec, i) => {
       if (!inBounds(map, spec.pos)) throw new Error(`Gruppe ${i} von Seite ${side} steht ausserhalb der Karte`);
       const id = spec.id ?? side + String(i + 1).padStart(2, '0');
