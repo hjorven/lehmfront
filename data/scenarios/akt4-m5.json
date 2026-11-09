@@ -1,0 +1,319 @@
+{
+  "id": "akt4-m5",
+  "name": "Die Brücke",
+  "map": "faehrhaus",
+  "act": 4,
+  "features": [
+    "bridge"
+  ],
+  "startHour": 6,
+  "turnKind": "position",
+  "weather": {
+    "kind": "rain",
+    "season": "fruehling",
+    "wind": {
+      "dir": "w",
+      "speed": 1
+    },
+    "rain": 0.5,
+    "wet": 3
+  },
+  "cells": [],
+  "mission": {
+    "id": "a4m5",
+    "lask": [
+      {
+        "from": 1,
+        "posture": "vorbereiten"
+      },
+      {
+        "from": 3,
+        "posture": "sturm"
+      },
+      {
+        "from": 5,
+        "posture": "auto"
+      }
+    ],
+    "fire": [
+      {
+        "from": 2,
+        "to": 3,
+        "plan": {
+          "id": "m-bruecke",
+          "kind": "harass",
+          "batteries": [
+            "mb1"
+          ],
+          "target": {
+            "x": 18,
+            "y": 20
+          }
+        }
+      },
+      {
+        "from": 5,
+        "to": 5,
+        "plan": {
+          "id": "m-bruecke",
+          "kind": "harass",
+          "batteries": [
+            "mb2"
+          ],
+          "target": {
+            "x": 18,
+            "y": 20
+          }
+        }
+      }
+    ]
+  },
+  "view": {
+    "x": 20,
+    "y": 20
+  },
+  "sides": {
+    "a": {
+      "faction": "kaldern",
+      "supplies": {
+        "carts": 4,
+        "cartsTotal": 6,
+        "material": 40
+      },
+      "ai": {
+        "goals": {
+          "bridge": {
+            "x": 16,
+            "y": 20
+          }
+        }
+      },
+      "groups": [
+        {
+          "type": "pioneers",
+          "pos": {
+            "x": 15,
+            "y": 19
+          },
+          "morale": 70,
+          "leader": {
+            "name": "Swantje Fedders",
+            "home": "Grauwarf"
+          }
+        },
+        {
+          "type": "pioneers",
+          "pos": {
+            "x": 15,
+            "y": 21
+          },
+          "morale": 66
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 15,
+            "y": 20
+          },
+          "morale": 62
+        },
+        {
+          "type": "medics",
+          "pos": {
+            "x": 11,
+            "y": 24
+          },
+          "morale": 70
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 34,
+            "y": 5
+          },
+          "morale": 54,
+          "fatigue": 30
+        },
+        {
+          "type": "mg",
+          "pos": {
+            "x": 33,
+            "y": 14
+          },
+          "morale": 56,
+          "fatigue": 30
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 33,
+            "y": 20
+          },
+          "morale": 56,
+          "fatigue": 30,
+          "leader": {
+            "name": "Otto Harms",
+            "home": "Ostmoor"
+          },
+          "harms": true
+        },
+        {
+          "type": "mg",
+          "pos": {
+            "x": 33,
+            "y": 26
+          },
+          "morale": 54,
+          "fatigue": 30
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 34,
+            "y": 33
+          },
+          "morale": 52,
+          "fatigue": 30
+        },
+        {
+          "type": "listeners",
+          "pos": {
+            "x": 28,
+            "y": 20
+          },
+          "morale": 60,
+          "leader": {
+            "name": "Wiebke Albers",
+            "home": "Fennhusen"
+          }
+        }
+      ]
+    },
+    "b": {
+      "faction": "morrow",
+      "control": "ai",
+      "ai": {
+        "doctrine": "tiefe",
+        "difficulty": "veteran"
+      },
+      "supplies": {
+        "carts": 3,
+        "cartsTotal": 5
+      },
+      "artillery": {
+        "exchange": {
+          "x": 53,
+          "y": 19
+        },
+        "batteries": [
+          {
+            "id": "mb1",
+            "type": "feldhaubitzen",
+            "x": 55,
+            "y": 6,
+            "w": 2,
+            "h": 2,
+            "label": "Batterie Morrow Nord"
+          },
+          {
+            "id": "mb2",
+            "type": "feldhaubitzen",
+            "x": 55,
+            "y": 36,
+            "w": 2,
+            "h": 2,
+            "label": "Batterie Morrow Süd"
+          }
+        ],
+        "lines": [
+          {
+            "id": "m1",
+            "to": "Abschnitt Fährhaus",
+            "points": [
+              [
+                53,
+                19
+              ],
+              [
+                49,
+                19
+              ]
+            ]
+          },
+          {
+            "id": "m2",
+            "to": "mb1",
+            "points": [
+              [
+                53,
+                19
+              ],
+              [
+                55,
+                7
+              ]
+            ]
+          },
+          {
+            "id": "m3",
+            "to": "mb2",
+            "points": [
+              [
+                53,
+                19
+              ],
+              [
+                55,
+                36
+              ]
+            ]
+          }
+        ]
+      },
+      "groups": [
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 44,
+            "y": 8
+          }
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 43,
+            "y": 16
+          }
+        },
+        {
+          "type": "mg",
+          "pos": {
+            "x": 43,
+            "y": 22
+          }
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 43,
+            "y": 28
+          }
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 44,
+            "y": 34
+          }
+        },
+        {
+          "type": "stormtroops",
+          "pos": {
+            "x": 49,
+            "y": 20
+          }
+        }
+      ]
+    }
+  }
+}

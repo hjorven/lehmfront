@@ -1,0 +1,397 @@
+{
+  "id": "akt4-m2",
+  "name": "Der Kasten",
+  "map": "raudas",
+  "act": 4,
+  "features": [
+    "fieldgun",
+    "tank"
+  ],
+  "startHour": 6,
+  "turnKind": "position",
+  "weather": {
+    "kind": "clear",
+    "season": "fruehling",
+    "wind": {
+      "dir": "w",
+      "speed": 1
+    },
+    "fixed": true,
+    "wet": 0
+  },
+  "cells": [
+    {
+      "x": 34,
+      "y": 14,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 34,
+      "y": 15,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 34,
+      "y": 16,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 33,
+      "y": 17,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 33,
+      "y": 18,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 33,
+      "y": 19,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 33,
+      "y": 20,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 33,
+      "y": 21,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 33,
+      "y": 22,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 33,
+      "y": 23,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 33,
+      "y": 24,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 33,
+      "y": 25,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    },
+    {
+      "x": 33,
+      "y": 26,
+      "trench": {
+        "side": "own",
+        "kind": "fire",
+        "level": 3,
+        "facing": "E"
+      }
+    }
+  ],
+  "mission": {
+    "id": "a4m2",
+    "lask": [
+      {
+        "from": 1,
+        "posture": "halten"
+      },
+      {
+        "from": 4,
+        "posture": "auto"
+      }
+    ]
+  },
+  "sides": {
+    "a": {
+      "faction": "kaldern",
+      "supplies": {
+        "carts": 4,
+        "cartsTotal": 6
+      },
+      "ai": {
+        "goals": {
+          "attack": {
+            "x": 39,
+            "y": 20
+          },
+          "tank": true
+        }
+      },
+      "groups": [
+        {
+          "type": "tank",
+          "pos": {
+            "x": 30,
+            "y": 20
+          },
+          "morale": 70,
+          "experience": 0,
+          "callsign": "K1",
+          "leader": {
+            "name": "Tjark Boysen",
+            "home": "Haverstadt"
+          }
+        },
+        {
+          "type": "stormtroops",
+          "pos": {
+            "x": 33,
+            "y": 19
+          },
+          "morale": 70,
+          "experience": 2
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 33,
+            "y": 22
+          },
+          "morale": 64,
+          "leader": {
+            "name": "Otto Harms",
+            "home": "Ostmoor"
+          },
+          "harms": true
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 34,
+            "y": 15
+          },
+          "morale": 62
+        },
+        {
+          "type": "pioneers",
+          "pos": {
+            "x": 30,
+            "y": 21
+          },
+          "morale": 68,
+          "leader": {
+            "name": "Swantje Fedders",
+            "home": "Grauwarf"
+          }
+        },
+        {
+          "type": "mg",
+          "pos": {
+            "x": 33,
+            "y": 25
+          },
+          "morale": 64
+        },
+        {
+          "type": "fieldgun",
+          "pos": {
+            "x": 21,
+            "y": 18
+          },
+          "morale": 68
+        },
+        {
+          "type": "medics",
+          "pos": {
+            "x": 18,
+            "y": 20
+          },
+          "morale": 70
+        }
+      ]
+    },
+    "b": {
+      "faction": "morrow",
+      "control": "ai",
+      "ai": {
+        "doctrine": "tiefe",
+        "difficulty": "veteran"
+      },
+      "supplies": {
+        "carts": 3,
+        "cartsTotal": 5
+      },
+      "artillery": {
+        "exchange": {
+          "x": 55,
+          "y": 20
+        },
+        "batteries": [
+          {
+            "id": "mb1",
+            "type": "feldhaubitzen",
+            "x": 56,
+            "y": 33,
+            "w": 2,
+            "h": 2,
+            "label": "Batterie Raudas Süd"
+          },
+          {
+            "id": "mb2",
+            "type": "feldhaubitzen",
+            "x": 56,
+            "y": 4,
+            "w": 2,
+            "h": 2,
+            "label": "Batterie Raudas Nord"
+          }
+        ],
+        "lines": [
+          {
+            "id": "m1",
+            "to": "Bahndamm",
+            "points": [
+              [
+                55,
+                20
+              ],
+              [
+                50,
+                20
+              ],
+              [
+                47,
+                20
+              ]
+            ]
+          },
+          {
+            "id": "m2",
+            "to": "mb1",
+            "points": [
+              [
+                55,
+                20
+              ],
+              [
+                56,
+                33
+              ]
+            ]
+          },
+          {
+            "id": "m3",
+            "to": "mb2",
+            "points": [
+              [
+                55,
+                20
+              ],
+              [
+                56,
+                5
+              ]
+            ]
+          }
+        ]
+      },
+      "groups": [
+        {
+          "type": "mg",
+          "pos": {
+            "x": 39,
+            "y": 19
+          }
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 39,
+            "y": 21
+          }
+        },
+        {
+          "type": "fieldgun",
+          "pos": {
+            "x": 41,
+            "y": 20
+          }
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 40,
+            "y": 13
+          }
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 40,
+            "y": 27
+          }
+        },
+        {
+          "type": "stormtroops",
+          "pos": {
+            "x": 47,
+            "y": 20
+          }
+        }
+      ]
+    }
+  }
+}

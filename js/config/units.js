@@ -77,7 +77,7 @@ export const UNIT_TYPES = {
   },
   tank: {
     id: 'tank', name: 'Panzerwagen (Prototyp)', short: 'Panzerw.', role: 'Überquert Draht und Gräben, oft liegengeblieben',
-    release: '1.4', available: 'akt4', enabled: false,
+    release: '1.4', available: 'akt4', enabled: true,
     size: [6, 8], range: 8, shots: 12, suppressionPerShot: 0.03, digRate: 0, speed: 2, carry: 0, breakdown: 0.25,
   },
 };

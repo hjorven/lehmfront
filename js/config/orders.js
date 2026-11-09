@@ -34,6 +34,8 @@ export const ORDER_TYPES = {
   decoy:       { id: 'decoy',       label: 'Tarnen',          kind: 'position', target: null, scope: 'side' },
   truce:       { id: 'truce',       label: 'Waffenruhe',      kind: 'position', target: null, scope: 'side' },
   recover:     { id: 'recover',     label: 'Bergen',          kind: 'position', target: 'cell' },
+  // P26 (Akt 4): Pionierbruecke ueber Wasser, mit Feldbahngleis darauf
+  bridge:      { id: 'bridge',      label: 'Brücke bauen',    kind: 'position', target: 'path' },
 
   move:        { id: 'move',        label: 'Bewegen',         kind: 'battle',   target: 'path' },
   fire:        { id: 'fire',        label: 'Feuern',          kind: 'battle',   target: 'cell' },

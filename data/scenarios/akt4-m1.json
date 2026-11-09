@@ -1,0 +1,358 @@
+{
+  "id": "akt4-m1",
+  "name": "Tauwetter",
+  "map": "raudas",
+  "act": 4,
+  "features": [
+    "fieldgun",
+    "occupy",
+    "traps"
+  ],
+  "startHour": 6,
+  "turnKind": "position",
+  "weather": {
+    "kind": "rain",
+    "season": "fruehling",
+    "wind": {
+      "dir": "w",
+      "speed": 1
+    },
+    "rain": 0.3,
+    "wet": 2
+  },
+  "cells": [
+    {
+      "x": 33,
+      "y": 3,
+      "trap": {
+        "side": "enemy"
+      }
+    },
+    {
+      "x": 33,
+      "y": 6,
+      "trap": {
+        "side": "enemy"
+      }
+    },
+    {
+      "x": 34,
+      "y": 11,
+      "trap": {
+        "side": "enemy"
+      }
+    },
+    {
+      "x": 34,
+      "y": 14,
+      "trap": {
+        "side": "enemy"
+      }
+    },
+    {
+      "x": 33,
+      "y": 19,
+      "trap": {
+        "side": "enemy"
+      }
+    },
+    {
+      "x": 35,
+      "y": 21,
+      "trap": {
+        "side": "enemy"
+      }
+    },
+    {
+      "x": 33,
+      "y": 23,
+      "trap": {
+        "side": "enemy"
+      }
+    },
+    {
+      "x": 34,
+      "y": 29,
+      "trap": {
+        "side": "enemy"
+      }
+    },
+    {
+      "x": 34,
+      "y": 33,
+      "trap": {
+        "side": "enemy"
+      }
+    },
+    {
+      "x": 34,
+      "y": 36,
+      "trap": {
+        "side": "enemy"
+      }
+    }
+  ],
+  "mission": {
+    "id": "a4m1",
+    "lask": [
+      {
+        "from": 1,
+        "posture": "halten"
+      },
+      {
+        "from": 3,
+        "posture": "sturm"
+      },
+      {
+        "from": 5,
+        "posture": "auto"
+      }
+    ]
+  },
+  "sides": {
+    "a": {
+      "faction": "kaldern",
+      "supplies": {
+        "carts": 4,
+        "cartsTotal": 6
+      },
+      "ai": {
+        "goals": {
+          "attack": {
+            "x": 33,
+            "y": 20
+          }
+        }
+      },
+      "groups": [
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 23,
+            "y": 4
+          },
+          "morale": 62
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 24,
+            "y": 12
+          },
+          "morale": 62
+        },
+        {
+          "type": "mg",
+          "pos": {
+            "x": 23,
+            "y": 19
+          },
+          "morale": 64
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 23,
+            "y": 22
+          },
+          "morale": 66,
+          "leader": {
+            "name": "Otto Harms",
+            "home": "Ostmoor"
+          },
+          "harms": true
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 23,
+            "y": 28
+          },
+          "morale": 60
+        },
+        {
+          "type": "mg",
+          "pos": {
+            "x": 24,
+            "y": 34
+          },
+          "morale": 62
+        },
+        {
+          "type": "pioneers",
+          "pos": {
+            "x": 23,
+            "y": 20
+          },
+          "morale": 68,
+          "leader": {
+            "name": "Swantje Fedders",
+            "home": "Grauwarf"
+          }
+        },
+        {
+          "type": "pioneers",
+          "pos": {
+            "x": 24,
+            "y": 10
+          },
+          "morale": 64
+        },
+        {
+          "type": "fieldgun",
+          "pos": {
+            "x": 19,
+            "y": 18
+          },
+          "morale": 68
+        },
+        {
+          "type": "observers",
+          "pos": {
+            "x": 18,
+            "y": 9
+          },
+          "morale": 66
+        },
+        {
+          "type": "medics",
+          "pos": {
+            "x": 18,
+            "y": 25
+          },
+          "morale": 70
+        }
+      ]
+    },
+    "b": {
+      "faction": "morrow",
+      "control": "ai",
+      "ai": {
+        "doctrine": "tiefe",
+        "difficulty": "veteran"
+      },
+      "supplies": {
+        "carts": 3,
+        "cartsTotal": 5
+      },
+      "artillery": {
+        "exchange": {
+          "x": 55,
+          "y": 20
+        },
+        "batteries": [
+          {
+            "id": "mb1",
+            "type": "feldhaubitzen",
+            "x": 56,
+            "y": 33,
+            "w": 2,
+            "h": 2,
+            "label": "Batterie Raudas Süd"
+          },
+          {
+            "id": "mb2",
+            "type": "feldhaubitzen",
+            "x": 56,
+            "y": 4,
+            "w": 2,
+            "h": 2,
+            "label": "Batterie Raudas Nord"
+          }
+        ],
+        "lines": [
+          {
+            "id": "m1",
+            "to": "Bahndamm",
+            "points": [
+              [
+                55,
+                20
+              ],
+              [
+                50,
+                20
+              ],
+              [
+                47,
+                20
+              ]
+            ]
+          },
+          {
+            "id": "m2",
+            "to": "mb1",
+            "points": [
+              [
+                55,
+                20
+              ],
+              [
+                56,
+                33
+              ]
+            ]
+          },
+          {
+            "id": "m3",
+            "to": "mb2",
+            "points": [
+              [
+                55,
+                20
+              ],
+              [
+                56,
+                5
+              ]
+            ]
+          }
+        ]
+      },
+      "groups": [
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 40,
+            "y": 8
+          }
+        },
+        {
+          "type": "mg",
+          "pos": {
+            "x": 40,
+            "y": 13
+          }
+        },
+        {
+          "type": "mg",
+          "pos": {
+            "x": 39,
+            "y": 20
+          }
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 40,
+            "y": 27
+          }
+        },
+        {
+          "type": "rifles",
+          "pos": {
+            "x": 40,
+            "y": 32
+          }
+        },
+        {
+          "type": "stormtroops",
+          "pos": {
+            "x": 47,
+            "y": 20
+          }
+        }
+      ]
+    }
+  }
+}

@@ -213,6 +213,10 @@ Bekannte Flags aus Akt 1 und 2:
 | `gas_abgeblasen`, `gas_batterien`, `gas_zurueck` | Entscheidung nach a3m3 |
 | `befehl117_befolgt`, `befehl117_umgedeutet`, `befehl117_verweigert` | Entscheidung a3m4 |
 | `waffenruhe_angenommen`, `waffenruhe_geduldet`, `waffenruhe_abgelehnt` | Entscheidung a3m5 |
+| `kasten_durch`, `kasten_liegen` | Mission a4m2: Panzerwagen K1 erreicht das Ziel oder bleibt liegen (Wrack ab a4m3 auf der Karte) |
+| `verweigerung_damm` | Mission a4m4, wenn eine Gruppe den Sturm verweigert hat |
+| `waffenstillstand_gebrochen` | Mission a4m6, wenn nach Beginn des Waffenstillstands noch geschossen wurde |
+| `ende_haelt`, `ende_waffenstillstand`, `ende_durchbruch`, `ende_abgeloest` | Feldzug vor a4m6 nach Ansehen und Vertrauen (`endingFor` in `js/campaign.js`) |
 | `selin_fruehjahr_loren` | Entscheidung nach a3m6: zwei Loren nur für das Lazarett in Akt 4 |
 | `mine_gezuendet`, `mine_gewarnt`, `mine_geflutet` | Entscheidung a4m3 (`mine_gewarnt` setzt auch `mine_gezuendet`) |
 | `verweigerung_mitgegangen`, `verweigerung_harms`, `verweigerung_gemeldet`, `verweigerung_aufgehoben` | Entscheidung a4m4 |

@@ -14,7 +14,7 @@
 // - rally (vor der Moral): Unterdrueckung klingt ab. Wer in dieser Runde nicht beschossen wurde, faengt sich.
 //   Nach einer Stellungsrunde (12 Stunden) ist niemand mehr niedergehalten.
 import { registerPhase, ORDER } from './registry.js';
-import { bonusFor } from '../modifiers.js';
+import { bonusFor, factorFor } from '../modifiers.js';
 import { registerOrderValidator } from '../orders.js';
 import { unitType } from '../config/units.js';
 import { resolveFire, hitChance, coverValue, visibilityFromDarkness } from '../rules.js';
@@ -235,6 +235,12 @@ function runFire(ctx) {
       { shots: odds.shots, range: t.range, experience: shooter.experience, suppressed: shooter.suppressed, suppressionPerShot: t.suppressionPerShot },
       { cover: odds.cover, suppressed: 0, reversed: odds.reversed, inDugout: target.inDugout },
       { distance: odds.distance, visibility: visibilityFromDarkness(darknessAtCell(ctx.state, target.pos, darkness)) * (odds.blind ? BLIND : 1), enfilade: odds.enfilade });
+    // P26: Panzerung (Panzerwagen gegen Gewehre und MG) und Deckung hinter dem Wagen, Faktor aus dem Register
+    const armor = factorFor('armor', { state: ctx.state, map, shooter, target });
+    if (armor !== 1) {
+      r.hits = Math.floor(r.hits * armor);
+      r.suppression = r2(r.suppression * armor);
+    }
     shooter.fired = true;
     if (!hitsOn.has(target.id)) hitsOn.set(target.id, { hits: 0, supp: 0, from: [] });
     const acc = hitsOn.get(target.id);

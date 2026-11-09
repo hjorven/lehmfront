@@ -35,6 +35,8 @@ export const MAX_ASSAULT_CELLS = 40;
 export const ASSAULT_TYPES = new Set(['rifles', 'pioneers', 'stormtroops', 'flamethrowers', 'tank']);
 /** Einheiten, die feindlichen Draht schneiden */
 export const WIRE_CUTTERS = new Set(['pioneers', 'stormtroops']);
+/** P26: Einheiten, die Draht niederwalzen und dabei weiterfahren (Panzerwagen) */
+export const WIRE_CRUSHERS = new Set(['tank']);
 
 /** Bewegungsbudget einer Gruppe in Zehnteln */
 export function moveBudget(group, kind) {
@@ -129,6 +131,7 @@ export function roundsAlong(map, state, group, path, kind = state.turnKind, type
     steps++;
     prev = p;
     const k = p.x + ',' + p.y;
+    if (enemyWire(c, group.side) && !cut.has(k) && WIRE_CRUSHERS.has(group.type)) { wire++; cut.add(k); continue; }
     if (enemyWire(c, group.side) && !cut.has(k)) {
       wire++;
       cut.add(k);
@@ -232,7 +235,11 @@ function runMove(ctx) {
       m.blockedBy = null;
       progress = true;
       const c = map ? liveCell(map, state, p.x, p.y) : null;
-      if (ctx.kind === 'battle' && enemyWire(c, m.g.side)) {
+      if (ctx.kind === 'battle' && enemyWire(c, m.g.side) && WIRE_CRUSHERS.has(m.g.type)) {
+        // P26: Der Panzerwagen walzt den Draht nieder und faehrt weiter; dahinter ist eine Gasse
+        state.cells[p.x + ',' + p.y] = { ...(state.cells[p.x + ',' + p.y] ?? {}), wire: null, wireCut: ctx.turn };
+        (m.crushed ??= []).push({ ...p });
+      } else if (ctx.kind === 'battle' && enemyWire(c, m.g.side)) {
         // Im feindlichen Draht: haengt fest; Pioniere schneiden eine Gasse
         // Erfahrungsbericht Drahtscheren (P14): dann schneiden auch Schuetzen
         if (WIRE_CUTTERS.has(m.g.type) || (m.g.type === 'rifles' && hasReport(state, m.g.side, 'drahtscheren'))) {
@@ -280,6 +287,13 @@ function runMove(ctx) {
     // Sturm traegt sich selbst weiter (ausser bei Feindberuehrung: das entscheidet der Nahkampf)
     if (type === 'assault' && rest.length && !m.foe) ev.carry = { group: g.id, type, path: rest };
     ctx.emit(type, ev);
+    for (const p of m.crushed ?? []) {
+      ctx.emit('wire_cut', {
+        side: g.side, group: g.id, public: true, cell: p, crushed: true,
+        reason: `${name} walzt bei ${cellLabel(p.x, p.y)} den Draht nieder. Dahinter liegt eine Gasse, so breit wie der Wagen.`,
+        at: { ...p },
+      });
+    }
     if (m.cut) {
       ctx.emit('wire_cut', {
         side: g.side, group: g.id, public: true, cell: m.cut,

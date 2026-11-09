@@ -95,6 +95,8 @@ export function coverAt(state, map, pos, side) {
   if (craterAt(state, map, pos.x, pos.y)) better('crater');
   // Minentrichter (P23): der aufgeworfene Rand eines Sprengtrichters deckt wie ein Schuetzenloch
   if (state?.cells?.[pos.x + ',' + pos.y]?.trichter) better('foxhole', { label: 'Trichterrand' });
+  // Wrack des Panzerwagens (P26, a4m2 "Der Kasten"): Stahl zwischen sich und dem Feind, fuer beide Seiten
+  if (state?.cells?.[pos.x + ',' + pos.y]?.wreck) better('foxhole', { label: 'Wrack des Panzerwagens' });
   const tr = trenchAt(state, map, pos.x, pos.y);
   if (tr) {
     // Stufen 1 bis 4 (P04: Schuetzenloch, Graben, ausgebaut, betoniert)

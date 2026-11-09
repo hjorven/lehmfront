@@ -53,7 +53,10 @@ function whyNot(map, state, group, cell) {
   return `kein Sturmweg dorthin (höchstens ${MAX_ASSAULT_CELLS} Felder)`;
 }
 
-function previewText(state, side, plan, cell) {
+/** Zusaetze zur Vorschau aus anderen Paketen (P26: erwartete Verluste, Verweigerung): fn(ctx) -> Text | null */
+export const ASSAULT_NOTES = [];
+
+function previewText(state, side, plan, cell, group = null, map = null) {
   const word = assaultWord(state, side);
   const bits = [`${word} auf ${cellLabel(cell.x, cell.y)}`, plural(plan.path.length, 'Feld', 'Felder')];
   bits.push(state.turnKind === 'battle'
@@ -61,6 +64,10 @@ function previewText(state, side, plan, cell) {
     : `Gefecht ab nächster Runde, etwa ${plural(plan.rounds, 'Gefechtsrunde', 'Gefechtsrunden')}`);
   if (plan.wire) bits.push(`${plural(plan.wire, 'Feld', 'Felder')} Draht`);
   if (plan.breach >= 0) bits.push('Einbruch in den Graben');
+  for (const f of ASSAULT_NOTES) {
+    const t = group ? f({ state, side, plan, cell, group, map }) : null;
+    if (t) bits.push(t);
+  }
   return bits.join(' · ');
 }
 
@@ -93,7 +100,7 @@ registerTool({
       preview(cell) {
         const plan = cell ? planAssault(map, state, group, cell) : null;
         if (!plan) return { path: null, text: cell ? `${cellLabel(cell.x, cell.y)}: ${whyNot(map, state, group, cell)}` : '' };
-        return { path: plan.path, reach: plan.reach, text: previewText(state, side, plan, cell) };
+        return { path: plan.path, reach: plan.reach, text: previewText(state, side, plan, cell, group, map) };
       },
       pick(cell) {
         const plan = cell ? planAssault(map, state, group, cell) : null;

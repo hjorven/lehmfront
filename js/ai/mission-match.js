@@ -9,9 +9,11 @@ import { viewFor } from '../view.js';
 import { decide } from '../ai.js';
 import { judgeMission } from '../campaign.js';
 import { prepareMission } from '../config/missions.js';
+import { prepareMission as prepareScript, missionAi, withMissionOrders } from '../missions/script.js';
 
 /**
- * Eine Mission. opts: { mapJson | map, scenario, mission, seed, passive?, flags?, turns? }
+ * Eine Mission. opts: { mapJson | map, scenario, mission, seed, passive?, flags?, turns?, script? }
+ * script: Lask folgt dem Ablaufplan des Szenarios (scenario.mission: Lage, Feuerplaene) wie im Gefecht (P26).
  * Liefert { outcome, orderMet, why, flags, rounds, state, events: { type: n } }.
  */
 export function runMission(opts) {
@@ -20,6 +22,7 @@ export function runMission(opts) {
   const env = { map };
   let state = initEtappen(createInitialState(map, opts.scenario, seed), map, opts.scenario);
   state = prepareMission(opts.mission, state, { flags: opts.flags ?? [] }, 'a');
+  if (opts.script) state = prepareScript(state, opts.scenario);
   const memory = { a: undefined, b: undefined };
   const rounds = [];
   const events = {};
@@ -31,10 +34,10 @@ export function runMission(opts) {
     for (const side of ['a', 'b']) {
       const cfg = side === 'a'
         ? { posture: opts.passive ? 'halten' : undefined, doctrine: 'ausgewogen', difficulty: 'lask', goals: goalsA }
-        : { doctrine: opts.scenario.sides.b.ai?.doctrine, difficulty: opts.scenario.sides.b.ai?.difficulty, goals: opts.scenario.sides.b.ai?.goals ?? null };
+        : { doctrine: opts.scenario.sides.b.ai?.doctrine, difficulty: opts.scenario.sides.b.ai?.difficulty, goals: opts.scenario.sides.b.ai?.goals ?? null, ...(opts.script ? missionAi(state) : {}) };
       const d = decide(viewFor(state, log, side, env), { map, seed, side, memory: memory[side], ...cfg });
       memory[side] = d.memory;
-      orders[side] = opts.passive && side === 'a' ? [] : d.orders;
+      orders[side] = opts.passive && side === 'a' ? [] : side === 'b' && opts.script ? withMissionOrders(d.orders, state) : d.orders;
     }
     const kind = state.turnKind;
     const r = resolveTurn(state, orders.a, orders.b, seed, state.turn, env);

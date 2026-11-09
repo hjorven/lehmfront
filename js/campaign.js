@@ -7,7 +7,7 @@
 //     mission, counters: { <bericht>: n }, reports: [ids], withheld: [ids], fresh: [ids],
 //     stamps: { <mission>: 'befolgen'|'umdeuten'|'verweigern' }, ledger: [{ mission, changes }],
 //     history: [{ mission, ansehen, vertrauen, outcome }], front: [Zahl je Mission], threat: null|{ mission },
-//     ended: null|'vorzeitig_abgeloest'|'vorzeitig_meuterei', reply: null|{ mission, outcome, band } }
+//     ended: null|'vorzeitig_abgeloest'|'vorzeitig_meuterei'|'haelt'|'waffenstillstand'|'durchbruch'|'abgeloest', reply: null|{ mission, outcome, band } }
 //
 // Rein: kein DOM, kein Date, kein Math.random. Alle Werte ganze Zahlen.
 import { createCampaign } from './narrative/interlude.js';
@@ -335,10 +335,50 @@ export function finishMission(campaign, input) {
   return { campaign: c, changes, reached: r.reached, ended: c.ended };
 }
 
+// ------------------------------------------------------------------ Die vier Enden (P26)
+
+/** Die regulaeren Enden (Plan 2.6), in der Reihenfolge, in der ende.wahl sie prueft */
+export const ENDINGS = ['haelt', 'waffenstillstand', 'durchbruch', 'abgeloest'];
+
+/**
+ * Welches Ende? Dieselben Grenzen wie der Slot ende.wahl in data/texts/enden.json (ein Test prueft das):
+ * beide Werte ab 60 haelt; Vertrauen ab 50 und Ansehen bis 59 Waffenstillstand; Ansehen ab 50 Durchbruch; sonst abgeloest.
+ */
+export function endingFor(ansehen, vertrauen) {
+  if (ansehen >= 60 && vertrauen >= 60) return 'haelt';
+  if (ansehen <= 59 && vertrauen >= 50) return 'waffenstillstand';
+  if (ansehen >= 50) return 'durchbruch';
+  return 'abgeloest';
+}
+
+/** Ende, auf das der Feldzug zulaeuft (Flag ende_*, sonst aus den Werten) */
+export function endingOf(campaign) {
+  const f = (campaign.flags ?? []).find((x) => /^ende_/.test(x) && ENDINGS.includes(x.slice(5)));
+  return f ? f.slice(5) : endingFor(campaign.ansehen, campaign.vertrauen);
+}
+
+/**
+ * Vor der letzten Mission wird das Ende gewaehlt (Flag ende_<schluessel>, README "Enden"); nach ihr endet der
+ * Feldzug mit diesem Ende (c.ended), sofern er nicht vorher vorzeitig geendet hat.
+ */
+function settleEnding(c) {
+  if (c.ended || !c.mission || nextMission(c.mission)) return c;
+  if (!c.outcomes?.[c.mission]) {
+    const key = endingFor(c.ansehen, c.vertrauen);
+    c.flags = [...c.flags.filter((x) => !/^ende_/.test(x)), 'ende_' + key];
+  } else {
+    const key = endingOf(c);
+    if (!c.flags.includes('ende_' + key)) c.flags = [...c.flags, 'ende_' + key];
+    c.ended = key;
+  }
+  return c;
+}
+
 /** Nach den Entscheidungen der Zwischenszene (playInterlude) erneut pruefen und den Verlauf nachtragen */
 export function afterInterlude(campaign) {
   let c = normalizeCampaign(campaign);
   c = checkThresholds(c, c.mission);
+  c = settleEnding(c);
   const last = c.history[c.history.length - 1];
   if (last && (last.ansehen !== c.ansehen || last.vertrauen !== c.vertrauen)) {
     c.history[c.history.length - 1] = { ...last, ansehen: c.ansehen, vertrauen: c.vertrauen };
