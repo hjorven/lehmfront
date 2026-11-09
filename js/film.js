@@ -185,7 +185,7 @@ function hhmm(c) {
 export function planFilm(input, result, side) {
   const kind = input.state.turnKind;
   const phases = phasesFor(kind, input.env?.phases);
-  const visible = viewFor(result.state, result.log, side).log;
+  const visible = viewFor(result.state, result.log, side, input.env ?? {}).log;
   // Ereignisse nur der eigenen Befehlspruefung zeigen (wie bisher im Meldungen-Kaertchen)
   const log = visible.filter((e) => e.phase !== 'orders' || e.side === side);
   const sections = planSections(kind, phases, log);
@@ -200,7 +200,8 @@ export function planFilm(input, result, side) {
         id: `${input.turn}-${lines.length}`,
         time,
         section: si,
-        head: `${hhmm(clock)} ${s.label.toUpperCase()} · FELD ${cellLabel(e.at.x, e.at.y)}`,
+        // Ereignisse ohne Seite (Uhr, Wetter) betreffen den ganzen Abschnitt: ohne Feldangabe
+        head: `${hhmm(clock)} ${s.label.toUpperCase()}` + (e.side ? ` · FELD ${cellLabel(e.at.x, e.at.y)}` : ''),
         text: stopText(e.reason),
         tone: toneOf(e),
         at: { ...e.at },

@@ -74,7 +74,7 @@ test('planFilm: Abschnitte lueckenlos, letzter ist die Uhr, Zeilen in Zeitordnun
   for (const l of film.lines) {
     assert.match(l.text, / STOP$/);
     assert.ok(Number.isInteger(l.at.x) && Number.isInteger(l.at.y));
-    assert.match(l.head, /^\d{4} [A-ZÄÖÜ]+ · FELD \d+\/\d+$/);
+    assert.match(l.head, /^\d{4} [A-ZÄÖÜ]+( · FELD \d+\/\d+)?$/);
     assert.ok(l.time < film.total);
   }
   // Nacht bricht an: Zeile im letzten Abschnitt
