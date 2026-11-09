@@ -94,7 +94,7 @@ test('Deckung: Graben, eroberter Graben halb, Wald', () => {
   const terrain = Array.from({ length: 7 }, () => '....w...............');
   const map = makeMap({ terrain, trenches: [{ x: 2, y: 3, side: 'own', kind: 'fire', level: 2, facing: 'E' }] });
   const s = createInitialState(map, scenario([], []), 1);
-  assert.equal(coverAt(s, map, { x: 2, y: 3 }, 'a').cover, 'trench_improved');
+  assert.equal(coverAt(s, map, { x: 2, y: 3 }, 'a').cover, 'trench'); // Stufe 2 = Schützengraben (P04)
   assert.equal(coverAt(s, map, { x: 2, y: 3 }, 'a').reversed, false);
   assert.equal(coverAt(s, map, { x: 2, y: 3 }, 'b').reversed, true);
   assert.equal(coverAt(s, map, { x: 4, y: 0 }, 'a').label, 'Wald');
@@ -130,7 +130,7 @@ test('Laengsfeuer: entlang eines geraden Grabens, nicht von vorn, nicht ueber Tr
 });
 
 test('Vorschau: Trefferchance faellt mit Deckung und Nacht, ohne Sicht kein Feuer', () => {
-  const map = makeMap({ trenches: [{ x: 8, y: 3, side: 'enemy', kind: 'fire', level: 1, facing: 'W' }] });
+  const map = makeMap({ trenches: [{ x: 8, y: 3, side: 'enemy', kind: 'fire', level: 2, facing: 'W' }] });
   const s = battleState(map, [{ type: 'rifles', pos: { x: 3, y: 3 } }], [{ type: 'rifles', pos: { x: 8, y: 3 } }]);
   const a = getGroup(s, 'a01');
   const open = fireOdds(s, map, a, { x: 8, y: 2 }, 'b', { darkness: 0 });

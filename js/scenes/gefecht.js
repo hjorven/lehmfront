@@ -71,7 +71,10 @@ export async function mount(root, params) {
   const humans = mode === 'hotseat' ? ['a', 'b'] : ['a'];
   const env = { map };
   // Karte mit Graeben, Kratern usw. aus dem Spielzustand (Anzeige und Werkzeuge); env.map bleibt die Grundkarte
-  let liveMap = applyCellState(map, state.cells);
+  // Nur Felder, die die planende Seite kennt (Nebel des Krieges fuer Graeben, Aufwurf usw.)
+  let seenCells = viewFor(state, [], 'a', env).cells; // Seite a plant zuerst
+  let liveMap = applyCellState(map, seenCells);
+  const updateLiveMap = () => { seenCells = viewFor(state, [], side, env).cells; liveMap = applyCellState(map, seenCells); layer.setMap(liveMap); };
 
   // Planungszustand
   let side = 'a';
@@ -167,7 +170,7 @@ export async function mount(root, params) {
     }
     const prev = tool?.preview;
     drawBattle(dctx, cam, dpr, currentTheme(), {
-      state, map: liveMap, side, groups, ghosts, orders, reach, selectedId, planning: !modalOpen, anim,
+      state, map: liveMap, cells: seenCells, side, groups, ghosts, orders, reach, selectedId, planning: !modalOpen, anim,
       hover: tool?.pick ? tool.hoverCell : null,
       preview: prev ? { ...prev, group: tool.group.id, cell: tool.hoverCell, ok: prev.ok ?? !!prev.path } : null,
       sightLine: !tool && hoverSight ? hoverSight : null,
@@ -520,7 +523,7 @@ export async function mount(root, params) {
         text: `Die Befehle von ${faction(state.sides[side].faction).name} sind verschlossen. Gib das Gerät an ${faction(state.sides[waiting].faction).name} weiter.`,
         button: `Weiter als ${faction(state.sides[waiting].faction).short}`,
         onGo: () => {
-          modalOpen = false; side = waiting; homeView(); onCamera();
+          modalOpen = false; side = waiting; updateLiveMap(); homeView(); onCamera();
           if (reportDue.has(side)) showReport();
           refresh(); dynCv.focus({ preventScroll: true });
         },
@@ -613,7 +616,6 @@ export async function mount(root, params) {
     lastLog = r.log;
     lastRound = { input, result: r };
     archive = archiveRound(archive, input, r);
-    if (state.cells !== before.cells) { liveMap = applyCellState(map, state.cells); layer.setMap(liveMap); }
     // Unvollendete Wege laufen als Befehl weiter, solange die Rundenart passt
     const carry = { a: [], b: [] };
     for (const e of r.log) {
@@ -633,6 +635,7 @@ export async function mount(root, params) {
     book = nextRound(book, carry);
     sidePlans = { a: {}, b: {} }; // der Lorenplan steht danach im Zustand und gilt weiter
     side = humans[0];
+    updateLiveMap();
     playSfx('clock-lock');
     // Der Tag-Nacht-Uebergang laeuft in der letzten Sekunde des Films (Plan 7.7)
     const target = forcedDark ?? darknessAt(state.clock, state.turnKind, state.night);
@@ -979,8 +982,7 @@ export async function mount(root, params) {
       g.pos = { x: 44, y: 7 };
       for (const e of groupsOf(state, otherSide(side))) if (e.pos.x === 45 && e.pos.y <= 12) e.pos = { x: 48, y: e.pos.y };
       for (let y = 4; y <= 12; y++) captureTrench(state, map, 45, y, side);
-      liveMap = applyCellState(map, state.cells);
-      layer.setMap(liveMap);
+      updateLiveMap();
       api.select(g.id);
       centerOn(cam, 45, narrow() ? 5 : 8.5, Math.max(cam.zoom, narrow() ? 26 : 30));
       api.tool('rebuild');

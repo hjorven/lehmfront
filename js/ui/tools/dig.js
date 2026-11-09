@@ -109,7 +109,7 @@ registerDecor({
     }
     ctx.restore();
     const good = cells.filter((c) => !bad.has(c.x + ',' + c.y));
-    doubleLine(ctx, good.length ? cells : cells, bad.size ? th.danger : th.accent, th.paper, px, { width: draft.kind === 'comm' ? 4.5 : 6 });
+    doubleLine(ctx, good.length ? cells : cells, bad.size ? th.danger : th.accent, th.paper, px, { width: draft.kind === 'comm' ? 5.5 : 7.5 });
     if (draft.kind === 'fire') facingTicks(ctx, cells, draft.facings, th.ink, px);
     for (const r of draft.runs) enfiladeSweep(ctx, cells, r, th, px);
     // Reichweite: Kreis um die Gruppe, wenn der Anfang zu weit weg ist
@@ -163,12 +163,13 @@ registerDecor({
   order: 10,
   draw(ctx, d) {
     const st = d.state;
-    if (!st?.cells) return;
+    const cells = d.cells ?? st?.cells;
+    if (!st || !cells) return;
     const th = d.theme, px = d.px;
     const now = st.turn - 1;
     const z = 1 / px;
-    for (const k of Object.keys(st.cells).sort()) {
-      const c = st.cells[k];
+    for (const k of Object.keys(cells).sort()) {
+      const c = cells[k];
       const [x, y] = k.split(',').map(Number);
       // Angefangen, noch kein Loch: abgesteckt mit Pflock-Strichen
       if (c.dig && !c.trench) {

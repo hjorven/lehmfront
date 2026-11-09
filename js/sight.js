@@ -86,9 +86,11 @@ export function coverAt(state, map, pos, side) {
   if (craterAt(state, map, pos.x, pos.y)) better('crater');
   const tr = trenchAt(state, map, pos.x, pos.y);
   if (tr) {
-    const level = Math.max(0, Math.min(3, tr.level ?? 1));
-    const cover = TRENCH_COVER[level];
-    const reversed = side != null && tr.side != null && tr.side !== mapSide(side);
+    // Stufen 1 bis 4 (P04: Schuetzenloch, Graben, ausgebaut, betoniert)
+    const level = Math.max(1, Math.min(4, tr.level ?? 2));
+    const cover = TRENCH_COVER[level - 1];
+    // Fremder Graben oder eroberter, noch nicht umgebauter (P04: captured) gibt halbe Deckung
+    const reversed = side != null && tr.side != null && (tr.side !== mapSide(side) || tr.captured === true);
     // Ein eroberter Graben zaehlt mit seiner halben Deckung gegen Krater und Wald
     const eff = (COVER[cover] ?? 0) * (reversed ? 0.5 : 1);
     if (eff > (COVER[best.cover] ?? 0) * (best.reversed ? 0.5 : 1)) {

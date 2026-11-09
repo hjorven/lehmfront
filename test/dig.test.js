@@ -366,3 +366,17 @@ test('Graben über fertige Felder: kein Sprung der Gruppe', () => {
   assert.ok(Math.max(Math.abs(g.pos.x - 5), Math.abs(g.pos.y - 0)) <= 1 + 3);
   assert.match(validateOrder({ group: 'a01', type: 'dig', path: line(6, 0, 1), facing: ['E', 'X'] }, s0, 'a', { map: MAP }), /Feuerrichtung/);
 });
+
+test('Feuer (P05) sieht eroberte Gräben als halbe Deckung und nutzt die Längsfeuer-Regel aus P04', async () => {
+  const { coverAt } = await import('../js/sight.js');
+  const s = createInitialState(MAP, scenario([fullRifles({ x: 11, y: 0 })]), 1);
+  captureTrench(s, MAP, 12, 2, 'a');
+  assert.equal(coverAt(s, MAP, { x: 12, y: 2 }, 'a').reversed, true);
+  for (const p of line(6, 1, 6)) s.cells[p.x + ',' + p.y] = { trench: { side: 'own', kind: 'fire', level: 2, facing: 'E' } };
+  const { fireOdds } = await import('../js/phases/fire.js');
+  const g = s.groups[0];
+  const along = fireOdds(s, MAP, { ...g, pos: { x: 6, y: 10 } }, { x: 6, y: 4 }, 'a', { darkness: 0 });
+  const front = fireOdds(s, MAP, { ...g, pos: { x: 11, y: 4 } }, { x: 6, y: 4 }, 'a', { darkness: 0 });
+  assert.equal(along.enfilade, true);
+  assert.equal(front.enfilade, false);
+});

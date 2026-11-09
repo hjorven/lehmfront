@@ -287,9 +287,23 @@ const AXES = [[0, 1], [1, 0], [1, 1], [1, -1]];
  * Laufgraeben zaehlen mit, denn auch dort steht man in einer Reihe. Rueckgabe: { run, axis } oder null.
  */
 export function enfiladeOf(map, target, shooter) {
-  const t = cellAt(map, target.x, target.y);
-  if (!t?.trench) return null;
-  const same = (x, y) => { const c = cellAt(map, x, y); return c?.trench && c.trench.side === t.trench.side; };
+  return enfiladeWith((x, y) => cellAt(map, x, y)?.trench ?? null, target, shooter);
+}
+
+/** Wie enfiladeOf, aber mit Zustand ohne Kartenkopie (fuer viele Schuesse je Runde) */
+export function enfiladeInState(state, map, target, shooter) {
+  return enfiladeWith((x, y) => {
+    const o = state.cells[x + ',' + y];
+    if (o && Object.hasOwn(o, 'trench')) return o.trench;
+    return cellAt(map, x, y)?.trench ?? null;
+  }, target, shooter);
+}
+
+function enfiladeWith(trenchAt, target, shooter) {
+  const tt = trenchAt(target.x, target.y);
+  if (!tt) return null;
+  const t = { x: target.x, y: target.y };
+  const same = (x, y) => { const c = trenchAt(x, y); return c && c.side === tt.side; };
   for (const [ax, ay] of AXES) {
     let fwd = 0, back = 0;
     while (same(t.x + ax * (fwd + 1), t.y + ay * (fwd + 1))) fwd++;

@@ -22,6 +22,11 @@ import {
   LEVELS, MAX_LEVEL, workIn, levelForWork, cellCost, workFromBudget, mapSideOf, defaultFacings, levelName,
 } from '../trench.js';
 import { surname } from './hold.js';
+import { setEnfiladeRule } from './fire.js';
+import { enfiladeInState } from '../trench.js';
+
+// Laengsfeuer im Gefecht: gerade Abschnitte ab ENFILADE_RUN Feldern, Schuetze in der Verlaengerung (P04 ersetzt die Grundregel aus P05)
+setEnfiladeRule((state, map, shooterPos, targetPos) => !!(map && enfiladeInState(state, map, targetPos, shooterPos)));
 
 export const BASE_WORK = 100;
 export const MAX_DIG_CELLS = 40;

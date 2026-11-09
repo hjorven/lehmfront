@@ -107,7 +107,7 @@ Jeder Thread traegt hier nach dem Merge ein, was fertig ist und was offen bleibt
 ### Für die nächsten Pakete (nach P04)
 
 - Gräben im Spiel stehen in `state.cells[k].trench` (`{ side: 'own'|'enemy', kind, level, facing, captured? }`, Kartenseite wie in der Karte). Für Regeln und Anzeige: `applyCellState(map, state.cells)` aus `js/map.js` legt den Zustand über die Karte.
-- P05 Feuer: `trenchCover(map, x, y, side)` liefert `{ cover, reversed }` für `hitChance`, `enfiladeOf(map, target, shooter)` sagt, ob ein Schütze einen geraden Abschnitt längs bestreicht (Deckung dann 30 Prozent über `coverValue(..., { enfilade: true })`).
+- Feuer (P05) ist angeschlossen: `js/phases/dig.js` setzt `setEnfiladeRule` auf `enfiladeInState` (gerade Abschnitte ab 4 Feldern, Schütze in der Verlängerung, seitlich höchstens ein Feld). `coverAt` in `js/sight.js` liest jetzt Stufe 1 bis 4 wie `LEVELS` und wertet `captured` als halbe Deckung. `trenchCover` und `enfiladeOf` aus `js/trench.js` gibt es zusätzlich für Karten mit Zustand.
 - P06/P09 Sturm und Nahkampf: `captureTrench(state, map, x, y, side)` beim Einbruch aufrufen; der Graben gibt dann halbe Deckung, bis er umgebaut ist.
 - Wetter (P10?), Etappe (P11, Pionierpark) und Moral (P12) melden Grabfaktoren mit `registerDigFactor` an oder ersetzen die vorläufigen.
 - Dynamische Ebene: `registerDecor({ id, order, draw(ctx, d) })` und `registerOrderPainter(type, fn)` aus `js/render/decor.js` zeichnen eigene Dinge, ohne `units-layer.js` anzufassen.
@@ -154,7 +154,8 @@ Jeder Thread traegt hier nach dem Merge ein, was fertig ist und was offen bleibt
 - P05: Feuer in Gefechtsrunden trifft nur Gruppen, die nach der Bewegung sichtbar sind; Feuer während der Bewegung (Sperrfeuer auf den Weg) gibt es noch nicht.
 - P05: Mit `night=` (ab 0,5) stellt die Szene die Uhr auf 22 Uhr, damit Regeln und Optik übereinstimmen.
 - P04: Die Gruppe rückt beim Graben zum zuletzt bearbeiteten Feld nach. Ist das Feld besetzt, bleibt sie stehen; ein weitergetragener Rest gilt, solange irgendein Feld davon höchstens drei Felder entfernt ist. Grabgeschwindigkeit und Materialkosten sind Startwerte für das Balancing (P21).
-- P04: Laufgräben warnen nicht vor Längsfeuer, `enfiladeOf` zählt sie im Gefecht aber mit.
+- P04: Laufgräben warnen nicht vor Längsfeuer, `enfiladeOf` zählt sie im Gefecht aber mit. Schräg gezeichnete Linien zerfallen in kurze Stücke und lösen selten eine Warnung aus.
+- P04: Die Anzeige von Gräben und Aufwurf folgt `viewFor(...).cells`; solange `cellVisible` immer wahr ist, sieht man feindliche Gräben überall.
 
 ## Freigaben und Entscheidungen von Jorven
 
