@@ -5,7 +5,9 @@ import { audio, playSfx } from './audio/engine.js';
 import { dayKey, dayLabel } from './modes/skirmish.js';
 import { boardFor } from './modes/board.js';
 
-export const VERSION = '0.1.0';
+export const VERSION = '1.0.0';
+const FIELD_DAY_KEY = 'lehmfront.berichtigt'; // Druckvermerk auf dem Titelblatt (P21)
+const MONTHS = ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'];
 
 function drawBackground(canvas) {
   const dpr = window.devicePixelRatio || 1;
@@ -68,6 +70,7 @@ async function mountScene(name) {
   const mod = await import(`./scenes/${name}.js`);
   document.body.classList.remove('menu');
   document.body.dataset.scene = name;
+  markFieldDay();
   const root = document.createElement('div');
   root.id = 'scene';
   document.body.replaceChildren(root);
@@ -85,7 +88,7 @@ if (scene) {
   redraw();
   addEventListener('resize', redraw);
   matchMedia('(prefers-color-scheme: dark)').addEventListener('change', redraw);
-  document.getElementById('version').textContent = 'v' + VERSION;
+  showImprint();
   menuSound();
   menuToday();
   import('./ui/menu-akte.js').then((m) => m.mountMenuAkte(params)).catch((e) => console.error(e));
@@ -111,6 +114,28 @@ function menuSound() {
   audio.onChange(show);
   show(audio.init());
   btn.addEventListener('click', () => { if (audio.init().ready) audio.setMuted(!audio.isMuted()); });
+}
+
+// Ueberraschung P21: Wie auf einer echten Generalstabskarte steht unten ein Druckvermerk. "Berichtigt bis" ist der
+// letzte Tag, an dem auf diesem Geraet gespielt wurde; wer lange fort war, sieht, wie alt sein Blatt geworden ist.
+function markFieldDay() {
+  const d = new Date();
+  try { localStorage.setItem(FIELD_DAY_KEY, [d.getFullYear(), d.getMonth() + 1, d.getDate()].join('-')); } catch { /* ohne Speicher */ }
+}
+function showImprint() {
+  const el = document.getElementById('version');
+  let last = null;
+  try { last = localStorage.getItem(FIELD_DAY_KEY); } catch { /* ohne Speicher */ }
+  const m = /^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(last ?? '');
+  const head = `Ausgabe ${VERSION}`;
+  if (!m) { el.textContent = head; return; }
+  const [y, mo, da] = [Number(m[1]), Number(m[2]), Number(m[3])];
+  const now = new Date();
+  const days = Math.round((Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) - Date.UTC(y, mo - 1, da)) / 86400000);
+  const when = `${da}. ${MONTHS[mo - 1] ?? ''}${y !== now.getFullYear() ? ' ' + y : ''}`;
+  el.textContent = `${head} · berichtigt bis ${when}`;
+  if (days >= 14) el.title = `Seit ${days} Tagen nicht nachgetragen. Die Front hat nicht gewartet.`;
+  el.classList.toggle('stale', days >= 14);
 }
 
 // Tageslage im Menue: heutiges Datum und der beste Eintrag im Wachbuch dieses Geraets

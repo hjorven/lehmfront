@@ -10,7 +10,7 @@ import { resolveTurn } from '../resolve.js';
 import { viewFor } from '../view.js';
 import { sightLine, coverAt, PINNED, darknessOf } from '../sight.js';
 import { faction } from '../config/factions.js';
-import { themeAt, applyTheme, currentTheme, onThemeChange, blueprintTheme } from '../theme.js';
+import { themeAt, applyTheme, currentTheme, baseTheme, onThemeChange, blueprintTheme } from '../theme.js';
 import {
   createCamera, resizeCamera, attachCameraControls, screenToWorld, worldToScreen, centerOn, fitZoom,
 } from '../render/camera.js';
@@ -88,7 +88,7 @@ export async function mount(root, params) {
     ensureCss('css/feuerplan.css'), // P09: Editor und Zittern der Karte bei Einschlaegen
     ensureCss('css/uhr.css'),
     ensureCss('css/motion.css'),
-    Promise.all(['16px "Special Elite"', '16px "IBM Plex Mono"', '700 16px "IBM Plex Mono"', '700 16px "Caveat"', '16px "IBM Plex Sans"', '700 16px "IBM Plex Sans"']
+    Promise.all(['16px "Special Elite"', '16px "IBM Plex Mono"', '700 16px "IBM Plex Mono"', '16px "Caveat"', '700 16px "Caveat"', '16px "IBM Plex Sans"', '700 16px "IBM Plex Sans"']
       .map((f) => document.fonts.load(f))).catch(() => {}),
   ]);
   const { scenario, mapJson, scenId, mode: modeInfo } = battle;
@@ -166,7 +166,7 @@ export async function mount(root, params) {
   let helpShown = false;
   let suppressTap = false;
   let modalOpen = false;
-  if (resumed) { archive = resumed.archive ?? archive; aiMemory = resumed.aiMemory; lastLog = resumed.lastLog; if (resumed.book) book = resumed.book; }
+  if (resumed) { archive = resumed.archive ?? archive; aiMemory = resumed.aiMemory; lastLog = resumed.lastLog; if (resumed.book) book = resumed.book; if (resumed.decor) burns = resumed.decor.burns; }
   if (online?.kind === 'match' && online.state) { lastLog = online.log; book = nextRound(book, { a: [], b: [], [online.side]: online.carry }); }
   const forcedDark = params.has('night') && !fixed ? Math.max(0, Math.min(1, num(params.get('night'), 0))) : null;
   // Erzwungene Nacht auch fuer die Regeln (Sichtweite, Trefferchance): Uhr auf 22 Uhr stellen
@@ -204,6 +204,7 @@ export async function mount(root, params) {
 
   const layer = createMapLayer(staticCv, liveMap, { getCamera: () => cam, getTheme: currentTheme });
   const weather = attachWeather({ root, before: dynCv, map, seed, cam, staticCanvas: staticCv, getTheme: currentTheme, still: params.has('demo') });
+  if (resumed?.decor?.stains?.length) weather.layer.importStains(resumed.decor.stains); // Tropfenflecken aus der Akte (P21)
   const dctx = dynCv.getContext('2d');
   let dpr = 1;
 
@@ -342,7 +343,8 @@ export async function mount(root, params) {
   // P18: Dienstbuch (Einstellungen, Spielstaende, Klang, Tasten) und laufende Akte nach jeder Runde
   const gameMenu = attachGameMenu({
     ui, params,
-    snapshot: () => ({ state, map: liveMap, archive, aiMemory, lastLog, rules: { ...rules.snapshot(), ...(koop ? { koop: koop.snapshot() } : {}) }, side, book }),
+    snapshot: () => ({ state, map: liveMap, archive, aiMemory, lastLog, rules: { ...rules.snapshot(), ...(koop ? { koop: koop.snapshot() } : {}) }, side, book,
+      decor: { burns: burns.map(({ x, y, r, seed, turn }) => ({ x, y, r, seed, turn })), stains: weather.layer.exportStains?.() ?? [] } }),
     busy: () => (online?.kind === 'match' ? 'Online-Gefechte liegen beim Stab, nicht in der Kartentasche.'
       : online?.kind === 'replay' ? 'Eine Wiedergabe steckt im Link, nicht in der Kartentasche.'
       : filmFrame || book.a?.sealed || book.b?.sealed ? 'Während der Ausführung oder Übergabe kann nicht abgelegt werden.' : rules.ended ? 'Die Partie ist beendet.' : null),
@@ -651,7 +653,7 @@ export async function mount(root, params) {
       onEnd: (fn) => { t.onEnd = fn; },
       marks: () => Object.fromEntries(groupsOf(state, side).map((x) => [x.id, groupMark(state, x)])),
       blueprint: (on, base) => {
-        if (on) { const b = currentTheme(); applyTheme(blueprintTheme(b)); playSfx('paper', { intensity: 0.6 }); return b; }
+        if (on) { const b = baseTheme(); applyTheme(blueprintTheme(b)); playSfx('paper', { intensity: 0.6 }); return b; }
         applyTheme(base && !base.blueprint ? base : themeAt(darkness));
         return null;
       },
@@ -1236,6 +1238,7 @@ export async function mount(root, params) {
     overlay: (slot) => toggleOverlay(slot),
     commit: () => commitSide(),
     get player() { return player; },
+    get side() { return side; },
     archive: () => openArchive(),
     finishAnim: () => { anim = null; drawDynNow(); },
     get plans() { return sidePlans; },

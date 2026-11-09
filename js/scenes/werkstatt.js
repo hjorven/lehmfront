@@ -97,7 +97,7 @@ export async function mount(root, params = new URLSearchParams(location.search))
   audio.init();
   await Promise.all([
     ensureCss('css/werkstatt.css'),
-    Promise.all(['16px "Special Elite"', '16px "IBM Plex Mono"', '700 16px "Caveat"', '16px "IBM Plex Sans"'].map((f) => document.fonts.load(f))).catch(() => {}),
+    Promise.all(['16px "Special Elite"', '16px "IBM Plex Mono"', '16px "Caveat"', '700 16px "Caveat"', '16px "IBM Plex Sans"'].map((f) => document.fonts.load(f))).catch(() => {}),
   ]);
 
   // Entwurf: Code aus der Adresse, Beispiel, gespeicherter Entwurf oder Beispiel-Sandkasten

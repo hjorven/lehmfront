@@ -110,7 +110,7 @@ export function createBoard(root, opts) {
     const actCard = index.byId.get(`a${act}.titel`);
     const title = m ? missionTitle(index, m) : '';
     $('.fz-head').innerHTML = `<span class="k">Feldzugskarte · Abschnitt ${esc(sector)}</span>
-      <b class="fz-title">Akt ${actRoman(act)}${actCard?.titel ? ' · ' + esc(actCard.titel) : ''}</b>
+      <b class="fz-title">Akt ${actRoman(act)}${actCard?.titel ? ' · ' + esc(actCard.titel.replace(/^Akt\s+\d+\s*:\s*/, '')) : ''}</b>
       <span class="fz-sub">${campaign.ended ? 'Der Feldzug ist für Brandt zu Ende.' : m ? `Nächster Einsatz ${missionShort(m)}: ${esc(title)}${missionBuilt(m) ? '' : ' <i>(Übungslage an der Asse)</i>'}` : 'Alle Einsätze gespielt.'}</span>`;
   }
 
@@ -178,6 +178,14 @@ export function createBoard(root, opts) {
         }
       }
     }
+    // P21: Ausgabe 1.0 enthaelt Akt 1 und 2. Danach geht es als Uebungslage weiter, das sagt ein Vermerk deutlich.
+    if (m && !missionBuilt(m) && !campaign.ended) {
+      out.push(telegram({
+        cls: 't-reply t-small', heading: 'VERMERK DER SCHREIBSTUBE',
+        lines: telegramLines(`Die Karten für Akt ${actRoman(actOf(m))} sind noch nicht gedruckt. Der Einsatz läuft bis dahin als Übungslage an der Asse, ohne eigene Ziele.`),
+        mark: { cls: 'blue', text: 'FOLGT' },
+      }));
+    }
     // Drohung unter 25 (rot gerandet)
     if (campaign.threat && !campaign.ended) {
       const t = pickSlot(index, 'stab.drohung', ctxOf());
@@ -231,7 +239,7 @@ export function createBoard(root, opts) {
     $('.fz-actions').innerHTML = `
       <button type="button" class="btn fz-new">Neuer Feldzug</button>
       <button type="button" class="btn fz-journal" aria-keyshortcuts="T">Tagebuch <kbd>T</kbd></button>
-      ${m ? `<button type="button" class="btn fz-go" aria-keyshortcuts="Enter">Zum Einsatz ${esc(missionShort(m))} <kbd>Enter</kbd></button>` : ''}`;
+      ${m ? `<button type="button" class="btn fz-go" aria-keyshortcuts="Enter">${missionBuilt(m) ? 'Zum Einsatz' : 'Übungslage'} ${esc(missionShort(m))} <kbd>Enter</kbd></button>` : ''}`;
   }
 
   function render() {
