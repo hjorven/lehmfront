@@ -2,7 +2,7 @@
 // Taste O. Dazu Spielstaende: automatisch nach jeder Runde (Slot "auto", mit Protokoll-Archiv) und von Hand
 // in drei Kartentaschen; ?slot=<name> laedt einen Stand beim Start der Szene.
 import { createSaveStore, stampOf } from '../save.js';
-import { AUTO_SLOT, packGame, unpackGame, saveQuery } from '../savegame.js';
+import { AUTO_SLOT, packGame, unpackGame, saveQuery, loadHref } from '../savegame.js';
 import { openSettings, settingsOpen } from './settings.js';
 import { ensureCss } from './dom.js';
 
@@ -36,7 +36,13 @@ export async function resumeGame(params) {
     if (slot) {
       if (!/^[a-z0-9-]+$/.test(slot)) return null;
       const loaded = await store.load(slot);
-      return loaded ? { slot, ...unpackGame(loaded) } : null;
+      if (!loaded) return null;
+      // Gehoert der Stand zu einem anderen Gefecht (Lesezeichen, alte Adresse): dorthin umleiten
+      if (loaded.meta?.query && saveQuery(loaded.meta.query) !== saveQuery(params)) {
+        location.replace(loadHref(loaded.meta.query, slot));
+        return new Promise(() => {}); // die Seite wird ersetzt
+      }
+      return { slot, ...unpackGame(loaded) };
     }
     if (params.has('demo')) return null;
     const auto = await store.load(AUTO_SLOT);
@@ -51,11 +57,11 @@ export async function resumeGame(params) {
 }
 
 /**
- * attachGameMenu({ ui, params, snapshot, busy, onOpen, onClose })
+ * attachGameMenu({ ui, params, snapshot, busy, canOpen, ended, onOpen, onClose })
  * snapshot() -> { state, map, archive, aiMemory, lastLog, rules, side }; busy() -> null | Grund, warum gerade nicht.
  * Liefert { open(tab), autosave(), get open }.
  */
-export function attachGameMenu({ ui, params, snapshot, busy, onOpen = () => {}, onClose = () => {} }) {
+export function attachGameMenu({ ui, params, snapshot, busy, canOpen = () => true, ended = () => false, onOpen = () => {}, onClose = () => {} }) {
   ensureCss('css/einstellungen.css');
   const query = saveQuery(params);
   const keyP = resumeKeyFor(params);
@@ -80,7 +86,7 @@ export function attachGameMenu({ ui, params, snapshot, busy, onOpen = () => {}, 
   };
 
   function open(tab = 'akten') {
-    if (settingsOpen()) return;
+    if (settingsOpen() || !canOpen()) return;
     onOpen();
     openSettings({
       tab,
@@ -96,6 +102,8 @@ export function attachGameMenu({ ui, params, snapshot, busy, onOpen = () => {}, 
     /** Nach jeder Runde: laufende Akte schreiben. Fehler (Speicher voll, privat) nur melden, nie stoeren. */
     async autosave() {
       if (params.has('demo')) return false; // Screenshot-Zustaende ueberschreiben keine echte Akte
+      // Beendete Partie: keine laufende Akte mehr (sonst boete das Hauptmenue "Weiterspielen" an)
+      if (ended()) { try { await store.remove(AUTO_SLOT); } catch { /* egal */ } return false; }
       try { await save(AUTO_SLOT, 'auto'); return true; } catch (e) { console.warn('Automatisch speichern ging nicht:', e.message); return false; }
     },
   };

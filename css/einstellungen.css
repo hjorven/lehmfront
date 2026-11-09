@@ -21,7 +21,7 @@ html[data-speed="2"]{--dur-quick:.06s;--dur-sheet:.12s;--dur-slow:.21s}
 @media (min-width:700px){.gefecht .round,.gefecht .res-row,.gefecht .axes,.gefecht .hud-right{zoom:var(--text-scale,1)}}
 
 /* ---------- Menueknopf im Gefecht: Desktop rechte Leiste, Handy in der Seitenleiste ---------- */
-.gefecht .menu-btn kbd{margin-left:2px}
+.gefecht .menu-btn kbd{font:11px var(--font-ui);color:var(--ink2);border:var(--border);border-radius:var(--radius);padding:0 4px;margin-left:2px}
 .gefecht .menu-card{display:none}
 @media (max-width:699px){
   .gefecht .menu-btn{display:none !important}
@@ -55,7 +55,7 @@ html[data-signs="on"] .telegram li.warn,html[data-signs="on"] .archive li.warn{b
 .set-tabs button[aria-selected="true"]{background:var(--card);color:var(--ink);border-color:var(--line);position:relative}
 .set-tabs button[aria-selected="true"]::after{content:"";position:absolute;right:-1px;top:0;bottom:0;width:2px;background:var(--card)}
 .set-tabs button:hover{color:var(--ink)}
-.set-panel{padding:12px 16px 14px;overflow:auto;min-height:0}
+.set-panel{padding:12px 16px 20px;overflow:auto;min-height:0;scroll-padding-bottom:20px}
 .set-panel[hidden]{display:none}
 .set-status{grid-column:1 / -1;margin:0;padding:8px 16px 10px;min-height:36px;border-top:var(--border);font:13px var(--font-num);color:var(--ink2)}
 .set-status:empty{display:none}

@@ -143,7 +143,7 @@ export async function mount(root, params) {
   let helpShown = false;
   let suppressTap = false;
   let modalOpen = false;
-  if (resumed) { archive = resumed.archive ?? archive; aiMemory = resumed.aiMemory; lastLog = resumed.lastLog; }
+  if (resumed) { archive = resumed.archive ?? archive; aiMemory = resumed.aiMemory; lastLog = resumed.lastLog; if (resumed.book) book = resumed.book; }
   const forcedDark = params.has('night') ? Math.max(0, Math.min(1, num(params.get('night'), 0))) : null;
   // Erzwungene Nacht auch fuer die Regeln (Sichtweite, Trefferchance): Uhr auf 22 Uhr stellen
   if (forcedDark !== null && forcedDark >= 0.5 && !state.night) { state.clock = { ...state.clock, hour: 22, minute: 0 }; state.night = true; }
@@ -305,8 +305,10 @@ export async function mount(root, params) {
   // P18: Dienstbuch (Einstellungen, Spielstaende, Klang, Tasten) und laufende Akte nach jeder Runde
   const gameMenu = attachGameMenu({
     ui, params,
-    snapshot: () => ({ state, map: liveMap, archive, aiMemory, lastLog, rules: rules.snapshot(), side }),
-    busy: () => (filmFrame || book[side]?.sealed ? 'Während der Ausführung kann nicht abgelegt werden.' : rules.ended ? 'Die Partie ist beendet.' : null),
+    snapshot: () => ({ state, map: liveMap, archive, aiMemory, lastLog, rules: rules.snapshot(), side, book }),
+    busy: () => (filmFrame || book.a?.sealed || book.b?.sealed ? 'Während der Ausführung oder Übergabe kann nicht abgelegt werden.' : rules.ended ? 'Die Partie ist beendet.' : null),
+    canOpen: () => !modalOpen && !filmFrame,
+    ended: () => rules.ended,
     onOpen: () => { cancelTool(false); radial.hide(); modalOpen = true; refresh(); },
     onClose: () => { modalOpen = false; refresh(); },
   });
@@ -856,7 +858,6 @@ export async function mount(root, params) {
     lehrling.afterRound(humans);
     archive = archiveRound(archive, input, r);
     campaignRun?.afterRound(state, archive);
-    gameMenu.autosave();
     // Unvollendete Wege laufen als Befehl weiter, solange die Rundenart passt
     const carry = { a: [], b: [] };
     for (const e of r.log) {
@@ -874,6 +875,7 @@ export async function mount(root, params) {
       }
     }
     book = nextRound(book, carry);
+    gameMenu.autosave(); // nach dem Weitertragen, damit laufende Wege und Graben mit in die Akte kommen
     sidePlans = { a: {}, b: {} }; // der Lorenplan steht danach im Zustand und gilt weiter
     side = humans[0];
     updateLiveMap();
@@ -1136,8 +1138,11 @@ export async function mount(root, params) {
   drawDynNow();
   dynCv.focus({ preventScroll: true });
   // Geladener Slot wird zur laufenden Akte; ohne slot= in der Adresse nimmt ein Neuladen diese Akte wieder auf
-  if (resumed && !resumed.reload) {
+  // Neues Gefecht: gleich als laufende Akte ablegen, damit ein Neuladen nie eine fremde alte Akte aufnimmt
+  if (!resumed || !resumed.reload) {
     gameMenu.autosave();
+  }
+  if (resumed && !resumed.reload) {
     const u = new URL(location.href);
     u.searchParams.delete('slot');
     history.replaceState(history.state, '', u);

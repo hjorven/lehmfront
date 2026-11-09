@@ -1,7 +1,7 @@
 // Hauptmenue (P18): "Weiterspielen" aus der laufenden Akte und das Dienstbuch.
 // ?akte=<reiter> oeffnet das Dienstbuch gleich (Screenshots, Lesezeichen).
 import { createSaveStore } from '../save.js';
-import { AUTO_SLOT } from '../savegame.js';
+import { AUTO_SLOT, loadHref } from '../savegame.js';
 import { openSettings } from './settings.js';
 import { playSfx } from '../audio/engine.js';
 
@@ -14,7 +14,7 @@ export async function mountMenuAkte(params) {
   try {
     const auto = await createSaveStore().load(AUTO_SLOT);
     if (!auto) return;
-    weiter.href = '?' + (auto.meta?.query || 'scene=gefecht') + '&slot=' + AUTO_SLOT;
+    weiter.href = loadHref(auto.meta?.query, AUTO_SLOT);
     const t = auto.meta?.title;
     weiter.querySelector('small').textContent = `Runde ${auto.state.turn}${t ? ' · ' + t : ''}`;
     weiter.hidden = false;

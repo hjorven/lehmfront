@@ -78,6 +78,7 @@ export function packGame(game) {
         lastLog: game.lastLog ?? [],
         rules: game.rules ?? null,
         side: game.side ?? 'a',
+        book: game.book ?? null,
       },
     },
   };
@@ -99,8 +100,17 @@ export function unpackGame(loaded) {
     lastLog: Array.isArray(g.lastLog) ? g.lastLog : [],
     rules: g.rules ?? null,
     side: g.side === 'b' ? 'b' : 'a',
+    book: g.book && typeof g.book === 'object' ? g.book : null,
     archiveDropped: !sameVersion && !!g.archive,
   };
+}
+
+/** Adresse zum Laden eines Slots. Die Abfrage kommt aus dem Stand (auch aus importierten Dateien):
+ * normalisiert, Szene nur aus Kleinbuchstaben, Ziffern und Bindestrich, sonst "gefecht". */
+export function loadHref(query, slot) {
+  const q = new URLSearchParams(saveQuery(query || ''));
+  if (!/^[a-z0-9-]+$/.test(q.get('scene') || '')) q.set('scene', 'gefecht');
+  return '?' + q.toString() + '&slot=' + encodeURIComponent(slot);
 }
 
 /** Dateiname fuer den Export, nur ASCII */

@@ -6,7 +6,7 @@ import { createSaveStore, memoryBackend, SAVE_VERSION } from '../js/save.js';
 import { createInitialState } from '../js/state.js';
 import { resolveTurn } from '../js/resolve.js';
 import { createArchive, archiveRound } from '../js/archive.js';
-import { saveQuery, sketchOf, slotTitle, packGame, unpackGame, freeSlot, exportName, HAND_SLOTS } from '../js/savegame.js';
+import { saveQuery, sketchOf, slotTitle, packGame, unpackGame, freeSlot, exportName, loadHref, HAND_SLOTS } from '../js/savegame.js';
 import { normalizeSettings, DEFAULT_SETTINGS, SETTING_CHOICES } from '../js/settings.js';
 import { DAY, NIGHT, contrast } from '../js/theme.js';
 import { precacheFiles, renderBlock, listVersion } from '../tools/precache.mjs';
@@ -16,6 +16,12 @@ test('saveQuery: Ansichtsparameter fallen weg, Reihenfolge fest', () => {
   assert.equal(saveQuery('scene=gefecht&x=3&seed=5&karte=asse&slot=auto&demo=film'), 'karte=asse&scene=gefecht&seed=5');
   assert.equal(saveQuery('seed=5&scene=gefecht'), saveQuery('scene=gefecht&seed=5'));
   assert.equal(saveQuery(''), 'scene=gefecht');
+});
+
+test('loadHref: Abfrage aus fremden Dateien wird normalisiert', () => {
+  assert.equal(loadHref('seed=5&scene=gefecht&slot=x', 'tasche-1'), '?scene=gefecht&seed=5&slot=tasche-1');
+  assert.equal(loadHref('scene=../boese', 'auto'), '?scene=gefecht&slot=auto');
+  assert.equal(loadHref(undefined, 'auto'), '?scene=gefecht&slot=auto');
 });
 
 test('Skizze: Graeben je Seite, nur eigene Gruppen', () => {
@@ -42,7 +48,7 @@ test('Packen und Entpacken: Archiv, KI-Gedaechtnis und Zaehler kommen zurueck', 
   const r = resolveTurn(s0, [], [], 9, 1);
   const archive = archiveRound(createArchive('test'), { state: s0, ordersA: [], ordersB: [], seed: 9, turn: 1 }, r);
   const store = createSaveStore(memoryBackend());
-  const { state, meta } = packGame({ state: r.state, map: { ...MAP, cells: [] }, query: 'scene=gefecht&seed=9', archive, aiMemory: { seen: 3 }, lastLog: r.log, rules: { tally: { positionRounds: 1 } }, side: 'a' });
+  const { state, meta } = packGame({ state: r.state, map: { ...MAP, cells: [] }, query: 'scene=gefecht&seed=9', archive, aiMemory: { seen: 3 }, lastLog: r.log, rules: { tally: { positionRounds: 1 } }, side: 'a', book: { a: { orders: { a01: { group: 'a01', type: 'dig', carried: true } } } } });
   await store.save('auto', state, meta);
   const back = unpackGame(await store.load('auto'));
   assert.deepEqual(back.state, r.state);
@@ -53,6 +59,7 @@ test('Packen und Entpacken: Archiv, KI-Gedaechtnis und Zaehler kommen zurueck', 
   assert.deepEqual(back.lastLog, r.log);
   assert.deepEqual(back.rules, { tally: { positionRounds: 1 } });
   assert.equal(back.archiveDropped, false);
+  assert.equal(back.book.a.orders.a01.carried, true);
   // Weiterrechnen aus dem geladenen Stand ergibt dasselbe wie ohne Speichern
   const a = resolveTurn(r.state, [], [], 9, 2);
   const b = resolveTurn(back.state, [], [], 9, 2);

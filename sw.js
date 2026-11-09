@@ -1,7 +1,7 @@
 // Service Worker (P18): Lehmfront offline spielbar. Alle Pfade relativ zum Ort dieser Datei, weil GitHub Pages
 // unter /lehmfront/ liegt und lokal unter /.
-// Strategie: Netz zuerst (online immer die frische Ausgabe, kein Mischmasch aus alten und neuen Modulen),
-// nach kurzer Wartezeit oder ohne Netz aus dem Cache. Bei der Installation wird die ganze Liste vorgeladen;
+// Strategie: Netz zuerst (online immer die frische Ausgabe, kein Mischmasch aus alten und neuen Modulen).
+// Nur die Seite selbst faellt nach kurzer Wartezeit auf den Cache zurueck; Module, Stile und Daten nur ohne Netz. Bei der Installation wird die ganze Liste vorgeladen;
 // danach frischt der Worker sie hoechstens stuendlich im Hintergrund auf, damit offline alles zusammenpasst.
 // Die Liste unten schreibt `node tools/precache.mjs` (ein Test prueft, dass sie zum Stand der Dateien passt).
 // VERSION haengt an der Liste: neue oder entfernte Dateien ergeben einen neuen Cache und den Update-Hinweis.
@@ -233,7 +233,7 @@ const FILES = [
 const CACHE = 'lehmfront-' + VERSION;
 const NETWORK_WAIT_MS = 4000;
 const REFRESH_MS = 60 * 60 * 1000;
-let lastRefresh = 0;
+const STAMP = '__aufgefrischt';
 
 const url = (p) => new URL(p, self.registration.scope).href;
 
@@ -255,7 +255,7 @@ self.addEventListener('activate', (e) => {
   e.waitUntil((async () => {
     for (const k of await caches.keys()) if (k.startsWith('lehmfront-') && k !== CACHE) await caches.delete(k);
     await self.clients.claim();
-    lastRefresh = Date.now();
+    await (await caches.open(CACHE)).put(url(STAMP), new Response(String(Date.now())));
   })());
 });
 
@@ -263,10 +263,13 @@ self.addEventListener('message', (e) => {
   if (e.data?.type === 'skip-waiting') self.skipWaiting();
 });
 
-function refreshLater() {
-  if (Date.now() - lastRefresh < REFRESH_MS) return;
-  lastRefresh = Date.now();
-  caches.open(CACHE).then((c) => fill(c, 'no-cache'));
+// Zeitpunkt im Cache, nicht in einer Variablen: der Browser beendet den Worker nach kurzer Ruhe
+async function refreshLater() {
+  const c = await caches.open(CACHE);
+  const last = Number(await (await c.match(url(STAMP)))?.text() ?? 0);
+  if (Date.now() - last < REFRESH_MS) return;
+  await c.put(url(STAMP), new Response(String(Date.now())));
+  await fill(c, 'no-cache');
 }
 
 self.addEventListener('fetch', (e) => {
@@ -284,9 +287,9 @@ self.addEventListener('fetch', (e) => {
       return res;
     });
     net.catch(() => {}); // Fehler wird unten behandelt
-    if (nav) refreshLater();
+    if (nav) e.waitUntil(refreshLater().catch(() => {}));
     let timer;
-    const late = new Promise((ok) => { timer = setTimeout(ok, NETWORK_WAIT_MS); });
+    const late = nav ? new Promise((ok) => { timer = setTimeout(ok, NETWORK_WAIT_MS); }) : new Promise(() => {});
     try {
       const res = await Promise.race([net, late.then(() => null)]);
       if (res) return res;

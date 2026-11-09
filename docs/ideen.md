@@ -29,3 +29,5 @@ Neue Ideen landen hier, nicht im Code (Plan 13). Mit Datum und Paket, aus dem si
 - 2026-11-09, P14: Die Antworten des Stabs könnten Tippfehler bekommen, je näher das Ende kommt (der Fernschreiber im Stab wird von immer jüngeren Leuten bedient).
 - 2026-11-09, P14: Auf dem Kartentisch könnten mit der Zeit Kaffeeränder und Brandlöcher von Zigaretten erscheinen, je mehr Missionen gespielt sind.
 - 2026-11-09, P14: Eine verweigerte Order könnte Wochen später als Randnotiz in einer Zeitung wieder auftauchen („Ein Abschnitt an der Asse soll ...“).
+- 2026-11-09, P18: Die Kartentaschen könnten mit jedem Speichern abgegriffener aussehen (Eselsohren, Fingerabdrücke aus Lehm), und ein lange nicht geöffneter Stand bekommt Staub.
+- 2026-11-09, P18: Offline könnte das Spiel einen Vermerk „Leitung gestört, Meldungen per Läufer“ zeigen und die Telegramme handschriftlich statt getippt setzen.

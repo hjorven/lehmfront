@@ -7,7 +7,7 @@ import { esc, ensureCss } from './dom.js';
 import { soundPanel } from './sound.js';
 import { getSettings, setSettings, resetSettings, onSettingsChange, SETTING_CHOICES } from '../settings.js';
 import { createSaveStore, exportSave, inspectSave } from '../save.js';
-import { SLOTS, AUTO_SLOT, freeSlot, exportName, slotTitle } from '../savegame.js';
+import { SLOTS, AUTO_SLOT, freeSlot, exportName, slotTitle, loadHref } from '../savegame.js';
 import { playSfx } from '../audio/engine.js';
 
 export const TABS = [
@@ -111,7 +111,7 @@ export function openSettings({ tab = 'akten', game = null, container = document.
     const extra = list.filter((x) => !SLOTS.includes(x.slot));
     panel.innerHTML = `
       <p class="set-note">${game
-        ? (reason ? esc(reason) : 'Abgelegt wird die Lage zu Beginn dieser Runde; Befehle, die noch nicht ausgeführt sind, kommen nicht mit.')
+        ? (reason ? esc(reason) : 'Abgelegt wird die Lage mit allen Befehlen, die schon eingetragen sind.')
         : 'Die laufende Akte schreibt sich nach jeder Runde selbst. Drei Kartentaschen nehmen Stände von Hand auf.'}</p>
       <ul class="set-slots">${[...SLOTS, ...extra.map((x) => x.slot)].map((slot) => slotHtml(slot, bySlot.get(slot), !!game && !reason)).join('')}</ul>
       <div class="set-row">
@@ -168,10 +168,12 @@ export function openSettings({ tab = 'akten', game = null, container = document.
         say('Abgelegt in der Kartentasche.');
         renderSaves($('#set-panel-akten'));
       } else if (act === 'load') {
-        if (game && !confirmTwice(btn, 'Laufende Lage verlassen?')) return;
+        // Laden ersetzt die laufende Akte: im Gefecht und bei belegter Akte erst nachfragen
+        const autoBusy = slot !== AUTO_SLOT && !dlg.querySelector(`.set-slot[data-slot="${AUTO_SLOT}"]`)?.classList.contains('empty');
+        if ((game || autoBusy) && !confirmTwice(btn, game ? 'Laufende Lage verlassen?' : 'Laufende Akte ersetzen?')) return;
         const loaded = await store.load(slot);
         if (!loaded) { say('Der Slot ist leer.', 'warn'); return; }
-        location.href = '?' + (loaded.meta?.query || 'scene=gefecht') + '&slot=' + encodeURIComponent(slot);
+        location.href = loadHref(loaded.meta?.query, slot);
       } else if (act === 'export') {
         const loaded = await store.load(slot);
         if (!loaded) return;
