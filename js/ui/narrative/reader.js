@@ -9,6 +9,8 @@
 // (Tagebuch nach einer Entscheidung), die direkt danach kommen.
 import { createPaperLayer } from '../paper/index.js';
 import { el } from '../paper/registry.js';
+import { paperHooks } from '../../audio/director.js';
+import { playSfx, audio } from '../../audio/engine.js';
 import './kinds.js';
 
 const SECTION = {
@@ -86,6 +88,13 @@ export function playSteps(opts) {
   root.setAttribute('role', 'dialog');
   root.setAttribute('aria-label', title || 'Zwischen den Missionen');
   document.body.append(root);
+  // Zwischen den Missionen: nur die karge Musik, keine Front (Klang wartet auf das erste Tippen)
+  try {
+    audio.init();
+    audio.startMusic();
+  } catch (e) {
+    console.warn('Erzählung: Klang nicht verfügbar', e);
+  }
 
   const updatePile = () => {
     const n = paper.pileCount();
@@ -94,13 +103,13 @@ export function playSteps(opts) {
   };
   const paper = createPaperLayer(host, {
     light: 'auto',
-    hooks: {
+    hooks: paperHooks({
       ...hooks,
       onDismiss: (a) => {
         hooks.onDismiss?.(a);
         queueMicrotask(updatePile);
       },
-    },
+    }),
   });
 
   pileBtn.addEventListener('click', () => {
@@ -204,6 +213,7 @@ export function playSteps(opts) {
     // Hoehe hat sich geaendert: Tisch nachziehen
     const page = pages[idx];
     fitHost(page, layout(page));
+    playSfx('stamp');
     const extra = onChoice ? onChoice(id, optionId) ?? [] : [];
     if (extra.length) pages = [...pages.slice(0, idx + 1), ...paginate(extra), ...pages.slice(idx + 1)];
     pending = null;

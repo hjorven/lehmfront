@@ -8,6 +8,8 @@
 import { el } from '../paper/registry.js';
 import { artCanvas, paintAll } from '../paper/art.js';
 import { createPaperLayer } from '../paper/index.js';
+import { paperHooks } from '../../audio/director.js';
+import { playSfx } from '../../audio/engine.js';
 import { missionTitle } from '../../narrative/interlude.js';
 import { actOf, actRoman } from '../../narrative/texts.js';
 import { letterSheet, fieldPostSheet, findSheet } from '../../narrative/sheets.js';
@@ -203,7 +205,7 @@ export function openJournal({ campaign, index, fresh = [], tab = null, onClose =
   Object.assign(putAway.style, { position: 'fixed', left: '50%', bottom: '12px', transform: 'translateX(-50%)', zIndex: 76, pointerEvents: 'auto', background: 'var(--bar)', color: 'var(--bar-ink)' });
   root.append(paperHost, putAway);
   document.body.append(root);
-  const paper = createPaperLayer(paperHost, { light: 'auto', hooks: { onDismiss: () => queueMicrotask(() => (putAway.hidden = paper.ids().length === 0)) } });
+  const paper = createPaperLayer(paperHost, { light: 'auto', hooks: paperHooks({ onDismiss: () => queueMicrotask(() => (putAway.hidden = paper.ids().length === 0)) }) });
 
   function openSheets(list) {
     paper.clear();
@@ -253,6 +255,11 @@ export function openJournal({ campaign, index, fresh = [], tab = null, onClose =
     spread.replaceChildren(...shown.map((i) => el('section', 'journal-page', built[i]())));
     if (per === 2 && shown.length === 1) spread.append(el('section', 'journal-page'));
     paintAll(spread);
+    // Bleistift kratzt, waehrend die neuen Namen eingetragen werden
+    const freshRows = spread.querySelectorAll('.is-fresh').length;
+    if (freshRows && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      for (let i = 0; i < Math.min(freshRows, 6); i++) playSfx('pencil', { delay: 0.3 + i * 0.45 });
+    }
     count.textContent = built.length > per ? `Seite ${page + 1}${per === 2 && shown.length > 1 ? '–' + (page + 2) : ''} von ${built.length}` : '';
     prev.disabled = page === 0;
     next.disabled = page + per >= built.length;
