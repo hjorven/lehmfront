@@ -84,16 +84,24 @@ export async function mount(root, params) {
   ]);
   const { scenario, mapJson, scenId, mode: modeInfo } = battle;
   const map = loadMap(mapJson);
-  const mode = params.get('mode') === 'hotseat' ? 'hotseat' : 'frei';
+  const mode = modeInfo?.kind === 'hotseat' ? 'hotseat' : 'frei';
+  // Tageslage: fuer alle dieselbe Lage, darum keine URL-Eingriffe in Wetter, Rundenart oder Gegner
+  const fixed = modeInfo?.kind === 'tageslage';
   const seed = battle.seed ?? ((num(params.get('seed'), 1917) >>> 0) || 1);
   let state = createInitialState(map, scenario, seed);
   state = initEtappen(state, map, scenario); // P11: Etappe mit Grundausbau aus dem Szenario
-  if (params.get('kind') === 'battle') { state.turnKind = 'battle'; state.battle = { round: 1 }; }
-  applyWeatherParams(state, map, params);
+  if (!fixed && params.get('kind') === 'battle') { state.turnKind = 'battle'; state.battle = { round: 1 }; }
+  if (!fixed) applyWeatherParams(state, map, params);
   const humans = mode === 'hotseat' ? ['a', 'b'] : ['a'];
   const env = { map };
-  // KI-Kommandant (P13): Doktrin und Schwierigkeit aus dem Szenario (sides.b.ai), per URL &doktrin= &ki=
-  const aiCfg = { doctrine: params.get('doktrin') || scenario.sides.b.ai?.doctrine, difficulty: params.get('ki') || scenario.sides.b.ai?.difficulty };
+  // KI-Kommandant (P13): Doktrin und Schwierigkeit aus dem Szenario (sides.b.ai), per URL &doktrin= &ki=.
+  // Mit Marschbefehl (karte=) steckt die Wahl schon im Szenario; die Tageslage nimmt gar keine URL-Eingriffe an.
+  const sai = scenario.sides.b.ai ?? {};
+  const urlAi = { doctrine: params.get('doktrin') || undefined, difficulty: params.get('ki') || undefined };
+  let aiCfg;
+  if (fixed) aiCfg = { doctrine: sai.doctrine, difficulty: sai.difficulty };
+  else if (modeInfo?.map) aiCfg = { doctrine: sai.doctrine ?? urlAi.doctrine, difficulty: sai.difficulty ?? urlAi.difficulty };
+  else aiCfg = { doctrine: urlAi.doctrine ?? sai.doctrine, difficulty: urlAi.difficulty ?? sai.difficulty };
   let aiMemory;                 // Gedaechtnis der KI ueber die Runden
   let aiNext = null;            // { turn, decision }: Lasks naechster Zug, schon nach der Runde gerechnet (Notizen)
   let pendingNote = null;       // abgefangene Notiz, erscheint nach dem Phasenfilm

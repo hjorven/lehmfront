@@ -4,7 +4,7 @@
 // Ohne karte und tageslage bleibt alles wie vorher (scenario=<id> aus data/scenarios/).
 import { battleMap } from '../config/battlemaps.js';
 import {
-  FACTION_IDS, DIFFICULTY_IDS, mapJsonFor, skirmishScenario, adaptFixedScenario, dailyBrief, dailyMap,
+  FACTION_IDS, DIFFICULTY_IDS, validDayKey, mapJsonFor, skirmishScenario, adaptFixedScenario, dailyBrief, dailyMap,
 } from './skirmish.js';
 
 const num = (v, d) => (v === null || v === '' || !Number.isFinite(Number(v)) ? d : Number(v));
@@ -17,7 +17,7 @@ export async function loadBattle(params, fetchJson) {
   const tl = params.get('tageslage');
   const karte = params.get('karte');
   const hotseat = params.get('mode') === 'hotseat';
-  if (tl && /^\d{8}$/.test(tl)) {
+  if (tl && validDayKey(tl)) {
     const brief = dailyBrief(Number(tl));
     const mapJson = dailyMap(brief);
     const scenario = skirmishScenario(mapJson, { faction: brief.faction, difficulty: brief.difficulty, seed: brief.seed });

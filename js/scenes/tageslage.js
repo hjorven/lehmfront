@@ -8,7 +8,7 @@ import { createMapLayer, sheetBounds } from '../render/map-layer.js';
 import { themeAt, applyTheme, currentTheme } from '../theme.js';
 import { FACTIONS } from '../config/factions.js';
 import { DIFFICULTIES } from '../config/doctrines.js';
-import { dailyBrief, dailyMap, dayKey, dayLabel, otherFaction } from '../modes/skirmish.js';
+import { dailyBrief, dailyMap, dayKey, dayLabel, otherFaction, validDayKey } from '../modes/skirmish.js';
 import { boardFor, bestDays } from '../modes/board.js';
 import { esc, ensureCss } from '../ui/dom.js';
 import { audio, playSfx } from '../audio/engine.js';
@@ -33,7 +33,7 @@ export async function mount(root, params) {
 
   const now = new Date(); // nur hier: welcher Tag heute ist; die Lage selbst ist rein aus dem Schluessel
   const p = params.get('tag');
-  const key = p && /^\d{8}$/.test(p) ? Number(p) : dayKey(now.getFullYear(), now.getMonth() + 1, now.getDate());
+  const key = p && validDayKey(p) ? Number(p) : dayKey(now.getFullYear(), now.getMonth() + 1, now.getDate());
   const brief = dailyBrief(key);
   const json = dailyMap(brief);
   const map = loadMap(json);

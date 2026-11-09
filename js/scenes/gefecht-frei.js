@@ -144,6 +144,8 @@ export async function mount(root, params) {
   });
   form.addEventListener('submit', (e) => {
     e.preventDefault();
+    // Enter im Seed-Feld loest kein change aus: den Wert hier noch einmal lesen
+    if (choice.map === 'zufall') choice.mapSeed = (Number(seedInput.value.replace(/\D/g, '')) >>> 0) || 1;
     const q = new URLSearchParams({ scene: 'gefecht', karte: choice.map, fraktion: choice.faction, runden: String(choice.rounds) });
     if (choice.map === 'zufall') q.set('kseed', String(choice.mapSeed));
     if (hotseat) q.set('mode', 'hotseat');

@@ -94,6 +94,26 @@ export function lineupFor(map, factionId) {
 
 const pickFrom = (rng, list) => list[Math.floor(rng() * list.length) % list.length];
 
+/** Mitte eines Gebaeudes, gerundet wie in initArtillery */
+const centerCell = (b) => ({ x: b.x + Math.floor(((b.w ?? 1) - 1) / 2), y: b.y + Math.floor(((b.h ?? 1) - 1) / 2) });
+
+/**
+ * Batterien und Fernmeldestelle der Seite b mit gespiegelten Mittelpunkten. Bei gerader Gebaeudebreite wuerde die
+ * Rundung sonst die Mitte der Seite b um ein Feld verschieben (Reichweite, Naehe zur Fernmeldestelle).
+ */
+function mirroredArtillery(map, meta) {
+  const blds = map.buildings ?? [];
+  const own = new Map(blds.filter((b) => (b.side ?? 'own') === 'own').map((b) => [b.id, b]));
+  const mc = (b) => { const c = centerCell(b); return mirrorCell(meta, c.x, c.y); };
+  const batteries = blds.filter((b) => b.side === 'enemy' && b.type === 'batterie')
+    .map((b) => {
+      const twin = own.get(String(b.id).replace(/^m-/, ''));
+      return { id: b.id, type: b.battery ?? 'feldhaubitzen', x: b.x, y: b.y, w: b.w, h: b.h, label: b.label, ...(twin ? { center: mc(twin) } : {}) };
+    });
+  const fe = [...own.values()].find((b) => b.type === 'fernmelde');
+  return { batteries, ...(fe ? { exchange: mc(fe) } : {}) };
+}
+
 /**
  * Szenario fuer eine Spiegelkarte (Zufallskarte und handgebaute Karten ausser Asse-Nord).
  * opts: { faction, difficulty, seed, hotseat, doctrine? }
@@ -123,7 +143,7 @@ export function skirmishScenario(mapJson, { faction = 'kaldern', difficulty = 'v
         control: hotseat ? 'human' : 'ai',
         ...(hotseat ? {} : { ai: { doctrine: doc, difficulty: diff } }),
         groups: groupsB,
-        artillery: { lines: mirroredLines(mapJson) },
+        artillery: { ...mirroredArtillery(map, meta), lines: mirroredLines(mapJson) },
       },
     },
   };
@@ -146,6 +166,14 @@ export function adaptFixedScenario(scenario, { faction = 'kaldern', difficulty =
 /** Schluessel eines Tages: 20261109 */
 export function dayKey(y, m, d) {
   return y * 10000 + m * 100 + d;
+}
+
+/** Gueltiger Tagesschluessel JJJJMMTT (Monat 1 bis 12, Tag 1 bis 31)? */
+export function validDayKey(k) {
+  const s = String(k);
+  if (!/^\d{8}$/.test(s)) return false;
+  const m = Number(s.slice(4, 6)), d = Number(s.slice(6, 8));
+  return m >= 1 && m <= 12 && d >= 1 && d <= 31;
 }
 
 /** Seed eines Tages: fuer alle gleich, aus dem Datum gemischt */
@@ -216,7 +244,9 @@ export function finalReport({ start, end, map, tally, side = 'a' }) {
   const lost = groundHeld(end, map, foe);
   const held = alive && lost < 3;
   const gained = groundHeld(end, map, side);
-  const rescued = tally.returned[side];
+  // Geborgen = von der Sanitaetskette nach hinten getragen (Plan 8.3), nicht erst die Genesenen
+  const carried = (st) => st?.sides?.[side]?.supply?.stats?.woundedCarried ?? 0;
+  const rescued = Math.max(0, carried(end) - carried(start));
   const parts = [
     { id: 'held', label: 'Woche gehalten', count: held ? 1 : 0, per: 100 },
     { id: 'gained', label: 'Grabenfelder gewonnen', count: gained, per: 5 },

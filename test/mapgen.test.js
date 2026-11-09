@@ -6,11 +6,12 @@ import { buildMap, generateMap, randomSpec, mirrorCell } from '../js/mapgen.js';
 import { BATTLE_MAPS } from '../js/config/battlemaps.js';
 import { createNamer } from '../js/placenames.js';
 import { createRng } from '../js/rng.js';
+import { batteryCenter } from '../js/artillery.js';
 import { createInitialState } from '../js/state.js';
 import { initEtappen } from '../js/etappe-map.js';
 import { runMatch } from '../js/ai/match.js';
 import {
-  skirmishScenario, mapJsonFor, adaptFixedScenario, dailySeed, dailyBrief, dayKey, emptyTally, tallyLog, finalReport,
+  skirmishScenario, mapJsonFor, adaptFixedScenario, dailySeed, dailyBrief, dayKey, validDayKey, emptyTally, tallyLog, finalReport,
   limitReached, lineupFor,
 } from '../js/modes/skirmish.js';
 import { readFileSync } from 'node:fs';
@@ -237,6 +238,10 @@ test('Tageslage: fester Seed je Tag, für alle gleich', () => {
   assert.notEqual(dailySeed(k), dailySeed(dayKey(2026, 11, 10)));
   assert.deepEqual(dailyBrief(k), dailyBrief(k));
   assert.equal(dailyBrief(k).rounds, 14);
+  assert.equal(validDayKey('20261109'), true);
+  assert.equal(validDayKey('20261340'), false, 'Monat 13');
+  assert.equal(validDayKey('20260100'), false, 'Tag 0');
+  assert.equal(validDayKey('2026119'), false);
   const factions = new Set(Array.from({ length: 20 }, (_, i) => dailyBrief(dayKey(2026, 12, i + 1)).faction));
   assert.deepEqual([...factions].sort(), ['kaldern', 'morrow']);
 });
@@ -254,7 +259,9 @@ test('Wertung: Protokoll zählen, Rundengrenze, Punkte nach Plan 8.3', () => {
   const map = loadMap(json);
   const sc = skirmishScenario(json, { seed: 11 });
   const start = createInitialState(map, sc, 11);
-  const r = finalReport({ start, end: start, map, tally: t });
+  const end = structuredClone(start);
+  end.sides.a.supply = { ...(end.sides.a.supply ?? {}), stats: { woundedCarried: 2 } };
+  const r = finalReport({ start, end, map, tally: t });
   assert.equal(r.fallen, 2);
   assert.equal(r.rescued, 2);
   assert.equal(r.points, 100 + 2 * 2 - 3 * 2);
@@ -263,4 +270,21 @@ test('Wertung: Protokoll zählen, Rundengrenze, Punkte nach Plan 8.3', () => {
   assert.equal(limitReached({ turnKind: 'battle' }, { positionRounds: 14 }, 14), false, 'Gefecht läuft zu Ende');
   assert.equal(limitReached({ turnKind: 'position' }, { positionRounds: 30 }, 0), false, 'offen');
   assert.equal(lineupFor(map, 'kaldern').length, 6);
+});
+
+test('Spiegelkarte: Artilleriemitte und Fernmeldestelle der Seite b liegen genau gespiegelt', () => {
+  for (const seed of [3, 11, 42]) {
+    const json = generateMap(seed);
+    const map = loadMap(json);
+    const meta = { width: map.width, height: map.height, symmetry: json.symmetry };
+    const st = createInitialState(map, skirmishScenario(json, { seed }), seed);
+    const A = st.sides.a.artillery, B = st.sides.b.artillery;
+    assert.equal(A.batteries.length, B.batteries.length);
+    for (const a of A.batteries) {
+      const b = B.batteries.find((x) => x.id === 'm-' + a.id);
+      assert.ok(b, 'Gegenstueck zu ' + a.id);
+      assert.deepEqual(batteryCenter(b), mirrorCell(meta, batteryCenter(a).x, batteryCenter(a).y));
+    }
+    assert.deepEqual(B.exchange, mirrorCell(meta, A.exchange.x, A.exchange.y));
+  }
 });
